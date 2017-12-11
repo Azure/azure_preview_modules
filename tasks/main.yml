@@ -1,0 +1,4 @@
+---
+# Install Azure Python SDK required by modules.
+- pip:
+    requirements: "{{ role_path }}/files/requirements.txt"

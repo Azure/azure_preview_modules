@@ -1,0 +1,95 @@
+language: python
+python: '2.7'
+
+branches:
+  only:
+    - master
+
+env:
+  global:
+    - exit_code=0
+    - number_per_job=2
+    - message=()
+    - ANSIBLE_VERSION=latest
+    #- ANSIBLE_VERSION=2.4.2.0
+  matrix:
+    - id=1
+    - id=2
+    - id=3
+    - id=4
+    - id=5
+    - id=6
+    - id=7
+    - id=8
+    - id=9
+    - id=10
+    - id=11
+    - id=12
+    - id=13
+    - id=14
+    - id=15
+    - id=16
+    - id=17
+    - id=18
+    - id=19
+    - id=20
+
+before_install:
+  - sudo apt-get update -qq
+  - create_resource_group(){
+      name=$1;
+      ansible-playbook tests/utils/create_resource_group.yml --extra-vars="name=$name";
+    }
+  - delete_resource_group(){
+      name=$1;
+      ansible-playbook tests/utils/delete_resource_group.yml --extra-vars="name=$name";
+    }
+
+  - run_test(){
+      file=$1;
+      filename=${file##tests/integration/};
+      test_name=${file##tests/integration/targets/};
+      test_name=${test_name%%/tasks/main.yml};
+
+      echo Run test $test_name from $filename;
+      resource_group="ansible-role-test-${test_name##azure_rm_}$(date +%s)";
+      create_resource_group $resource_group;
+
+      travis_wait 50 ansible-playbook tests/integration/main.yml --extra-vars "{\"test\":$filename,\"resource_group\":$resource_group,\"azure_subscription_id\":$AZURE_SUBSCRIPTION_ID}";
+
+      if [ $? -ne 0 ]; then
+        message+=($test_name);
+        export exit_code=1;
+      fi
+
+      travis_wait 50 delete_resource_group $resource_group;
+    }
+
+
+  - scan_test() {
+      end=$((id * number_per_job));
+      start=$((end - number_per_job));
+
+      liststr=tests/integration/targets/azure_rm_*/tasks/main.yml;
+      list=($liststr);
+
+      echo start = $start, end = $end, list_lenth = ${#list[@]};
+
+      for (( i = $start; i < $end; i++ )); do
+        if [ "$i" -lt "${#list[@]}" ]; then
+          run_test ${list[$i]};
+        fi
+      done
+    }
+
+install:
+  - if [ "$ANSIBLE_VERSION" = "latest" ]; then pip install ansible[azure]; else pip
+    install ansible[azure]==$ANSIBLE_VERSION; fi
+  - "{ echo '[defaults]'; echo 'roles_path = ../'; } >> ansible.cfg"
+
+script:
+  - scan_test
+  - exit $exit_code
+
+notifications:
+  webhooks: https://galaxy.ansible.com/api/v1/notifications/

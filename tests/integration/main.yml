@@ -1,0 +1,9 @@
+---
+- hosts: localhost
+  roles:
+  - { role: preview-modules }
+  tasks:
+    - debug:
+        msg: "{{resource_group}} {{test}}"
+
+    - include_tasks: "{{test}}"
