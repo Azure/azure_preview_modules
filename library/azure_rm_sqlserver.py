@@ -36,14 +36,6 @@ options:
     location:
         description:
             - Resource location.
-    identity:
-        description:
-            - The Azure Active Directory identity of the server.
-        suboptions:
-            type:
-                description:
-                    - "The identity type. Set this to 'SystemAssigned' in order to automatically create and assign an Azure Active Directory principal for th
-                       e resource. Possible values include: 'SystemAssigned'"
     admin_username:
         description:
             - Administrator username for the server. Once created it cannot be changed.
@@ -52,7 +44,11 @@ options:
             - The administrator login password (required for server creation).
     version:
         description:
-            - The version of the server.
+            - "The version of the server. For example '12.0'."
+    identity:
+        description:
+            - "The identity type. Set this to 'SystemAssigned' in order to automatically create and assign an Azure Active Directory principal for the resour
+               ce. Possible values include: 'SystemAssigned'"
 
 extends_documentation_fragment:
     - azure
@@ -137,19 +133,20 @@ class AzureRMServers(AzureRMModuleBase):
                 type='str',
                 required=False
             ),
-            identity=dict(
-                type='dict',
-                required=False
-            ),
             admin_username=dict(
                 type='str',
                 required=False
             ),
             admin_password=dict(
                 type='str',
+                no_log=True,
                 required=False
             ),
             version=dict(
+                type='str',
+                required=False
+            ),
+            identity=dict(
                 type='str',
                 required=False
             ),
@@ -165,7 +162,7 @@ class AzureRMServers(AzureRMModuleBase):
         self.name = None
         self.parameters = dict()
 
-        self.results = dict(changed=False, state=dict())
+        self.results = dict(changed=False)
         self.mgmt_client = None
         self.state = None
         self.to_do = Actions.NoAction
@@ -180,18 +177,18 @@ class AzureRMServers(AzureRMModuleBase):
         for key in list(self.module_arg_spec.keys()) + ['tags']:
             if hasattr(self, key):
                 setattr(self, key, kwargs[key])
-            elif key == "tags":
-                self.parameters["tags"] = kwargs[key]
-            elif key == "location":
-                self.parameters["location"] = kwargs[key]
-            elif key == "identity":
-                self.parameters["identity"] = kwargs[key]
-            elif key == "admin_username":
-                self.parameters["administrator_login"] = kwargs[key]
-            elif key == "admin_password":
-                self.parameters["administrator_login_password"] = kwargs[key]
-            elif key == "version":
-                self.parameters["version"] = kwargs[key]
+            elif key == "tags" and kwargs[key] is not None:
+                self.parameters.update({"tags": kwargs[key]})
+            elif key == "location" and kwargs[key] is not None:
+                self.parameters.update({"location": kwargs[key]})
+            elif key == "admin_username" and kwargs[key] is not None:
+                self.parameters.update({"administrator_login": kwargs[key]})
+            elif key == "admin_password" and kwargs[key] is not None:
+                self.parameters.update({"administrator_login_password": kwargs[key]})
+            elif key == "version" and kwargs[key] is not None:
+                self.parameters.update({"version": kwargs[key]})
+            elif key == "identity" and kwargs[key] is not None:
+                self.parameters.update({"identity": {"type": kwargs[key]}})
 
         old_response = None
         results = dict()
@@ -199,12 +196,9 @@ class AzureRMServers(AzureRMModuleBase):
         self.mgmt_client = self.get_mgmt_svc_client(SqlManagementClient,
                                                     base_url=self._cloud_environment.endpoints.resource_manager)
 
-        try:
-            resource_group = self.get_resource_group(self.resource_group)
-        except CloudError:
-            self.fail('resource group {0} not found'.format(self.resource_group))
+        resource_group = self.get_resource_group(self.resource_group)
 
-        if not ("location" in self.parameters):
+        if "location" not in self.parameters:
             self.parameters["location"] = resource_group.location
 
         old_response = self.get_sqlserver()
@@ -230,10 +224,13 @@ class AzureRMServers(AzureRMModuleBase):
                 return self.results
 
             response = self.create_update_sqlserver()
+            response.pop('administrator_login_password', None)
+
             if not old_response:
                 self.results['changed'] = True
             else:
                 self.results['changed'] = old_response.__ne__(response)
+
             self.results.update(response)
 
             # remove unnecessary fields from return state
@@ -244,7 +241,6 @@ class AzureRMServers(AzureRMModuleBase):
             self.results.pop('identity', None)
             self.results.pop('kind', None)
             self.results.pop('administrator_login', None)
-            self.results.pop('administrator_login_password', None)
             self.log("Creation / Update done")
         elif self.to_do == Actions.Delete:
             self.log("SQL Server instance deleted")
