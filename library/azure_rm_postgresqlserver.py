@@ -211,13 +211,13 @@ class AzureRMServers(AzureRMModuleBase):
         for key in list(self.module_arg_spec.keys()) + ['tags']:
             if hasattr(self, key):
                 setattr(self, key, kwargs[key])
-            elif key == "sku":
+            elif key == "sku" and kwargs[key] is not None:
                 self.parameters.update({"sku": kwargs[key]})
-            elif key == "properties":
+            elif key == "properties" and kwargs[key] is not None:
                 self.parameters.update({"properties": kwargs[key]})
-            elif key == "location":
+            elif key == "location" and kwargs[key] is not None:
                 self.parameters.update({"location": kwargs[key]})
-            elif key == "tags":
+            elif key == "tags" and kwargs[key] is not None:
                 self.parameters.update({"tags": kwargs[key]})
 
         self.adjust_parameters()
@@ -228,12 +228,9 @@ class AzureRMServers(AzureRMModuleBase):
         self.mgmt_client = self.get_mgmt_svc_client(PostgreSQLManagementClient,
                                                     base_url=self._cloud_environment.endpoints.resource_manager)
 
-        try:
-            resource_group = self.get_resource_group(self.resource_group)
-        except CloudError:
-            self.fail('resource group {0} not found'.format(self.resource_group))
+        resource_group = self.get_resource_group(self.resource_group)
 
-        if not ("location" in self.parameters):
+        if self.parameters["location"] is None:
             self.parameters["location"] = resource_group.location
 
         old_response = self.get_postgresqlserver()
@@ -259,10 +256,12 @@ class AzureRMServers(AzureRMModuleBase):
                 return self.results
 
             response = self.create_update_postgresqlserver()
+
             if not old_response:
                 self.results['changed'] = True
             else:
                 self.results['changed'] = old_response.__ne__(response)
+
             self.results.update(response)
 
             # remove unnecessary fields from return state

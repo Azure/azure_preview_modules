@@ -296,37 +296,37 @@ class AzureRMDatabases(AzureRMModuleBase):
         for key in list(self.module_arg_spec.keys()) + ['tags']:
             if hasattr(self, key):
                 setattr(self, key, kwargs[key])
-            elif key == "tags":
+            elif key == "tags" and kwargs[key] is not None:
                 self.parameters.update({"tags": kwargs[key]})
-            elif key == "location":
+            elif key == "location" and kwargs[key] is not None:
                 self.parameters.update({"location": kwargs[key]})
-            elif key == "collation":
+            elif key == "collation" and kwargs[key] is not None:
                 self.parameters.update({"collation": kwargs[key]})
-            elif key == "create_mode":
+            elif key == "create_mode" and kwargs[key] is not None:
                 self.parameters.update({"create_mode": kwargs[key]})
-            elif key == "source_database_id":
+            elif key == "source_database_id" and kwargs[key] is not None:
                 self.parameters.update({"source_database_id": kwargs[key]})
-            elif key == "source_database_deletion_date":
+            elif key == "source_database_deletion_date" and kwargs[key] is not None:
                 self.parameters.update({"source_database_deletion_date": kwargs[key]})
-            elif key == "restore_point_in_time":
+            elif key == "restore_point_in_time" and kwargs[key] is not None:
                 self.parameters.update({"restore_point_in_time": kwargs[key]})
-            elif key == "recovery_services_recovery_point_resource_id":
+            elif key == "recovery_services_recovery_point_resource_id" and kwargs[key] is not None:
                 self.parameters.update({"recovery_services_recovery_point_resource_id": kwargs[key]})
-            elif key == "edition":
+            elif key == "edition" and kwargs[key] is not None:
                 self.parameters.update({"edition": kwargs[key]})
-            elif key == "max_size_bytes":
+            elif key == "max_size_bytes" and kwargs[key] is not None:
                 self.parameters.update({"max_size_bytes": kwargs[key]})
-            elif key == "requested_service_objective_id":
+            elif key == "requested_service_objective_id" and kwargs[key] is not None:
                 self.parameters.update({"requested_service_objective_id": kwargs[key]})
-            elif key == "requested_service_objective_name":
+            elif key == "requested_service_objective_name" and kwargs[key] is not None:
                 self.parameters.update({"requested_service_objective_name": kwargs[key]})
-            elif key == "elastic_pool_name":
+            elif key == "elastic_pool_name" and kwargs[key] is not None:
                 self.parameters.update({"elastic_pool_name": kwargs[key]})
-            elif key == "read_scale":
+            elif key == "read_scale" and kwargs[key] is not None:
                 self.parameters.update({"read_scale": kwargs[key]})
-            elif key == "sample_name":
+            elif key == "sample_name" and kwargs[key] is not None:
                 self.parameters.update({"sample_name": kwargs[key]})
-            elif key == "zone_redundant":
+            elif key == "zone_redundant" and kwargs[key] is not None:
                 self.parameters.update({"zone_redundant": kwargs[key]})
 
         old_response = None
@@ -335,12 +335,9 @@ class AzureRMDatabases(AzureRMModuleBase):
         self.mgmt_client = self.get_mgmt_svc_client(SqlManagementClient,
                                                     base_url=self._cloud_environment.endpoints.resource_manager)
 
-        try:
-            resource_group = self.get_resource_group(self.resource_group)
-        except CloudError:
-            self.fail('resource group {0} not found'.format(self.resource_group))
+        resource_group = self.get_resource_group(self.resource_group)
 
-        if not ("location" in self.parameters):
+        if self.parameters["location"] is None:
             self.parameters["location"] = resource_group.location
 
         old_response = self.get_sqldatabase()
@@ -366,10 +363,12 @@ class AzureRMDatabases(AzureRMModuleBase):
                 return self.results
 
             response = self.create_update_sqldatabase()
+
             if not old_response:
                 self.results['changed'] = True
             else:
                 self.results['changed'] = old_response.__ne__(response)
+
             self.results.update(response)
 
             # remove unnecessary fields from return state
