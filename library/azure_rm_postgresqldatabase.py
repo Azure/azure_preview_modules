@@ -144,10 +144,11 @@ class AzureRMDatabases(AzureRMModuleBase):
         for key in list(self.module_arg_spec.keys()) + ['tags']:
             if hasattr(self, key):
                 setattr(self, key, kwargs[key])
-            elif key == "charset" and kwargs[key] is not None:
-                self.parameters.update({"charset": kwargs[key]})
-            elif key == "collation" and kwargs[key] is not None:
-                self.parameters.update({"collation": kwargs[key]})
+            elif kwargs[key] is not None:
+                if key == "charset":
+                    self.parameters.update({"charset": kwargs[key]})
+                elif key == "collation":
+                    self.parameters.update({"collation": kwargs[key]})
 
         old_response = None
         results = dict()
@@ -186,22 +187,22 @@ class AzureRMDatabases(AzureRMModuleBase):
                 self.results['changed'] = True
             else:
                 self.results['changed'] = old_response.__ne__(response)
-
-            self.results.update(response)
-
-            # remove unnecessary fields from return state
-            self.results.pop('type', None)
-            self.results.pop('charset', None)
-            self.results.pop('collation', None)
             self.log("Creation / Update done")
         elif self.to_do == Actions.Delete:
             self.log("PostgreSQL Database instance deleted")
+
+            if self.check_mode:
+                return self.results
+
             self.delete_postgresqldatabase()
             self.results['changed'] = True
         else:
             self.log("PostgreSQL Database instance unchanged")
-            self.results['state'] = old_response
             self.results['changed'] = False
+            response = old_response
+
+        self.results["id"] = response["id"]
+        self.results["name"] = response["name"]
 
         return self.results
 
