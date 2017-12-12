@@ -1,7 +1,5 @@
 ---
 - hosts: localhost
-  roles:
-   - { role: preview-modules }
   tasks:
     - name: Delete a resource group
       azure_rm_resourcegroup:
