@@ -161,7 +161,6 @@ class AzureRMServers(AzureRMModuleBase):
         self.resource_group = None
         self.name = None
         self.parameters = dict()
-        self.parameters['identity'] = dict()
 
         self.results = dict(changed=False, state=dict())
         self.mgmt_client = None
@@ -179,17 +178,17 @@ class AzureRMServers(AzureRMModuleBase):
             if hasattr(self, key):
                 setattr(self, key, kwargs[key])
             elif key == "tags":
-                self.parameters["tags"] = kwargs[key]
+                self.parameters.update({ "tags": kwargs[key] })
             elif key == "location":
-                self.parameters["location"] = kwargs[key]
+                self.parameters.update( { "location": kwargs[key] })
             elif key == "admin_username":
-                self.parameters["administrator_login"] = kwargs[key]
+                self.parameters.update({"administrator_login": kwargs[key]})
             elif key == "admin_password":
-                self.parameters["administrator_login_password"] = kwargs[key]
+                self.parameters.update({"administrator_login_password": kwargs[key]})
             elif key == "version":
-                self.parameters["version"] = kwargs[key]
+                self.parameters.update({"version"]: kwargs[key]})
             elif key == "identity":
-                self.parameters['identity']["type"] = kwargs[key]
+                self.parameters.update({'identity': {"type" : kwargs[key]}})
 
         old_response = None
         results = dict()
