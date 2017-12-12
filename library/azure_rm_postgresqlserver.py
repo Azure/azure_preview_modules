@@ -214,6 +214,7 @@ class AzureRMServers(AzureRMModuleBase):
         self.adjust_parameters()
 
         old_response = None
+        response = None
         results = dict()
 
         self.mgmt_client = self.get_mgmt_svc_client(PostgreSQLManagementClient,
@@ -266,10 +267,11 @@ class AzureRMServers(AzureRMModuleBase):
             self.results['changed'] = False
             response = old_response
 
-        self.results["id"] = response["id"]
-        self.results["version"] = response["version"]
-        self.results["user_visible_state"] = response["user_visible_state"]
-        self.results["fully_qualified_domain_name"] = response["fully_qualified_domain_name"]
+        if response is not None:
+            self.results["id"] = response["id"]
+            self.results["version"] = response["version"]
+            self.results["user_visible_state"] = response["user_visible_state"]
+            self.results["fully_qualified_domain_name"] = response["fully_qualified_domain_name"]
 
         return self.results
 

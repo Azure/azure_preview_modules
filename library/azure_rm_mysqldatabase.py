@@ -151,6 +151,7 @@ class AzureRMDatabases(AzureRMModuleBase):
                     self.parameters.update({"collation": kwargs[key]})
 
         old_response = None
+        response = None
         results = dict()
 
         self.mgmt_client = self.get_mgmt_svc_client(MySQLManagementClient,
@@ -201,8 +202,9 @@ class AzureRMDatabases(AzureRMModuleBase):
             self.results['changed'] = False
             response = old_response
 
-        self.results["id"] = response["id"]
-        self.results["name"] = response["name"]
+        if response is not None:
+            self.results["id"] = response["id"]
+            self.results["name"] = response["name"]
 
         return self.results
 

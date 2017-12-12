@@ -321,6 +321,7 @@ class AzureRMDatabases(AzureRMModuleBase):
                     self.parameters.update({"zone_redundant": kwargs[key]})
 
         old_response = None
+        response = None
         results = dict()
 
         self.mgmt_client = self.get_mgmt_svc_client(SqlManagementClient,
@@ -373,9 +374,10 @@ class AzureRMDatabases(AzureRMModuleBase):
             self.results['changed'] = False
             response = old_response
 
-        self.results["id"] = response["id"]
-        self.results["database_id"] = response["database_id"]
-        self.results["status"] = response["status"]
+        if response is not None:
+            self.results["id"] = response["id"]
+            self.results["database_id"] = response["database_id"]
+            self.results["status"] = response["status"]
 
         return self.results
 
