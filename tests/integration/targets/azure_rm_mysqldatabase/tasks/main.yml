@@ -1,6 +1,6 @@
 - name: Prepare random number
   set_fact:
-    random_postfix: "{{ 100 | random }}"
+    random_postfix: "{{ 1000 | random }}"
   run_once: yes
 - name: Create MySQL Server
   azure_rm_mysqlserver:
