@@ -129,7 +129,7 @@ class AzureRMDatabases(AzureRMModuleBase):
         self.name = None
         self.parameters = dict()
 
-        self.results = dict(changed=False, state=dict())
+        self.results = dict(changed=False)
         self.mgmt_client = None
         self.state = None
         self.to_do = Actions.NoAction
@@ -145,9 +145,9 @@ class AzureRMDatabases(AzureRMModuleBase):
             if hasattr(self, key):
                 setattr(self, key, kwargs[key])
             elif key == "charset":
-                self.parameters["charset"] = kwargs[key]
+                self.parameters.update({"charset": kwargs[key]})
             elif key == "collation":
-                self.parameters["collation"] = kwargs[key]
+                self.parameters.update({"collation": kwargs[key]})
 
         old_response = None
         results = dict()

@@ -196,7 +196,7 @@ class AzureRMServers(AzureRMModuleBase):
         self.name = None
         self.parameters = dict()
 
-        self.results = dict(changed=False, state=dict())
+        self.results = dict(changed=False)
         self.mgmt_client = None
         self.state = None
         self.to_do = Actions.NoAction
@@ -212,13 +212,13 @@ class AzureRMServers(AzureRMModuleBase):
             if hasattr(self, key):
                 setattr(self, key, kwargs[key])
             elif key == "sku":
-                self.parameters["sku"] = kwargs[key]
+                self.parameters.update({"sku": kwargs[key]})
             elif key == "properties":
-                self.parameters["properties"] = kwargs[key]
+                self.parameters.update({"properties": kwargs[key]})
             elif key == "location":
-                self.parameters["location"] = kwargs[key]
+                self.parameters.update({"location": kwargs[key]})
             elif key == "tags":
-                self.parameters["tags"] = kwargs[key]
+                self.parameters.update({"tags": kwargs[key]})
 
         self.adjust_parameters()
 

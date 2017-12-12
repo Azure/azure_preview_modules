@@ -281,7 +281,7 @@ class AzureRMDatabases(AzureRMModuleBase):
         self.name = None
         self.parameters = dict()
 
-        self.results = dict(changed=False, state=dict())
+        self.results = dict(changed=False)
         self.mgmt_client = None
         self.state = None
         self.to_do = Actions.NoAction
@@ -297,37 +297,37 @@ class AzureRMDatabases(AzureRMModuleBase):
             if hasattr(self, key):
                 setattr(self, key, kwargs[key])
             elif key == "tags":
-                self.parameters["tags"] = kwargs[key]
+                self.parameters.update({"tags": kwargs[key]})
             elif key == "location":
-                self.parameters["location"] = kwargs[key]
+                self.parameters.update({"location": kwargs[key]})
             elif key == "collation":
-                self.parameters["collation"] = kwargs[key]
+                self.parameters.update({"collation": kwargs[key]})
             elif key == "create_mode":
-                self.parameters["create_mode"] = kwargs[key]
+                self.parameters.update({"create_mode": kwargs[key]})
             elif key == "source_database_id":
-                self.parameters["source_database_id"] = kwargs[key]
+                self.parameters.update({"source_database_id": kwargs[key]})
             elif key == "source_database_deletion_date":
-                self.parameters["source_database_deletion_date"] = kwargs[key]
+                self.parameters.update({"source_database_deletion_date": kwargs[key]})
             elif key == "restore_point_in_time":
-                self.parameters["restore_point_in_time"] = kwargs[key]
+                self.parameters.update({"restore_point_in_time": kwargs[key]})
             elif key == "recovery_services_recovery_point_resource_id":
-                self.parameters["recovery_services_recovery_point_resource_id"] = kwargs[key]
+                self.parameters.update({"recovery_services_recovery_point_resource_id": kwargs[key]})
             elif key == "edition":
-                self.parameters["edition"] = kwargs[key]
+                self.parameters.update({"edition": kwargs[key]})
             elif key == "max_size_bytes":
-                self.parameters["max_size_bytes"] = kwargs[key]
+                self.parameters.update({"max_size_bytes": kwargs[key]})
             elif key == "requested_service_objective_id":
-                self.parameters["requested_service_objective_id"] = kwargs[key]
+                self.parameters.update({"requested_service_objective_id": kwargs[key]})
             elif key == "requested_service_objective_name":
-                self.parameters["requested_service_objective_name"] = kwargs[key]
+                self.parameters.update({"requested_service_objective_name": kwargs[key]})
             elif key == "elastic_pool_name":
-                self.parameters["elastic_pool_name"] = kwargs[key]
+                self.parameters.update({"elastic_pool_name": kwargs[key]})
             elif key == "read_scale":
-                self.parameters["read_scale"] = kwargs[key]
+                self.parameters.update({"read_scale": kwargs[key]})
             elif key == "sample_name":
-                self.parameters["sample_name"] = kwargs[key]
+                self.parameters.update({"sample_name": kwargs[key]})
             elif key == "zone_redundant":
-                self.parameters["zone_redundant"] = kwargs[key]
+                self.parameters.update({"zone_redundant": kwargs[key]})
 
         old_response = None
         results = dict()
