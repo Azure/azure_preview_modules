@@ -34,9 +34,6 @@ options:
         description:
             - The name of the database to be operated on (updated or created).
         required: True
-    tags:
-        description:
-            - Resource tags.
     location:
         description:
             - Resource location.
@@ -132,7 +129,6 @@ EXAMPLES = '''
       resource_group: resource_group_name
       server_name: server_name
       name: database_name
-      tags: tags
       location: location
       collation: collation
       create_mode: create_mode
@@ -203,10 +199,6 @@ class AzureRMDatabases(AzureRMModuleBase):
             name=dict(
                 type='str',
                 required=True
-            ),
-            tags=dict(
-                type='dict',
-                required=False
             ),
             location=dict(
                 type='str',
@@ -296,40 +288,40 @@ class AzureRMDatabases(AzureRMModuleBase):
         for key in list(self.module_arg_spec.keys()) + ['tags']:
             if hasattr(self, key):
                 setattr(self, key, kwargs[key])
-            elif key == "tags" and kwargs[key] is not None:
-                self.parameters.update({"tags": kwargs[key]})
-            elif key == "location" and kwargs[key] is not None:
-                self.parameters.update({"location": kwargs[key]})
-            elif key == "collation" and kwargs[key] is not None:
-                self.parameters.update({"collation": kwargs[key]})
-            elif key == "create_mode" and kwargs[key] is not None:
-                self.parameters.update({"create_mode": kwargs[key]})
-            elif key == "source_database_id" and kwargs[key] is not None:
-                self.parameters.update({"source_database_id": kwargs[key]})
-            elif key == "source_database_deletion_date" and kwargs[key] is not None:
-                self.parameters.update({"source_database_deletion_date": kwargs[key]})
-            elif key == "restore_point_in_time" and kwargs[key] is not None:
-                self.parameters.update({"restore_point_in_time": kwargs[key]})
-            elif key == "recovery_services_recovery_point_resource_id" and kwargs[key] is not None:
-                self.parameters.update({"recovery_services_recovery_point_resource_id": kwargs[key]})
-            elif key == "edition" and kwargs[key] is not None:
-                self.parameters.update({"edition": kwargs[key]})
-            elif key == "max_size_bytes" and kwargs[key] is not None:
-                self.parameters.update({"max_size_bytes": kwargs[key]})
-            elif key == "requested_service_objective_id" and kwargs[key] is not None:
-                self.parameters.update({"requested_service_objective_id": kwargs[key]})
-            elif key == "requested_service_objective_name" and kwargs[key] is not None:
-                self.parameters.update({"requested_service_objective_name": kwargs[key]})
-            elif key == "elastic_pool_name" and kwargs[key] is not None:
-                self.parameters.update({"elastic_pool_name": kwargs[key]})
-            elif key == "read_scale" and kwargs[key] is not None:
-                self.parameters.update({"read_scale": kwargs[key]})
-            elif key == "sample_name" and kwargs[key] is not None:
-                self.parameters.update({"sample_name": kwargs[key]})
-            elif key == "zone_redundant" and kwargs[key] is not None:
-                self.parameters.update({"zone_redundant": kwargs[key]})
+            elif kwargs[key] is not None:
+                if key == "location":
+                    self.parameters.update({"location": kwargs[key]})
+                elif key == "collation":
+                    self.parameters.update({"collation": kwargs[key]})
+                elif key == "create_mode":
+                    self.parameters.update({"create_mode": kwargs[key]})
+                elif key == "source_database_id":
+                    self.parameters.update({"source_database_id": kwargs[key]})
+                elif key == "source_database_deletion_date":
+                    self.parameters.update({"source_database_deletion_date": kwargs[key]})
+                elif key == "restore_point_in_time":
+                    self.parameters.update({"restore_point_in_time": kwargs[key]})
+                elif key == "recovery_services_recovery_point_resource_id":
+                    self.parameters.update({"recovery_services_recovery_point_resource_id": kwargs[key]})
+                elif key == "edition":
+                    self.parameters.update({"edition": kwargs[key]})
+                elif key == "max_size_bytes":
+                    self.parameters.update({"max_size_bytes": kwargs[key]})
+                elif key == "requested_service_objective_id":
+                    self.parameters.update({"requested_service_objective_id": kwargs[key]})
+                elif key == "requested_service_objective_name":
+                    self.parameters.update({"requested_service_objective_name": kwargs[key]})
+                elif key == "elastic_pool_name":
+                    self.parameters.update({"elastic_pool_name": kwargs[key]})
+                elif key == "read_scale":
+                    self.parameters.update({"read_scale": kwargs[key]})
+                elif key == "sample_name":
+                    self.parameters.update({"sample_name": kwargs[key]})
+                elif key == "zone_redundant":
+                    self.parameters.update({"zone_redundant": kwargs[key]})
 
         old_response = None
+        response = None
         results = dict()
 
         self.mgmt_client = self.get_mgmt_svc_client(SqlManagementClient,
@@ -368,48 +360,24 @@ class AzureRMDatabases(AzureRMModuleBase):
                 self.results['changed'] = True
             else:
                 self.results['changed'] = old_response.__ne__(response)
-
-            self.results.update(response)
-
-            # remove unnecessary fields from return state
-            self.results.pop('name', None)
-            self.results.pop('type', None)
-            self.results.pop('tags', None)
-            self.results.pop('location', None)
-            self.results.pop('kind', None)
-            self.results.pop('collation', None)
-            self.results.pop('creation_date', None)
-            self.results.pop('containment_state', None)
-            self.results.pop('current_service_objective_id', None)
-            self.results.pop('earliest_restore_date', None)
-            self.results.pop('create_mode', None)
-            self.results.pop('source_database_id', None)
-            self.results.pop('source_database_deletion_date', None)
-            self.results.pop('restore_point_in_time', None)
-            self.results.pop('recovery_services_recovery_point_resource_id', None)
-            self.results.pop('edition', None)
-            self.results.pop('max_size_bytes', None)
-            self.results.pop('requested_service_objective_id', None)
-            self.results.pop('requested_service_objective_name', None)
-            self.results.pop('service_level_objective', None)
-            self.results.pop('elastic_pool_name', None)
-            self.results.pop('default_secondary_location', None)
-            self.results.pop('service_tier_advisors', None)
-            self.results.pop('transparent_data_encryption', None)
-            self.results.pop('recommended_index', None)
-            self.results.pop('failover_group_id', None)
-            self.results.pop('read_scale', None)
-            self.results.pop('sample_name', None)
-            self.results.pop('zone_redundant', None)
             self.log("Creation / Update done")
         elif self.to_do == Actions.Delete:
             self.log("SQL Database instance deleted")
+
+            if self.check_mode:
+                return self.results
+
             self.delete_sqldatabase()
             self.results['changed'] = True
         else:
             self.log("SQL Database instance unchanged")
-            self.results['state'] = old_response
             self.results['changed'] = False
+            response = old_response
+
+        if response is not None:
+            self.results["id"] = response["id"]
+            self.results["database_id"] = response["database_id"]
+            self.results["status"] = response["status"]
 
         return self.results
 
