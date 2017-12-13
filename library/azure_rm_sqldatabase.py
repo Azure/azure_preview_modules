@@ -352,6 +352,7 @@ class AzureRMDatabases(AzureRMModuleBase):
             self.log("Need to Create / Update the SQL Database instance")
 
             if self.check_mode:
+                self.results['changed'] = True
                 return self.results
 
             response = self.create_update_sqldatabase()
@@ -363,18 +364,18 @@ class AzureRMDatabases(AzureRMModuleBase):
             self.log("Creation / Update done")
         elif self.to_do == Actions.Delete:
             self.log("SQL Database instance deleted")
+            self.results['changed'] = True
 
             if self.check_mode:
                 return self.results
 
             self.delete_sqldatabase()
-            self.results['changed'] = True
         else:
             self.log("SQL Database instance unchanged")
             self.results['changed'] = False
             response = old_response
 
-        if response is not None:
+        if response:
             self.results["id"] = response["id"]
             self.results["database_id"] = response["database_id"]
             self.results["status"] = response["status"]
