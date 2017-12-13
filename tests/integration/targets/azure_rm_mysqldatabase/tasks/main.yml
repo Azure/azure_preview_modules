@@ -3,6 +3,18 @@
     random_postfix: "{{ 1000 | random }}"
   run_once: yes
 
+- name: Delete unexisting instance of MySQL Database
+  azure_rm_mysqldatabase:
+    resource_group: "{{ resource_group }}"
+    server_name: "mysqlsrv{{ random_postfix }}{{ resource_group | hash('md5') | truncate(7, True, '') }}"
+    name: testdatabase
+    state: absent
+  register: output
+- name: Assert the state has changed
+  assert:
+    that:
+      - output.changed == false
+
 - name: Create MySQL Server -- check mode
   azure_rm_mysqlserver:
     resource_group: "{{ resource_group }}"
@@ -83,18 +95,6 @@
   assert:
     that:
       - output.changed
-
-- name: Delete unexisting instance of MySQL Database
-  azure_rm_mysqldatabase:
-    resource_group: "{{ resource_group }}"
-    server_name: "mysqlsrv{{ random_postfix }}{{ resource_group | hash('md5') | truncate(7, True, '') }}"
-    name: testdatabase
-    state: absent
-  register: output
-- name: Assert the state has changed
-  assert:
-    that:
-      - output.changed == false
 
 - name: Delete instance of MySQL Server
   azure_rm_mysqlserver:

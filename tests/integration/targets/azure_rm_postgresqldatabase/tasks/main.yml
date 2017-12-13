@@ -3,6 +3,18 @@
     random_postfix: "{{ 1000 | random }}"
   run_once: yes
 
+- name: Delete unexisting instance of PostgreSQL Database
+  azure_rm_postgresqldatabase:
+    resource_group: "{{ resource_group }}"
+    server_name: "postgresqlsrv{{ random_postfix }}{{ resource_group | hash('md5') | truncate(7, True, '') }}"
+    name: testdatabase
+    state: absent
+  register: output
+- name: Assert the state has changed
+  assert:
+    that:
+      - output.changed == false
+
 - name: Create PostgreSQL Server -- check mode
   azure_rm_postgresqlserver:
     resource_group: "{{ resource_group }}"
@@ -81,18 +93,6 @@
   assert:
     that:
       - output.changed
-
-- name: Delete unexisting instance of PostgreSQL Database
-  azure_rm_postgresqldatabase:
-    resource_group: "{{ resource_group }}"
-    server_name: "postgresqlsrv{{ random_postfix }}{{ resource_group | hash('md5') | truncate(7, True, '') }}"
-    name: testdatabase
-    state: absent
-  register: output
-- name: Assert the state has changed
-  assert:
-    that:
-      - output.changed == false
 
 - name: Delete instance of PostgreSQL Server
   azure_rm_postgresqlserver:
