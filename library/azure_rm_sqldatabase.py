@@ -167,6 +167,7 @@ status:
     sample: status
 '''
 
+import time
 from ansible.module_utils.azure_rm_common import AzureRMModuleBase
 
 try:
@@ -290,35 +291,35 @@ class AzureRMDatabases(AzureRMModuleBase):
                 setattr(self, key, kwargs[key])
             elif kwargs[key] is not None:
                 if key == "location":
-                    self.parameters.update({"location": kwargs[key]})
+                    self.parameters["location"] = kwargs[key]
                 elif key == "collation":
-                    self.parameters.update({"collation": kwargs[key]})
+                    self.parameters["collation"] = kwargs[key]
                 elif key == "create_mode":
-                    self.parameters.update({"create_mode": kwargs[key]})
+                    self.parameters["create_mode"] = kwargs[key]
                 elif key == "source_database_id":
-                    self.parameters.update({"source_database_id": kwargs[key]})
+                    self.parameters["source_database_id"] = kwargs[key]
                 elif key == "source_database_deletion_date":
-                    self.parameters.update({"source_database_deletion_date": kwargs[key]})
+                    self.parameters["source_database_deletion_date"] = kwargs[key]
                 elif key == "restore_point_in_time":
-                    self.parameters.update({"restore_point_in_time": kwargs[key]})
+                    self.parameters["restore_point_in_time"] = kwargs[key]
                 elif key == "recovery_services_recovery_point_resource_id":
-                    self.parameters.update({"recovery_services_recovery_point_resource_id": kwargs[key]})
+                    self.parameters["recovery_services_recovery_point_resource_id"] = kwargs[key]
                 elif key == "edition":
-                    self.parameters.update({"edition": kwargs[key]})
+                    self.parameters["edition"] = kwargs[key]
                 elif key == "max_size_bytes":
-                    self.parameters.update({"max_size_bytes": kwargs[key]})
+                    self.parameters["max_size_bytes"] = kwargs[key]
                 elif key == "requested_service_objective_id":
-                    self.parameters.update({"requested_service_objective_id": kwargs[key]})
+                    self.parameters["requested_service_objective_id"] = kwargs[key]
                 elif key == "requested_service_objective_name":
-                    self.parameters.update({"requested_service_objective_name": kwargs[key]})
+                    self.parameters["requested_service_objective_name"] = kwargs[key]
                 elif key == "elastic_pool_name":
-                    self.parameters.update({"elastic_pool_name": kwargs[key]})
+                    self.parameters["elastic_pool_name"] = kwargs[key]
                 elif key == "read_scale":
-                    self.parameters.update({"read_scale": kwargs[key]})
+                    self.parameters["read_scale"] = kwargs[key]
                 elif key == "sample_name":
-                    self.parameters.update({"sample_name": kwargs[key]})
+                    self.parameters["sample_name"] = kwargs[key]
                 elif key == "zone_redundant":
-                    self.parameters.update({"zone_redundant": kwargs[key]})
+                    self.parameters["zone_redundant"] = kwargs[key]
 
         old_response = None
         response = None
@@ -370,6 +371,10 @@ class AzureRMDatabases(AzureRMModuleBase):
                 return self.results
 
             self.delete_sqldatabase()
+            # make sure instance is actually deleted, for some Azure resources, instance is hanging around
+            # for some time after deletion -- this should be really fixed in Azure
+            while self.get_sqldatabase():
+                time.sleep(20)
         else:
             self.log("SQL Database instance unchanged")
             self.results['changed'] = False
