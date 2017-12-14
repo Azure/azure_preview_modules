@@ -93,6 +93,7 @@ fully_qualified_domain_name:
     sample: sqlcrudtest-4645.database.windows.net
 '''
 
+import time
 from ansible.module_utils.azure_rm_common import AzureRMModuleBase
 
 try:
@@ -172,15 +173,15 @@ class AzureRMServers(AzureRMModuleBase):
                 setattr(self, key, kwargs[key])
             elif kwargs[key] is not None:
                 if key == "location":
-                    self.parameters.update({"location": kwargs[key]})
+                    self.parameters["location"] = kwargs[key]
                 elif key == "admin_username":
-                    self.parameters.update({"administrator_login": kwargs[key]})
+                    self.parameters["administrator_login"] = kwargs[key]
                 elif key == "admin_password":
-                    self.parameters.update({"administrator_login_password": kwargs[key]})
+                    self.parameters["administrator_login_password"] = kwargs[key]
                 elif key == "version":
-                    self.parameters.update({"version": kwargs[key]})
+                    self.parameters["version"] = kwargs[key]
                 elif key == "identity":
-                    self.parameters.update({"identity": {"type": kwargs[key]}})
+                    self.parameters.setdefault("identity", {})["type"] = kwargs[key]
 
         old_response = None
         response = None
@@ -214,6 +215,7 @@ class AzureRMServers(AzureRMModuleBase):
             self.log("Need to Create / Update the SQL Server instance")
 
             if self.check_mode:
+                self.results['changed'] = True
                 return self.results
 
             response = self.create_update_sqlserver()
@@ -226,18 +228,22 @@ class AzureRMServers(AzureRMModuleBase):
             self.log("Creation / Update done")
         elif self.to_do == Actions.Delete:
             self.log("SQL Server instance deleted")
+            self.results['changed'] = True
 
             if self.check_mode:
                 return self.results
 
             self.delete_sqlserver()
-            self.results['changed'] = True
+            # make sure instance is actually deleted, for some Azure resources, instance is hanging around
+            # for some time after deletion -- this should be really fixed in Azure
+            while self.get_sqlserver():
+                time.sleep(20)
         else:
             self.log("SQL Server instance unchanged")
             self.results['changed'] = False
             response = old_response
 
-        if response is not None:
+        if response:
             self.results["id"] = response["id"]
             self.results["version"] = response["version"]
             self.results["state"] = response["state"]

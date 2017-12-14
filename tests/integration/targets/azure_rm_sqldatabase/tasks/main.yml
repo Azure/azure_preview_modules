@@ -2,6 +2,27 @@
   set_fact:
     random_postfix: "{{ 1000 | random }}"
   run_once: yes
+
+- name: Create SQL Server -- check mode
+  azure_rm_sqlserver:
+    resource_group: "{{ resource_group }}"
+    name: "sqlsrv{{ random_postfix }}{{ resource_group | hash('md5') | truncate(7, True, '') }}"
+    location: eastus
+    admin_username: mylogin
+    admin_password: Testpasswordxyz12!
+- name: Create instance of SQL Database -- check mode
+  azure_rm_sqldatabase:
+    resource_group: "{{ resource_group }}"
+    server_name: "sqlsrv{{ random_postfix }}{{ resource_group | hash('md5') | truncate(7, True, '') }}"
+    name: test-database
+    location: eastus
+  check_mode: yes
+  register: output
+- name: Assert the resource instance is well created
+  assert:
+    that:
+      - output.changed
+
 - name: Create SQL Server
   azure_rm_sqlserver:
     resource_group: "{{ resource_group }}"
@@ -22,7 +43,14 @@
       - output.changed
       - output.status == 'Online'
 
-- name: Update instance of SQL Database
+- name: Create SQL Server
+  azure_rm_sqlserver:
+    resource_group: "{{ resource_group }}"
+    name: "sqlsrv{{ random_postfix }}{{ resource_group | hash('md5') | truncate(7, True, '') }}"
+    location: eastus
+    admin_username: mylogin
+    admin_password: Testpasswordxyz12!
+- name: Create again instance of SQL Database
   azure_rm_sqldatabase:
     resource_group: "{{ resource_group }}"
     server_name: "sqlsrv{{ random_postfix }}{{ resource_group | hash('md5') | truncate(7, True, '') }}"
@@ -35,6 +63,19 @@
       - output.changed == false
       - output.status == 'Online'
 
+- name: Delete instance of SQL Database -- check mode
+  azure_rm_sqldatabase:
+    resource_group: "{{ resource_group }}"
+    server_name: "sqlsrv{{ random_postfix }}{{ resource_group | hash('md5') | truncate(7, True, '') }}"
+    name: test-database
+    state: absent
+  check_mode: yes
+  register: output
+- name: Assert the state has changed
+  assert:
+    that:
+      - output.changed
+
 - name: Delete instance of SQL Database
   azure_rm_sqldatabase:
     resource_group: "{{ resource_group }}"
@@ -46,6 +87,18 @@
   assert:
     that:
       - output.changed
+
+- name: Delete unexisting instance of SQL Database
+  azure_rm_sqldatabase:
+    resource_group: "{{ resource_group }}"
+    server_name: "sqlsrv{{ random_postfix }}{{ resource_group | hash('md5') | truncate(7, True, '') }}"
+    name: test-database
+    state: absent
+  register: output
+- name: Assert the state has changed
+  assert:
+    that:
+      - output.changed == false
 
 - name: Delete instance of SQL Server
   azure_rm_sqlserver:
