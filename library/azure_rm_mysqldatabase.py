@@ -75,6 +75,7 @@ name:
     sample: name
 '''
 
+import time
 from ansible.module_utils.azure_rm_common import AzureRMModuleBase
 
 try:
@@ -146,9 +147,9 @@ class AzureRMDatabases(AzureRMModuleBase):
                 setattr(self, key, kwargs[key])
             elif kwargs[key] is not None:
                 if key == "charset":
-                    self.parameters.update({"charset": kwargs[key]})
+                    self.parameters["charset"] = kwargs[key]
                 elif key == "collation":
-                    self.parameters.update({"collation": kwargs[key]})
+                    self.parameters["collation"] = kwargs[key]
 
         old_response = None
         response = None
@@ -180,6 +181,7 @@ class AzureRMDatabases(AzureRMModuleBase):
             self.log("Need to Create / Update the MySQL Database instance")
 
             if self.check_mode:
+                self.results['changed'] = True
                 return self.results
 
             response = self.create_update_mysqldatabase()
@@ -191,18 +193,22 @@ class AzureRMDatabases(AzureRMModuleBase):
             self.log("Creation / Update done")
         elif self.to_do == Actions.Delete:
             self.log("MySQL Database instance deleted")
+            self.results['changed'] = True
 
             if self.check_mode:
                 return self.results
 
             self.delete_mysqldatabase()
-            self.results['changed'] = True
+            # make sure instance is actually deleted, for some Azure resources, instance is hanging around
+            # for some time after deletion -- this should be really fixed in Azure
+            while self.get_mysqldatabase():
+                time.sleep(20)
         else:
             self.log("MySQL Database instance unchanged")
             self.results['changed'] = False
             response = old_response
 
-        if response is not None:
+        if response:
             self.results["id"] = response["id"]
             self.results["name"] = response["name"]
 
