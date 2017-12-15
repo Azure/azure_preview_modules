@@ -3,13 +3,14 @@
     random_postfix: "{{ 1000 | random }}"
   run_once: yes
 
-- name: Create PostgreSQL Server -- check mode
+- name: Create PostgreSQL Server
   azure_rm_postgresqlserver:
     resource_group: "{{ resource_group }}"
     name: "postgresqlsrv{{ random_postfix }}{{ resource_group | hash('md5') | truncate(7, True, '') }}"
     location: westus
     admin_username: zimxyz
     admin_password: Testpasswordxyz12!
+
 - name: Create instance of PostgreSQL Database -- check mode
   azure_rm_postgresqldatabase:
     resource_group: "{{ resource_group }}"
@@ -22,13 +23,6 @@
     that:
       - output.changed
 
-- name: Create PostgreSQL Server
-  azure_rm_postgresqlserver:
-    resource_group: "{{ resource_group }}"
-    name: "postgresqlsrv{{ random_postfix }}{{ resource_group | hash('md5') | truncate(7, True, '') }}"
-    location: westus
-    admin_username: zimxyz
-    admin_password: Testpasswordxyz12!
 - name: Create instance of PostgreSQL Database
   azure_rm_postgresqldatabase:
     resource_group: "{{ resource_group }}"
@@ -41,13 +35,6 @@
       - output.changed
       - output.name == 'testdatabase'
 
-- name: Create PostgreSQL Server
-  azure_rm_postgresqlserver:
-    resource_group: "{{ resource_group }}"
-    name: "postgresqlsrv{{ random_postfix }}{{ resource_group | hash('md5') | truncate(7, True, '') }}"
-    location: westus
-    admin_username: zimxyz
-    admin_password: Testpasswordxyz12!
 - name: Create again instance of PostgreSQL Database
   azure_rm_postgresqldatabase:
     resource_group: "{{ resource_group }}"

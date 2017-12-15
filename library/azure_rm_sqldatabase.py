@@ -126,24 +126,10 @@ author:
 EXAMPLES = '''
   - name: Create (or update) SQL Database
     azure_rm_sqldatabase:
-      resource_group: resource_group_name
-      server_name: server_name
-      name: database_name
-      location: location
-      collation: collation
-      create_mode: create_mode
-      source_database_id: source_database_id
-      source_database_deletion_date: source_database_deletion_date
-      restore_point_in_time: restore_point_in_time
-      recovery_services_recovery_point_resource_id: recovery_services_recovery_point_resource_id
-      edition: edition
-      max_size_bytes: max_size_bytes
-      requested_service_objective_id: requested_service_objective_id
-      requested_service_objective_name: requested_service_objective_name
-      elastic_pool_name: elastic_pool_name
-      read_scale: read_scale
-      sample_name: sample_name
-      zone_redundant: zone_redundant
+      resource_group: sqlcrudtest-4799
+      server_name: sqlcrudtest-5961
+      name: testdb
+      location: Japan East
 '''
 
 RETURN = '''
@@ -323,7 +309,6 @@ class AzureRMDatabases(AzureRMModuleBase):
 
         old_response = None
         response = None
-        results = dict()
 
         self.mgmt_client = self.get_mgmt_svc_client(SqlManagementClient,
                                                     base_url=self._cloud_environment.endpoints.resource_manager)
