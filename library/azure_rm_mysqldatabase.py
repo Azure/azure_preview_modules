@@ -53,11 +53,9 @@ author:
 EXAMPLES = '''
   - name: Create (or update) MySQL Database
     azure_rm_mysqldatabase:
-      resource_group: resource_group_name
-      server_name: server_name
-      name: database_name
-      charset: charset
-      collation: collation
+      resource_group: TestGroup
+      server_name: testserver
+      name: db1
 '''
 
 RETURN = '''
@@ -153,7 +151,6 @@ class AzureRMDatabases(AzureRMModuleBase):
 
         old_response = None
         response = None
-        results = dict()
 
         self.mgmt_client = self.get_mgmt_svc_client(MySQLManagementClient,
                                                     base_url=self._cloud_environment.endpoints.resource_manager)

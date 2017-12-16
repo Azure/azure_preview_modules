@@ -83,21 +83,17 @@ author:
 EXAMPLES = '''
   - name: Create (or update) MySQL Server
     azure_rm_mysqlserver:
-      resource_group: resource_group_name
-      name: server_name
+      resource_group: TestGroup
+      name: testserver
       sku:
-        name: name
-        tier: tier
-        capacity: capacity
-        size: size
-        family: family
-      location: location
-      storage_mb: storage_mb
-      version: version
-      ssl_enforcement: ssl_enforcement
-      create_mode: create_mode
-      admin_username: administrator_login
-      admin_password: administrator_login_password
+        name: SkuName
+        tier: Basic
+        capacity: 100
+      location: OneBox
+      storage_mb: 1024
+      ssl_enforcement: Enabled
+      admin_username: cloudsa
+      admin_password: password
 '''
 
 RETURN = '''
@@ -237,7 +233,6 @@ class AzureRMServers(AzureRMModuleBase):
 
         old_response = None
         response = None
-        results = dict()
 
         self.mgmt_client = self.get_mgmt_svc_client(MySQLManagementClient,
                                                     base_url=self._cloud_environment.endpoints.resource_manager)

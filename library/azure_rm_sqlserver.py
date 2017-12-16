@@ -60,7 +60,7 @@ EXAMPLES = '''
   - name: Create (or update) SQL Server
     azure_rm_sqlserver:
       resource_group: resource_group
-      name: server_name
+      name: sqlcrudtest-4645
       location: westus
       admin_username: mylogin
       admin_password: Testpasswordxyz12!
@@ -185,7 +185,6 @@ class AzureRMServers(AzureRMModuleBase):
 
         old_response = None
         response = None
-        results = dict()
 
         self.mgmt_client = self.get_mgmt_svc_client(SqlManagementClient,
                                                     base_url=self._cloud_environment.endpoints.resource_manager)
