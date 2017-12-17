@@ -37,7 +37,6 @@
   assert:
     that:
       - output.changed
-      - output.name == 'test-firewall-rule'
 
 - name: Create again instance of FirewallRules
   azure_rm_postgresqlfirewallrule:
@@ -51,7 +50,6 @@
   assert:
     that:
       - output.changed == false
-      - output.name == 'test-firewall-rule'
 
 - name: Delete instance of FirewallRules -- check mode
   azure_rm_postgresqlfirewallrule:
