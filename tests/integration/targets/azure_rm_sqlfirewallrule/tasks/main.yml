@@ -21,7 +21,6 @@
   assert:
     that:
       - output.changed
-      - output.state == 'Ready'
 
 - name: Create again instance of FirewallRules
   azure_rm_sqlfirewallrule:
@@ -31,7 +30,6 @@
   assert:
     that:
       - output.changed == false
-      - output.state == 'Ready'
 
 - name: Delete instance of FirewallRules -- check mode
   azure_rm_sqlfirewallrule:

@@ -34,7 +34,6 @@
   assert:
     that:
       - output.changed
-      - output.state == 'Ready'
 
 - name: Create again instance of VirtualNetworkRules
   azure_rm_mysqlvirtualnetworkrule:
@@ -46,7 +45,6 @@
   assert:
     that:
       - output.changed == false
-      - output.state == 'Ready'
 
 - name: Delete instance of VirtualNetworkRules -- check mode
   azure_rm_mysqlvirtualnetworkrule:
