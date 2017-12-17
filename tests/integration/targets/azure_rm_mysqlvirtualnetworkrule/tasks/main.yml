@@ -3,6 +3,15 @@
     random_postfix: "{{ 1000 | random }}"
   run_once: yes
 
+        - name: Create MySQL Server
+          azure_rm_mysqlserver:
+            resource_group: "{{ resource_group }}"
+            name: "mysqlsrv{{ random_postfix }}{{ resource_group | hash('md5') | truncate(7, True, '') }}"
+            location: westus
+            version: 5.6
+            admin_username: zimxyz
+            admin_password: Testpasswordxyz12!
+
 - name: Create instance of VirtualNetworkRules -- check mode
   azure_rm_mysqlvirtualnetworkrule:
     resource_group: "{{ resource_group }}"
