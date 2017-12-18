@@ -37,7 +37,6 @@
   assert:
     that:
       - output.changed
-      - output.value == 'ON'
 
 - name: Create again instance of Configurations
   azure_rm_postgresqlconfiguration:
@@ -51,7 +50,6 @@
   assert:
     that:
       - output.changed == false
-      - output.value == 'ON'
 
 - name: Delete instance of PostgreSQL Server
   azure_rm_postgresqlserver:
