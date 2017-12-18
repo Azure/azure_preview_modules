@@ -14,8 +14,8 @@
   azure_rm_postgresqlconfiguration:
     resource_group: "{{ resource_group }}"
     server_name: "postgresqlsrv{{ random_postfix }}{{ resource_group | hash('md5') | truncate(7, True, '') }}"
-    name: event_scheduler
-    value: "ON"
+    name: deadlock_timeout
+    value: 2000
     source: user-override
 
 - name: Gather facts PostgreSQL Configuration

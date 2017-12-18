@@ -15,8 +15,8 @@
   azure_rm_postgresqlconfiguration:
     resource_group: "{{ resource_group }}"
     server_name: "postgresqlsrv{{ random_postfix }}{{ resource_group | hash('md5') | truncate(7, True, '') }}"
-    name: event_scheduler
-    value: "ON"
+    name: deadlock_timeout
+    value: 2000
     source: user-override
   check_mode: yes
   register: output
@@ -29,8 +29,8 @@
   azure_rm_postgresqlconfiguration:
     resource_group: "{{ resource_group }}"
     server_name: "postgresqlsrv{{ random_postfix }}{{ resource_group | hash('md5') | truncate(7, True, '') }}"
-    name: event_scheduler
-    value: "ON"
+    name: deadlock_timeout
+    value: 2000
     source: user-override
   register: output
 - name: Assert the resource instance is well created
@@ -42,8 +42,8 @@
   azure_rm_postgresqlconfiguration:
     resource_group: "{{ resource_group }}"
     server_name: "postgresqlsrv{{ random_postfix }}{{ resource_group | hash('md5') | truncate(7, True, '') }}"
-    name: event_scheduler
-    value: "ON"
+    name: deadlock_timeout
+    value: 2000
     source: user-override
   register: output
 - name: Assert the state has not changed
