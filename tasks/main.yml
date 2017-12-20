@@ -2,4 +2,3 @@
 # Install Azure Python SDK required by modules.
 - pip:
     requirements: "{{ role_path }}/files/requirements-azure.txt"
-    extra_args: --user --upgrade
