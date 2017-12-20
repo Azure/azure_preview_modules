@@ -1,4 +1,6 @@
 language: python
+virtualenv:
+  system_site_packages: true
 python: '2.7'
 
 branches:
@@ -33,6 +35,16 @@ env:
     - id=18
     - id=19
     - id=20
+    - id=21
+    - id=22
+    - id=23
+    - id=24
+    - id=25
+    - id=26
+    - id=27
+    - id=28
+    - id=29
+    - id=30
 
 before_install:
   - sudo apt-get update -qq
@@ -83,7 +95,7 @@ before_install:
     }
 
 install:
-  - if [ "$ANSIBLE_VERSION" = "latest" ]; then pip install ansible[azure]; else pip
+  - if [ "$ANSIBLE_VERSION" = "latest" ]; then pip install --user --force --upgrade ansible[azure]; else pip
     install ansible[azure]==$ANSIBLE_VERSION; fi
   - "{ echo '[defaults]'; echo 'roles_path = ../'; } >> ansible.cfg"
 
