@@ -14,4 +14,4 @@ azure-mgmt-web>=0.32.0,<0.33
 azure-mgmt-containerservice>=2.0.0,<3.0.0
 azure-mgmt-rdbms>=0.2.0rc1
 azure-mgmt-authorization>=0.30.0
-
+azure-mgmt-containerinstance>=0.1.0
