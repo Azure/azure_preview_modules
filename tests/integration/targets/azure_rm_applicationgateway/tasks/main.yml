@@ -153,6 +153,11 @@
     that:
       - output.changed == false
 
+- name: Remove subnet
+  azure_rm_subnet:
+    name: sample-subnet
+    resource_group: "{{ resource_group }}"
+    state: absent
 - name: Remove virtual network
   azure_rm_virtualnetwork:
     name: sample-vnet
