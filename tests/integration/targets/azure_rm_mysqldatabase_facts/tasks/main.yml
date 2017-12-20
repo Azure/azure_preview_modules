@@ -43,6 +43,7 @@
     resource_group: "{{ resource_group }}"
     server_name: "mysqlsrv{{ random_postfix }}{{ resource_group | hash('md5') | truncate(7, True, '') }}"
     name: testdatabase
+    state: absent
 - name: Delete instance of MySQL Server
   azure_rm_mysqlserver:
     resource_group: "{{ resource_group }}"

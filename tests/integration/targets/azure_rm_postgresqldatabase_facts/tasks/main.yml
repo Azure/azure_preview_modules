@@ -42,6 +42,7 @@
     resource_group: "{{ resource_group }}"
     server_name: "postgresqlsrv{{ random_postfix }}{{ resource_group | hash('md5') | truncate(7, True, '') }}"
     name: testdatabase
+    state: absent
 - name: Delete instance of PostgreSQL Server
   azure_rm_postgresqlserver:
     resource_group: "{{ resource_group }}"

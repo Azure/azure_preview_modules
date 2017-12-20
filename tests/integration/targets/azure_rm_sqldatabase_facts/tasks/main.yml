@@ -85,6 +85,7 @@
     resource_group: "{{ resource_group }}"
     server_name: "sqlsrv{{ random_postfix }}{{ resource_group | hash('md5') | truncate(7, True, '') }}"
     name: test-database
+    state: absent
 - name: Delete instance of SQL Server
   azure_rm_sqlserver:
     resource_group: "{{ resource_group }}"
