@@ -1,12 +1,12 @@
 - name: Prepare random number
   set_fact:
-    random_postfix: "{{ 1000 | random }}"
+    rpfx: "{{ 1000 | random }}{{ resource_group | hash('md5') | truncate(7, True, '') }}"
   run_once: yes
 
 - name: Create MySQL Server
   azure_rm_mysqlserver:
     resource_group: "{{ resource_group }}"
-    name: "mysqlsrv{{ random_postfix }}{{ resource_group | hash('md5') | truncate(7, True, '') }}"
+    name: "mysqlsrv{{ rpfx }}"
     location: westus
     version: 5.6
     admin_username: zimxyz
@@ -15,7 +15,7 @@
 - name: Gather facts MySQL Server
   azure_rm_mysqlserver_facts:
     resource_group: "{{ resource_group }}"
-    server_name: "mysqlsrv{{ random_postfix }}{{ resource_group | hash('md5') | truncate(7, True, '') }}"
+    server_name: "mysqlsrv{{ rpfx }}"
   register: output
 - name: Assert that facts are returned
   assert:
@@ -34,5 +34,5 @@
 - name: Delete instance of MySQL Server
   azure_rm_mysqlserver:
     resource_group: "{{ resource_group }}"
-    name: "mysqlsrv{{ random_postfix }}{{ resource_group | hash('md5') | truncate(7, True, '') }}"
+    name: "mysqlsrv{{ rpfx }}"
     state: absent

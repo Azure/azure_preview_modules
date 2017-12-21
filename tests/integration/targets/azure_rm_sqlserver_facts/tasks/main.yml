@@ -1,12 +1,12 @@
 - name: Prepare random number
   set_fact:
-    random_postfix: "{{ 1000 | random }}"
+    rpfx: "{{ 1000 | random }}{{ resource_group | hash('md5') | truncate(7, True, '') }}"
   run_once: yes
 
 - name: Create SQL Server
   azure_rm_sqlserver:
     resource_group: "{{ resource_group }}"
-    name: "sqlsrv{{ random_postfix }}{{ resource_group | hash('md5') | truncate(7, True, '') }}"
+    name: "sqlsrv{{ rpfx }}"
     location: eastus
     admin_username: mylogin
     admin_password: Testpasswordxyz12!
@@ -14,7 +14,7 @@
 - name: Gather facts SQL Server
   azure_rm_sqlserver_facts:
     resource_group: "{{ resource_group }}"
-    server_name: "sqlsrv{{ random_postfix }}{{ resource_group | hash('md5') | truncate(7, True, '') }}"
+    server_name: "sqlsrv{{ rpfx }}"
   register: output
 - name: Assert that facts are returned
   assert:
@@ -33,5 +33,5 @@
 - name: Delete instance of SQL Server
   azure_rm_sqlserver:
     resource_group: "{{ resource_group }}"
-    name: "sqlsrv{{ random_postfix }}{{ resource_group | hash('md5') | truncate(7, True, '') }}"
+    name: "sqlsrv{{ rpfx }}"
     state: absent

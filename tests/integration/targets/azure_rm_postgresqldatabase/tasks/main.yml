@@ -1,12 +1,12 @@
 - name: Prepare random number
   set_fact:
-    random_postfix: "{{ 1000 | random }}"
+    rpfx: "{{ resource_group | hash('md5') | truncate(7, True, '') }}{{ 1000 | random }}"
   run_once: yes
 
 - name: Create PostgreSQL Server
   azure_rm_postgresqlserver:
     resource_group: "{{ resource_group }}"
-    name: "postgresqlsrv{{ random_postfix }}{{ resource_group | hash('md5') | truncate(7, True, '') }}"
+    name: "postgresqlsrv{{ rpfx }}"
     location: westus
     admin_username: zimxyz
     admin_password: Testpasswordxyz12!
@@ -14,7 +14,7 @@
 - name: Create instance of PostgreSQL Database -- check mode
   azure_rm_postgresqldatabase:
     resource_group: "{{ resource_group }}"
-    server_name: "postgresqlsrv{{ random_postfix }}{{ resource_group | hash('md5') | truncate(7, True, '') }}"
+    server_name: "postgresqlsrv{{ rpfx }}"
     name: testdatabase
   check_mode: yes
   register: output
@@ -26,7 +26,7 @@
 - name: Create instance of PostgreSQL Database
   azure_rm_postgresqldatabase:
     resource_group: "{{ resource_group }}"
-    server_name: "postgresqlsrv{{ random_postfix }}{{ resource_group | hash('md5') | truncate(7, True, '') }}"
+    server_name: "postgresqlsrv{{ rpfx }}"
     name: testdatabase
   register: output
 - name: Assert the resource instance is well created
@@ -38,7 +38,7 @@
 - name: Create again instance of PostgreSQL Database
   azure_rm_postgresqldatabase:
     resource_group: "{{ resource_group }}"
-    server_name: "postgresqlsrv{{ random_postfix }}{{ resource_group | hash('md5') | truncate(7, True, '') }}"
+    server_name: "postgresqlsrv{{ rpfx }}"
     name: testdatabase
   register: output
 - name: Assert the state has not changed
@@ -50,7 +50,7 @@
 - name: Delete instance of PostgreSQL Database -- check mode
   azure_rm_postgresqldatabase:
     resource_group: "{{ resource_group }}"
-    server_name: "postgresqlsrv{{ random_postfix }}{{ resource_group | hash('md5') | truncate(7, True, '') }}"
+    server_name: "postgresqlsrv{{ rpfx }}"
     name: testdatabase
     state: absent
   check_mode: yes
@@ -63,7 +63,7 @@
 - name: Delete instance of PostgreSQL Database
   azure_rm_postgresqldatabase:
     resource_group: "{{ resource_group }}"
-    server_name: "postgresqlsrv{{ random_postfix }}{{ resource_group | hash('md5') | truncate(7, True, '') }}"
+    server_name: "postgresqlsrv{{ rpfx }}"
     name: testdatabase
     state: absent
   register: output
@@ -75,7 +75,7 @@
 - name: Delete unexisting instance of PostgreSQL Database
   azure_rm_postgresqldatabase:
     resource_group: "{{ resource_group }}"
-    server_name: "postgresqlsrv{{ random_postfix }}{{ resource_group | hash('md5') | truncate(7, True, '') }}"
+    server_name: "postgresqlsrv{{ rpfx }}"
     name: testdatabase
     state: absent
   register: output
@@ -87,5 +87,5 @@
 - name: Delete instance of PostgreSQL Server
   azure_rm_postgresqlserver:
     resource_group: "{{ resource_group }}"
-    name: "postgresqlsrv{{ random_postfix }}{{ resource_group | hash('md5') | truncate(7, True, '') }}"
+    name: "postgresqlsrv{{ rpfx }}"
     state: absent
