@@ -26,7 +26,7 @@ Installation
 
     - New module is added to the role and this module is for one new Azure service, which is not part of existing Ansible release yet. Corresponding SDK of this new service needs to be installed.
 
-    - Newer version of SDKs introduces breaking API change. One specific working version should be installed here.
+    - Newer versions of SDKs introduce breaking API change. One specific working version should be installed here.
 
     The required SDKs are listed in the *[~/files/requirements-azure.txt](files/requirements-azure.txt)* file. The tricky part is the installation location, which has to be the same as where existing Azure Python SKDs are installed.
 
