@@ -1,14 +1,14 @@
 Azure.azure_preview_modules
 =========
 
-The role includes the most compelete and latest Azure modules for Ansible users. The update and bug fix are done in a more timely mannaer than official Ansible release. 
+This role is the most complete and includes all the latest Azure modules. The update and bug fix are done in a more timely manner than official Ansible release.
 
 If you use Ansible for Azure resource provisioning purpose, you're strongly encouraged to install this role. 
 
 Prerequisite
 ------------
 
-The usage of this role assumes that you've already setup an Ansible environemnt for Azure. For details, please reference Ansible tutorial [Getting Started with Azure](http://docs.ansible.com/ansible/latest/guide_azure.html)
+The usage of this role assumes that you've already setup an Ansible environment for Azure. For details, please refer to Ansible tutorial [Getting Started with Azure](http://docs.ansible.com/ansible/latest/guide_azure.html)
 
 
 Installation
@@ -22,18 +22,20 @@ Installation
 
 2. Install Azure Python SDKs.
 
-    Several reasons for installing Python SKDs here.
+    Several reasons for installing Python SDKs are listed here.
 
     - New module is added to the role and this module is for one new Azure service, which is not part of existing Ansible release yet. Corresponding SDK of this new service needs to be installed.
 
-    - Newer version of SDK introduces breaking API change. One specific working version should be installed here.
+    - Newer version of SDKs introduces breaking API change. One specific working version should be installed here.
 
-    The required SDKs are listed in the *[~/files/requirements-azure.txt](files/requirements-azure.txt)* file. The tricky part is the installation location, which has to be the same as where existing Azure Python SKDs installed.
+    The required SDKs are listed in the *[~/files/requirements-azure.txt](files/requirements-azure.txt)* file. The tricky part is the installation location, which has to be the same as where existing Azure Python SKDs are installed.
 
-    Taking Ubuntu for example, the existing SDKs can be in folders like
-    `/home/your-user-name/.local/lib/python2.7/site-packages` or `/usr/local/lib/python2.7/dist-packages`. The former is a user folder and the later is a system folder, which requires sudo access. This depends on how you have installed `ansible`. In short, you should install the SDKs the same way as you installed `ansible` so that the SDKs are in the same `site-packages` folder.
+    Taking Ubuntu for example, the existing SDKs may be located in folders like
+    `/home/your-user-name/.local/lib/python2.7/site-packages` or `/usr/local/lib/python2.7/dist-packages`. The former is an user folder and the later is a system folder, which requires sudo access. This depends on how you have installed `ansible`. In short, you should install the SDKs the same way as you installed `ansible` so that the SDKs are in the same `site-packages` folder.
 
-    One trick to figure out the correct `site-packages` path is to check the details of existing packages, say `azure-mgmt-storage` by running below command.
+    On macOS, the path of `site-packages` folder can be like `/Users/your-user-name/Library/Python/2.7/lib/python/site-packages` or `/Library/Python/2.7/site-packages`. Similar to Ubuntu, the former is an user folder and the later is a system folder.
+
+    One way to figure out the correct `site-packages` path is to check the details of existing packages, say `azure-mgmt-storage` by running below command.
 
       ``` bash
       $ pip show azure-mgmt-storage
@@ -54,7 +56,7 @@ Installation
     Requires: azure-common, azure-mgmt-nspkg, msrestazure
     ```
 
-    So, you know that the SDKs are installed in *user* `site-packages` folder. Then, we can use below command to install the listed packages. You can find the `requirements-azure.txt` file in your installed role folder, which is usually at `~\.ansible\roles` folder.
+    From the information above you can learn that the SDKs are installed in *user* `site-packages` folder and use below command to install the listed packages. The `requirements-azure.txt` file can be found in the installed role folder, which is usually at `~\.ansible\roles` folder.
 
     ``` bash
     pip install --user -r files/requirements-azure.txt
