@@ -1,6 +1,6 @@
 - name: Prepare random number
   set_fact:
-    random_postfix: "{{ 1000 | random }}"
+    rpfx: "{{ resource_group | hash('md5') | truncate(7, True, '') }}{{ 1000 | random }}"
   run_once: yes
 
 - name: Create instance of MySQL Server -- check mode
