@@ -28,12 +28,12 @@ Installation
 
     - Newer version of SDK introduces breaking API change. One specific working version should be installed here.
 
-    The required SDKs are listed in the *[~/files/requirements-azure.txt](files/requirements-azure.txt)* file. The tricky part is the install location, which has to be the same as where existing Azure Python SKDs installed. 
+    The required SDKs are listed in the *[~/files/requirements-azure.txt](files/requirements-azure.txt)* file. The tricky part is the installation location, which has to be the same as where existing Azure Python SKDs installed.
 
     Taking Ubuntu for example, the existing SDKs can be in folders like
-    `/home/your-user-name/.local/lib/python2.7/site-packages` or `/usr/local/lib/python2.7/dist-packages`. The former is a user folder and the later is a system folder, which requires sudo access. This depends on how you have installed `ansible`. In short, you should install the SDKs the same way as you're installing `ansible` so that the SDKs are in the same `site-packages` folder. 
+    `/home/your-user-name/.local/lib/python2.7/site-packages` or `/usr/local/lib/python2.7/dist-packages`. The former is a user folder and the later is a system folder, which requires sudo access. This depends on how you have installed `ansible`. In short, you should install the SDKs the same way as you installed `ansible` so that the SDKs are in the same `site-packages` folder.
 
-    One trick to figure out the correct `site-packages` path is to check the info of existing package, say `azure-mgmt-storage` by running below command.
+    One trick to figure out the correct `site-packages` path is to check the details of existing packages, say `azure-mgmt-storage` by running below command.
 
       ``` bash
       $ pip show azure-mgmt-storage
