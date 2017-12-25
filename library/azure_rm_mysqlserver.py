@@ -17,9 +17,9 @@ DOCUMENTATION = '''
 ---
 module: azure_rm_mysqlserver
 version_added: "2.5"
-short_description: Manage MySQL Server instance
+short_description: Manage MySQL Server instance.
 description:
-    - Create, update and delete instance of MySQL Server
+    - Create, update and delete instance of MySQL Server.
 
 options:
     resource_group:
@@ -154,41 +154,33 @@ class AzureRMServers(AzureRMModuleBase):
                 required=True
             ),
             sku=dict(
-                type='dict',
-                required=False
+                type='dict'
             ),
             location=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             storage_mb=dict(
-                type='long',
-                required=False
+                type='long'
             ),
             version=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             ssl_enforcement=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             create_mode=dict(
                 type='str',
                 default='Default'
             ),
             admin_username=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             admin_password=dict(
                 type='str',
-                no_log=True,
-                required=False
+                no_log=True
             ),
             state=dict(
                 type='str',
-                required=False,
                 default='present',
                 choices=['present', 'absent']
             )

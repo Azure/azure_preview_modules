@@ -17,9 +17,9 @@ DOCUMENTATION = '''
 ---
 module: azure_rm_mysqldatabase
 version_added: "2.5"
-short_description: Manage MySQL Database instance
+short_description: Manage MySQL Database instance.
 description:
-    - Create, update and delete instance of MySQL Database
+    - Create, update and delete instance of MySQL Database.
 
 options:
     resource_group:
@@ -108,16 +108,13 @@ class AzureRMDatabases(AzureRMModuleBase):
                 required=True
             ),
             charset=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             collation=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             state=dict(
                 type='str',
-                required=False,
                 default='present',
                 choices=['present', 'absent']
             )

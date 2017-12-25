@@ -17,9 +17,9 @@ DOCUMENTATION = '''
 ---
 module: azure_rm_mysqlfirewallrule
 version_added: "2.5"
-short_description: Manage FirewallRules instance
+short_description: Manage FirewallRules instance.
 description:
-    - Create, update and delete instance of FirewallRules
+    - Create, update and delete instance of FirewallRules.
 
 options:
     resource_group:
@@ -106,20 +106,16 @@ class AzureRMFirewallRules(AzureRMModuleBase):
                 required=True
             ),
             parameters=dict(
-                type='dict',
-                required=False
+                type='dict'
             ),
             start_ip_address=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             end_ip_address=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             state=dict(
                 type='str',
-                required=False,
                 default='present',
                 choices=['present', 'absent']
             )

@@ -17,9 +17,9 @@ DOCUMENTATION = '''
 ---
 module: azure_rm_mysqlconfiguration
 version_added: "2.5"
-short_description: Manage Configurations instance
+short_description: Manage Configurations instance.
 description:
-    - Create, update and delete instance of Configurations
+    - Create, update and delete instance of Configurations.
 
 options:
     resource_group:
@@ -106,20 +106,16 @@ class AzureRMConfigurations(AzureRMModuleBase):
                 required=True
             ),
             parameters=dict(
-                type='dict',
-                required=False
+                type='dict'
             ),
             value=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             source=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             state=dict(
                 type='str',
-                required=False,
                 default='present',
                 choices=['present', 'absent']
             )

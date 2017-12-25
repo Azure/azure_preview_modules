@@ -17,9 +17,9 @@ DOCUMENTATION = '''
 ---
 module: azure_rm_sqldatabase
 version_added: "2.5"
-short_description: Manage SQL Database instance
+short_description: Manage SQL Database instance.
 description:
-    - Create, update and delete instance of SQL Database
+    - Create, update and delete instance of SQL Database.
 
 options:
     resource_group:
@@ -188,68 +188,52 @@ class AzureRMDatabases(AzureRMModuleBase):
                 required=True
             ),
             location=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             collation=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             create_mode=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             source_database_id=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             source_database_deletion_date=dict(
-                type='datetime',
-                required=False
+                type='datetime'
             ),
             restore_point_in_time=dict(
-                type='datetime',
-                required=False
+                type='datetime'
             ),
             recovery_services_recovery_point_resource_id=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             edition=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             max_size_bytes=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             requested_service_objective_id=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             requested_service_objective_name=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             elastic_pool_name=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             read_scale=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             sample_name=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             zone_redundant=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             state=dict(
                 type='str',
-                required=False,
                 default='present',
                 choices=['present', 'absent']
             )

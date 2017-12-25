@@ -17,9 +17,9 @@ DOCUMENTATION = '''
 ---
 module: azure_rm_applicationgateway
 version_added: "2.5"
-short_description: Manage Application Gateway instance
+short_description: Manage Application Gateway instance.
 description:
-    - Create, update and delete instance of Application Gateway
+    - Create, update and delete instance of Application Gateway.
 
 options:
     resource_group:
@@ -1042,92 +1042,70 @@ class AzureRMApplicationGateways(AzureRMModuleBase):
                 required=True
             ),
             id=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             location=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             sku=dict(
-                type='dict',
-                required=False
+                type='dict'
             ),
             ssl_policy=dict(
-                type='dict',
-                required=False
+                type='dict'
             ),
             gateway_ip_configurations=dict(
-                type='list',
-                required=False
+                type='list'
             ),
             authentication_certificates=dict(
-                type='list',
-                required=False
+                type='list'
             ),
             ssl_certificates=dict(
-                type='list',
-                required=False
+                type='list'
             ),
             frontend_ip_configurations=dict(
-                type='list',
-                required=False
+                type='list'
             ),
             frontend_ports=dict(
-                type='list',
-                required=False
+                type='list'
             ),
             probes=dict(
-                type='list',
-                required=False
+                type='list'
             ),
             backend_address_pools=dict(
-                type='list',
-                required=False
+                type='list'
             ),
             backend_http_settings_collection=dict(
-                type='list',
-                required=False
+                type='list'
             ),
             http_listeners=dict(
-                type='list',
-                required=False
+                type='list'
             ),
             url_path_maps=dict(
-                type='list',
-                required=False
+                type='list'
             ),
             request_routing_rules=dict(
-                type='list',
-                required=False
+                type='list'
             ),
             redirect_configurations=dict(
-                type='list',
-                required=False
+                type='list'
             ),
             web_application_firewall_configuration=dict(
-                type='dict',
-                required=False
+                type='dict'
             ),
             enable_http2=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             resource_guid=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             provisioning_state=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             etag=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             state=dict(
                 type='str',
-                required=False,
                 default='present',
                 choices=['present', 'absent']
             )
