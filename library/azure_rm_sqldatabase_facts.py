@@ -121,25 +121,20 @@ class AzureRMDatabasesFacts(AzureRMModuleBase):
                 required=True
             ),
             database_name=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             filter=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             expand=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             elastic_pool_name=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             recommended_elastic_pool_name=dict(
-                type='str',
-                required=False
-            ),
+                type='str'
+            )
         )
         # store the results of the module operation
         self.results = dict(
