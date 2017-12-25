@@ -253,9 +253,9 @@ class AzureRMServers(AzureRMModuleBase):
         self.log("Creating / Updating the SQL Server instance {0}".format(self.name))
 
         try:
-            response = self.mgmt_client.servers.create_or_update(self.resource_group,
-                                                                 self.name,
-                                                                 self.parameters)
+            response = self.mgmt_client.servers.create_or_update(resource_group_name=self.resource_group,
+                                                                 server_name=self.name,
+                                                                 parameters=self.parameters)
             if isinstance(response, AzureOperationPoller):
                 response = self.get_poller_result(response)
 
@@ -272,8 +272,8 @@ class AzureRMServers(AzureRMModuleBase):
         '''
         self.log("Deleting the SQL Server instance {0}".format(self.name))
         try:
-            response = self.mgmt_client.servers.delete(self.resource_group,
-                                                       self.name)
+            response = self.mgmt_client.servers.delete(resource_group_name=self.resource_group,
+                                                       server_name=self.name)
         except CloudError as e:
             self.log('Error attempting to delete the SQL Server instance.')
             self.fail("Error deleting the SQL Server instance: {0}".format(str(e)))
@@ -289,8 +289,8 @@ class AzureRMServers(AzureRMModuleBase):
         self.log("Checking if the SQL Server instance {0} is present".format(self.name))
         found = False
         try:
-            response = self.mgmt_client.servers.get(self.resource_group,
-                                                    self.name)
+            response = self.mgmt_client.servers.get(resource_group_name=self.resource_group,
+                                                    server_name=self.name)
             found = True
             self.log("Response : {0}".format(response))
             self.log("SQL Server instance : {0} found".format(response.name))

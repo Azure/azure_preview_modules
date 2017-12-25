@@ -1246,9 +1246,9 @@ class AzureRMApplicationGateways(AzureRMModuleBase):
         self.log("Creating / Updating the Application Gateway instance {0}".format(self.name))
 
         try:
-            response = self.mgmt_client.application_gateways.create_or_update(self.resource_group,
-                                                                              self.name,
-                                                                              self.parameters)
+            response = self.mgmt_client.application_gateways.create_or_update(resource_group_name=self.resource_group,
+                                                                              application_gateway_name=self.name,
+                                                                              parameters=self.parameters)
             if isinstance(response, AzureOperationPoller):
                 response = self.get_poller_result(response)
 
@@ -1265,8 +1265,8 @@ class AzureRMApplicationGateways(AzureRMModuleBase):
         '''
         self.log("Deleting the Application Gateway instance {0}".format(self.name))
         try:
-            response = self.mgmt_client.application_gateways.delete(self.resource_group,
-                                                                    self.name)
+            response = self.mgmt_client.application_gateways.delete(resource_group_name=self.resource_group,
+                                                                    application_gateway_name=self.name)
         except CloudError as e:
             self.log('Error attempting to delete the Application Gateway instance.')
             self.fail("Error deleting the Application Gateway instance: {0}".format(str(e)))
@@ -1282,8 +1282,8 @@ class AzureRMApplicationGateways(AzureRMModuleBase):
         self.log("Checking if the Application Gateway instance {0} is present".format(self.name))
         found = False
         try:
-            response = self.mgmt_client.application_gateways.get(self.resource_group,
-                                                                 self.name)
+            response = self.mgmt_client.application_gateways.get(resource_group_name=self.resource_group,
+                                                                 application_gateway_name=self.name)
             found = True
             self.log("Response : {0}".format(response))
             self.log("Application Gateway instance : {0} found".format(response.name))

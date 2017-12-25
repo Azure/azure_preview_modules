@@ -212,11 +212,11 @@ class AzureRMConfigurations(AzureRMModuleBase):
         self.log("Creating / Updating the Configurations instance {0}".format(self.name))
 
         try:
-            response = self.mgmt_client.configurations.create_or_update(self.resource_group,
-                                                                        self.server_name,
-                                                                        self.name,
-                                                                        self.value,
-                                                                        self.source)
+            response = self.mgmt_client.configurations.create_or_update(resource_group_name=self.resource_group,
+                                                                        server_name=self.server_name,
+                                                                        configuration_name=self.name,
+                                                                        value=self.value,
+                                                                        source=self.source)
             if isinstance(response, AzureOperationPoller):
                 response = self.get_poller_result(response)
 
@@ -249,9 +249,9 @@ class AzureRMConfigurations(AzureRMModuleBase):
         self.log("Checking if the Configurations instance {0} is present".format(self.name))
         found = False
         try:
-            response = self.mgmt_client.configurations.get(self.resource_group,
-                                                           self.server_name,
-                                                           self.name)
+            response = self.mgmt_client.configurations.get(resource_group_name=self.resource_group,
+                                                           server_name=self.server_name,
+                                                           configuration_name=self.name)
             found = True
             self.log("Response : {0}".format(response))
             self.log("Configurations instance : {0} found".format(response.name))

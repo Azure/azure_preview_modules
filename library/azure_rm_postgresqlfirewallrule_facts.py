@@ -120,9 +120,9 @@ class AzureRMFirewallRulesFacts(AzureRMModuleBase):
         response = None
         results = False
         try:
-            response = self.mgmt_client.firewall_rules.get(self.resource_group,
-                                                           self.server_name,
-                                                           self.firewall_rule_name)
+            response = self.mgmt_client.firewall_rules.get(resource_group_name=self.resource_group,
+                                                           server_name=self.server_name,
+                                                           firewall_rule_name=self.firewall_rule_name)
             self.log("Response : {0}".format(response))
         except CloudError as e:
             self.log('Could not get facts for FirewallRules.')
@@ -141,8 +141,8 @@ class AzureRMFirewallRulesFacts(AzureRMModuleBase):
         response = None
         results = False
         try:
-            response = self.mgmt_client.firewall_rules.list_by_server(self.resource_group,
-                                                                      self.server_name)
+            response = self.mgmt_client.firewall_rules.list_by_server(resource_group_name=self.resource_group,
+                                                                      server_name=self.server_name)
             self.log("Response : {0}".format(response))
         except CloudError as e:
             self.log('Could not get facts for FirewallRules.')
