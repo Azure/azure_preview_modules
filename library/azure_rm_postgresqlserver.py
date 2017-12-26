@@ -17,9 +17,9 @@ DOCUMENTATION = '''
 ---
 module: azure_rm_postgresqlserver
 version_added: "2.5"
-short_description: Manage PostgreSQL Server instance
+short_description: Manage PostgreSQL Server instance.
 description:
-    - Create, update and delete instance of PostgreSQL Server
+    - Create, update and delete instance of PostgreSQL Server.
 
 options:
     resource_group:
@@ -154,41 +154,33 @@ class AzureRMServers(AzureRMModuleBase):
                 required=True
             ),
             sku=dict(
-                type='dict',
-                required=False
+                type='dict'
             ),
             location=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             storage_mb=dict(
-                type='long',
-                required=False
+                type='long'
             ),
             version=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             ssl_enforcement=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             create_mode=dict(
                 type='str',
                 default='Default'
             ),
             admin_username=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             admin_password=dict(
                 type='str',
-                no_log=True,
-                required=False
+                no_log=True
             ),
             state=dict(
                 type='str',
-                required=False,
                 default='present',
                 choices=['present', 'absent']
             )
@@ -307,13 +299,13 @@ class AzureRMServers(AzureRMModuleBase):
 
         try:
             if self.to_do == Actions.Create:
-                response = self.mgmt_client.servers.create(self.resource_group,
-                                                           self.name,
-                                                           self.parameters)
+                response = self.mgmt_client.servers.create(resource_group_name=self.resource_group,
+                                                           server_name=self.name,
+                                                           parameters=self.parameters)
             else:
-                response = self.mgmt_client.servers.update(self.resource_group,
-                                                           self.name,
-                                                           self.parameters)
+                response = self.mgmt_client.servers.update(resource_group_name=self.resource_group,
+                                                           server_name=self.name,
+                                                           parameters=self.parameters)
             if isinstance(response, AzureOperationPoller):
                 response = self.get_poller_result(response)
 
@@ -330,8 +322,8 @@ class AzureRMServers(AzureRMModuleBase):
         '''
         self.log("Deleting the PostgreSQL Server instance {0}".format(self.name))
         try:
-            response = self.mgmt_client.servers.delete(self.resource_group,
-                                                       self.name)
+            response = self.mgmt_client.servers.delete(resource_group_name=self.resource_group,
+                                                       server_name=self.name)
         except CloudError as e:
             self.log('Error attempting to delete the PostgreSQL Server instance.')
             self.fail("Error deleting the PostgreSQL Server instance: {0}".format(str(e)))
@@ -347,8 +339,8 @@ class AzureRMServers(AzureRMModuleBase):
         self.log("Checking if the PostgreSQL Server instance {0} is present".format(self.name))
         found = False
         try:
-            response = self.mgmt_client.servers.get(self.resource_group,
-                                                    self.name)
+            response = self.mgmt_client.servers.get(resource_group_name=self.resource_group,
+                                                    server_name=self.name)
             found = True
             self.log("Response : {0}".format(response))
             self.log("PostgreSQL Server instance : {0} found".format(response.name))

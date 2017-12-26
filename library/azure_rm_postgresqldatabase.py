@@ -17,9 +17,9 @@ DOCUMENTATION = '''
 ---
 module: azure_rm_postgresqldatabase
 version_added: "2.5"
-short_description: Manage PostgreSQL Database instance
+short_description: Manage PostgreSQL Database instance.
 description:
-    - Create, update and delete instance of PostgreSQL Database
+    - Create, update and delete instance of PostgreSQL Database.
 
 options:
     resource_group:
@@ -108,16 +108,13 @@ class AzureRMDatabases(AzureRMModuleBase):
                 required=True
             ),
             charset=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             collation=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             state=dict(
                 type='str',
-                required=False,
                 default='present',
                 choices=['present', 'absent']
             )
@@ -220,10 +217,10 @@ class AzureRMDatabases(AzureRMModuleBase):
         self.log("Creating / Updating the PostgreSQL Database instance {0}".format(self.name))
 
         try:
-            response = self.mgmt_client.databases.create_or_update(self.resource_group,
-                                                                   self.server_name,
-                                                                   self.name,
-                                                                   self.parameters)
+            response = self.mgmt_client.databases.create_or_update(resource_group_name=self.resource_group,
+                                                                   server_name=self.server_name,
+                                                                   database_name=self.name,
+                                                                   parameters=self.parameters)
             if isinstance(response, AzureOperationPoller):
                 response = self.get_poller_result(response)
 
@@ -240,9 +237,9 @@ class AzureRMDatabases(AzureRMModuleBase):
         '''
         self.log("Deleting the PostgreSQL Database instance {0}".format(self.name))
         try:
-            response = self.mgmt_client.databases.delete(self.resource_group,
-                                                         self.server_name,
-                                                         self.name)
+            response = self.mgmt_client.databases.delete(resource_group_name=self.resource_group,
+                                                         server_name=self.server_name,
+                                                         database_name=self.name)
         except CloudError as e:
             self.log('Error attempting to delete the PostgreSQL Database instance.')
             self.fail("Error deleting the PostgreSQL Database instance: {0}".format(str(e)))
@@ -258,9 +255,9 @@ class AzureRMDatabases(AzureRMModuleBase):
         self.log("Checking if the PostgreSQL Database instance {0} is present".format(self.name))
         found = False
         try:
-            response = self.mgmt_client.databases.get(self.resource_group,
-                                                      self.server_name,
-                                                      self.name)
+            response = self.mgmt_client.databases.get(resource_group_name=self.resource_group,
+                                                      server_name=self.server_name,
+                                                      database_name=self.name)
             found = True
             self.log("Response : {0}".format(response))
             self.log("PostgreSQL Database instance : {0} found".format(response.name))

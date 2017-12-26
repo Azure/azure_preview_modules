@@ -17,9 +17,9 @@ DOCUMENTATION = '''
 ---
 module: azure_rm_sqldatabase
 version_added: "2.5"
-short_description: Manage SQL Database instance
+short_description: Manage SQL Database instance.
 description:
-    - Create, update and delete instance of SQL Database
+    - Create, update and delete instance of SQL Database.
 
 options:
     resource_group:
@@ -188,68 +188,52 @@ class AzureRMDatabases(AzureRMModuleBase):
                 required=True
             ),
             location=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             collation=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             create_mode=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             source_database_id=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             source_database_deletion_date=dict(
-                type='datetime',
-                required=False
+                type='datetime'
             ),
             restore_point_in_time=dict(
-                type='datetime',
-                required=False
+                type='datetime'
             ),
             recovery_services_recovery_point_resource_id=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             edition=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             max_size_bytes=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             requested_service_objective_id=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             requested_service_objective_name=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             elastic_pool_name=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             read_scale=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             sample_name=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             zone_redundant=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             state=dict(
                 type='str',
-                required=False,
                 default='present',
                 choices=['present', 'absent']
             )
@@ -381,10 +365,10 @@ class AzureRMDatabases(AzureRMModuleBase):
         self.log("Creating / Updating the SQL Database instance {0}".format(self.name))
 
         try:
-            response = self.mgmt_client.databases.create_or_update(self.resource_group,
-                                                                   self.server_name,
-                                                                   self.name,
-                                                                   self.parameters)
+            response = self.mgmt_client.databases.create_or_update(resource_group_name=self.resource_group,
+                                                                   server_name=self.server_name,
+                                                                   database_name=self.name,
+                                                                   parameters=self.parameters)
             if isinstance(response, AzureOperationPoller):
                 response = self.get_poller_result(response)
 
@@ -401,9 +385,9 @@ class AzureRMDatabases(AzureRMModuleBase):
         '''
         self.log("Deleting the SQL Database instance {0}".format(self.name))
         try:
-            response = self.mgmt_client.databases.delete(self.resource_group,
-                                                         self.server_name,
-                                                         self.name)
+            response = self.mgmt_client.databases.delete(resource_group_name=self.resource_group,
+                                                         server_name=self.server_name,
+                                                         database_name=self.name)
         except CloudError as e:
             self.log('Error attempting to delete the SQL Database instance.')
             self.fail("Error deleting the SQL Database instance: {0}".format(str(e)))
@@ -419,9 +403,9 @@ class AzureRMDatabases(AzureRMModuleBase):
         self.log("Checking if the SQL Database instance {0} is present".format(self.name))
         found = False
         try:
-            response = self.mgmt_client.databases.get(self.resource_group,
-                                                      self.server_name,
-                                                      self.name)
+            response = self.mgmt_client.databases.get(resource_group_name=self.resource_group,
+                                                      server_name=self.server_name,
+                                                      database_name=self.name)
             found = True
             self.log("Response : {0}".format(response))
             self.log("SQL Database instance : {0} found".format(response.name))

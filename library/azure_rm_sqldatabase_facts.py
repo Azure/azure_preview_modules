@@ -121,25 +121,20 @@ class AzureRMDatabasesFacts(AzureRMModuleBase):
                 required=True
             ),
             database_name=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             filter=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             expand=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             elastic_pool_name=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             recommended_elastic_pool_name=dict(
-                type='str',
-                required=False
-            ),
+                type='str'
+            )
         )
         # store the results of the module operation
         self.results = dict(
@@ -197,10 +192,10 @@ class AzureRMDatabasesFacts(AzureRMModuleBase):
         response = None
         results = False
         try:
-            response = self.mgmt_client.databases.list_metrics(self.resource_group,
-                                                               self.server_name,
-                                                               self.database_name,
-                                                               self.filter)
+            response = self.mgmt_client.databases.list_metrics(resource_group_name=self.resource_group,
+                                                               server_name=self.server_name,
+                                                               database_name=self.database_name,
+                                                               filter=self.filter)
             self.log("Response : {0}".format(response))
         except CloudError as e:
             self.log('Could not get facts for Databases.')
@@ -221,9 +216,9 @@ class AzureRMDatabasesFacts(AzureRMModuleBase):
         response = None
         results = False
         try:
-            response = self.mgmt_client.databases.get(self.resource_group,
-                                                      self.server_name,
-                                                      self.database_name)
+            response = self.mgmt_client.databases.get(resource_group_name=self.resource_group,
+                                                      server_name=self.server_name,
+                                                      database_name=self.database_name)
             self.log("Response : {0}".format(response))
         except CloudError as e:
             self.log('Could not get facts for Databases.')
@@ -242,8 +237,8 @@ class AzureRMDatabasesFacts(AzureRMModuleBase):
         response = None
         results = False
         try:
-            response = self.mgmt_client.databases.list_by_server(self.resource_group,
-                                                                 self.server_name)
+            response = self.mgmt_client.databases.list_by_server(resource_group_name=self.resource_group,
+                                                                 server_name=self.server_name)
             self.log("Response : {0}".format(response))
         except CloudError as e:
             self.log('Could not get facts for Databases.')
@@ -264,9 +259,9 @@ class AzureRMDatabasesFacts(AzureRMModuleBase):
         response = None
         results = False
         try:
-            response = self.mgmt_client.databases.list_metric_definitions(self.resource_group,
-                                                                          self.server_name,
-                                                                          self.database_name)
+            response = self.mgmt_client.databases.list_metric_definitions(resource_group_name=self.resource_group,
+                                                                          server_name=self.server_name,
+                                                                          database_name=self.database_name)
             self.log("Response : {0}".format(response))
         except CloudError as e:
             self.log('Could not get facts for Databases.')
@@ -287,9 +282,9 @@ class AzureRMDatabasesFacts(AzureRMModuleBase):
         response = None
         results = False
         try:
-            response = self.mgmt_client.databases.list_by_elastic_pool(self.resource_group,
-                                                                       self.server_name,
-                                                                       self.elastic_pool_name)
+            response = self.mgmt_client.databases.list_by_elastic_pool(resource_group_name=self.resource_group,
+                                                                       server_name=self.server_name,
+                                                                       elastic_pool_name=self.elastic_pool_name)
             self.log("Response : {0}".format(response))
         except CloudError as e:
             self.log('Could not get facts for Databases.')
@@ -310,9 +305,9 @@ class AzureRMDatabasesFacts(AzureRMModuleBase):
         response = None
         results = False
         try:
-            response = self.mgmt_client.databases.list_by_recommended_elastic_pool(self.resource_group,
-                                                                                   self.server_name,
-                                                                                   self.recommended_elastic_pool_name)
+            response = self.mgmt_client.databases.list_by_recommended_elastic_pool(resource_group_name=self.resource_group,
+                                                                                   server_name=self.server_name,
+                                                                                   recommended_elastic_pool_name=self.recommended_elastic_pool_name)
             self.log("Response : {0}".format(response))
         except CloudError as e:
             self.log('Could not get facts for Databases.')

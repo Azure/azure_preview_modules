@@ -17,9 +17,9 @@ DOCUMENTATION = '''
 ---
 module: azure_rm_applicationgateway
 version_added: "2.5"
-short_description: Manage Application Gateway instance
+short_description: Manage Application Gateway instance.
 description:
-    - Create, update and delete instance of Application Gateway
+    - Create, update and delete instance of Application Gateway.
 
 options:
     resource_group:
@@ -1042,92 +1042,70 @@ class AzureRMApplicationGateways(AzureRMModuleBase):
                 required=True
             ),
             id=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             location=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             sku=dict(
-                type='dict',
-                required=False
+                type='dict'
             ),
             ssl_policy=dict(
-                type='dict',
-                required=False
+                type='dict'
             ),
             gateway_ip_configurations=dict(
-                type='list',
-                required=False
+                type='list'
             ),
             authentication_certificates=dict(
-                type='list',
-                required=False
+                type='list'
             ),
             ssl_certificates=dict(
-                type='list',
-                required=False
+                type='list'
             ),
             frontend_ip_configurations=dict(
-                type='list',
-                required=False
+                type='list'
             ),
             frontend_ports=dict(
-                type='list',
-                required=False
+                type='list'
             ),
             probes=dict(
-                type='list',
-                required=False
+                type='list'
             ),
             backend_address_pools=dict(
-                type='list',
-                required=False
+                type='list'
             ),
             backend_http_settings_collection=dict(
-                type='list',
-                required=False
+                type='list'
             ),
             http_listeners=dict(
-                type='list',
-                required=False
+                type='list'
             ),
             url_path_maps=dict(
-                type='list',
-                required=False
+                type='list'
             ),
             request_routing_rules=dict(
-                type='list',
-                required=False
+                type='list'
             ),
             redirect_configurations=dict(
-                type='list',
-                required=False
+                type='list'
             ),
             web_application_firewall_configuration=dict(
-                type='dict',
-                required=False
+                type='dict'
             ),
             enable_http2=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             resource_guid=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             provisioning_state=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             etag=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             state=dict(
                 type='str',
-                required=False,
                 default='present',
                 choices=['present', 'absent']
             )
@@ -1268,9 +1246,9 @@ class AzureRMApplicationGateways(AzureRMModuleBase):
         self.log("Creating / Updating the Application Gateway instance {0}".format(self.name))
 
         try:
-            response = self.mgmt_client.application_gateways.create_or_update(self.resource_group,
-                                                                              self.name,
-                                                                              self.parameters)
+            response = self.mgmt_client.application_gateways.create_or_update(resource_group_name=self.resource_group,
+                                                                              application_gateway_name=self.name,
+                                                                              parameters=self.parameters)
             if isinstance(response, AzureOperationPoller):
                 response = self.get_poller_result(response)
 
@@ -1287,8 +1265,8 @@ class AzureRMApplicationGateways(AzureRMModuleBase):
         '''
         self.log("Deleting the Application Gateway instance {0}".format(self.name))
         try:
-            response = self.mgmt_client.application_gateways.delete(self.resource_group,
-                                                                    self.name)
+            response = self.mgmt_client.application_gateways.delete(resource_group_name=self.resource_group,
+                                                                    application_gateway_name=self.name)
         except CloudError as e:
             self.log('Error attempting to delete the Application Gateway instance.')
             self.fail("Error deleting the Application Gateway instance: {0}".format(str(e)))
@@ -1304,8 +1282,8 @@ class AzureRMApplicationGateways(AzureRMModuleBase):
         self.log("Checking if the Application Gateway instance {0} is present".format(self.name))
         found = False
         try:
-            response = self.mgmt_client.application_gateways.get(self.resource_group,
-                                                                 self.name)
+            response = self.mgmt_client.application_gateways.get(resource_group_name=self.resource_group,
+                                                                 application_gateway_name=self.name)
             found = True
             self.log("Response : {0}".format(response))
             self.log("Application Gateway instance : {0} found".format(response.name))

@@ -71,9 +71,8 @@ class AzureRMServersFacts(AzureRMModuleBase):
                 required=True
             ),
             server_name=dict(
-                type='str',
-                required=False
-            ),
+                type='str'
+            )
         )
         # store the results of the module operation
         self.results = dict(
@@ -107,8 +106,8 @@ class AzureRMServersFacts(AzureRMModuleBase):
         response = None
         results = False
         try:
-            response = self.mgmt_client.servers.get(self.resource_group,
-                                                    self.server_name)
+            response = self.mgmt_client.servers.get(resource_group_name=self.resource_group,
+                                                    server_name=self.server_name)
             self.log("Response : {0}".format(response))
         except CloudError as e:
             self.log('Could not get facts for Servers.')
@@ -127,7 +126,7 @@ class AzureRMServersFacts(AzureRMModuleBase):
         response = None
         results = False
         try:
-            response = self.mgmt_client.servers.list_by_resource_group(self.resource_group)
+            response = self.mgmt_client.servers.list_by_resource_group(resource_group_name=self.resource_group)
             self.log("Response : {0}".format(response))
         except CloudError as e:
             self.log('Could not get facts for Servers.')
