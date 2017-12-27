@@ -88,8 +88,8 @@ class AzureRMServersFacts(AzureRMModuleBase):
         for key in self.module_arg_spec:
             setattr(self, key, kwargs[key])
         self.mgmt_client = self.get_mgmt_svc_client(PostgreSQLManagementClient,
-                                                    api_version='2017-04-30-preview',
-                                                    base_url=self._cloud_environment.endpoints.resource_manager)
+                                                    base_url=self._cloud_environment.endpoints.resource_manager,
+                                                    api_version='2017-04-30-preview')
 
         if (self.resource_group is not None and
                 self.server_name is not None):
