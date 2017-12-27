@@ -60,7 +60,7 @@ options:
             - Server version. Possible values include: C(9.5), C(9.6)
     enforce_ssl:
         description:
-            - Enable ssl enforcement or not when connect to server. Possible values include: C(Enabled), C(Disabled)
+            - Enable SSL enforcement.
     create_mode:
         description:
             - Currently only C(Default) value supported
@@ -109,7 +109,7 @@ version:
     returned: always
     type: str
     sample: version
-user_visible_state:
+state:
     description:
         - A state of a server that is visible to user. Possible values include: C(Ready), C(Dropping), C(Disabled)
     returned: always
@@ -166,7 +166,8 @@ class AzureRMServers(AzureRMModuleBase):
                 type='str'
             ),
             enforce_ssl=dict(
-                type='bool'
+                type='bool',
+                default=False
             ),
             create_mode=dict(
                 type='str',
@@ -284,7 +285,7 @@ class AzureRMServers(AzureRMModuleBase):
         if response:
             self.results["id"] = response["id"]
             self.results["version"] = response["version"]
-            self.results["user_visible_state"] = response["user_visible_state"]
+            self.results["state"] = response["user_visible_state"]
             self.results["fully_qualified_domain_name"] = response["fully_qualified_domain_name"]
 
         return self.results
