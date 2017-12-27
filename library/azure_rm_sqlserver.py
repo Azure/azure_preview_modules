@@ -46,6 +46,7 @@ options:
         description:
             - "The identity type. Set this to C(SystemAssigned) in order to automatically create and assign an Azure Active Directory principal for the resou
                rce. Possible values include: C(SystemAssigned)"
+        choices: ['SystemAssigned']
 
 extends_documentation_fragment:
     - azure
@@ -137,7 +138,8 @@ class AzureRMServers(AzureRMModuleBase):
                 type='str'
             ),
             identity=dict(
-                type='str'
+                type='str',
+                choices=['SystemAssigned']
             ),
             state=dict(
                 type='str',
