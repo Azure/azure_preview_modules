@@ -150,8 +150,7 @@ class AzureRMDatabases(AzureRMModuleBase):
         response = None
 
         self.mgmt_client = self.get_mgmt_svc_client(MySQLManagementClient,
-                                                    base_url=self._cloud_environment.endpoints.resource_manager,
-                                                    api_version='2017-04-30-preview')
+                                                    base_url=self._cloud_environment.endpoints.resource_manager)
 
         resource_group = self.get_resource_group(self.resource_group)
 
