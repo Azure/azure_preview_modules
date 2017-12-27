@@ -39,7 +39,7 @@ options:
                     - The name of the sku, typically, a letter + Number code, e.g. P3.
             tier:
                 description:
-                    - "The tier of the particular SKU, e.g. Basic. Possible values include: 'Basic', 'Standard'"
+                    - The tier of the particular SKU, e.g. Basic. Possible values include: C(Basic), C(Standard)
             capacity:
                 description:
                     - "The scale up/out capacity, representing server's compute units."
@@ -51,19 +51,19 @@ options:
                     - The family of hardware.
     location:
         description:
-            - The location the resource resides in.
+            - Resource location. If not set, location from the resource group will be used as default.
     storage_mb:
         description:
             - The maximum storage allowed for a server.
     version:
         description:
-            - "Server version. Possible values include: '5.6', '5.7'"
-    ssl_enforcement:
+            - Server version. Possible values include: C(5.6), C(5.7)
+    enforce_ssl:
         description:
-            - "Enable ssl enforcement or not when connect to server. Possible values include: 'Enabled', 'Disabled'"
+            - Enable ssl enforcement or not when connect to server. Possible values include: C(Enabled), C(Disabled)
     create_mode:
         description:
-            - "Currently only 'Default' value supported"
+            - Currently only C(Default) value supported
     admin_username:
         description:
             - "The administrator's login name of a server. Can only be specified when the server is being created (and is required for creation)."
@@ -89,9 +89,9 @@ EXAMPLES = '''
         name: SkuName
         tier: Basic
         capacity: 100
-      location: OneBox
+      location: eastus
       storage_mb: 1024
-      ssl_enforcement: Enabled
+      enforce_ssl: Enabled
       admin_username: cloudsa
       admin_password: password
 '''
@@ -105,13 +105,13 @@ id:
     sample: id
 version:
     description:
-        - "Server version. Possible values include: '5.6', '5.7'"
+        - Server version. Possible values include: C(5.6), C(5.7)
     returned: always
     type: str
     sample: version
 user_visible_state:
     description:
-        - "A state of a server that is visible to user. Possible values include: 'Ready', 'Dropping', 'Disabled'"
+        - A state of a server that is visible to user. Possible values include: C(Ready), C(Dropping), C(Disabled)
     returned: always
     type: str
     sample: user_visible_state
@@ -160,13 +160,13 @@ class AzureRMServers(AzureRMModuleBase):
                 type='str'
             ),
             storage_mb=dict(
-                type='long'
+                type='int'
             ),
             version=dict(
                 type='str'
             ),
-            ssl_enforcement=dict(
-                type='str'
+            enforce_ssl=dict(
+                type='bool'
             ),
             create_mode=dict(
                 type='str',
@@ -214,8 +214,8 @@ class AzureRMServers(AzureRMModuleBase):
                     self.parameters.setdefault("properties", {})["storage_mb"] = kwargs[key]
                 elif key == "version":
                     self.parameters.setdefault("properties", {})["version"] = kwargs[key]
-                elif key == "ssl_enforcement":
-                    self.parameters.setdefault("properties", {})["ssl_enforcement"] = kwargs[key]
+                elif key == "enforce_ssl":
+                    self.parameters.setdefault("properties", {})["ssl_enforcement"] = 'Enabled' if kwargs[key] else 'Disabled'
                 elif key == "create_mode":
                     self.parameters.setdefault("properties", {})["create_mode"] = kwargs[key]
                 elif key == "admin_username":
@@ -227,6 +227,7 @@ class AzureRMServers(AzureRMModuleBase):
         response = None
 
         self.mgmt_client = self.get_mgmt_svc_client(MySQLManagementClient,
+                                                    api_version='2017-04-30-preview',
                                                     base_url=self._cloud_environment.endpoints.resource_manager)
 
         resource_group = self.get_resource_group(self.resource_group)

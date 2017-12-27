@@ -42,14 +42,14 @@ options:
             - The destination CIDR to which the route applies.
     next_hop_type:
         description:
-            - "The type of Azure hop the packet should be sent to. Possible values are: 'VirtualNetworkGateway', 'VnetLocal', 'Internet', 'VirtualAppliance',
-                and 'None'. Possible values include: 'VirtualNetworkGateway', 'VnetLocal', 'Internet', 'VirtualAppliance', 'None'"
+            - "The type of Azure hop the packet should be sent to. Possible values are: C(VirtualNetworkGateway), C(VnetLocal), C(Internet), C(VirtualApplian
+               ce), and C(None). Possible values include: C(VirtualNetworkGateway), C(VnetLocal), C(Internet), C(VirtualAppliance), C(None)"
     next_hop_ip_address:
         description:
             - The IP address packets should be forwarded to. Next hop values are only allowed in routes where the next hop type is VirtualAppliance.
     provisioning_state:
         description:
-            - "The provisioning state of the resource. Possible values are: 'Updating', 'Deleting', and 'Failed'."
+            - The provisioning state of the resource. Possible values are: C(Updating), C(Deleting), and C(Failed).
     name:
         description:
             - The name of the resource that is unique within a resource group. This name can be used to access the resource.
