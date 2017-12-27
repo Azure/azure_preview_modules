@@ -44,6 +44,7 @@ options:
         description:
             - "The type of Azure hop the packet should be sent to. Possible values are: C(VirtualNetworkGateway), C(VnetLocal), C(Internet), C(VirtualApplian
                ce), and C(None). Possible values include: C(VirtualNetworkGateway), C(VnetLocal), C(Internet), C(VirtualAppliance), C(None)"
+        choices: ['VirtualNetworkGateway', 'VnetLocal', 'Internet', 'VirtualAppliance', 'None']
     next_hop_ip_address:
         description:
             - The IP address packets should be forwarded to. Next hop values are only allowed in routes where the next hop type is VirtualAppliance.
@@ -124,7 +125,8 @@ class AzureRMRoutes(AzureRMModuleBase):
                 type='str'
             ),
             next_hop_type=dict(
-                type='str'
+                type='str',
+                choices=['VirtualNetworkGateway', 'VnetLocal', 'Internet', 'VirtualAppliance', 'None']
             ),
             next_hop_ip_address=dict(
                 type='str'

@@ -51,6 +51,7 @@ options:
                     - "The type of Azure hop the packet should be sent to. Possible values are: C(VirtualNetworkGateway), C(VnetLocal), C(Internet), C(Virtua
                        lAppliance), and C(None). Possible values include: C(VirtualNetworkGateway), C(VnetLocal), C(Internet), C(VirtualAppliance), C(None)"
                 required: True
+                choices: ['VirtualNetworkGateway', 'VnetLocal', 'Internet', 'VirtualAppliance', 'None']
             next_hop_ip_address:
                 description:
                     - The IP address packets should be forwarded to. Next hop values are only allowed in routes where the next hop type is VirtualAppliance.
