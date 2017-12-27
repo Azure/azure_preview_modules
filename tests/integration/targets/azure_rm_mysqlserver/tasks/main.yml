@@ -31,7 +31,7 @@
   assert:
     that:
       - output.changed
-      - output.user_visible_state == 'Ready'
+      - output.state == 'Ready'
 
 - name: Create again instance of MySQL Server
   azure_rm_mysqlserver:
@@ -46,7 +46,7 @@
   assert:
     that:
       - output.changed == false
-      - output.user_visible_state == 'Ready'
+      - output.state == 'Ready'
 
 - name: Delete instance of MySQL Server -- check mode
   azure_rm_mysqlserver:
