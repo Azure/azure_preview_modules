@@ -35,7 +35,7 @@ options:
             - Resource ID.
     location:
         description:
-            - Resource location.
+            - Resource location. If not set, location from the resource group will be used as default.
     routes:
         description:
             - Collection of routes contained within a route table.
@@ -48,15 +48,15 @@ options:
                     - The destination CIDR to which the route applies.
             next_hop_type:
                 description:
-                    - "The type of Azure hop the packet should be sent to. Possible values are: 'VirtualNetworkGateway', 'VnetLocal', 'Internet', 'VirtualApp
-                       liance', and 'None'. Possible values include: 'VirtualNetworkGateway', 'VnetLocal', 'Internet', 'VirtualAppliance', 'None'"
+                    - "The type of Azure hop the packet should be sent to. Possible values are: C(VirtualNetworkGateway), C(VnetLocal), C(Internet), C(Virtua
+                       lAppliance), and C(None). Possible values include: C(VirtualNetworkGateway), C(VnetLocal), C(Internet), C(VirtualAppliance), C(None)"
                 required: True
             next_hop_ip_address:
                 description:
                     - The IP address packets should be forwarded to. Next hop values are only allowed in routes where the next hop type is VirtualAppliance.
             provisioning_state:
                 description:
-                    - "The provisioning state of the resource. Possible values are: 'Updating', 'Deleting', and 'Failed'."
+                    - The provisioning state of the resource. Possible values are: C(Updating), C(Deleting), and C(Failed).
             name:
                 description:
                     - The name of the resource that is unique within a resource group. This name can be used to access the resource.
@@ -68,7 +68,7 @@ options:
             - Gets or sets whether to disable the routes learned by BGP on that route table. True means disable.
     provisioning_state:
         description:
-            - "The provisioning state of the resource. Possible values are: 'Updating', 'Deleting', and 'Failed'."
+            - The provisioning state of the resource. Possible values are: C(Updating), C(Deleting), and C(Failed).
     etag:
         description:
             - Gets a unique read-only string that changes whenever the resource is updated.
@@ -87,6 +87,7 @@ EXAMPLES = '''
     azure_rm_applicationgatewayroutetable:
       resource_group: rg1
       route_table_name: testrt
+      location: eastus
 '''
 
 RETURN = '''
