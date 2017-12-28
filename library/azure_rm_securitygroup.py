@@ -439,7 +439,7 @@ def create_rule_instance(self, rule):
     :param rule: dict
     :return: SecurityRule
     '''
-    return SecurityRule(
+    return self.network_models.SecurityRule(
         protocol=rule['protocol'],
         source_address_prefix=rule['source_address_prefix'],
         destination_address_prefix=rule['destination_address_prefix'],
