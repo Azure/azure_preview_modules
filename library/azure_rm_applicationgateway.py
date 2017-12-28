@@ -1165,7 +1165,7 @@ class AzureRMApplicationGateways(AzureRMModuleBase):
                         elif ev['name'] == 'waf_large':
                             ev['name'] = 'WAF_Large'
                     if 'tier' in ev:
-                        elif ev['tier'] == 'standard':
+                        if ev['tier'] == 'standard':
                             ev['tier'] = 'Standard'
                         elif ev['tier'] == 'waf':
                             ev['tier'] = 'WAF'
@@ -1178,14 +1178,14 @@ class AzureRMApplicationGateways(AzureRMModuleBase):
                         elif ev['policy_type'] == 'custom':
                             ev['policy_type'] = 'Custom'
                     if 'policy_name' in ev:
-                        elif ev['policy_name'] == 'app_gw_ssl_policy20150501':
+                        if ev['policy_name'] == 'app_gw_ssl_policy20150501':
                             ev['policy_name'] = 'AppGwSslPolicy20150501'
                         elif ev['policy_name'] == 'app_gw_ssl_policy20170401':
                             ev['policy_name'] = 'AppGwSslPolicy20170401'
                         elif ev['policy_name'] == 'app_gw_ssl_policy20170401_s':
                             ev['policy_name'] = 'AppGwSslPolicy20170401S'
                     if 'min_protocol_version' in ev:
-                        elif ev['min_protocol_version'] == 'tl_sv1_0':
+                        if ev['min_protocol_version'] == 'tl_sv1_0':
                             ev['min_protocol_version'] = 'TLSv1_0'
                         elif ev['min_protocol_version'] == 'tl_sv1_1':
                             ev['min_protocol_version'] = 'TLSv1_1'
@@ -1226,7 +1226,7 @@ class AzureRMApplicationGateways(AzureRMModuleBase):
                         elif ev['protocol'] == 'https':
                             ev['protocol'] = 'Https'
                     if 'cookie_based_affinity' in ev:
-                        elif ev['cookie_based_affinity'] == 'enabled':
+                        if ev['cookie_based_affinity'] == 'enabled':
                             ev['cookie_based_affinity'] = 'Enabled'
                         elif ev['cookie_based_affinity'] == 'disabled':
                             ev['cookie_based_affinity'] = 'Disabled'
