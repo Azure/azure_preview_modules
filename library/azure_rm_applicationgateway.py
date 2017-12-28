@@ -44,11 +44,11 @@ options:
                 description:
                     - "Name of an application gateway SKU. Possible values include: C(Standard_Small), C(Standard_Medium), C(Standard_Large), C(WAF_Medium),
                        C(WAF_Large)"
-                choices: ['Standard_Small', 'Standard_Medium', 'Standard_Large', 'WAF_Medium', 'WAF_Large']
+                choices: ['standard_small', 'standard_medium', 'standard_large', 'waf_medium', 'waf_large']
             tier:
                 description:
                     - Tier of an application gateway. Possible values include: C(Standard), C(WAF)
-                choices: ['Standard', 'WAF']
+                choices: ['standard', 'waf']
             capacity:
                 description:
                     - Capacity (instance count) of an application gateway.
@@ -62,18 +62,18 @@ options:
             policy_type:
                 description:
                     - Type of Ssl Policy. Possible values include: C(Predefined), C(Custom)
-                choices: ['Predefined', 'Custom']
+                choices: ['predefined', 'custom']
             policy_name:
                 description:
                     - Name of Ssl predefined policy. Possible values include: C(AppGwSslPolicy20150501), C(AppGwSslPolicy20170401), C(AppGwSslPolicy20170401S)
-                choices: ['AppGwSslPolicy20150501', 'AppGwSslPolicy20170401', 'AppGwSslPolicy20170401S']
+                choices: ['app_gw_ssl_policy20150501', 'app_gw_ssl_policy20170401', 'app_gw_ssl_policy20170401_s']
             cipher_suites:
                 description:
                     - Ssl cipher suites to be enabled in the specified order to application gateway.
             min_protocol_version:
                 description:
                     - Minimum version of Ssl protocol to be supported on application gateway. Possible values include: C(TLSv1_0), C(TLSv1_1), C(TLSv1_2)
-                choices: ['TLSv1_0', 'TLSv1_1', 'TLSv1_2']
+                choices: ['tl_sv1_0', 'tl_sv1_1', 'tl_sv1_2']
     gateway_ip_configurations:
         description:
             - Subnets of application the gateway resource.
@@ -163,7 +163,7 @@ options:
             private_ip_allocation_method:
                 description:
                     - PrivateIP allocation method. Possible values include: C(Static), C(Dynamic)
-                choices: ['Static', 'Dynamic']
+                choices: ['static', 'dynamic']
             subnet:
                 description:
                     - Reference of the subnet resource.
@@ -222,7 +222,7 @@ options:
             protocol:
                 description:
                     - Protocol. Possible values include: C(Http), C(Https)
-                choices: ['Http', 'Https']
+                choices: ['http', 'https']
             host:
                 description:
                     - Host name to send the probe to.
@@ -313,13 +313,13 @@ options:
                                         description:
                                             - "Defines how a private IP address is assigned. Possible values are: C(Static) and C(Dynamic). Possible values i
                                                nclude: C(Static), C(Dynamic)"
-                                        choices: ['Static', 'Dynamic']
+                                        choices: ['static', 'dynamic']
                                     private_ip_address_version:
                                         description:
                                             - "Available from Api-Version 2016-03-30 onwards, it represents whether the specific ipconfiguration is IPv4 or I
                                                Pv6. Default is taken as IPv4.  Possible values are: C(IPv4) and C(IPv6). Possible values include: C(IPv4), C(
                                                IPv6)"
-                                        choices: ['IPv4', 'IPv6']
+                                        choices: ['ipv4', 'ipv6']
                                     subnet:
                                         description:
                                             - Subnet bound to the IP configuration.
@@ -397,7 +397,7 @@ options:
                             protocol:
                                 description:
                                     - Possible values include: C(Udp), C(Tcp), C(All)
-                                choices: ['Udp', 'Tcp', 'All']
+                                choices: ['udp', 'tcp', 'all']
                             frontend_port:
                                 description:
                                     - "The port for the external endpoint. Port numbers for each rule must be unique within the Load Balancer. Acceptable val
@@ -430,12 +430,12 @@ options:
                         description:
                             - "Defines how a private IP address is assigned. Possible values are: C(Static) and C(Dynamic). Possible values include: C(Static
                                ), C(Dynamic)"
-                        choices: ['Static', 'Dynamic']
+                        choices: ['static', 'dynamic']
                     private_ip_address_version:
                         description:
                             - "Available from Api-Version 2016-03-30 onwards, it represents whether the specific ipconfiguration is IPv4 or IPv6. Default is
                                taken as IPv4.  Possible values are: C(IPv4) and C(IPv6). Possible values include: C(IPv4), C(IPv6)"
-                        choices: ['IPv4', 'IPv6']
+                        choices: ['ipv4', 'ipv6']
                     subnet:
                         description:
                             - Subnet bound to the IP configuration.
@@ -551,16 +551,16 @@ options:
                                     name:
                                         description:
                                             - Name of a public IP address SKU. Possible values include: C(Basic), C(Standard)
-                                        choices: ['Basic', 'Standard']
+                                        choices: ['basic', 'standard']
                             public_ip_allocation_method:
                                 description:
                                     - "The public IP allocation method. Possible values are: C(Static) and C(Dynamic). Possible values include: C(Static), C(
                                        Dynamic)"
-                                choices: ['Static', 'Dynamic']
+                                choices: ['static', 'dynamic']
                             public_ip_address_version:
                                 description:
                                     - The public IP address version. Possible values are: C(IPv4) and C(IPv6). Possible values include: C(IPv4), C(IPv6)
-                                choices: ['IPv4', 'IPv6']
+                                choices: ['ipv4', 'ipv6']
                             dns_settings:
                                 description:
                                     - The FQDN of the DNS record associated with the public IP address.
@@ -651,11 +651,11 @@ options:
             protocol:
                 description:
                     - Protocol. Possible values include: C(Http), C(Https)
-                choices: ['Http', 'Https']
+                choices: ['http', 'https']
             cookie_based_affinity:
                 description:
                     - Cookie based affinity. Possible values include: C(Enabled), C(Disabled)
-                choices: ['Enabled', 'Disabled']
+                choices: ['enabled', 'disabled']
             request_timeout:
                 description:
                     - "Request timeout in seconds. Application Gateway will fail the request if response is not received within RequestTimeout. Acceptable va
@@ -737,7 +737,7 @@ options:
             protocol:
                 description:
                     - Protocol. Possible values include: C(Http), C(Https)
-                choices: ['Http', 'Https']
+                choices: ['http', 'https']
             host_name:
                 description:
                     - Host name of HTTP listener.
@@ -856,7 +856,7 @@ options:
             rule_type:
                 description:
                     - Rule type. Possible values include: C(Basic), C(PathBasedRouting)
-                choices: ['Basic', 'PathBasedRouting']
+                choices: ['basic', 'path_based_routing']
             backend_address_pool:
                 description:
                     - Backend address pool resource of the application gateway.
@@ -915,7 +915,7 @@ options:
                 description:
                     - "Supported http redirection types - Permanent, Temporary, Found, SeeOther. Possible values include: C(Permanent), C(Found), C(SeeOther)
                        , C(Temporary)"
-                choices: ['Permanent', 'Found', 'SeeOther', 'Temporary']
+                choices: ['permanent', 'found', 'see_other', 'temporary']
             target_listener:
                 description:
                     - Reference to a listener to redirect the request to.
@@ -974,7 +974,7 @@ options:
                 description:
                     - Web application firewall mode. Possible values include: C(Detection), C(Prevention)
                 required: True
-                choices: ['Detection', 'Prevention']
+                choices: ['detection', 'prevention']
             rule_set_type:
                 description:
                     - The type of the web application firewall rule set. Possible values are: C(OWASP).
