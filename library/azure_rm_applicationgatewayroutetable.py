@@ -49,7 +49,7 @@ options:
             next_hop_type:
                 description:
                     - "The type of Azure hop the packet should be sent to. Possible values are: C(VirtualNetworkGateway), C(VnetLocal), C(Internet), C(Virtua
-                       lAppliance), and C(None). Possible values include: C(VirtualNetworkGateway), C(VnetLocal), C(Internet), C(VirtualAppliance), C(None)"
+                       lAppliance), and C(None)."
                 required: True
                 choices: ['virtual_network_gateway', 'vnet_local', 'internet', 'virtual_appliance', 'none']
             next_hop_ip_address:
@@ -180,7 +180,19 @@ class AzureRMRouteTables(AzureRMModuleBase):
                 elif key == "location":
                     self.parameters["location"] = kwargs[key]
                 elif key == "routes":
-                    self.parameters["routes"] = kwargs[key]
+                    ev = kwargs[key]
+                    if 'next_hop_type' in ev:
+                        if ev['next_hop_type'] == 'virtual_network_gateway':
+                            ev['next_hop_type'] = 'VirtualNetworkGateway'
+                        elif ev['next_hop_type'] == 'vnet_local':
+                            ev['next_hop_type'] = 'VnetLocal'
+                        elif ev['next_hop_type'] == 'internet':
+                            ev['next_hop_type'] = 'Internet'
+                        elif ev['next_hop_type'] == 'virtual_appliance':
+                            ev['next_hop_type'] = 'VirtualAppliance'
+                        elif ev['next_hop_type'] == 'none':
+                            ev['next_hop_type'] = 'None'
+                    self.parameters["routes"] = ev
                 elif key == "disable_bgp_route_propagation":
                     self.parameters["disable_bgp_route_propagation"] = kwargs[key]
                 elif key == "provisioning_state":

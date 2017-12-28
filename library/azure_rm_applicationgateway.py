@@ -42,12 +42,11 @@ options:
         suboptions:
             name:
                 description:
-                    - "Name of an application gateway SKU. Possible values include: C(Standard_Small), C(Standard_Medium), C(Standard_Large), C(WAF_Medium),
-                       C(WAF_Large)"
+                    - Name of an application gateway SKU.
                 choices: ['standard_small', 'standard_medium', 'standard_large', 'waf_medium', 'waf_large']
             tier:
                 description:
-                    - Tier of an application gateway. Possible values include: C(Standard), C(WAF)
+                    - Tier of an application gateway.
                 choices: ['standard', 'waf']
             capacity:
                 description:
@@ -61,18 +60,18 @@ options:
                     - Ssl protocols to be disabled on application gateway.
             policy_type:
                 description:
-                    - Type of Ssl Policy. Possible values include: C(Predefined), C(Custom)
+                    - Type of Ssl Policy.
                 choices: ['predefined', 'custom']
             policy_name:
                 description:
-                    - Name of Ssl predefined policy. Possible values include: C(AppGwSslPolicy20150501), C(AppGwSslPolicy20170401), C(AppGwSslPolicy20170401S)
+                    - Name of Ssl predefined policy.
                 choices: ['app_gw_ssl_policy20150501', 'app_gw_ssl_policy20170401', 'app_gw_ssl_policy20170401_s']
             cipher_suites:
                 description:
                     - Ssl cipher suites to be enabled in the specified order to application gateway.
             min_protocol_version:
                 description:
-                    - Minimum version of Ssl protocol to be supported on application gateway. Possible values include: C(TLSv1_0), C(TLSv1_1), C(TLSv1_2)
+                    - Minimum version of Ssl protocol to be supported on application gateway.
                 choices: ['tl_sv1_0', 'tl_sv1_1', 'tl_sv1_2']
     gateway_ip_configurations:
         description:
@@ -162,7 +161,7 @@ options:
                     - PrivateIPAddress of the network interface IP Configuration.
             private_ip_allocation_method:
                 description:
-                    - PrivateIP allocation method. Possible values include: C(Static), C(Dynamic)
+                    - PrivateIP allocation method.
                 choices: ['static', 'dynamic']
             subnet:
                 description:
@@ -221,7 +220,7 @@ options:
                     - Resource ID.
             protocol:
                 description:
-                    - Protocol. Possible values include: C(Http), C(Https)
+                    - Protocol.
                 choices: ['http', 'https']
             host:
                 description:
@@ -311,14 +310,12 @@ options:
                                             - Private IP address of the IP configuration.
                                     private_ip_allocation_method:
                                         description:
-                                            - "Defines how a private IP address is assigned. Possible values are: C(Static) and C(Dynamic). Possible values i
-                                               nclude: C(Static), C(Dynamic)"
+                                            - Defines how a private IP address is assigned. Possible values are: C(Static) and C(Dynamic).
                                         choices: ['static', 'dynamic']
                                     private_ip_address_version:
                                         description:
                                             - "Available from Api-Version 2016-03-30 onwards, it represents whether the specific ipconfiguration is IPv4 or I
-                                               Pv6. Default is taken as IPv4.  Possible values are: C(IPv4) and C(IPv6). Possible values include: C(IPv4), C(
-                                               IPv6)"
+                                               Pv6. Default is taken as IPv4.  Possible values are: C(IPv4) and C(IPv6)."
                                         choices: ['ipv4', 'ipv6']
                                     subnet:
                                         description:
@@ -428,13 +425,12 @@ options:
                             - Private IP address of the IP configuration.
                     private_ip_allocation_method:
                         description:
-                            - "Defines how a private IP address is assigned. Possible values are: C(Static) and C(Dynamic). Possible values include: C(Static
-                               ), C(Dynamic)"
+                            - Defines how a private IP address is assigned. Possible values are: C(Static) and C(Dynamic).
                         choices: ['static', 'dynamic']
                     private_ip_address_version:
                         description:
                             - "Available from Api-Version 2016-03-30 onwards, it represents whether the specific ipconfiguration is IPv4 or IPv6. Default is
-                               taken as IPv4.  Possible values are: C(IPv4) and C(IPv6). Possible values include: C(IPv4), C(IPv6)"
+                               taken as IPv4.  Possible values are: C(IPv4) and C(IPv6)."
                         choices: ['ipv4', 'ipv6']
                     subnet:
                         description:
@@ -550,16 +546,15 @@ options:
                                 suboptions:
                                     name:
                                         description:
-                                            - Name of a public IP address SKU. Possible values include: C(Basic), C(Standard)
+                                            - Name of a public IP address SKU.
                                         choices: ['basic', 'standard']
                             public_ip_allocation_method:
                                 description:
-                                    - "The public IP allocation method. Possible values are: C(Static) and C(Dynamic). Possible values include: C(Static), C(
-                                       Dynamic)"
+                                    - The public IP allocation method. Possible values are: C(Static) and C(Dynamic).
                                 choices: ['static', 'dynamic']
                             public_ip_address_version:
                                 description:
-                                    - The public IP address version. Possible values are: C(IPv4) and C(IPv6). Possible values include: C(IPv4), C(IPv6)
+                                    - The public IP address version. Possible values are: C(IPv4) and C(IPv6).
                                 choices: ['ipv4', 'ipv6']
                             dns_settings:
                                 description:
@@ -650,11 +645,11 @@ options:
                     - Port
             protocol:
                 description:
-                    - Protocol. Possible values include: C(Http), C(Https)
+                    - Protocol.
                 choices: ['http', 'https']
             cookie_based_affinity:
                 description:
-                    - Cookie based affinity. Possible values include: C(Enabled), C(Disabled)
+                    - Cookie based affinity.
                 choices: ['enabled', 'disabled']
             request_timeout:
                 description:
@@ -736,7 +731,7 @@ options:
                             - Resource ID.
             protocol:
                 description:
-                    - Protocol. Possible values include: C(Http), C(Https)
+                    - Protocol.
                 choices: ['http', 'https']
             host_name:
                 description:
@@ -855,7 +850,7 @@ options:
                     - Resource ID.
             rule_type:
                 description:
-                    - Rule type. Possible values include: C(Basic), C(PathBasedRouting)
+                    - Rule type.
                 choices: ['basic', 'path_based_routing']
             backend_address_pool:
                 description:
@@ -913,8 +908,7 @@ options:
                     - Resource ID.
             redirect_type:
                 description:
-                    - "Supported http redirection types - Permanent, Temporary, Found, SeeOther. Possible values include: C(Permanent), C(Found), C(SeeOther)
-                       , C(Temporary)"
+                    - Supported http redirection types - Permanent, Temporary, Found, SeeOther.
                 choices: ['permanent', 'found', 'see_other', 'temporary']
             target_listener:
                 description:
@@ -972,7 +966,7 @@ options:
                 required: True
             firewall_mode:
                 description:
-                    - Web application firewall mode. Possible values include: C(Detection), C(Prevention)
+                    - Web application firewall mode.
                 required: True
                 choices: ['detection', 'prevention']
             rule_set_type:
@@ -1158,9 +1152,46 @@ class AzureRMApplicationGateways(AzureRMModuleBase):
                 elif key == "location":
                     self.parameters["location"] = kwargs[key]
                 elif key == "sku":
-                    self.parameters["sku"] = kwargs[key]
+                    ev = kwargs[key]
+                    if 'name' in ev:
+                        if ev['name'] == 'standard_small':
+                            ev['name'] = 'Standard_Small'
+                        elif ev['name'] == 'standard_medium':
+                            ev['name'] = 'Standard_Medium'
+                        elif ev['name'] == 'standard_large':
+                            ev['name'] = 'Standard_Large'
+                        elif ev['name'] == 'waf_medium':
+                            ev['name'] = 'WAF_Medium'
+                        elif ev['name'] == 'waf_large':
+                            ev['name'] = 'WAF_Large'
+                    if 'tier' in ev:
+                        elif ev['tier'] == 'standard':
+                            ev['tier'] = 'Standard'
+                        elif ev['tier'] == 'waf':
+                            ev['tier'] = 'WAF'
+                    self.parameters["sku"] = ev
                 elif key == "ssl_policy":
-                    self.parameters["ssl_policy"] = kwargs[key]
+                    ev = kwargs[key]
+                    if 'policy_type' in ev:
+                        if ev['policy_type'] == 'predefined':
+                            ev['policy_type'] = 'Predefined'
+                        elif ev['policy_type'] == 'custom':
+                            ev['policy_type'] = 'Custom'
+                    if 'policy_name' in ev:
+                        elif ev['policy_name'] == 'app_gw_ssl_policy20150501':
+                            ev['policy_name'] = 'AppGwSslPolicy20150501'
+                        elif ev['policy_name'] == 'app_gw_ssl_policy20170401':
+                            ev['policy_name'] = 'AppGwSslPolicy20170401'
+                        elif ev['policy_name'] == 'app_gw_ssl_policy20170401_s':
+                            ev['policy_name'] = 'AppGwSslPolicy20170401S'
+                    if 'min_protocol_version' in ev:
+                        elif ev['min_protocol_version'] == 'tl_sv1_0':
+                            ev['min_protocol_version'] = 'TLSv1_0'
+                        elif ev['min_protocol_version'] == 'tl_sv1_1':
+                            ev['min_protocol_version'] = 'TLSv1_1'
+                        elif ev['min_protocol_version'] == 'tl_sv1_2':
+                            ev['min_protocol_version'] = 'TLSv1_2'
+                    self.parameters["ssl_policy"] = ev
                 elif key == "gateway_ip_configurations":
                     self.parameters["gateway_ip_configurations"] = kwargs[key]
                 elif key == "authentication_certificates":
@@ -1168,25 +1199,76 @@ class AzureRMApplicationGateways(AzureRMModuleBase):
                 elif key == "ssl_certificates":
                     self.parameters["ssl_certificates"] = kwargs[key]
                 elif key == "frontend_ip_configurations":
-                    self.parameters["frontend_ip_configurations"] = kwargs[key]
+                    ev = kwargs[key]
+                    if 'private_ip_allocation_method' in ev:
+                        if ev['private_ip_allocation_method'] == 'static':
+                            ev['private_ip_allocation_method'] = 'Static'
+                        elif ev['private_ip_allocation_method'] == 'dynamic':
+                            ev['private_ip_allocation_method'] = 'Dynamic'
+                    self.parameters["frontend_ip_configurations"] = ev
                 elif key == "frontend_ports":
                     self.parameters["frontend_ports"] = kwargs[key]
                 elif key == "probes":
-                    self.parameters["probes"] = kwargs[key]
+                    ev = kwargs[key]
+                    if 'protocol' in ev:
+                        if ev['protocol'] == 'http':
+                            ev['protocol'] = 'Http'
+                        elif ev['protocol'] == 'https':
+                            ev['protocol'] = 'Https'
+                    self.parameters["probes"] = ev
                 elif key == "backend_address_pools":
                     self.parameters["backend_address_pools"] = kwargs[key]
                 elif key == "backend_http_settings_collection":
-                    self.parameters["backend_http_settings_collection"] = kwargs[key]
+                    ev = kwargs[key]
+                    if 'protocol' in ev:
+                        if ev['protocol'] == 'http':
+                            ev['protocol'] = 'Http'
+                        elif ev['protocol'] == 'https':
+                            ev['protocol'] = 'Https'
+                    if 'cookie_based_affinity' in ev:
+                        elif ev['cookie_based_affinity'] == 'enabled':
+                            ev['cookie_based_affinity'] = 'Enabled'
+                        elif ev['cookie_based_affinity'] == 'disabled':
+                            ev['cookie_based_affinity'] = 'Disabled'
+                    self.parameters["backend_http_settings_collection"] = ev
                 elif key == "http_listeners":
-                    self.parameters["http_listeners"] = kwargs[key]
+                    ev = kwargs[key]
+                    if 'protocol' in ev:
+                        if ev['protocol'] == 'http':
+                            ev['protocol'] = 'Http'
+                        elif ev['protocol'] == 'https':
+                            ev['protocol'] = 'Https'
+                    self.parameters["http_listeners"] = ev
                 elif key == "url_path_maps":
                     self.parameters["url_path_maps"] = kwargs[key]
                 elif key == "request_routing_rules":
-                    self.parameters["request_routing_rules"] = kwargs[key]
+                    ev = kwargs[key]
+                    if 'rule_type' in ev:
+                        if ev['rule_type'] == 'basic':
+                            ev['rule_type'] = 'Basic'
+                        elif ev['rule_type'] == 'path_based_routing':
+                            ev['rule_type'] = 'PathBasedRouting'
+                    self.parameters["request_routing_rules"] = ev
                 elif key == "redirect_configurations":
-                    self.parameters["redirect_configurations"] = kwargs[key]
+                    ev = kwargs[key]
+                    if 'redirect_type' in ev:
+                        if ev['redirect_type'] == 'permanent':
+                            ev['redirect_type'] = 'Permanent'
+                        elif ev['redirect_type'] == 'found':
+                            ev['redirect_type'] = 'Found'
+                        elif ev['redirect_type'] == 'see_other':
+                            ev['redirect_type'] = 'SeeOther'
+                        elif ev['redirect_type'] == 'temporary':
+                            ev['redirect_type'] = 'Temporary'
+                    self.parameters["redirect_configurations"] = ev
                 elif key == "web_application_firewall_configuration":
-                    self.parameters["web_application_firewall_configuration"] = kwargs[key]
+                    ev = kwargs[key]
+                    if 'firewall_mode' in ev:
+                        if ev['firewall_mode'] == 'detection':
+                            ev['firewall_mode'] = 'Detection'
+                        elif ev['firewall_mode'] == 'prevention':
+                            ev['firewall_mode'] = 'Prevention'
+                    self.parameters["web_application_firewall_configuration"] = ev
                 elif key == "enable_http2":
                     self.parameters["enable_http2"] = kwargs[key]
                 elif key == "resource_guid":

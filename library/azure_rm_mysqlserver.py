@@ -39,7 +39,7 @@ options:
                     - The name of the sku, typically, a letter + Number code, e.g. P3.
             tier:
                 description:
-                    - The tier of the particular SKU, e.g. Basic. Possible values include: C(Basic), C(Standard)
+                    - The tier of the particular SKU, e.g. Basic.
                 choices: ['basic', 'standard']
             capacity:
                 description:
@@ -58,7 +58,7 @@ options:
             - The maximum storage allowed for a server.
     version:
         description:
-            - Server version. Possible values include: C(5.6), C(5.7)
+            - Server version.
         choices: ['5.6', '5.7']
     enforce_ssl:
         description:
@@ -208,7 +208,13 @@ class AzureRMServers(AzureRMModuleBase):
                 setattr(self, key, kwargs[key])
             elif kwargs[key] is not None:
                 if key == "sku":
-                    self.parameters["sku"] = kwargs[key]
+                    ev = kwargs[key]
+                    if 'tier' in ev:
+                        if ev['tier'] == 'basic':
+                            ev['tier'] = 'Basic'
+                        elif ev['tier'] == 'standard':
+                            ev['tier'] = 'Standard'
+                    self.parameters["sku"] = ev
                 elif key == "location":
                     self.parameters["location"] = kwargs[key]
                 elif key == "storage_mb":

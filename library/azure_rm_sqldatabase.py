@@ -48,13 +48,12 @@ options:
                rimary database.\n\nPointInTimeRestore: Creates a database by restoring a point in time backup of an existing database. sourceDatabaseId must
                be specified as the resource ID of the existing database, and restorePointInTime must be specified.\n\nRecovery: Creates a database by restori
                ng a geo-replicated backup. sourceDatabaseId must be specified as the recoverable database resource ID to restore.\n\nRestore: Creates a datab
-               ase by restoring a backup of a deleted database. sourceDatabaseId must be specified. If sourceDatabaseId is the databaseC(s original resource
-               ID, then sourceDatabaseDeletionDate must be specified. Otherwise sourceDatabaseId must be the restorable dropped database resource ID and sour
-               ceDatabaseDeletionDate is ignored. restorePointInTime may also be specified to restore from an earlier point in time.\n\nRestoreLongTermRetent
-               ionBackup: Creates a database by restoring from a long term retention vault. recoveryServicesRecoveryPointResourceId must be specified as the
-               recovery point resource ID.\n\nCopy, NonReadableSecondary, OnlineSecondary and RestoreLongTermRetentionBackup are not supported for DataWareho
-               use edition. Possible values include: )CopyC(, )DefaultC(, )NonReadableSecondaryC(, )OnlineSecondaryC(, )PointInTimeRestoreC(, )RecoveryC(, )R
-               estoreC(, )RestoreLongTermRetentionBackup'"
+               ase by restoring a backup of a deleted database. sourceDatabaseId must be specified. If sourceDatabaseId is the database's original resource I
+               D, then sourceDatabaseDeletionDate must be specified. Otherwise sourceDatabaseId must be the restorable dropped database resource ID and sourc
+               eDatabaseDeletionDate is ignored. restorePointInTime may also be specified to restore from an earlier point in time.\n\nRestoreLongTermRetenti
+               onBackup: Creates a database by restoring from a long term retention vault. recoveryServicesRecoveryPointResourceId must be specified as the r
+               ecovery point resource ID.\n\nCopy, NonReadableSecondary, OnlineSecondary and RestoreLongTermRetentionBackup are not supported for DataWarehou
+               se edition."
         choices: ['copy', 'default', 'non_readable_secondary', 'online_secondary', 'point_in_time_restore', 'recovery', 'restore', 'restore_long_term_retention_backup']
     source_database_id:
         description:
@@ -78,8 +77,7 @@ options:
         description:
             - "The edition of the database. The DatabaseEditions enumeration contains all the valid editions. If createMode is NonReadableSecondary or Online
                Secondary, this value is ignored. To see possible values, query the capabilities API (/subscriptions/{subscriptionId}/providers/Microsoft.Sql/
-               locations/{locationID}/capabilities) referred to by operationId: 'Capabilities_ListByLocation.'. Possible values include: C(Web), C(Business),
-                C(Basic), C(Standard), C(Premium), C(Free), C(Stretch), C(DataWarehouse), C(System), C(System2)"
+               locations/{locationID}/capabilities) referred to by operationId: 'Capabilities_ListByLocation.'."
         choices: ['web', 'business', 'basic', 'standard', 'premium', 'free', 'stretch', 'data_warehouse', 'system', 'system2']
     max_size_bytes:
         description:
@@ -98,8 +96,7 @@ options:
             - "The name of the configured service level objective of the database. This is the service level objective that is in the process of being applie
                d to the database. Once successfully updated, it will match the value of serviceLevelObjective property. To see possible values, query the cap
                abilities API (/subscriptions/{subscriptionId}/providers/Microsoft.Sql/locations/{locationID}/capabilities) referred to by operationId: 'Capab
-               ilities_ListByLocation.'. Possible values include: C(Basic), C(S0), C(S1), C(S2), C(S3), C(P1), C(P2), C(P3), C(P4), C(P6), C(P11), C(P15), C(
-               System), C(System2), C(ElasticPool)"
+               ilities_ListByLocation.'."
         choices: ['basic', 's0', 's1', 's2', 's3', 'p1', 'p2', 'p3', 'p4', 'p6', 'p11', 'p15', 'system', 'system2', 'elastic_pool']
     elastic_pool_name:
         description:
@@ -108,12 +105,12 @@ options:
     read_scale:
         description:
             - "Conditional. If the database is a geo-secondary, readScale indicates whether read-only connections are allowed to this database or not. Not su
-               pported for DataWarehouse edition. Possible values include: C(Enabled), C(Disabled)"
+               pported for DataWarehouse edition."
         choices: ['enabled', 'disabled']
     sample_name:
         description:
             - "Indicates the name of the sample schema to apply when creating this database. If createMode is not Default, this value is ignored. Not support
-               ed for DataWarehouse edition. Possible values include: C(AdventureWorksLT)"
+               ed for DataWarehouse edition."
         choices: ['adventure_works_lt']
     zone_redundant:
         description:
