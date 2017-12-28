@@ -8,6 +8,7 @@
     resource_group: "{{ resource_group }}"
     name: "mysqlsrv{{ rpfx }}"
     sku:
+      name: SkuName
       tier: basic
     location: westus
     version: 5.6
