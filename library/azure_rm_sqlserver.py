@@ -44,8 +44,7 @@ options:
             - The version of the server. For example C(12.0).
     identity:
         description:
-            - "The identity type. Set this to C(SystemAssigned) in order to automatically create and assign an Azure Active Directory principal for the resou
-               rce. Possible values include: C(SystemAssigned)"
+            - The identity type. Set this to C(SystemAssigned) in order to automatically create and assign an Azure Active Directory principal for the resource.
         choices: ['system_assigned']
 
 extends_documentation_fragment:
