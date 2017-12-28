@@ -55,7 +55,7 @@ options:
                recovery point resource ID.\n\nCopy, NonReadableSecondary, OnlineSecondary and RestoreLongTermRetentionBackup are not supported for DataWareho
                use edition. Possible values include: )CopyC(, )DefaultC(, )NonReadableSecondaryC(, )OnlineSecondaryC(, )PointInTimeRestoreC(, )RecoveryC(, )R
                estoreC(, )RestoreLongTermRetentionBackup'"
-        choices: ['Copy', 'Default', 'NonReadableSecondary', 'OnlineSecondary', 'PointInTimeRestore', 'Recovery', 'Restore', 'RestoreLongTermRetentionBackup']
+        choices: ['copy', 'default', 'non_readable_secondary', 'online_secondary', 'point_in_time_restore', 'recovery', 'restore', 'restore_long_term_retention_backup']
     source_database_id:
         description:
             - "Conditional. If createMode is Copy, NonReadableSecondary, OnlineSecondary, PointInTimeRestore, Recovery, or Restore, then this value is requir
@@ -80,7 +80,7 @@ options:
                Secondary, this value is ignored. To see possible values, query the capabilities API (/subscriptions/{subscriptionId}/providers/Microsoft.Sql/
                locations/{locationID}/capabilities) referred to by operationId: 'Capabilities_ListByLocation.'. Possible values include: C(Web), C(Business),
                 C(Basic), C(Standard), C(Premium), C(Free), C(Stretch), C(DataWarehouse), C(System), C(System2)"
-        choices: ['Web', 'Business', 'Basic', 'Standard', 'Premium', 'Free', 'Stretch', 'DataWarehouse', 'System', 'System2']
+        choices: ['web', 'business', 'basic', 'standard', 'premium', 'free', 'stretch', 'data_warehouse', 'system', 'system2']
     max_size_bytes:
         description:
             - "The max size of the database expressed in bytes. If createMode is not Default, this value is ignored. To see possible values, query the capabi
@@ -100,7 +100,7 @@ options:
                abilities API (/subscriptions/{subscriptionId}/providers/Microsoft.Sql/locations/{locationID}/capabilities) referred to by operationId: 'Capab
                ilities_ListByLocation.'. Possible values include: C(Basic), C(S0), C(S1), C(S2), C(S3), C(P1), C(P2), C(P3), C(P4), C(P6), C(P11), C(P15), C(
                System), C(System2), C(ElasticPool)"
-        choices: ['Basic', 'S0', 'S1', 'S2', 'S3', 'P1', 'P2', 'P3', 'P4', 'P6', 'P11', 'P15', 'System', 'System2', 'ElasticPool']
+        choices: ['basic', 's0', 's1', 's2', 's3', 'p1', 'p2', 'p3', 'p4', 'p6', 'p11', 'p15', 'system', 'system2', 'elastic_pool']
     elastic_pool_name:
         description:
             - "The name of the elastic pool the database is in. If elasticPoolName and requestedServiceObjectiveName are both updated, the value of requested
@@ -109,12 +109,12 @@ options:
         description:
             - "Conditional. If the database is a geo-secondary, readScale indicates whether read-only connections are allowed to this database or not. Not su
                pported for DataWarehouse edition. Possible values include: C(Enabled), C(Disabled)"
-        choices: ['Enabled', 'Disabled']
+        choices: ['enabled', 'disabled']
     sample_name:
         description:
             - "Indicates the name of the sample schema to apply when creating this database. If createMode is not Default, this value is ignored. Not support
                ed for DataWarehouse edition. Possible values include: C(AdventureWorksLT)"
-        choices: ['AdventureWorksLT']
+        choices: ['adventure_works_lt']
     zone_redundant:
         description:
             - Whether or not this database is zone redundant, which means the replicas of this database will be spread across multiple availability zones.
@@ -200,7 +200,7 @@ class AzureRMDatabases(AzureRMModuleBase):
             ),
             create_mode=dict(
                 type='str',
-                choices=['Copy', 'Default', 'NonReadableSecondary', 'OnlineSecondary', 'PointInTimeRestore', 'Recovery', 'Restore', 'RestoreLongTermRetentionBackup']
+                choices=['copy', 'default', 'non_readable_secondary', 'online_secondary', 'point_in_time_restore', 'recovery', 'restore', 'restore_long_term_retention_backup']
             ),
             source_database_id=dict(
                 type='str'
@@ -216,7 +216,7 @@ class AzureRMDatabases(AzureRMModuleBase):
             ),
             edition=dict(
                 type='str',
-                choices=['Web', 'Business', 'Basic', 'Standard', 'Premium', 'Free', 'Stretch', 'DataWarehouse', 'System', 'System2']
+                choices=['web', 'business', 'basic', 'standard', 'premium', 'free', 'stretch', 'data_warehouse', 'system', 'system2']
             ),
             max_size_bytes=dict(
                 type='str'
@@ -226,18 +226,18 @@ class AzureRMDatabases(AzureRMModuleBase):
             ),
             requested_service_objective_name=dict(
                 type='str',
-                choices=['Basic', 'S0', 'S1', 'S2', 'S3', 'P1', 'P2', 'P3', 'P4', 'P6', 'P11', 'P15', 'System', 'System2', 'ElasticPool']
+                choices=['basic', 's0', 's1', 's2', 's3', 'p1', 'p2', 'p3', 'p4', 'p6', 'p11', 'p15', 'system', 'system2', 'elastic_pool']
             ),
             elastic_pool_name=dict(
                 type='str'
             ),
             read_scale=dict(
                 type='str',
-                choices=['Enabled', 'Disabled']
+                choices=['enabled', 'disabled']
             ),
             sample_name=dict(
                 type='str',
-                choices=['AdventureWorksLT']
+                choices=['adventure_works_lt']
             ),
             zone_redundant=dict(
                 type='str'
@@ -275,7 +275,24 @@ class AzureRMDatabases(AzureRMModuleBase):
                 elif key == "collation":
                     self.parameters["collation"] = kwargs[key]
                 elif key == "create_mode":
-                    self.parameters["create_mode"] = kwargs[key]
+                    ev = kwargs[key]
+                    if ev == 'copy':
+                        ev = 'Copy'
+                    elif ev == 'default':
+                        ev = 'Default'
+                    elif ev == 'non_readable_secondary':
+                        ev = 'NonReadableSecondary'
+                    elif ev == 'online_secondary':
+                        ev = 'OnlineSecondary'
+                    elif ev == 'point_in_time_restore':
+                        ev = 'PointInTimeRestore'
+                    elif ev == 'recovery':
+                        ev = 'Recovery'
+                    elif ev == 'restore':
+                        ev = 'Restore'
+                    elif ev == 'restore_long_term_retention_backup':
+                        ev = 'RestoreLongTermRetentionBackup'
+                    self.parameters["create_mode"] = ev
                 elif key == "source_database_id":
                     self.parameters["source_database_id"] = kwargs[key]
                 elif key == "source_database_deletion_date":
@@ -285,19 +302,79 @@ class AzureRMDatabases(AzureRMModuleBase):
                 elif key == "recovery_services_recovery_point_resource_id":
                     self.parameters["recovery_services_recovery_point_resource_id"] = kwargs[key]
                 elif key == "edition":
-                    self.parameters["edition"] = kwargs[key]
+                    ev = kwargs[key]
+                    if ev == 'web':
+                        ev = 'Web'
+                    elif ev == 'business':
+                        ev = 'Business'
+                    elif ev == 'basic':
+                        ev = 'Basic'
+                    elif ev == 'standard':
+                        ev = 'Standard'
+                    elif ev == 'premium':
+                        ev = 'Premium'
+                    elif ev == 'free':
+                        ev = 'Free'
+                    elif ev == 'stretch':
+                        ev = 'Stretch'
+                    elif ev == 'data_warehouse':
+                        ev = 'DataWarehouse'
+                    elif ev == 'system':
+                        ev = 'System'
+                    elif ev == 'system2':
+                        ev = 'System2'
+                    self.parameters["edition"] = ev
                 elif key == "max_size_bytes":
                     self.parameters["max_size_bytes"] = kwargs[key]
                 elif key == "requested_service_objective_id":
                     self.parameters["requested_service_objective_id"] = kwargs[key]
                 elif key == "requested_service_objective_name":
-                    self.parameters["requested_service_objective_name"] = kwargs[key]
+                    ev = kwargs[key]
+                    if ev == 'basic':
+                        ev = 'Basic'
+                    elif ev == 's0':
+                        ev = 'S0'
+                    elif ev == 's1':
+                        ev = 'S1'
+                    elif ev == 's2':
+                        ev = 'S2'
+                    elif ev == 's3':
+                        ev = 'S3'
+                    elif ev == 'p1':
+                        ev = 'P1'
+                    elif ev == 'p2':
+                        ev = 'P2'
+                    elif ev == 'p3':
+                        ev = 'P3'
+                    elif ev == 'p4':
+                        ev = 'P4'
+                    elif ev == 'p6':
+                        ev = 'P6'
+                    elif ev == 'p11':
+                        ev = 'P11'
+                    elif ev == 'p15':
+                        ev = 'P15'
+                    elif ev == 'system':
+                        ev = 'System'
+                    elif ev == 'system2':
+                        ev = 'System2'
+                    elif ev == 'elastic_pool':
+                        ev = 'ElasticPool'
+                    self.parameters["requested_service_objective_name"] = ev
                 elif key == "elastic_pool_name":
                     self.parameters["elastic_pool_name"] = kwargs[key]
                 elif key == "read_scale":
-                    self.parameters["read_scale"] = kwargs[key]
+                    ev = kwargs[key]
+                    if ev == 'enabled':
+                        ev = 'Enabled'
+                    elif ev == 'disabled':
+                        ev = 'Disabled'
+                    self.parameters["read_scale"] = ev
                 elif key == "sample_name":
-                    self.parameters["sample_name"] = kwargs[key]
+                    ev = kwargs[key]
+                    if ev == 'adventure_works_lt':
+                        ev = 'AdventureWorksLT'
+                    self.parameters["sample_name"] = ev
                 elif key == "zone_redundant":
                     self.parameters["zone_redundant"] = kwargs[key]
 

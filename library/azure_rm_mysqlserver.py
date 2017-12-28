@@ -40,7 +40,7 @@ options:
             tier:
                 description:
                     - The tier of the particular SKU, e.g. Basic. Possible values include: C(Basic), C(Standard)
-                choices: ['Basic', 'Standard']
+                choices: ['basic', 'standard']
             capacity:
                 description:
                     - "The scale up/out capacity, representing server's compute units."
@@ -63,9 +63,6 @@ options:
     enforce_ssl:
         description:
             - Enable SSL enforcement.
-    create_mode:
-        description:
-            - Currently only C(Default) value supported
     admin_username:
         description:
             - "The administrator's login name of a server. Can only be specified when the server is being created (and is required for creation)."
