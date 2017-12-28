@@ -17,9 +17,9 @@ DOCUMENTATION = '''
 ---
 module: azure_rm_applicationgateway
 version_added: "2.5"
-short_description: Manage Application Gateway instance
+short_description: Manage Application Gateway instance.
 description:
-    - Create, update and delete instance of Application Gateway
+    - Create, update and delete instance of Application Gateway.
 
 options:
     resource_group:
@@ -35,18 +35,20 @@ options:
             - Resource ID.
     location:
         description:
-            - Resource location.
+            - Resource location. If not set, location from the resource group will be used as default.
     sku:
         description:
             - SKU of the application gateway resource.
         suboptions:
             name:
                 description:
-                    - "Name of an application gateway SKU. Possible values include: 'Standard_Small', 'Standard_Medium', 'Standard_Large', 'WAF_Medium', 'WAF
-                       _Large'"
+                    - "Name of an application gateway SKU. Possible values include: C(Standard_Small), C(Standard_Medium), C(Standard_Large), C(WAF_Medium),
+                       C(WAF_Large)"
+                choices: ['Standard_Small', 'Standard_Medium', 'Standard_Large', 'WAF_Medium', 'WAF_Large']
             tier:
                 description:
-                    - "Tier of an application gateway. Possible values include: 'Standard', 'WAF'"
+                    - Tier of an application gateway. Possible values include: C(Standard), C(WAF)
+                choices: ['Standard', 'WAF']
             capacity:
                 description:
                     - Capacity (instance count) of an application gateway.
@@ -59,16 +61,19 @@ options:
                     - Ssl protocols to be disabled on application gateway.
             policy_type:
                 description:
-                    - "Type of Ssl Policy. Possible values include: 'Predefined', 'Custom'"
+                    - Type of Ssl Policy. Possible values include: C(Predefined), C(Custom)
+                choices: ['Predefined', 'Custom']
             policy_name:
                 description:
-                    - "Name of Ssl predefined policy. Possible values include: 'AppGwSslPolicy20150501', 'AppGwSslPolicy20170401', 'AppGwSslPolicy20170401S'"
+                    - Name of Ssl predefined policy. Possible values include: C(AppGwSslPolicy20150501), C(AppGwSslPolicy20170401), C(AppGwSslPolicy20170401S)
+                choices: ['AppGwSslPolicy20150501', 'AppGwSslPolicy20170401', 'AppGwSslPolicy20170401S']
             cipher_suites:
                 description:
                     - Ssl cipher suites to be enabled in the specified order to application gateway.
             min_protocol_version:
                 description:
-                    - "Minimum version of Ssl protocol to be supported on application gateway. Possible values include: 'TLSv1_0', 'TLSv1_1', 'TLSv1_2'"
+                    - Minimum version of Ssl protocol to be supported on application gateway. Possible values include: C(TLSv1_0), C(TLSv1_1), C(TLSv1_2)
+                choices: ['TLSv1_0', 'TLSv1_1', 'TLSv1_2']
     gateway_ip_configurations:
         description:
             - Subnets of application the gateway resource.
@@ -85,7 +90,7 @@ options:
                             - Resource ID.
             provisioning_state:
                 description:
-                    - "Provisioning state of the application gateway subnet resource. Possible values are: 'Updating', 'Deleting', and 'Failed'."
+                    - Provisioning state of the application gateway subnet resource. Possible values are: C(Updating), C(Deleting), and C(Failed).
             name:
                 description:
                     - Name of the resource that is unique within a resource group. This name can be used to access the resource.
@@ -107,7 +112,7 @@ options:
                     - Certificate public data.
             provisioning_state:
                 description:
-                    - "Provisioning state of the authentication certificate resource. Possible values are: 'Updating', 'Deleting', and 'Failed'."
+                    - Provisioning state of the authentication certificate resource. Possible values are: C(Updating), C(Deleting), and C(Failed).
             name:
                 description:
                     - Name of the resource that is unique within a resource group. This name can be used to access the resource.
@@ -135,7 +140,7 @@ options:
                     - Base-64 encoded Public cert data corresponding to pfx specified in data. Only applicable in GET request.
             provisioning_state:
                 description:
-                    - "Provisioning state of the SSL certificate resource Possible values are: 'Updating', 'Deleting', and 'Failed'."
+                    - Provisioning state of the SSL certificate resource Possible values are: C(Updating), C(Deleting), and C(Failed).
             name:
                 description:
                     - Name of the resource that is unique within a resource group. This name can be used to access the resource.
@@ -157,7 +162,8 @@ options:
                     - PrivateIPAddress of the network interface IP Configuration.
             private_ip_allocation_method:
                 description:
-                    - "PrivateIP allocation method. Possible values include: 'Static', 'Dynamic'"
+                    - PrivateIP allocation method. Possible values include: C(Static), C(Dynamic)
+                choices: ['Static', 'Dynamic']
             subnet:
                 description:
                     - Reference of the subnet resource.
@@ -174,7 +180,7 @@ options:
                             - Resource ID.
             provisioning_state:
                 description:
-                    - "Provisioning state of the public IP resource. Possible values are: 'Updating', 'Deleting', and 'Failed'."
+                    - Provisioning state of the public IP resource. Possible values are: C(Updating), C(Deleting), and C(Failed).
             name:
                 description:
                     - Name of the resource that is unique within a resource group. This name can be used to access the resource.
@@ -196,7 +202,7 @@ options:
                     - Frontend port
             provisioning_state:
                 description:
-                    - "Provisioning state of the frontend port resource. Possible values are: 'Updating', 'Deleting', and 'Failed'."
+                    - Provisioning state of the frontend port resource. Possible values are: C(Updating), C(Deleting), and C(Failed).
             name:
                 description:
                     - Name of the resource that is unique within a resource group. This name can be used to access the resource.
@@ -215,13 +221,14 @@ options:
                     - Resource ID.
             protocol:
                 description:
-                    - "Protocol. Possible values include: 'Http', 'Https'"
+                    - Protocol. Possible values include: C(Http), C(Https)
+                choices: ['Http', 'Https']
             host:
                 description:
                     - Host name to send the probe to.
             path:
                 description:
-                    - "Relative path of probe. Valid path starts from '/'. Probe is sent to <Protocol>://<host>:<port><path>"
+                    - Relative path of probe. Valid path starts from C(/). Probe is sent to <Protocol>://<host>:<port><path>
             interval:
                 description:
                     - "The probing interval in seconds. This is the time interval between two consecutive probes. Acceptable values are from 1 second to 8640
@@ -252,7 +259,7 @@ options:
                             - Allowed ranges of healthy status codes. Default range of healthy status codes is 200-399.
             provisioning_state:
                 description:
-                    - "Provisioning state of the backend http settings resource. Possible values are: 'Updating', 'Deleting', and 'Failed'."
+                    - Provisioning state of the backend http settings resource. Possible values are: C(Updating), C(Deleting), and C(Failed).
             name:
                 description:
                     - Name of the resource that is unique within a resource group. This name can be used to access the resource.
@@ -304,13 +311,15 @@ options:
                                             - Private IP address of the IP configuration.
                                     private_ip_allocation_method:
                                         description:
-                                            - "Defines how a private IP address is assigned. Possible values are: 'Static' and 'Dynamic'. Possible values inc
-                                               lude: 'Static', 'Dynamic'"
+                                            - "Defines how a private IP address is assigned. Possible values are: C(Static) and C(Dynamic). Possible values i
+                                               nclude: C(Static), C(Dynamic)"
+                                        choices: ['Static', 'Dynamic']
                                     private_ip_address_version:
                                         description:
                                             - "Available from Api-Version 2016-03-30 onwards, it represents whether the specific ipconfiguration is IPv4 or I
-                                               Pv6. Default is taken as IPv4.  Possible values are: 'IPv4' and 'IPv6'. Possible values include: 'IPv4', 'IPv6
-                                               '"
+                                               Pv6. Default is taken as IPv4.  Possible values are: C(IPv4) and C(IPv6). Possible values include: C(IPv4), C(
+                                               IPv6)"
+                                        choices: ['IPv4', 'IPv6']
                                     subnet:
                                         description:
                                             - Subnet bound to the IP configuration.
@@ -325,8 +334,8 @@ options:
                                             - Application security groups in which the IP configuration is included.
                                     provisioning_state:
                                         description:
-                                            - "The provisioning state of the network interface IP configuration. Possible values are: 'Updating', 'Deleting',
-                                                and 'Failed'."
+                                            - "The provisioning state of the network interface IP configuration. Possible values are: C(Updating), C(Deleting
+                                               ), and C(Failed)."
                                     name:
                                         description:
                                             - The name of the resource that is unique within a resource group. This name can be used to access the resource.
@@ -345,7 +354,7 @@ options:
                                             - IP address
                             provisioning_state:
                                 description:
-                                    - "Provisioning state of the backend address pool resource. Possible values are: 'Updating', 'Deleting', and 'Failed'."
+                                    - Provisioning state of the backend address pool resource. Possible values are: C(Updating), C(Deleting), and C(Failed).
                             name:
                                 description:
                                     - Resource that is unique within a resource group. This name can be used to access the resource.
@@ -364,7 +373,7 @@ options:
                                     - Resource ID.
                             provisioning_state:
                                 description:
-                                    - "Get provisioning state of the public IP resource. Possible values are: 'Updating', 'Deleting', and 'Failed'."
+                                    - Get provisioning state of the public IP resource. Possible values are: C(Updating), C(Deleting), and C(Failed).
                             name:
                                 description:
                                     - Gets name of the resource that is unique within a resource group. This name can be used to access the resource.
@@ -387,7 +396,8 @@ options:
                                             - Resource ID.
                             protocol:
                                 description:
-                                    - "Possible values include: 'Udp', 'Tcp', 'All'"
+                                    - Possible values include: C(Udp), C(Tcp), C(All)
+                                choices: ['Udp', 'Tcp', 'All']
                             frontend_port:
                                 description:
                                     - "The port for the external endpoint. Port numbers for each rule must be unique within the Load Balancer. Acceptable val
@@ -401,12 +411,12 @@ options:
                                        . This element is only used when the protocol is set to TCP."
                             enable_floating_ip:
                                 description:
-                                    - "Configures a virtual machine's endpoint for the floating IP capability required to configure a SQL AlwaysOn Availabili
-                                       ty Group. This setting is required when using the SQL AlwaysOn Availability Groups in SQL server. This setting can't b
-                                       e changed after you create the endpoint."
+                                    - "Configures a virtual machineC(s endpoint for the floating IP capability required to configure a SQL AlwaysOn Availabil
+                                       ity Group. This setting is required when using the SQL AlwaysOn Availability Groups in SQL server. This setting can)t
+                                       be changed after you create the endpoint."
                             provisioning_state:
                                 description:
-                                    - "Gets the provisioning state of the public IP resource. Possible values are: 'Updating', 'Deleting', and 'Failed'."
+                                    - Gets the provisioning state of the public IP resource. Possible values are: C(Updating), C(Deleting), and C(Failed).
                             name:
                                 description:
                                     - Gets name of the resource that is unique within a resource group. This name can be used to access the resource.
@@ -418,12 +428,14 @@ options:
                             - Private IP address of the IP configuration.
                     private_ip_allocation_method:
                         description:
-                            - "Defines how a private IP address is assigned. Possible values are: 'Static' and 'Dynamic'. Possible values include: 'Static',
-                               'Dynamic'"
+                            - "Defines how a private IP address is assigned. Possible values are: C(Static) and C(Dynamic). Possible values include: C(Static
+                               ), C(Dynamic)"
+                        choices: ['Static', 'Dynamic']
                     private_ip_address_version:
                         description:
                             - "Available from Api-Version 2016-03-30 onwards, it represents whether the specific ipconfiguration is IPv4 or IPv6. Default is
-                               taken as IPv4.  Possible values are: 'IPv4' and 'IPv6'. Possible values include: 'IPv4', 'IPv6'"
+                               taken as IPv4.  Possible values are: C(IPv4) and C(IPv6). Possible values include: C(IPv4), C(IPv6)"
+                        choices: ['IPv4', 'IPv6']
                     subnet:
                         description:
                             - Subnet bound to the IP configuration.
@@ -455,7 +467,7 @@ options:
                                             - The resource GUID property of the network security group resource.
                                     provisioning_state:
                                         description:
-                                            - "The provisioning state of the public IP resource. Possible values are: 'Updating', 'Deleting', and 'Failed'."
+                                            - The provisioning state of the public IP resource. Possible values are: C(Updating), C(Deleting), and C(Failed).
                                     etag:
                                         description:
                                             - A unique read-only string that changes whenever the resource is updated.
@@ -477,7 +489,7 @@ options:
                                             - Gets or sets whether to disable the routes learned by BGP on that route table. True means disable.
                                     provisioning_state:
                                         description:
-                                            - "The provisioning state of the resource. Possible values are: 'Updating', 'Deleting', and 'Failed'."
+                                            - The provisioning state of the resource. Possible values are: C(Updating), C(Deleting), and C(Failed).
                                     etag:
                                         description:
                                             - Gets a unique read-only string that changes whenever the resource is updated.
@@ -538,14 +550,17 @@ options:
                                 suboptions:
                                     name:
                                         description:
-                                            - "Name of a public IP address SKU. Possible values include: 'Basic', 'Standard'"
+                                            - Name of a public IP address SKU. Possible values include: C(Basic), C(Standard)
+                                        choices: ['Basic', 'Standard']
                             public_ip_allocation_method:
                                 description:
-                                    - "The public IP allocation method. Possible values are: 'Static' and 'Dynamic'. Possible values include: 'Static', 'Dyna
-                                       mic'"
+                                    - "The public IP allocation method. Possible values are: C(Static) and C(Dynamic). Possible values include: C(Static), C(
+                                       Dynamic)"
+                                choices: ['Static', 'Dynamic']
                             public_ip_address_version:
                                 description:
-                                    - "The public IP address version. Possible values are: 'IPv4' and 'IPv6'. Possible values include: 'IPv4', 'IPv6'"
+                                    - The public IP address version. Possible values are: C(IPv4) and C(IPv6). Possible values include: C(IPv4), C(IPv6)
+                                choices: ['IPv4', 'IPv6']
                             dns_settings:
                                 description:
                                     - The FQDN of the DNS record associated with the public IP address.
@@ -575,7 +590,7 @@ options:
                                     - The resource GUID property of the public IP resource.
                             provisioning_state:
                                 description:
-                                    - "The provisioning state of the PublicIP resource. Possible values are: 'Updating', 'Deleting', and 'Failed'."
+                                    - The provisioning state of the PublicIP resource. Possible values are: C(Updating), C(Deleting), and C(Failed).
                             etag:
                                 description:
                                     - A unique read-only string that changes whenever the resource is updated.
@@ -594,7 +609,7 @@ options:
                                     - Resource location.
                     provisioning_state:
                         description:
-                            - "The provisioning state of the network interface IP configuration. Possible values are: 'Updating', 'Deleting', and 'Failed'."
+                            - The provisioning state of the network interface IP configuration. Possible values are: C(Updating), C(Deleting), and C(Failed).
                     name:
                         description:
                             - The name of the resource that is unique within a resource group. This name can be used to access the resource.
@@ -613,7 +628,7 @@ options:
                             - IP address
             provisioning_state:
                 description:
-                    - "Provisioning state of the backend address pool resource. Possible values are: 'Updating', 'Deleting', and 'Failed'."
+                    - Provisioning state of the backend address pool resource. Possible values are: C(Updating), C(Deleting), and C(Failed).
             name:
                 description:
                     - Resource that is unique within a resource group. This name can be used to access the resource.
@@ -635,10 +650,12 @@ options:
                     - Port
             protocol:
                 description:
-                    - "Protocol. Possible values include: 'Http', 'Https'"
+                    - Protocol. Possible values include: C(Http), C(Https)
+                choices: ['Http', 'Https']
             cookie_based_affinity:
                 description:
-                    - "Cookie based affinity. Possible values include: 'Enabled', 'Disabled'"
+                    - Cookie based affinity. Possible values include: C(Enabled), C(Disabled)
+                choices: ['Enabled', 'Disabled']
             request_timeout:
                 description:
                     - "Request timeout in seconds. Application Gateway will fail the request if response is not received within RequestTimeout. Acceptable va
@@ -686,7 +703,7 @@ options:
                     - Path which should be used as a prefix for all HTTP requests. Null means no path will be prefixed. Default value is null.
             provisioning_state:
                 description:
-                    - "Provisioning state of the backend http settings resource. Possible values are: 'Updating', 'Deleting', and 'Failed'."
+                    - Provisioning state of the backend http settings resource. Possible values are: C(Updating), C(Deleting), and C(Failed).
             name:
                 description:
                     - Name of the resource that is unique within a resource group. This name can be used to access the resource.
@@ -719,7 +736,8 @@ options:
                             - Resource ID.
             protocol:
                 description:
-                    - "Protocol. Possible values include: 'Http', 'Https'"
+                    - Protocol. Possible values include: C(Http), C(Https)
+                choices: ['Http', 'Https']
             host_name:
                 description:
                     - Host name of HTTP listener.
@@ -735,7 +753,7 @@ options:
                     - Applicable only if protocol is https. Enables SNI for multi-hosting.
             provisioning_state:
                 description:
-                    - "Provisioning state of the HTTP listener resource. Possible values are: 'Updating', 'Deleting', and 'Failed'."
+                    - Provisioning state of the HTTP listener resource. Possible values are: C(Updating), C(Deleting), and C(Failed).
             name:
                 description:
                     - Name of the resource that is unique within a resource group. This name can be used to access the resource.
@@ -806,7 +824,7 @@ options:
                                     - Resource ID.
                     provisioning_state:
                         description:
-                            - "Path rule of URL path map resource. Possible values are: 'Updating', 'Deleting', and 'Failed'."
+                            - Path rule of URL path map resource. Possible values are: C(Updating), C(Deleting), and C(Failed).
                     name:
                         description:
                             - Name of the resource that is unique within a resource group. This name can be used to access the resource.
@@ -818,7 +836,7 @@ options:
                             - Type of the resource.
             provisioning_state:
                 description:
-                    - "Provisioning state of the backend http settings resource. Possible values are: 'Updating', 'Deleting', and 'Failed'."
+                    - Provisioning state of the backend http settings resource. Possible values are: C(Updating), C(Deleting), and C(Failed).
             name:
                 description:
                     - Name of the resource that is unique within a resource group. This name can be used to access the resource.
@@ -837,7 +855,8 @@ options:
                     - Resource ID.
             rule_type:
                 description:
-                    - "Rule type. Possible values include: 'Basic', 'PathBasedRouting'"
+                    - Rule type. Possible values include: C(Basic), C(PathBasedRouting)
+                choices: ['Basic', 'PathBasedRouting']
             backend_address_pool:
                 description:
                     - Backend address pool resource of the application gateway.
@@ -875,7 +894,7 @@ options:
                             - Resource ID.
             provisioning_state:
                 description:
-                    - "Provisioning state of the request routing rule resource. Possible values are: 'Updating', 'Deleting', and 'Failed'."
+                    - Provisioning state of the request routing rule resource. Possible values are: C(Updating), C(Deleting), and C(Failed).
             name:
                 description:
                     - Name of the resource that is unique within a resource group. This name can be used to access the resource.
@@ -894,8 +913,9 @@ options:
                     - Resource ID.
             redirect_type:
                 description:
-                    - "Supported http redirection types - Permanent, Temporary, Found, SeeOther. Possible values include: 'Permanent', 'Found', 'SeeOther', '
-                       Temporary'"
+                    - "Supported http redirection types - Permanent, Temporary, Found, SeeOther. Possible values include: C(Permanent), C(Found), C(SeeOther)
+                       , C(Temporary)"
+                choices: ['Permanent', 'Found', 'SeeOther', 'Temporary']
             target_listener:
                 description:
                     - Reference to a listener to redirect the request to.
@@ -952,11 +972,12 @@ options:
                 required: True
             firewall_mode:
                 description:
-                    - "Web application firewall mode. Possible values include: 'Detection', 'Prevention'"
+                    - Web application firewall mode. Possible values include: C(Detection), C(Prevention)
                 required: True
+                choices: ['Detection', 'Prevention']
             rule_set_type:
                 description:
-                    - "The type of the web application firewall rule set. Possible values are: 'OWASP'."
+                    - The type of the web application firewall rule set. Possible values are: C(OWASP).
                 required: True
             rule_set_version:
                 description:
@@ -981,7 +1002,7 @@ options:
             - Resource GUID property of the application gateway resource.
     provisioning_state:
         description:
-            - "Provisioning state of the application gateway resource. Possible values are: 'Updating', 'Deleting', and 'Failed'."
+            - Provisioning state of the application gateway resource. Possible values are: C(Updating), C(Deleting), and C(Failed).
     etag:
         description:
             - A unique read-only string that changes whenever the resource is updated.
@@ -1000,6 +1021,7 @@ EXAMPLES = '''
     azure_rm_applicationgateway:
       resource_group: NOT FOUND
       name: NOT FOUND
+      location: eastus
 '''
 
 RETURN = '''
@@ -1042,92 +1064,70 @@ class AzureRMApplicationGateways(AzureRMModuleBase):
                 required=True
             ),
             id=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             location=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             sku=dict(
-                type='dict',
-                required=False
+                type='dict'
             ),
             ssl_policy=dict(
-                type='dict',
-                required=False
+                type='dict'
             ),
             gateway_ip_configurations=dict(
-                type='list',
-                required=False
+                type='list'
             ),
             authentication_certificates=dict(
-                type='list',
-                required=False
+                type='list'
             ),
             ssl_certificates=dict(
-                type='list',
-                required=False
+                type='list'
             ),
             frontend_ip_configurations=dict(
-                type='list',
-                required=False
+                type='list'
             ),
             frontend_ports=dict(
-                type='list',
-                required=False
+                type='list'
             ),
             probes=dict(
-                type='list',
-                required=False
+                type='list'
             ),
             backend_address_pools=dict(
-                type='list',
-                required=False
+                type='list'
             ),
             backend_http_settings_collection=dict(
-                type='list',
-                required=False
+                type='list'
             ),
             http_listeners=dict(
-                type='list',
-                required=False
+                type='list'
             ),
             url_path_maps=dict(
-                type='list',
-                required=False
+                type='list'
             ),
             request_routing_rules=dict(
-                type='list',
-                required=False
+                type='list'
             ),
             redirect_configurations=dict(
-                type='list',
-                required=False
+                type='list'
             ),
             web_application_firewall_configuration=dict(
-                type='dict',
-                required=False
+                type='dict'
             ),
             enable_http2=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             resource_guid=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             provisioning_state=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             etag=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             state=dict(
                 type='str',
-                required=False,
                 default='present',
                 choices=['present', 'absent']
             )
@@ -1268,9 +1268,9 @@ class AzureRMApplicationGateways(AzureRMModuleBase):
         self.log("Creating / Updating the Application Gateway instance {0}".format(self.name))
 
         try:
-            response = self.mgmt_client.application_gateways.create_or_update(self.resource_group,
-                                                                              self.name,
-                                                                              self.parameters)
+            response = self.mgmt_client.application_gateways.create_or_update(resource_group_name=self.resource_group,
+                                                                              application_gateway_name=self.name,
+                                                                              parameters=self.parameters)
             if isinstance(response, AzureOperationPoller):
                 response = self.get_poller_result(response)
 
@@ -1287,8 +1287,8 @@ class AzureRMApplicationGateways(AzureRMModuleBase):
         '''
         self.log("Deleting the Application Gateway instance {0}".format(self.name))
         try:
-            response = self.mgmt_client.application_gateways.delete(self.resource_group,
-                                                                    self.name)
+            response = self.mgmt_client.application_gateways.delete(resource_group_name=self.resource_group,
+                                                                    application_gateway_name=self.name)
         except CloudError as e:
             self.log('Error attempting to delete the Application Gateway instance.')
             self.fail("Error deleting the Application Gateway instance: {0}".format(str(e)))
@@ -1304,8 +1304,8 @@ class AzureRMApplicationGateways(AzureRMModuleBase):
         self.log("Checking if the Application Gateway instance {0} is present".format(self.name))
         found = False
         try:
-            response = self.mgmt_client.application_gateways.get(self.resource_group,
-                                                                 self.name)
+            response = self.mgmt_client.application_gateways.get(resource_group_name=self.resource_group,
+                                                                 application_gateway_name=self.name)
             found = True
             self.log("Response : {0}".format(response))
             self.log("Application Gateway instance : {0} found".format(response.name))

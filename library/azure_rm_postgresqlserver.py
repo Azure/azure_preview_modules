@@ -17,9 +17,9 @@ DOCUMENTATION = '''
 ---
 module: azure_rm_postgresqlserver
 version_added: "2.5"
-short_description: Manage PostgreSQL Server instance
+short_description: Manage PostgreSQL Server instance.
 description:
-    - Create, update and delete instance of PostgreSQL Server
+    - Create, update and delete instance of PostgreSQL Server.
 
 options:
     resource_group:
@@ -39,7 +39,8 @@ options:
                     - The name of the sku, typically, a letter + Number code, e.g. P3.
             tier:
                 description:
-                    - "The tier of the particular SKU, e.g. Basic. Possible values include: 'Basic', 'Standard'"
+                    - The tier of the particular SKU, e.g. Basic. Possible values include: C(Basic), C(Standard)
+                choices: ['Basic', 'Standard']
             capacity:
                 description:
                     - "The scale up/out capacity, representing server's compute units."
@@ -51,19 +52,20 @@ options:
                     - The family of hardware.
     location:
         description:
-            - The location the resource resides in.
+            - Resource location. If not set, location from the resource group will be used as default.
     storage_mb:
         description:
             - The maximum storage allowed for a server.
     version:
         description:
-            - "Server version. Possible values include: '9.5', '9.6'"
-    ssl_enforcement:
+            - Server version. Possible values include: C(9.5), C(9.6)
+        choices: ['9.5', '9.6']
+    enforce_ssl:
         description:
-            - "Enable ssl enforcement or not when connect to server. Possible values include: 'Enabled', 'Disabled'"
+            - Enable SSL enforcement.
     create_mode:
         description:
-            - "Currently only 'Default' value supported"
+            - Currently only C(Default) value supported
     admin_username:
         description:
             - "The administrator's login name of a server. Can only be specified when the server is being created (and is required for creation)."
@@ -89,9 +91,9 @@ EXAMPLES = '''
         name: SkuName
         tier: Basic
         capacity: 100
-      location: OneBox
+      location: eastus
       storage_mb: 1024
-      ssl_enforcement: Enabled
+      enforce_ssl: Enabled
       admin_username: cloudsa
       admin_password: password
 '''
@@ -105,13 +107,13 @@ id:
     sample: id
 version:
     description:
-        - "Server version. Possible values include: '9.5', '9.6'"
+        - Server version. Possible values include: C(9.5), C(9.6)
     returned: always
     type: str
     sample: version
-user_visible_state:
+state:
     description:
-        - "A state of a server that is visible to user. Possible values include: 'Ready', 'Dropping', 'Disabled'"
+        - A state of a server that is visible to user. Possible values include: C(Ready), C(Dropping), C(Disabled)
     returned: always
     type: str
     sample: user_visible_state
@@ -154,41 +156,35 @@ class AzureRMServers(AzureRMModuleBase):
                 required=True
             ),
             sku=dict(
-                type='dict',
-                required=False
+                type='dict'
             ),
             location=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             storage_mb=dict(
-                type='long',
-                required=False
+                type='int'
             ),
             version=dict(
                 type='str',
-                required=False
+                choices=['9.5', '9.6']
             ),
-            ssl_enforcement=dict(
-                type='str',
-                required=False
+            enforce_ssl=dict(
+                type='bool',
+                default=False
             ),
             create_mode=dict(
                 type='str',
                 default='Default'
             ),
             admin_username=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             admin_password=dict(
                 type='str',
-                no_log=True,
-                required=False
+                no_log=True
             ),
             state=dict(
                 type='str',
-                required=False,
                 default='present',
                 choices=['present', 'absent']
             )
@@ -222,8 +218,8 @@ class AzureRMServers(AzureRMModuleBase):
                     self.parameters.setdefault("properties", {})["storage_mb"] = kwargs[key]
                 elif key == "version":
                     self.parameters.setdefault("properties", {})["version"] = kwargs[key]
-                elif key == "ssl_enforcement":
-                    self.parameters.setdefault("properties", {})["ssl_enforcement"] = kwargs[key]
+                elif key == "enforce_ssl":
+                    self.parameters.setdefault("properties", {})["ssl_enforcement"] = 'Enabled' if kwargs[key] else 'Disabled'
                 elif key == "create_mode":
                     self.parameters.setdefault("properties", {})["create_mode"] = kwargs[key]
                 elif key == "admin_username":
@@ -292,7 +288,7 @@ class AzureRMServers(AzureRMModuleBase):
         if response:
             self.results["id"] = response["id"]
             self.results["version"] = response["version"]
-            self.results["user_visible_state"] = response["user_visible_state"]
+            self.results["state"] = response["user_visible_state"]
             self.results["fully_qualified_domain_name"] = response["fully_qualified_domain_name"]
 
         return self.results
@@ -307,13 +303,13 @@ class AzureRMServers(AzureRMModuleBase):
 
         try:
             if self.to_do == Actions.Create:
-                response = self.mgmt_client.servers.create(self.resource_group,
-                                                           self.name,
-                                                           self.parameters)
+                response = self.mgmt_client.servers.create(resource_group_name=self.resource_group,
+                                                           server_name=self.name,
+                                                           parameters=self.parameters)
             else:
-                response = self.mgmt_client.servers.update(self.resource_group,
-                                                           self.name,
-                                                           self.parameters)
+                response = self.mgmt_client.servers.update(resource_group_name=self.resource_group,
+                                                           server_name=self.name,
+                                                           parameters=self.parameters)
             if isinstance(response, AzureOperationPoller):
                 response = self.get_poller_result(response)
 
@@ -330,8 +326,8 @@ class AzureRMServers(AzureRMModuleBase):
         '''
         self.log("Deleting the PostgreSQL Server instance {0}".format(self.name))
         try:
-            response = self.mgmt_client.servers.delete(self.resource_group,
-                                                       self.name)
+            response = self.mgmt_client.servers.delete(resource_group_name=self.resource_group,
+                                                       server_name=self.name)
         except CloudError as e:
             self.log('Error attempting to delete the PostgreSQL Server instance.')
             self.fail("Error deleting the PostgreSQL Server instance: {0}".format(str(e)))
@@ -347,8 +343,8 @@ class AzureRMServers(AzureRMModuleBase):
         self.log("Checking if the PostgreSQL Server instance {0} is present".format(self.name))
         found = False
         try:
-            response = self.mgmt_client.servers.get(self.resource_group,
-                                                    self.name)
+            response = self.mgmt_client.servers.get(resource_group_name=self.resource_group,
+                                                    server_name=self.name)
             found = True
             self.log("Response : {0}".format(response))
             self.log("PostgreSQL Server instance : {0} found".format(response.name))

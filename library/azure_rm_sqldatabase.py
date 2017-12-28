@@ -17,9 +17,9 @@ DOCUMENTATION = '''
 ---
 module: azure_rm_sqldatabase
 version_added: "2.5"
-short_description: Manage SQL Database instance
+short_description: Manage SQL Database instance.
 description:
-    - Create, update and delete instance of SQL Database
+    - Create, update and delete instance of SQL Database.
 
 options:
     resource_group:
@@ -36,7 +36,7 @@ options:
         required: True
     location:
         description:
-            - Resource location.
+            - Resource location. If not set, location from the resource group will be used as default.
     collation:
         description:
             - The collation of the database. If createMode is not Default, this value is ignored.
@@ -48,13 +48,14 @@ options:
                rimary database.\n\nPointInTimeRestore: Creates a database by restoring a point in time backup of an existing database. sourceDatabaseId must
                be specified as the resource ID of the existing database, and restorePointInTime must be specified.\n\nRecovery: Creates a database by restori
                ng a geo-replicated backup. sourceDatabaseId must be specified as the recoverable database resource ID to restore.\n\nRestore: Creates a datab
-               ase by restoring a backup of a deleted database. sourceDatabaseId must be specified. If sourceDatabaseId is the database's original resource I
-               D, then sourceDatabaseDeletionDate must be specified. Otherwise sourceDatabaseId must be the restorable dropped database resource ID and sourc
-               eDatabaseDeletionDate is ignored. restorePointInTime may also be specified to restore from an earlier point in time.\n\nRestoreLongTermRetenti
-               onBackup: Creates a database by restoring from a long term retention vault. recoveryServicesRecoveryPointResourceId must be specified as the r
-               ecovery point resource ID.\n\nCopy, NonReadableSecondary, OnlineSecondary and RestoreLongTermRetentionBackup are not supported for DataWarehou
-               se edition. Possible values include: 'Copy', 'Default', 'NonReadableSecondary', 'OnlineSecondary', 'PointInTimeRestore', 'Recovery', 'Restore'
-               , 'RestoreLongTermRetentionBackup'"
+               ase by restoring a backup of a deleted database. sourceDatabaseId must be specified. If sourceDatabaseId is the databaseC(s original resource
+               ID, then sourceDatabaseDeletionDate must be specified. Otherwise sourceDatabaseId must be the restorable dropped database resource ID and sour
+               ceDatabaseDeletionDate is ignored. restorePointInTime may also be specified to restore from an earlier point in time.\n\nRestoreLongTermRetent
+               ionBackup: Creates a database by restoring from a long term retention vault. recoveryServicesRecoveryPointResourceId must be specified as the
+               recovery point resource ID.\n\nCopy, NonReadableSecondary, OnlineSecondary and RestoreLongTermRetentionBackup are not supported for DataWareho
+               use edition. Possible values include: )CopyC(, )DefaultC(, )NonReadableSecondaryC(, )OnlineSecondaryC(, )PointInTimeRestoreC(, )RecoveryC(, )R
+               estoreC(, )RestoreLongTermRetentionBackup'"
+        choices: ['Copy', 'Default', 'NonReadableSecondary', 'OnlineSecondary', 'PointInTimeRestore', 'Recovery', 'Restore', 'RestoreLongTermRetentionBackup']
     source_database_id:
         description:
             - "Conditional. If createMode is Copy, NonReadableSecondary, OnlineSecondary, PointInTimeRestore, Recovery, or Restore, then this value is requir
@@ -77,8 +78,9 @@ options:
         description:
             - "The edition of the database. The DatabaseEditions enumeration contains all the valid editions. If createMode is NonReadableSecondary or Online
                Secondary, this value is ignored. To see possible values, query the capabilities API (/subscriptions/{subscriptionId}/providers/Microsoft.Sql/
-               locations/{locationID}/capabilities) referred to by operationId: 'Capabilities_ListByLocation.'. Possible values include: 'Web', 'Business', '
-               Basic', 'Standard', 'Premium', 'Free', 'Stretch', 'DataWarehouse', 'System', 'System2'"
+               locations/{locationID}/capabilities) referred to by operationId: 'Capabilities_ListByLocation.'. Possible values include: C(Web), C(Business),
+                C(Basic), C(Standard), C(Premium), C(Free), C(Stretch), C(DataWarehouse), C(System), C(System2)"
+        choices: ['Web', 'Business', 'Basic', 'Standard', 'Premium', 'Free', 'Stretch', 'DataWarehouse', 'System', 'System2']
     max_size_bytes:
         description:
             - "The max size of the database expressed in bytes. If createMode is not Default, this value is ignored. To see possible values, query the capabi
@@ -96,8 +98,9 @@ options:
             - "The name of the configured service level objective of the database. This is the service level objective that is in the process of being applie
                d to the database. Once successfully updated, it will match the value of serviceLevelObjective property. To see possible values, query the cap
                abilities API (/subscriptions/{subscriptionId}/providers/Microsoft.Sql/locations/{locationID}/capabilities) referred to by operationId: 'Capab
-               ilities_ListByLocation.'. Possible values include: 'Basic', 'S0', 'S1', 'S2', 'S3', 'P1', 'P2', 'P3', 'P4', 'P6', 'P11', 'P15', 'System', 'Sys
-               tem2', 'ElasticPool'"
+               ilities_ListByLocation.'. Possible values include: C(Basic), C(S0), C(S1), C(S2), C(S3), C(P1), C(P2), C(P3), C(P4), C(P6), C(P11), C(P15), C(
+               System), C(System2), C(ElasticPool)"
+        choices: ['Basic', 'S0', 'S1', 'S2', 'S3', 'P1', 'P2', 'P3', 'P4', 'P6', 'P11', 'P15', 'System', 'System2', 'ElasticPool']
     elastic_pool_name:
         description:
             - "The name of the elastic pool the database is in. If elasticPoolName and requestedServiceObjectiveName are both updated, the value of requested
@@ -105,11 +108,13 @@ options:
     read_scale:
         description:
             - "Conditional. If the database is a geo-secondary, readScale indicates whether read-only connections are allowed to this database or not. Not su
-               pported for DataWarehouse edition. Possible values include: 'Enabled', 'Disabled'"
+               pported for DataWarehouse edition. Possible values include: C(Enabled), C(Disabled)"
+        choices: ['Enabled', 'Disabled']
     sample_name:
         description:
             - "Indicates the name of the sample schema to apply when creating this database. If createMode is not Default, this value is ignored. Not support
-               ed for DataWarehouse edition. Possible values include: 'AdventureWorksLT'"
+               ed for DataWarehouse edition. Possible values include: C(AdventureWorksLT)"
+        choices: ['AdventureWorksLT']
     zone_redundant:
         description:
             - Whether or not this database is zone redundant, which means the replicas of this database will be spread across multiple availability zones.
@@ -129,7 +134,7 @@ EXAMPLES = '''
       resource_group: sqlcrudtest-4799
       server_name: sqlcrudtest-5961
       name: testdb
-      location: Japan East
+      location: eastus
 '''
 
 RETURN = '''
@@ -188,68 +193,57 @@ class AzureRMDatabases(AzureRMModuleBase):
                 required=True
             ),
             location=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             collation=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             create_mode=dict(
                 type='str',
-                required=False
+                choices=['Copy', 'Default', 'NonReadableSecondary', 'OnlineSecondary', 'PointInTimeRestore', 'Recovery', 'Restore', 'RestoreLongTermRetentionBackup']
             ),
             source_database_id=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             source_database_deletion_date=dict(
-                type='datetime',
-                required=False
+                type='datetime'
             ),
             restore_point_in_time=dict(
-                type='datetime',
-                required=False
+                type='datetime'
             ),
             recovery_services_recovery_point_resource_id=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             edition=dict(
                 type='str',
-                required=False
+                choices=['Web', 'Business', 'Basic', 'Standard', 'Premium', 'Free', 'Stretch', 'DataWarehouse', 'System', 'System2']
             ),
             max_size_bytes=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             requested_service_objective_id=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             requested_service_objective_name=dict(
                 type='str',
-                required=False
+                choices=['Basic', 'S0', 'S1', 'S2', 'S3', 'P1', 'P2', 'P3', 'P4', 'P6', 'P11', 'P15', 'System', 'System2', 'ElasticPool']
             ),
             elastic_pool_name=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             read_scale=dict(
                 type='str',
-                required=False
+                choices=['Enabled', 'Disabled']
             ),
             sample_name=dict(
                 type='str',
-                required=False
+                choices=['AdventureWorksLT']
             ),
             zone_redundant=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             state=dict(
                 type='str',
-                required=False,
                 default='present',
                 choices=['present', 'absent']
             )
@@ -381,10 +375,10 @@ class AzureRMDatabases(AzureRMModuleBase):
         self.log("Creating / Updating the SQL Database instance {0}".format(self.name))
 
         try:
-            response = self.mgmt_client.databases.create_or_update(self.resource_group,
-                                                                   self.server_name,
-                                                                   self.name,
-                                                                   self.parameters)
+            response = self.mgmt_client.databases.create_or_update(resource_group_name=self.resource_group,
+                                                                   server_name=self.server_name,
+                                                                   database_name=self.name,
+                                                                   parameters=self.parameters)
             if isinstance(response, AzureOperationPoller):
                 response = self.get_poller_result(response)
 
@@ -401,9 +395,9 @@ class AzureRMDatabases(AzureRMModuleBase):
         '''
         self.log("Deleting the SQL Database instance {0}".format(self.name))
         try:
-            response = self.mgmt_client.databases.delete(self.resource_group,
-                                                         self.server_name,
-                                                         self.name)
+            response = self.mgmt_client.databases.delete(resource_group_name=self.resource_group,
+                                                         server_name=self.server_name,
+                                                         database_name=self.name)
         except CloudError as e:
             self.log('Error attempting to delete the SQL Database instance.')
             self.fail("Error deleting the SQL Database instance: {0}".format(str(e)))
@@ -419,9 +413,9 @@ class AzureRMDatabases(AzureRMModuleBase):
         self.log("Checking if the SQL Database instance {0} is present".format(self.name))
         found = False
         try:
-            response = self.mgmt_client.databases.get(self.resource_group,
-                                                      self.server_name,
-                                                      self.name)
+            response = self.mgmt_client.databases.get(resource_group_name=self.resource_group,
+                                                      server_name=self.server_name,
+                                                      database_name=self.name)
             found = True
             self.log("Response : {0}".format(response))
             self.log("SQL Database instance : {0} found".format(response.name))

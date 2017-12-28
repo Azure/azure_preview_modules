@@ -3,14 +3,10 @@
     rpfx: "{{ resource_group | hash('md5') | truncate(7, True, '') }}{{ 1000 | random }}"
   run_once: yes
 
-- name: Create instance of MySQL Server -- check mode
-  azure_rm_mysqlserver:
+- name: Create instance of RouteTables -- check mode
+  azure_rm_applicationgatewayroutetable:
     resource_group: "{{ resource_group }}"
-    name: "mysqlsrv{{ rpfx }}"
-    location: westus
-    version: 5.6
-    admin_username: zimxyz
-    admin_password: Testpasswordxyz12!
+    route_table_name: routetablename{{ rpfx }}
   check_mode: yes
   register: output
 - name: Assert the resource instance is well created
@@ -18,40 +14,30 @@
     that:
       - output.changed
 
-- name: Create instance of MySQL Server
-  azure_rm_mysqlserver:
+- name: Create instance of RouteTables
+  azure_rm_applicationgatewayroutetable:
     resource_group: "{{ resource_group }}"
-    name: "mysqlsrv{{ rpfx }}"
-    location: westus
-    version: 5.6
-    admin_username: zimxyz
-    admin_password: Testpasswordxyz12!
+    route_table_name: routetablename{{ rpfx }}
   register: output
 - name: Assert the resource instance is well created
   assert:
     that:
       - output.changed
-      - output.state == 'Ready'
 
-- name: Create again instance of MySQL Server
-  azure_rm_mysqlserver:
+- name: Create again instance of RouteTables
+  azure_rm_applicationgatewayroutetable:
     resource_group: "{{ resource_group }}"
-    name: "mysqlsrv{{ rpfx }}"
-    location: westus
-    version: 5.6
-    admin_username: zimxyz
-    admin_password: Testpasswordxyz12!
+    route_table_name: routetablename{{ rpfx }}
   register: output
 - name: Assert the state has not changed
   assert:
     that:
       - output.changed == false
-      - output.state == 'Ready'
 
-- name: Delete instance of MySQL Server -- check mode
-  azure_rm_mysqlserver:
+- name: Delete instance of RouteTables -- check mode
+  azure_rm_applicationgatewayroutetable:
     resource_group: "{{ resource_group }}"
-    name: "mysqlsrv{{ rpfx }}"
+    route_table_name: routetablename{{ rpfx }}
     state: absent
   check_mode: yes
   register: output
@@ -60,10 +46,10 @@
     that:
       - output.changed
 
-- name: Delete instance of MySQL Server
-  azure_rm_mysqlserver:
+- name: Delete instance of RouteTables
+  azure_rm_applicationgatewayroutetable:
     resource_group: "{{ resource_group }}"
-    name: "mysqlsrv{{ rpfx }}"
+    route_table_name: routetablename{{ rpfx }}
     state: absent
   register: output
 - name: Assert the state has changed
@@ -71,10 +57,10 @@
     that:
       - output.changed
 
-- name: Delete unexisting instance of MySQL Server
-  azure_rm_mysqlserver:
+- name: Delete unexisting instance of RouteTables
+  azure_rm_applicationgatewayroutetable:
     resource_group: "{{ resource_group }}"
-    name: "mysqlsrv{{ rpfx }}"
+    route_table_name: routetablename{{ rpfx }}
     state: absent
   register: output
 - name: Assert the state has changed

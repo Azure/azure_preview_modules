@@ -17,9 +17,9 @@ DOCUMENTATION = '''
 ---
 module: azure_rm_mysqlfirewallrule
 version_added: "2.5"
-short_description: Manage FirewallRules instance
+short_description: Manage FirewallRules instance.
 description:
-    - Create, update and delete instance of FirewallRules
+    - Create, update and delete instance of FirewallRules.
 
 options:
     resource_group:
@@ -106,20 +106,16 @@ class AzureRMFirewallRules(AzureRMModuleBase):
                 required=True
             ),
             parameters=dict(
-                type='dict',
-                required=False
+                type='dict'
             ),
             start_ip_address=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             end_ip_address=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             state=dict(
                 type='str',
-                required=False,
                 default='present',
                 choices=['present', 'absent']
             )
@@ -219,11 +215,11 @@ class AzureRMFirewallRules(AzureRMModuleBase):
         self.log("Creating / Updating the FirewallRules instance {0}".format(self.name))
 
         try:
-            response = self.mgmt_client.firewall_rules.create_or_update(self.resource_group,
-                                                                        self.server_name,
-                                                                        self.name,
-                                                                        self.start_ip_address,
-                                                                        self.end_ip_address)
+            response = self.mgmt_client.firewall_rules.create_or_update(resource_group_name=self.resource_group,
+                                                                        server_name=self.server_name,
+                                                                        firewall_rule_name=self.name,
+                                                                        start_ip_address=self.start_ip_address,
+                                                                        end_ip_address=self.end_ip_address)
             if isinstance(response, AzureOperationPoller):
                 response = self.get_poller_result(response)
 
@@ -240,9 +236,9 @@ class AzureRMFirewallRules(AzureRMModuleBase):
         '''
         self.log("Deleting the FirewallRules instance {0}".format(self.name))
         try:
-            response = self.mgmt_client.firewall_rules.delete(self.resource_group,
-                                                              self.server_name,
-                                                              self.name)
+            response = self.mgmt_client.firewall_rules.delete(resource_group_name=self.resource_group,
+                                                              server_name=self.server_name,
+                                                              firewall_rule_name=self.name)
         except CloudError as e:
             self.log('Error attempting to delete the FirewallRules instance.')
             self.fail("Error deleting the FirewallRules instance: {0}".format(str(e)))
@@ -258,9 +254,9 @@ class AzureRMFirewallRules(AzureRMModuleBase):
         self.log("Checking if the FirewallRules instance {0} is present".format(self.name))
         found = False
         try:
-            response = self.mgmt_client.firewall_rules.get(self.resource_group,
-                                                           self.server_name,
-                                                           self.name)
+            response = self.mgmt_client.firewall_rules.get(resource_group_name=self.resource_group,
+                                                           server_name=self.server_name,
+                                                           firewall_rule_name=self.name)
             found = True
             self.log("Response : {0}".format(response))
             self.log("FirewallRules instance : {0} found".format(response.name))

@@ -15,24 +15,22 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 
 DOCUMENTATION = '''
 ---
-module: azure_rm_mysqldatabase_facts
+module: azure_rm_applicationgatewayroutetable_facts
 version_added: "2.5"
-short_description: Get MySQL Database facts.
+short_description: Get RouteTables facts.
 description:
-    - Get facts of MySQL Database.
+    - Get facts of RouteTables.
 
 options:
     resource_group:
         description:
-            - The name of the resource group that contains the resource. You can obtain this value from the Azure Resource Manager API or the portal.
-        required: True
-    server_name:
+            - The name of the resource group.
+    route_table_name:
         description:
-            - The name of the server.
-        required: True
-    database_name:
+            - The name of the route table.
+    expand:
         description:
-            - The name of the database.
+            - Expands referenced resources.
 
 extends_documentation_fragment:
     - azure
@@ -44,16 +42,14 @@ author:
 '''
 
 EXAMPLES = '''
-  - name: Get instance of MySQL Database
-    azure_rm_mysqldatabase_facts:
+  - name: Get instance of RouteTables
+    azure_rm_applicationgatewayroutetable_facts:
       resource_group: resource_group_name
-      server_name: server_name
-      database_name: database_name
+      route_table_name: route_table_name
+      expand: expand
 
-  - name: List instances of MySQL Database
-    azure_rm_mysqldatabase_facts:
-      resource_group: resource_group_name
-      server_name: server_name
+  - name: List instances of RouteTables
+    azure_rm_applicationgatewayroutetable_facts:
 '''
 
 from ansible.module_utils.azure_rm_common import AzureRMModuleBase
@@ -61,26 +57,24 @@ from ansible.module_utils.azure_rm_common import AzureRMModuleBase
 try:
     from msrestazure.azure_exceptions import CloudError
     from msrestazure.azure_operation import AzureOperationPoller
-    from azure.mgmt.rdbms.mysql import MySQLManagementClient
+    from azure.mgmt.network import NetworkManagementClient
     from msrest.serialization import Model
 except ImportError:
     # This is handled in azure_rm_common
     pass
 
 
-class AzureRMDatabasesFacts(AzureRMModuleBase):
+class AzureRMRouteTablesFacts(AzureRMModuleBase):
     def __init__(self):
         # define user inputs into argument
         self.module_arg_spec = dict(
             resource_group=dict(
-                type='str',
-                required=True
+                type='str'
             ),
-            server_name=dict(
-                type='str',
-                required=True
+            route_table_name=dict(
+                type='str'
             ),
-            database_name=dict(
+            expand=dict(
                 type='str'
             )
         )
@@ -91,60 +85,55 @@ class AzureRMDatabasesFacts(AzureRMModuleBase):
         )
         self.mgmt_client = None
         self.resource_group = None
-        self.server_name = None
-        self.database_name = None
-        super(AzureRMDatabasesFacts, self).__init__(self.module_arg_spec)
+        self.route_table_name = None
+        self.expand = None
+        super(AzureRMRouteTablesFacts, self).__init__(self.module_arg_spec)
 
     def exec_module(self, **kwargs):
         for key in self.module_arg_spec:
             setattr(self, key, kwargs[key])
-        self.mgmt_client = self.get_mgmt_svc_client(MySQLManagementClient,
+        self.mgmt_client = self.get_mgmt_svc_client(NetworkManagementClient,
                                                     base_url=self._cloud_environment.endpoints.resource_manager)
 
         if (self.resource_group is not None and
-                self.server_name is not None and
-                self.database_name is not None):
+                self.route_table_name is not None):
             self.results['ansible_facts']['get'] = self.get()
-        elif (self.resource_group is not None and
-              self.server_name is not None):
-            self.results['ansible_facts']['list_by_server'] = self.list_by_server()
+            self.results['ansible_facts']['list_all'] = self.list_all()
         return self.results
 
     def get(self):
         '''
-        Gets facts of the specified MySQL Database.
+        Gets facts of the specified RouteTables.
 
-        :return: deserialized MySQL Databaseinstance state dictionary
+        :return: deserialized RouteTablesinstance state dictionary
         '''
         response = None
         results = False
         try:
-            response = self.mgmt_client.databases.get(resource_group_name=self.resource_group,
-                                                      server_name=self.server_name,
-                                                      database_name=self.database_name)
+            response = self.mgmt_client.route_tables.get(resource_group_name=self.resource_group,
+                                                         route_table_name=self.route_table_name)
             self.log("Response : {0}".format(response))
         except CloudError as e:
-            self.log('Could not get facts for Databases.')
+            self.log('Could not get facts for RouteTables.')
 
         if response is not None:
             results = response.as_dict()
 
         return results
 
-    def list_by_server(self):
+    def list_all(self):
         '''
-        Gets facts of the specified MySQL Database.
+        Gets facts of the specified RouteTables.
 
-        :return: deserialized MySQL Databaseinstance state dictionary
+        :return: deserialized RouteTablesinstance state dictionary
         '''
         response = None
         results = False
         try:
-            response = self.mgmt_client.databases.list_by_server(resource_group_name=self.resource_group,
-                                                                 server_name=self.server_name)
+            response = self.mgmt_client.route_tables.list_all()
             self.log("Response : {0}".format(response))
         except CloudError as e:
-            self.log('Could not get facts for Databases.')
+            self.log('Could not get facts for RouteTables.')
 
         if response is not None:
             results = []
@@ -155,6 +144,6 @@ class AzureRMDatabasesFacts(AzureRMModuleBase):
 
 
 def main():
-    AzureRMDatabasesFacts()
+    AzureRMRouteTablesFacts()
 if __name__ == '__main__':
     main()

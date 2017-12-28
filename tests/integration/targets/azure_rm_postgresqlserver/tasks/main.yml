@@ -29,7 +29,7 @@
   assert:
     that:
       - output.changed
-      - output.user_visible_state == 'Ready'
+      - output.state == 'Ready'
 
 - name: Create again instance of PostgreSQL Server
   azure_rm_postgresqlserver:
@@ -43,7 +43,7 @@
   assert:
     that:
       - output.changed == false
-      - output.user_visible_state == 'Ready'
+      - output.state == 'Ready'
 
 - name: Delete instance of PostgreSQL Server -- check mode
   azure_rm_postgresqlserver:
