@@ -1138,12 +1138,12 @@ class AzureRMApplicationGateways(AzureRMModuleBase):
 
         super(AzureRMApplicationGateways, self).__init__(derived_arg_spec=self.module_arg_spec,
                                                          supports_check_mode=True,
-                                                         supports_tags=True)
+                                                         supports_tags=False)
 
     def exec_module(self, **kwargs):
         """Main module execution method"""
 
-        for key in list(self.module_arg_spec.keys()) + ['tags']:
+        for key in list(self.module_arg_spec.keys()):
             if hasattr(self, key):
                 setattr(self, key, kwargs[key])
             elif kwargs[key] is not None:
