@@ -14,29 +14,43 @@
     tags:
         Release: beta1
         Environment: Production
-- name: Create Replications
-  azure_rm_containerregistryreplication:
+- name: Create instance of Webhooks
+  azure_rm_containerregistrywebhook:
     resource_group: "{{ resource_group }}"
     registry_name: acr{{ rpfx }}
-    replication_name: replication{{ rpfx }}
-    location: westus
+    location: eastus2
+    webhook_name: webhook{{ rpfx }}
+    service_uri: http://serviceuri.com
+    actions:
+      - push
 
-- name: Gather facts Replications
-  azure_rm_containerregistryreplication_facts:
+- name: Gather facts Webhooks
+  azure_rm_containerregistrywebhook_facts:
     resource_group: "{{ resource_group }}"
     registry_name: acr{{ rpfx }}
-    replication_name: replication{{ rpfx }}
+    webhook_name: webhook{{ rpfx }}
   register: output
 - name: Assert that facts are returned
   assert:
     that:
       - output.changed == False
 
-- name: Delete instance of Replications
-  azure_rm_containerregistryreplication:
+- name: Gather facts Webhooks
+  azure_rm_containerregistrywebhook_facts:
     resource_group: "{{ resource_group }}"
     registry_name: acr{{ rpfx }}
-    replication_name: replication{{ rpfx }}
+    webhook_name: webhook{{ rpfx }}
+  register: output
+- name: Assert that facts are returned
+  assert:
+    that:
+      - output.changed == False
+
+- name: Delete instance of Webhooks
+  azure_rm_containerregistrywebhook:
+    resource_group: "{{ resource_group }}"
+    registry_name: acr{{ rpfx }}
+    webhook_name: webhook{{ rpfx }}
     state: absent
 - name: Delete container registry
   azure_rm_containerregistry:

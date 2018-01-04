@@ -15,11 +15,15 @@
         Release: beta1
         Environment: Production
 
-- name: Create instance of Replications -- check mode
-  azure_rm_containerregistryreplication:
+- name: Create instance of Webhooks -- check mode
+  azure_rm_containerregistrywebhook:
     resource_group: "{{ resource_group }}"
     registry_name: acr{{ rpfx }}
-    replication_name: replication{{ rpfx }}
+    webhook_name: webhook{{ rpfx }}
+    location: eastus2
+    service_uri: http://serviceuri.com
+    actions:
+      - push
   check_mode: yes
   register: output
 - name: Assert the resource instance is well created
@@ -27,35 +31,41 @@
     that:
       - output.changed
 
-- name: Create instance of Replications
-  azure_rm_containerregistryreplication:
+- name: Create instance of Webhooks
+  azure_rm_containerregistrywebhook:
     resource_group: "{{ resource_group }}"
     registry_name: acr{{ rpfx }}
-    replication_name: replication{{ rpfx }}
-    location: westus
+    location: eastus2
+    webhook_name: webhook{{ rpfx }}
+    service_uri: http://serviceuri.com
+    actions:
+      - push
   register: output
 - name: Assert the resource instance is well created
   assert:
     that:
       - output.changed
 
-- name: Create again instance of Replications
-  azure_rm_containerregistryreplication:
+- name: Create again instance of Webhooks
+  azure_rm_containerregistrywebhook:
     resource_group: "{{ resource_group }}"
     registry_name: acr{{ rpfx }}
-    replication_name: replication{{ rpfx }}
-    location: westus
+    webhook_name: webhook{{ rpfx }}
+    location: eastus2
+    service_uri: http://serviceuri.com
+    actions:
+      - push
   register: output
 - name: Assert the state has not changed
   assert:
     that:
       - output.changed == false
 
-- name: Delete instance of Replications -- check mode
-  azure_rm_containerregistryreplication:
+- name: Delete instance of Webhooks -- check mode
+  azure_rm_containerregistrywebhook:
     resource_group: "{{ resource_group }}"
     registry_name: acr{{ rpfx }}
-    replication_name: replication{{ rpfx }}
+    webhook_name: webhook{{ rpfx }}
     state: absent
   check_mode: yes
   register: output
@@ -64,11 +74,11 @@
     that:
       - output.changed
 
-- name: Delete instance of Replications
-  azure_rm_containerregistryreplication:
+- name: Delete instance of Webhooks
+  azure_rm_containerregistrywebhook:
     resource_group: "{{ resource_group }}"
     registry_name: acr{{ rpfx }}
-    replication_name: replication{{ rpfx }}
+    webhook_name: webhook{{ rpfx }}
     state: absent
   register: output
 - name: Assert the state has changed
@@ -76,11 +86,11 @@
     that:
       - output.changed
 
-- name: Delete unexisting instance of Replications
-  azure_rm_containerregistryreplication:
+- name: Delete unexisting instance of Webhooks
+  azure_rm_containerregistrywebhook:
     resource_group: "{{ resource_group }}"
     registry_name: acr{{ rpfx }}
-    replication_name: replication{{ rpfx }}
+    webhook_name: webhook{{ rpfx }}
     state: absent
   register: output
 - name: Assert the state has changed
