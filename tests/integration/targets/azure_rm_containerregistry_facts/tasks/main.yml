@@ -5,7 +5,7 @@
 
 - name: Create an container registry
   azure_rm_containerregistry:
-    name: acr{{ resource_group | hash('md5') | truncate(7, True, '') }}
+    name: acr{{ rpfx }}
     resource_group: "{{ resource_group }}"
     location: eastus2
     state: present
@@ -53,6 +53,6 @@
 
 - name: Delete container registry
   azure_rm_containerregistry:
-    name: acr{{ resource_group | hash('md5') | truncate(7, True, '') }}
+    name: acr{{ rpfx }}
     resource_group: "{{ resource_group }}"
     state: absent

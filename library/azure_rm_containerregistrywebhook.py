@@ -40,7 +40,6 @@ options:
     service_uri:
         description:
             - The service URI for the webhook to post notifications.
-        required: True
     custom_headers:
         description:
             - Custom headers that will be added to the webhook notifications.
@@ -55,7 +54,6 @@ options:
     actions:
         description:
             - The list of actions that trigger the webhook to post notifications.
-        required: True
 
 extends_documentation_fragment:
     - azure
