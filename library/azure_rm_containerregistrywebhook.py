@@ -54,10 +54,10 @@ options:
     actions:
         description:
             - The list of actions that trigger the webhook to post notifications.
+        type: list
 
 extends_documentation_fragment:
     - azure
-    - azure_tags
 
 author:
     - "Zim Kalinowski (@zikalino)"

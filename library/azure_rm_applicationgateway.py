@@ -58,6 +58,7 @@ options:
             disabled_ssl_protocols:
                 description:
                     - Ssl protocols to be disabled on application gateway.
+                type: list
             policy_type:
                 description:
                     - Type of Ssl Policy.
@@ -69,6 +70,7 @@ options:
             cipher_suites:
                 description:
                     - Ssl cipher suites to be enabled in the specified order to application gateway.
+                type: list
             min_protocol_version:
                 description:
                     - Minimum version of Ssl protocol to be supported on application gateway.
@@ -76,6 +78,7 @@ options:
     gateway_ip_configurations:
         description:
             - Subnets of application the gateway resource.
+        type: list
         suboptions:
             id:
                 description:
@@ -102,6 +105,7 @@ options:
     authentication_certificates:
         description:
             - Authentication certificates of the application gateway resource.
+        type: list
         suboptions:
             id:
                 description:
@@ -124,6 +128,7 @@ options:
     ssl_certificates:
         description:
             - SSL certificates of the application gateway resource.
+        type: list
         suboptions:
             id:
                 description:
@@ -152,6 +157,7 @@ options:
     frontend_ip_configurations:
         description:
             - Frontend IP addresses of the application gateway resource.
+        type: list
         suboptions:
             id:
                 description:
@@ -192,6 +198,7 @@ options:
     frontend_ports:
         description:
             - Frontend ports of the application gateway resource.
+        type: list
         suboptions:
             id:
                 description:
@@ -214,6 +221,7 @@ options:
     probes:
         description:
             - Probes of the application gateway resource.
+        type: list
         suboptions:
             id:
                 description:
@@ -256,6 +264,7 @@ options:
                     status_codes:
                         description:
                             - Allowed ranges of healthy status codes. Default range of healthy status codes is 200-399.
+                        type: list
             provisioning_state:
                 description:
                     - Provisioning state of the backend http settings resource. Possible values are: C(Updating), C(Deleting), and C(Failed).
@@ -271,6 +280,7 @@ options:
     backend_address_pools:
         description:
             - Backend address pool of the application gateway resource.
+        type: list
         suboptions:
             id:
                 description:
@@ -278,6 +288,7 @@ options:
             backend_ip_configurations:
                 description:
                     - Collection of references to IPs defined in network interfaces.
+                type: list
                 suboptions:
                     id:
                         description:
@@ -285,6 +296,7 @@ options:
                     application_gateway_backend_address_pools:
                         description:
                             - The reference of ApplicationGatewayBackendAddressPool resource.
+                        type: list
                         suboptions:
                             id:
                                 description:
@@ -292,6 +304,7 @@ options:
                             backend_ip_configurations:
                                 description:
                                     - Collection of references to IPs defined in network interfaces.
+                                type: list
                                 suboptions:
                                     id:
                                         description:
@@ -299,12 +312,15 @@ options:
                                     application_gateway_backend_address_pools:
                                         description:
                                             - The reference of ApplicationGatewayBackendAddressPool resource.
+                                        type: list
                                     load_balancer_backend_address_pools:
                                         description:
                                             - The reference of LoadBalancerBackendAddressPool resource.
+                                        type: list
                                     load_balancer_inbound_nat_rules:
                                         description:
                                             - A list of references of LoadBalancerInboundNatRules.
+                                        type: list
                                     private_ip_address:
                                         description:
                                             - Private IP address of the IP configuration.
@@ -329,6 +345,7 @@ options:
                                     application_security_groups:
                                         description:
                                             - Application security groups in which the IP configuration is included.
+                                        type: list
                                     provisioning_state:
                                         description:
                                             - "The provisioning state of the network interface IP configuration. Possible values are: C(Updating), C(Deleting
@@ -342,6 +359,7 @@ options:
                             backend_addresses:
                                 description:
                                     - Backend addresses
+                                type: list
                                 suboptions:
                                     fqdn:
                                         description:
@@ -364,6 +382,7 @@ options:
                     load_balancer_backend_address_pools:
                         description:
                             - The reference of LoadBalancerBackendAddressPool resource.
+                        type: list
                         suboptions:
                             id:
                                 description:
@@ -380,6 +399,7 @@ options:
                     load_balancer_inbound_nat_rules:
                         description:
                             - A list of references of LoadBalancerInboundNatRules.
+                        type: list
                         suboptions:
                             id:
                                 description:
@@ -455,9 +475,11 @@ options:
                                     security_rules:
                                         description:
                                             - A collection of security rules of the network security group.
+                                        type: list
                                     default_security_rules:
                                         description:
                                             - The default security rules of network security group.
+                                        type: list
                                     resource_guid:
                                         description:
                                             - The resource GUID property of the network security group resource.
@@ -480,6 +502,7 @@ options:
                                     routes:
                                         description:
                                             - Collection of routes contained within a route table.
+                                        type: list
                                     disable_bgp_route_propagation:
                                         description:
                                             - Gets or sets whether to disable the routes learned by BGP on that route table. True means disable.
@@ -492,6 +515,7 @@ options:
                             service_endpoints:
                                 description:
                                     - An array of service endpoints.
+                                type: list
                                 suboptions:
                                     service:
                                         description:
@@ -499,12 +523,14 @@ options:
                                     locations:
                                         description:
                                             - A list of locations.
+                                        type: list
                                     provisioning_state:
                                         description:
                                             - The provisioning state of the resource.
                             resource_navigation_links:
                                 description:
                                     - Gets an array of references to the external resources using subnet.
+                                type: list
                                 suboptions:
                                     id:
                                         description:
@@ -592,9 +618,11 @@ options:
                             zones:
                                 description:
                                     - A list of availability zones denoting the IP allocated for the resource needs to come from.
+                                type: list
                     application_security_groups:
                         description:
                             - Application security groups in which the IP configuration is included.
+                        type: list
                         suboptions:
                             id:
                                 description:
@@ -614,6 +642,7 @@ options:
             backend_addresses:
                 description:
                     - Backend addresses
+                type: list
                 suboptions:
                     fqdn:
                         description:
@@ -636,6 +665,7 @@ options:
     backend_http_settings_collection:
         description:
             - Backend http settings of the application gateway resource.
+        type: list
         suboptions:
             id:
                 description:
@@ -665,6 +695,7 @@ options:
             authentication_certificates:
                 description:
                     - Array of references to application gateway authentication certificates.
+                type: list
                 suboptions:
                     id:
                         description:
@@ -711,6 +742,7 @@ options:
     http_listeners:
         description:
             - Http listeners of the application gateway resource.
+        type: list
         suboptions:
             id:
                 description:
@@ -761,6 +793,7 @@ options:
     url_path_maps:
         description:
             - URL path map of the application gateway resource.
+        type: list
         suboptions:
             id:
                 description:
@@ -789,6 +822,7 @@ options:
             path_rules:
                 description:
                     - Path rule of URL path map resource.
+                type: list
                 suboptions:
                     id:
                         description:
@@ -796,6 +830,7 @@ options:
                     paths:
                         description:
                             - Path rules of URL path map.
+                        type: list
                     backend_address_pool:
                         description:
                             - Backend address pool resource of URL path map path rule.
@@ -844,6 +879,7 @@ options:
     request_routing_rules:
         description:
             - Request routing rules of the application gateway resource.
+        type: list
         suboptions:
             id:
                 description:
@@ -902,6 +938,7 @@ options:
     redirect_configurations:
         description:
             - Redirect configurations of the application gateway resource.
+        type: list
         suboptions:
             id:
                 description:
@@ -929,6 +966,7 @@ options:
             request_routing_rules:
                 description:
                     - Request routing specifying redirect configuration.
+                type: list
                 suboptions:
                     id:
                         description:
@@ -936,6 +974,7 @@ options:
             url_path_maps:
                 description:
                     - Url path maps specifying default redirect configuration.
+                type: list
                 suboptions:
                     id:
                         description:
@@ -943,6 +982,7 @@ options:
             path_rules:
                 description:
                     - Path rules specifying redirect configuration.
+                type: list
                 suboptions:
                     id:
                         description:
@@ -980,6 +1020,7 @@ options:
             disabled_rule_groups:
                 description:
                     - The disabled rule groups.
+                type: list
                 suboptions:
                     rule_group_name:
                         description:
@@ -988,6 +1029,7 @@ options:
                     rules:
                         description:
                             - The list of rules that will be disabled. If null, all rules of the rule group will be disabled.
+                        type: list
     enable_http2:
         description:
             - Whether HTTP2 is enabled on the application gateway resource.
@@ -1003,7 +1045,6 @@ options:
 
 extends_documentation_fragment:
     - azure
-    - azure_tags
 
 author:
     - "Zim Kalinowski (@zikalino)"

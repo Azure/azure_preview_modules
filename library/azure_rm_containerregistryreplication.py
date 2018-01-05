@@ -43,7 +43,6 @@ options:
 
 extends_documentation_fragment:
     - azure
-    - azure_tags
 
 author:
     - "Zim Kalinowski (@zikalino)"
@@ -152,8 +151,8 @@ class AzureRMReplications(AzureRMModuleBase):
 
         resource_group = self.get_resource_group(self.resource_group)
 
-        #if "location" not in self.parameters:
-        #    self.parameters["location"] = resource_group.location
+        if "location" not in self.parameters:
+            self.parameters["location"] = resource_group.location
 
         old_response = self.get_replications()
 
