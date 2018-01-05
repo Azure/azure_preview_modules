@@ -150,7 +150,7 @@ class AzureRMRoutes(AzureRMModuleBase):
         self.resource_group = None
         self.route_table_name = None
         self.route_name = None
-        self.route_parameters = dict()
+        self.parameters = dict()
 
         self.results = dict(changed=False)
         self.mgmt_client = None
@@ -169,9 +169,9 @@ class AzureRMRoutes(AzureRMModuleBase):
                 setattr(self, key, kwargs[key])
             elif kwargs[key] is not None:
                 if key == "id":
-                    self.route_parameters["id"] = kwargs[key]
+                    self.parameters["id"] = kwargs[key]
                 elif key == "address_prefix":
-                    self.route_parameters["address_prefix"] = kwargs[key]
+                    self.parameters["address_prefix"] = kwargs[key]
                 elif key == "next_hop_type":
                     ev = kwargs[key]
                     if ev == 'virtual_network_gateway':
@@ -184,15 +184,15 @@ class AzureRMRoutes(AzureRMModuleBase):
                         ev = 'VirtualAppliance'
                     elif ev == 'none':
                         ev = 'None'
-                    self.route_parameters["next_hop_type"] = ev
+                    self.parameters["next_hop_type"] = ev
                 elif key == "next_hop_ip_address":
-                    self.route_parameters["next_hop_ip_address"] = kwargs[key]
+                    self.parameters["next_hop_ip_address"] = kwargs[key]
                 elif key == "provisioning_state":
-                    self.route_parameters["provisioning_state"] = kwargs[key]
+                    self.parameters["provisioning_state"] = kwargs[key]
                 elif key == "name":
-                    self.route_parameters["name"] = kwargs[key]
+                    self.parameters["name"] = kwargs[key]
                 elif key == "etag":
-                    self.route_parameters["etag"] = kwargs[key]
+                    self.parameters["etag"] = kwargs[key]
 
         old_response = None
         response = None
@@ -266,7 +266,7 @@ class AzureRMRoutes(AzureRMModuleBase):
             response = self.mgmt_client.routes.create_or_update(resource_group_name=self.resource_group,
                                                                 route_table_name=self.route_table_name,
                                                                 route_name=self.route_name,
-                                                                route_parameters=self.route_parameters)
+                                                                route_parameters=self.parameters)
             if isinstance(response, AzureOperationPoller):
                 response = self.get_poller_result(response)
 

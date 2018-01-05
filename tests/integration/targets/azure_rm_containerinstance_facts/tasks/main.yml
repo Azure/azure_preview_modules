@@ -6,7 +6,7 @@
 - name: Create sample container instance
   azure_rm_containerinstance:
     resource_group: "{{ resource_group }}"
-    name: aci{{ resource_group | hash('md5') | truncate(7, True, '') }}
+    name: aci{{ rpfx }}
     os_type: linux
     ip_address: public
     location: eastus
@@ -42,7 +42,7 @@
       - output.changed == False
 
     resource_group: "{{ resource_group }}"
-    name: aci{{ resource_group | hash('md5') | truncate(7, True, '') }}
+    name: aci{{ rpfx }}
     os_type: linux
     ip_address: public
     location: eastus
