@@ -39,6 +39,7 @@ options:
     routes:
         description:
             - Collection of routes contained within a route table.
+        type: list
         suboptions:
             id:
                 description:
@@ -76,7 +77,6 @@ options:
 
 extends_documentation_fragment:
     - azure
-    - azure_tags
 
 author:
     - "Zim Kalinowski (@zikalino)"
