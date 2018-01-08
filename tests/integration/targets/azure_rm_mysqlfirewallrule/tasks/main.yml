@@ -16,7 +16,7 @@
     admin_username: zimxyz
     admin_password: Testpasswordxyz12!
 
-- name: Create instance of FirewallRules -- check mode
+- name: Create instance of Firewall Rule -- check mode
   azure_rm_mysqlfirewallrule:
     resource_group: "{{ resource_group }}"
     server_name: "mysqlsrv{{ rpfx }}"
@@ -30,7 +30,7 @@
     that:
       - output.changed
 
-- name: Create instance of FirewallRules
+- name: Create instance of Firewall Rule
   azure_rm_mysqlfirewallrule:
     resource_group: "{{ resource_group }}"
     server_name: "mysqlsrv{{ rpfx }}"
@@ -43,7 +43,7 @@
     that:
       - output.changed
 
-- name: Create again instance of FirewallRules
+- name: Create again instance of Firewall Rule
   azure_rm_mysqlfirewallrule:
     resource_group: "{{ resource_group }}"
     server_name: "mysqlsrv{{ rpfx }}"
@@ -56,7 +56,7 @@
     that:
       - output.changed == false
 
-- name: Delete instance of FirewallRules -- check mode
+- name: Delete instance of Firewall Rule -- check mode
   azure_rm_mysqlfirewallrule:
     resource_group: "{{ resource_group }}"
     server_name: "mysqlsrv{{ rpfx }}"
@@ -69,7 +69,7 @@
     that:
       - output.changed
 
-- name: Delete instance of FirewallRules
+- name: Delete instance of Firewall Rule
   azure_rm_mysqlfirewallrule:
     resource_group: "{{ resource_group }}"
     server_name: "mysqlsrv{{ rpfx }}"
@@ -81,7 +81,7 @@
     that:
       - output.changed
 
-- name: Delete unexisting instance of FirewallRules
+- name: Delete unexisting instance of Firewall Rule
   azure_rm_mysqlfirewallrule:
     resource_group: "{{ resource_group }}"
     server_name: "mysqlsrv{{ rpfx }}"

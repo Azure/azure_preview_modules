@@ -17,9 +17,9 @@ DOCUMENTATION = '''
 ---
 module: azure_rm_containerregistrywebhook_facts
 version_added: "2.5"
-short_description: Get Webhooks facts.
+short_description: Get Webhook facts.
 description:
-    - Get facts of Webhooks.
+    - Get facts of Webhook.
 
 options:
     resource_group:
@@ -44,13 +44,13 @@ author:
 '''
 
 EXAMPLES = '''
-  - name: Get instance of Webhooks
+  - name: Get instance of Webhook
     azure_rm_containerregistrywebhook_facts:
       resource_group: resource_group_name
       registry_name: registry_name
       webhook_name: webhook_name
 
-  - name: List instances of Webhooks
+  - name: List instances of Webhook
     azure_rm_containerregistrywebhook_facts:
       resource_group: resource_group_name
       registry_name: registry_name
@@ -115,9 +115,9 @@ class AzureRMWebhooksFacts(AzureRMModuleBase):
 
     def get(self):
         '''
-        Gets facts of the specified Webhooks.
+        Gets facts of the specified Webhook.
 
-        :return: deserialized Webhooksinstance state dictionary
+        :return: deserialized Webhookinstance state dictionary
         '''
         response = None
         results = False
@@ -136,9 +136,9 @@ class AzureRMWebhooksFacts(AzureRMModuleBase):
 
     def list_events(self):
         '''
-        Gets facts of the specified Webhooks.
+        Gets facts of the specified Webhook.
 
-        :return: deserialized Webhooksinstance state dictionary
+        :return: deserialized Webhookinstance state dictionary
         '''
         response = None
         results = False

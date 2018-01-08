@@ -17,9 +17,9 @@ DOCUMENTATION = '''
 ---
 module: azure_rm_applicationgatewayroutetable
 version_added: "2.5"
-short_description: Manage RouteTables instance.
+short_description: Manage Route Table instance.
 description:
-    - Create, update and delete instance of RouteTables.
+    - Create, update and delete instance of Route Table.
 
 options:
     resource_group:
@@ -84,7 +84,7 @@ author:
 '''
 
 EXAMPLES = '''
-  - name: Create (or update) RouteTables
+  - name: Create (or update) Route Table
     azure_rm_applicationgatewayroutetable:
       resource_group: rg1
       route_table_name: testrt
@@ -97,7 +97,7 @@ id:
         - Resource ID.
     returned: always
     type: str
-    sample: id
+    sample: /subscriptions/subid/resourceGroups/rg1/providers/Microsoft.Network/routeTables/testrt
 '''
 
 import time
@@ -118,7 +118,7 @@ class Actions:
 
 
 class AzureRMRouteTables(AzureRMModuleBase):
-    """Configuration class for an Azure RM RouteTables resource"""
+    """Configuration class for an Azure RM Route Table resource"""
 
     def __init__(self):
         self.module_arg_spec = dict(
@@ -211,30 +211,30 @@ class AzureRMRouteTables(AzureRMModuleBase):
         if "location" not in self.parameters:
             self.parameters["location"] = resource_group.location
 
-        old_response = self.get_routetables()
+        old_response = self.get_routetable()
 
         if not old_response:
-            self.log("RouteTables instance doesn't exist")
+            self.log("Route Table instance doesn't exist")
             if self.state == 'absent':
                 self.log("Old instance didn't exist")
             else:
                 self.to_do = Actions.Create
         else:
-            self.log("RouteTables instance already exists")
+            self.log("Route Table instance already exists")
             if self.state == 'absent':
                 self.to_do = Actions.Delete
             elif self.state == 'present':
-                self.log("Need to check if RouteTables instance has to be deleted or may be updated")
+                self.log("Need to check if Route Table instance has to be deleted or may be updated")
                 self.to_do = Actions.Update
 
         if (self.to_do == Actions.Create) or (self.to_do == Actions.Update):
-            self.log("Need to Create / Update the RouteTables instance")
+            self.log("Need to Create / Update the Route Table instance")
 
             if self.check_mode:
                 self.results['changed'] = True
                 return self.results
 
-            response = self.create_update_routetables()
+            response = self.create_update_routetable()
 
             if not old_response:
                 self.results['changed'] = True
@@ -242,19 +242,19 @@ class AzureRMRouteTables(AzureRMModuleBase):
                 self.results['changed'] = old_response.__ne__(response)
             self.log("Creation / Update done")
         elif self.to_do == Actions.Delete:
-            self.log("RouteTables instance deleted")
+            self.log("Route Table instance deleted")
             self.results['changed'] = True
 
             if self.check_mode:
                 return self.results
 
-            self.delete_routetables()
+            self.delete_routetable()
             # make sure instance is actually deleted, for some Azure resources, instance is hanging around
             # for some time after deletion -- this should be really fixed in Azure
-            while self.get_routetables():
+            while self.get_routetable():
                 time.sleep(20)
         else:
-            self.log("RouteTables instance unchanged")
+            self.log("Route Table instance unchanged")
             self.results['changed'] = False
             response = old_response
 
@@ -263,13 +263,13 @@ class AzureRMRouteTables(AzureRMModuleBase):
 
         return self.results
 
-    def create_update_routetables(self):
+    def create_update_routetable(self):
         '''
-        Creates or updates RouteTables with the specified configuration.
+        Creates or updates Route Table with the specified configuration.
 
-        :return: deserialized RouteTables instance state dictionary
+        :return: deserialized Route Table instance state dictionary
         '''
-        self.log("Creating / Updating the RouteTables instance {0}".format(self.route_table_name))
+        self.log("Creating / Updating the Route Table instance {0}".format(self.route_table_name))
 
         try:
             response = self.mgmt_client.route_tables.create_or_update(resource_group_name=self.resource_group,
@@ -279,42 +279,42 @@ class AzureRMRouteTables(AzureRMModuleBase):
                 response = self.get_poller_result(response)
 
         except CloudError as exc:
-            self.log('Error attempting to create the RouteTables instance.')
-            self.fail("Error creating the RouteTables instance: {0}".format(str(exc)))
+            self.log('Error attempting to create the Route Table instance.')
+            self.fail("Error creating the Route Table instance: {0}".format(str(exc)))
         return response.as_dict()
 
-    def delete_routetables(self):
+    def delete_routetable(self):
         '''
-        Deletes specified RouteTables instance in the specified subscription and resource group.
+        Deletes specified Route Table instance in the specified subscription and resource group.
 
         :return: True
         '''
-        self.log("Deleting the RouteTables instance {0}".format(self.route_table_name))
+        self.log("Deleting the Route Table instance {0}".format(self.route_table_name))
         try:
             response = self.mgmt_client.route_tables.delete(resource_group_name=self.resource_group,
                                                             route_table_name=self.route_table_name)
         except CloudError as e:
-            self.log('Error attempting to delete the RouteTables instance.')
-            self.fail("Error deleting the RouteTables instance: {0}".format(str(e)))
+            self.log('Error attempting to delete the Route Table instance.')
+            self.fail("Error deleting the Route Table instance: {0}".format(str(e)))
 
         return True
 
-    def get_routetables(self):
+    def get_routetable(self):
         '''
-        Gets the properties of the specified RouteTables.
+        Gets the properties of the specified Route Table.
 
-        :return: deserialized RouteTables instance state dictionary
+        :return: deserialized Route Table instance state dictionary
         '''
-        self.log("Checking if the RouteTables instance {0} is present".format(self.route_table_name))
+        self.log("Checking if the Route Table instance {0} is present".format(self.route_table_name))
         found = False
         try:
             response = self.mgmt_client.route_tables.get(resource_group_name=self.resource_group,
                                                          route_table_name=self.route_table_name)
             found = True
             self.log("Response : {0}".format(response))
-            self.log("RouteTables instance : {0} found".format(response.name))
+            self.log("Route Table instance : {0} found".format(response.name))
         except CloudError as e:
-            self.log('Did not find the RouteTables instance.')
+            self.log('Did not find the Route Table instance.')
         if found is True:
             return response.as_dict()
 

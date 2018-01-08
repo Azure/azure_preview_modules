@@ -14,14 +14,14 @@
     tags:
         Release: beta1
         Environment: Production
-- name: Create Replications
+- name: Create Replication
   azure_rm_containerregistryreplication:
     resource_group: "{{ resource_group }}"
     registry_name: acr{{ rpfx }}
     replication_name: replication{{ rpfx }}
     location: westus
 
-- name: Gather facts Replications
+- name: Gather facts Replication
   azure_rm_containerregistryreplication_facts:
     resource_group: "{{ resource_group }}"
     registry_name: acr{{ rpfx }}
@@ -32,7 +32,7 @@
     that:
       - output.changed == False
 
-- name: Delete instance of Replications
+- name: Delete instance of Replication
   azure_rm_containerregistryreplication:
     resource_group: "{{ resource_group }}"
     registry_name: acr{{ rpfx }}

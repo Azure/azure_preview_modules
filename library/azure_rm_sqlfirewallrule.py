@@ -17,9 +17,9 @@ DOCUMENTATION = '''
 ---
 module: azure_rm_sqlfirewallrule
 version_added: "2.5"
-short_description: Manage FirewallRules instance.
+short_description: Manage Firewall Rule instance.
 description:
-    - Create, update and delete instance of FirewallRules.
+    - Create, update and delete instance of Firewall Rule.
 
 options:
     resource_group:
@@ -51,7 +51,7 @@ author:
 '''
 
 EXAMPLES = '''
-  - name: Create (or update) FirewallRules
+  - name: Create (or update) Firewall Rule
     azure_rm_sqlfirewallrule:
       resource_group: firewallrulecrudtest-12
       server_name: firewallrulecrudtest-6285
@@ -66,7 +66,7 @@ id:
         - Resource ID.
     returned: always
     type: str
-    sample: id
+    sample: /subscriptions/00000000-1111-2222-3333-444444444444/resourceGroups/firewallrulecrudtest-12/providers/Microsoft.Sql/servers/firewallrulecrudtest-6285/firewallRules/firewallrulecrudtest-5370
 '''
 
 import time
@@ -87,7 +87,7 @@ class Actions:
 
 
 class AzureRMFirewallRules(AzureRMModuleBase):
-    """Configuration class for an Azure RM FirewallRules resource"""
+    """Configuration class for an Azure RM Firewall Rule resource"""
 
     def __init__(self):
         self.module_arg_spec = dict(
@@ -146,33 +146,33 @@ class AzureRMFirewallRules(AzureRMModuleBase):
 
         resource_group = self.get_resource_group(self.resource_group)
 
-        old_response = self.get_firewallrules()
+        old_response = self.get_firewallrule()
 
         if not old_response:
-            self.log("FirewallRules instance doesn't exist")
+            self.log("Firewall Rule instance doesn't exist")
             if self.state == 'absent':
                 self.log("Old instance didn't exist")
             else:
                 self.to_do = Actions.Create
         else:
-            self.log("FirewallRules instance already exists")
+            self.log("Firewall Rule instance already exists")
             if self.state == 'absent':
                 self.to_do = Actions.Delete
             elif self.state == 'present':
-                self.log("Need to check if FirewallRules instance has to be deleted or may be updated")
+                self.log("Need to check if Firewall Rule instance has to be deleted or may be updated")
                 if (self.start_ip_address is not None) and (self.start_ip_address != old_response['start_ip_address']):
                     self.to_do = Actions.Update
                 if (self.end_ip_address is not None) and (self.end_ip_address != old_response['end_ip_address']):
                     self.to_do = Actions.Update
 
         if (self.to_do == Actions.Create) or (self.to_do == Actions.Update):
-            self.log("Need to Create / Update the FirewallRules instance")
+            self.log("Need to Create / Update the Firewall Rule instance")
 
             if self.check_mode:
                 self.results['changed'] = True
                 return self.results
 
-            response = self.create_update_firewallrules()
+            response = self.create_update_firewallrule()
 
             if not old_response:
                 self.results['changed'] = True
@@ -180,19 +180,19 @@ class AzureRMFirewallRules(AzureRMModuleBase):
                 self.results['changed'] = old_response.__ne__(response)
             self.log("Creation / Update done")
         elif self.to_do == Actions.Delete:
-            self.log("FirewallRules instance deleted")
+            self.log("Firewall Rule instance deleted")
             self.results['changed'] = True
 
             if self.check_mode:
                 return self.results
 
-            self.delete_firewallrules()
+            self.delete_firewallrule()
             # make sure instance is actually deleted, for some Azure resources, instance is hanging around
             # for some time after deletion -- this should be really fixed in Azure
-            while self.get_firewallrules():
+            while self.get_firewallrule():
                 time.sleep(20)
         else:
-            self.log("FirewallRules instance unchanged")
+            self.log("Firewall Rule instance unchanged")
             self.results['changed'] = False
             response = old_response
 
@@ -201,13 +201,13 @@ class AzureRMFirewallRules(AzureRMModuleBase):
 
         return self.results
 
-    def create_update_firewallrules(self):
+    def create_update_firewallrule(self):
         '''
-        Creates or updates FirewallRules with the specified configuration.
+        Creates or updates Firewall Rule with the specified configuration.
 
-        :return: deserialized FirewallRules instance state dictionary
+        :return: deserialized Firewall Rule instance state dictionary
         '''
-        self.log("Creating / Updating the FirewallRules instance {0}".format(self.name))
+        self.log("Creating / Updating the Firewall Rule instance {0}".format(self.name))
 
         try:
             response = self.mgmt_client.firewall_rules.create_or_update(resource_group_name=self.resource_group,
@@ -219,34 +219,34 @@ class AzureRMFirewallRules(AzureRMModuleBase):
                 response = self.get_poller_result(response)
 
         except CloudError as exc:
-            self.log('Error attempting to create the FirewallRules instance.')
-            self.fail("Error creating the FirewallRules instance: {0}".format(str(exc)))
+            self.log('Error attempting to create the Firewall Rule instance.')
+            self.fail("Error creating the Firewall Rule instance: {0}".format(str(exc)))
         return response.as_dict()
 
-    def delete_firewallrules(self):
+    def delete_firewallrule(self):
         '''
-        Deletes specified FirewallRules instance in the specified subscription and resource group.
+        Deletes specified Firewall Rule instance in the specified subscription and resource group.
 
         :return: True
         '''
-        self.log("Deleting the FirewallRules instance {0}".format(self.name))
+        self.log("Deleting the Firewall Rule instance {0}".format(self.name))
         try:
             response = self.mgmt_client.firewall_rules.delete(resource_group_name=self.resource_group,
                                                               server_name=self.server_name,
                                                               firewall_rule_name=self.name)
         except CloudError as e:
-            self.log('Error attempting to delete the FirewallRules instance.')
-            self.fail("Error deleting the FirewallRules instance: {0}".format(str(e)))
+            self.log('Error attempting to delete the Firewall Rule instance.')
+            self.fail("Error deleting the Firewall Rule instance: {0}".format(str(e)))
 
         return True
 
-    def get_firewallrules(self):
+    def get_firewallrule(self):
         '''
-        Gets the properties of the specified FirewallRules.
+        Gets the properties of the specified Firewall Rule.
 
-        :return: deserialized FirewallRules instance state dictionary
+        :return: deserialized Firewall Rule instance state dictionary
         '''
-        self.log("Checking if the FirewallRules instance {0} is present".format(self.name))
+        self.log("Checking if the Firewall Rule instance {0} is present".format(self.name))
         found = False
         try:
             response = self.mgmt_client.firewall_rules.get(resource_group_name=self.resource_group,
@@ -254,9 +254,9 @@ class AzureRMFirewallRules(AzureRMModuleBase):
                                                            firewall_rule_name=self.name)
             found = True
             self.log("Response : {0}".format(response))
-            self.log("FirewallRules instance : {0} found".format(response.name))
+            self.log("Firewall Rule instance : {0} found".format(response.name))
         except CloudError as e:
-            self.log('Did not find the FirewallRules instance.')
+            self.log('Did not find the Firewall Rule instance.')
         if found is True:
             return response.as_dict()
 

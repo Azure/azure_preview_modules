@@ -17,9 +17,9 @@ DOCUMENTATION = '''
 ---
 module: azure_rm_postgresqlconfiguration
 version_added: "2.5"
-short_description: Manage Configurations instance.
+short_description: Manage Configuration instance.
 description:
-    - Create, update and delete instance of Configurations.
+    - Create, update and delete instance of Configuration.
 
 options:
     resource_group:
@@ -53,7 +53,7 @@ author:
 '''
 
 EXAMPLES = '''
-  - name: Create (or update) Configurations
+  - name: Create (or update) Configuration
     azure_rm_postgresqlconfiguration:
       resource_group: TestGroup
       server_name: testserver
@@ -67,7 +67,7 @@ id:
         - Resource ID
     returned: always
     type: str
-    sample: id
+    sample: /subscriptions/ffffffff-ffff-ffff-ffff-ffffffffffff/resourceGroups/TestGroup/providers/Microsoft.DBforPostgreSQL/servers/testserver/configurations/array_nulls
 '''
 
 import time
@@ -88,7 +88,7 @@ class Actions:
 
 
 class AzureRMConfigurations(AzureRMModuleBase):
-    """Configuration class for an Azure RM Configurations resource"""
+    """Configuration class for an Azure RM Configuration resource"""
 
     def __init__(self):
         self.module_arg_spec = dict(
@@ -150,30 +150,30 @@ class AzureRMConfigurations(AzureRMModuleBase):
 
         resource_group = self.get_resource_group(self.resource_group)
 
-        old_response = self.get_configurations()
+        old_response = self.get_configuration()
 
         if not old_response:
-            self.log("Configurations instance doesn't exist")
+            self.log("Configuration instance doesn't exist")
             if self.state == 'absent':
                 self.log("Old instance didn't exist")
             else:
                 self.to_do = Actions.Create
         else:
-            self.log("Configurations instance already exists")
+            self.log("Configuration instance already exists")
             if self.state == 'absent':
                 self.to_do = Actions.Delete
             elif self.state == 'present':
-                self.log("Need to check if Configurations instance has to be deleted or may be updated")
+                self.log("Need to check if Configuration instance has to be deleted or may be updated")
                 self.to_do = Actions.Update
 
         if (self.to_do == Actions.Create) or (self.to_do == Actions.Update):
-            self.log("Need to Create / Update the Configurations instance")
+            self.log("Need to Create / Update the Configuration instance")
 
             if self.check_mode:
                 self.results['changed'] = True
                 return self.results
 
-            response = self.create_update_configurations()
+            response = self.create_update_configuration()
 
             if not old_response:
                 self.results['changed'] = True
@@ -181,19 +181,19 @@ class AzureRMConfigurations(AzureRMModuleBase):
                 self.results['changed'] = old_response.__ne__(response)
             self.log("Creation / Update done")
         elif self.to_do == Actions.Delete:
-            self.log("Configurations instance deleted")
+            self.log("Configuration instance deleted")
             self.results['changed'] = True
 
             if self.check_mode:
                 return self.results
 
-            self.delete_configurations()
+            self.delete_configuration()
             # make sure instance is actually deleted, for some Azure resources, instance is hanging around
             # for some time after deletion -- this should be really fixed in Azure
-            while self.get_configurations():
+            while self.get_configuration():
                 time.sleep(20)
         else:
-            self.log("Configurations instance unchanged")
+            self.log("Configuration instance unchanged")
             self.results['changed'] = False
             response = old_response
 
@@ -202,13 +202,13 @@ class AzureRMConfigurations(AzureRMModuleBase):
 
         return self.results
 
-    def create_update_configurations(self):
+    def create_update_configuration(self):
         '''
-        Creates or updates Configurations with the specified configuration.
+        Creates or updates Configuration with the specified configuration.
 
-        :return: deserialized Configurations instance state dictionary
+        :return: deserialized Configuration instance state dictionary
         '''
-        self.log("Creating / Updating the Configurations instance {0}".format(self.name))
+        self.log("Creating / Updating the Configuration instance {0}".format(self.name))
 
         try:
             response = self.mgmt_client.configurations.create_or_update(resource_group_name=self.resource_group,
@@ -220,32 +220,32 @@ class AzureRMConfigurations(AzureRMModuleBase):
                 response = self.get_poller_result(response)
 
         except CloudError as exc:
-            self.log('Error attempting to create the Configurations instance.')
-            self.fail("Error creating the Configurations instance: {0}".format(str(exc)))
+            self.log('Error attempting to create the Configuration instance.')
+            self.fail("Error creating the Configuration instance: {0}".format(str(exc)))
         return response.as_dict()
 
-    def delete_configurations(self):
+    def delete_configuration(self):
         '''
-        Deletes specified Configurations instance in the specified subscription and resource group.
+        Deletes specified Configuration instance in the specified subscription and resource group.
 
         :return: True
         '''
-        self.log("Deleting the Configurations instance {0}".format(self.name))
+        self.log("Deleting the Configuration instance {0}".format(self.name))
         try:
             response = self.mgmt_client.configurations.delete()
         except CloudError as e:
-            self.log('Error attempting to delete the Configurations instance.')
-            self.fail("Error deleting the Configurations instance: {0}".format(str(e)))
+            self.log('Error attempting to delete the Configuration instance.')
+            self.fail("Error deleting the Configuration instance: {0}".format(str(e)))
 
         return True
 
-    def get_configurations(self):
+    def get_configuration(self):
         '''
-        Gets the properties of the specified Configurations.
+        Gets the properties of the specified Configuration.
 
-        :return: deserialized Configurations instance state dictionary
+        :return: deserialized Configuration instance state dictionary
         '''
-        self.log("Checking if the Configurations instance {0} is present".format(self.name))
+        self.log("Checking if the Configuration instance {0} is present".format(self.name))
         found = False
         try:
             response = self.mgmt_client.configurations.get(resource_group_name=self.resource_group,
@@ -253,9 +253,9 @@ class AzureRMConfigurations(AzureRMModuleBase):
                                                            configuration_name=self.name)
             found = True
             self.log("Response : {0}".format(response))
-            self.log("Configurations instance : {0} found".format(response.name))
+            self.log("Configuration instance : {0} found".format(response.name))
         except CloudError as e:
-            self.log('Did not find the Configurations instance.')
+            self.log('Did not find the Configuration instance.')
         if found is True:
             return response.as_dict()
 

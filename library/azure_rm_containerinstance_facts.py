@@ -17,9 +17,9 @@ DOCUMENTATION = '''
 ---
 module: azure_rm_containerinstance_facts
 version_added: "2.5"
-short_description: Get ContainerGroups facts.
+short_description: Get Container Group facts.
 description:
-    - Get facts of ContainerGroups.
+    - Get facts of Container Group.
 
 options:
     resource_group:
@@ -39,12 +39,12 @@ author:
 '''
 
 EXAMPLES = '''
-  - name: Get instance of ContainerGroups
+  - name: Get instance of Container Group
     azure_rm_containerinstance_facts:
       resource_group: resource_group_name
       container_group_name: container_group_name
 
-  - name: List instances of ContainerGroups
+  - name: List instances of Container Group
     azure_rm_containerinstance_facts:
       resource_group: resource_group_name
 '''
@@ -98,9 +98,9 @@ class AzureRMContainerGroupsFacts(AzureRMModuleBase):
 
     def get(self):
         '''
-        Gets facts of the specified ContainerGroups.
+        Gets facts of the specified Container Group.
 
-        :return: deserialized ContainerGroupsinstance state dictionary
+        :return: deserialized Container Groupinstance state dictionary
         '''
         response = None
         results = False
@@ -118,9 +118,9 @@ class AzureRMContainerGroupsFacts(AzureRMModuleBase):
 
     def list_by_resource_group(self):
         '''
-        Gets facts of the specified ContainerGroups.
+        Gets facts of the specified Container Group.
 
-        :return: deserialized ContainerGroupsinstance state dictionary
+        :return: deserialized Container Groupinstance state dictionary
         '''
         response = None
         results = False

@@ -15,7 +15,7 @@
         Release: beta1
         Environment: Production
 
-- name: Gather facts Registries
+- name: Gather facts Registry
   azure_rm_containerregistry_facts:
     resource_group: "{{ resource_group }}"
   register: output
@@ -24,7 +24,7 @@
     that:
       - output.changed == False
 
-- name: Gather facts Registries
+- name: Gather facts Registry
   azure_rm_containerregistry_facts:
     resource_group: "{{ resource_group }}"
   register: output
@@ -33,7 +33,7 @@
     that:
       - output.changed == False
 
-- name: Gather facts Registries
+- name: Gather facts Registry
   azure_rm_containerregistry_facts:
     resource_group: "{{ resource_group }}"
   register: output
@@ -42,7 +42,7 @@
     that:
       - output.changed == False
 
-- name: Gather facts Registries
+- name: Gather facts Registry
   azure_rm_containerregistry_facts:
     resource_group: "{{ resource_group }}"
   register: output

@@ -3,7 +3,7 @@
     rpfx: "{{ resource_group | hash('md5') | truncate(7, True, '') }}{{ 1000 | random }}"
   run_once: yes
 
-- name: Create instance of RouteTables -- check mode
+- name: Create instance of Route Table -- check mode
   azure_rm_applicationgatewayroutetable:
     resource_group: "{{ resource_group }}"
     route_table_name: routetablename{{ rpfx }}
@@ -14,7 +14,7 @@
     that:
       - output.changed
 
-- name: Create instance of RouteTables
+- name: Create instance of Route Table
   azure_rm_applicationgatewayroutetable:
     resource_group: "{{ resource_group }}"
     route_table_name: routetablename{{ rpfx }}
@@ -24,7 +24,7 @@
     that:
       - output.changed
 
-- name: Create again instance of RouteTables
+- name: Create again instance of Route Table
   azure_rm_applicationgatewayroutetable:
     resource_group: "{{ resource_group }}"
     route_table_name: routetablename{{ rpfx }}
@@ -34,7 +34,7 @@
     that:
       - output.changed == false
 
-- name: Delete instance of RouteTables -- check mode
+- name: Delete instance of Route Table -- check mode
   azure_rm_applicationgatewayroutetable:
     resource_group: "{{ resource_group }}"
     route_table_name: routetablename{{ rpfx }}
@@ -46,7 +46,7 @@
     that:
       - output.changed
 
-- name: Delete instance of RouteTables
+- name: Delete instance of Route Table
   azure_rm_applicationgatewayroutetable:
     resource_group: "{{ resource_group }}"
     route_table_name: routetablename{{ rpfx }}
@@ -57,7 +57,7 @@
     that:
       - output.changed
 
-- name: Delete unexisting instance of RouteTables
+- name: Delete unexisting instance of Route Table
   azure_rm_applicationgatewayroutetable:
     resource_group: "{{ resource_group }}"
     route_table_name: routetablename{{ rpfx }}

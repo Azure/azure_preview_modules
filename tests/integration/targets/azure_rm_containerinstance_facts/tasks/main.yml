@@ -23,7 +23,7 @@
         image: httpd
         memory: 1.5
 
-- name: Gather facts ContainerGroups
+- name: Gather facts Container Group
   azure_rm_containerinstance_facts:
     resource_group: "{{ resource_group }}"
   register: output
@@ -32,7 +32,7 @@
     that:
       - output.changed == False
 
-- name: Gather facts ContainerGroups
+- name: Gather facts Container Group
   azure_rm_containerinstance_facts:
     resource_group: "{{ resource_group }}"
   register: output

@@ -17,9 +17,9 @@ DOCUMENTATION = '''
 ---
 module: azure_rm_applicationgatewayroutetable_facts
 version_added: "2.5"
-short_description: Get RouteTables facts.
+short_description: Get Route Table facts.
 description:
-    - Get facts of RouteTables.
+    - Get facts of Route Table.
 
 options:
     resource_group:
@@ -41,13 +41,13 @@ author:
 '''
 
 EXAMPLES = '''
-  - name: Get instance of RouteTables
+  - name: Get instance of Route Table
     azure_rm_applicationgatewayroutetable_facts:
       resource_group: resource_group_name
       route_table_name: route_table_name
       expand: expand
 
-  - name: List instances of RouteTables
+  - name: List instances of Route Table
     azure_rm_applicationgatewayroutetable_facts:
 '''
 
@@ -102,9 +102,9 @@ class AzureRMRouteTablesFacts(AzureRMModuleBase):
 
     def get(self):
         '''
-        Gets facts of the specified RouteTables.
+        Gets facts of the specified Route Table.
 
-        :return: deserialized RouteTablesinstance state dictionary
+        :return: deserialized Route Tableinstance state dictionary
         '''
         response = None
         results = False
@@ -122,9 +122,9 @@ class AzureRMRouteTablesFacts(AzureRMModuleBase):
 
     def list_all(self):
         '''
-        Gets facts of the specified RouteTables.
+        Gets facts of the specified Route Table.
 
-        :return: deserialized RouteTablesinstance state dictionary
+        :return: deserialized Route Tableinstance state dictionary
         '''
         response = None
         results = False
