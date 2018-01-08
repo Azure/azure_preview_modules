@@ -17,9 +17,9 @@ DOCUMENTATION = '''
 ---
 module: azure_rm_containerregistry_facts
 version_added: "2.5"
-short_description: Get Registries facts.
+short_description: Get Registry facts.
 description:
-    - Get facts of Registries.
+    - Get facts of Registry.
 
 options:
     resource_group:
@@ -39,22 +39,22 @@ author:
 '''
 
 EXAMPLES = '''
-  - name: Get instance of Registries
+  - name: Get instance of Registry
     azure_rm_containerregistry_facts:
       resource_group: resource_group_name
       registry_name: registry_name
 
-  - name: List instances of Registries
+  - name: List instances of Registry
     azure_rm_containerregistry_facts:
       resource_group: resource_group_name
       registry_name: registry_name
 
-  - name: List instances of Registries
+  - name: List instances of Registry
     azure_rm_containerregistry_facts:
       resource_group: resource_group_name
       registry_name: registry_name
 
-  - name: List instances of Registries
+  - name: List instances of Registry
     azure_rm_containerregistry_facts:
       resource_group: resource_group_name
 '''
@@ -114,9 +114,9 @@ class AzureRMRegistriesFacts(AzureRMModuleBase):
 
     def get(self):
         '''
-        Gets facts of the specified Registries.
+        Gets facts of the specified Registry.
 
-        :return: deserialized Registriesinstance state dictionary
+        :return: deserialized Registryinstance state dictionary
         '''
         response = None
         results = False
@@ -134,9 +134,9 @@ class AzureRMRegistriesFacts(AzureRMModuleBase):
 
     def list_credentials(self):
         '''
-        Gets facts of the specified Registries.
+        Gets facts of the specified Registry.
 
-        :return: deserialized Registriesinstance state dictionary
+        :return: deserialized Registryinstance state dictionary
         '''
         response = None
         results = False
@@ -156,9 +156,9 @@ class AzureRMRegistriesFacts(AzureRMModuleBase):
 
     def list_usages(self):
         '''
-        Gets facts of the specified Registries.
+        Gets facts of the specified Registry.
 
-        :return: deserialized Registriesinstance state dictionary
+        :return: deserialized Registryinstance state dictionary
         '''
         response = None
         results = False
@@ -178,9 +178,9 @@ class AzureRMRegistriesFacts(AzureRMModuleBase):
 
     def list_by_resource_group(self):
         '''
-        Gets facts of the specified Registries.
+        Gets facts of the specified Registry.
 
-        :return: deserialized Registriesinstance state dictionary
+        :return: deserialized Registryinstance state dictionary
         '''
         response = None
         results = False

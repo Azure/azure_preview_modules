@@ -14,7 +14,7 @@
     enforce_ssl: True
     admin_username: zimxyz
     admin_password: Testpasswordxyz12!
-- name: Create Configurations
+- name: Create Configuration
   azure_rm_postgresqlconfiguration:
     resource_group: "{{ resource_group }}"
     server_name: "postgresqlsrv{{ rpfx }}"

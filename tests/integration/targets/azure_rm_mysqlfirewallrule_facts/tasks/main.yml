@@ -15,7 +15,7 @@
     enforce_ssl: True
     admin_username: zimxyz
     admin_password: Testpasswordxyz12!
-- name: Create FirewallRules
+- name: Create Firewall Rule
   azure_rm_mysqlfirewallrule:
     resource_group: "{{ resource_group }}"
     server_name: "mysqlsrv{{ rpfx }}"
@@ -43,7 +43,7 @@
     that:
       - output.changed == False
 
-- name: Delete instance of FirewallRules
+- name: Delete instance of Firewall Rule
   azure_rm_mysqlfirewallrule:
     resource_group: "{{ resource_group }}"
     server_name: "mysqlsrv{{ rpfx }}"

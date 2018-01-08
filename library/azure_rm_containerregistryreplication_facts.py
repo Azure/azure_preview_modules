@@ -17,9 +17,9 @@ DOCUMENTATION = '''
 ---
 module: azure_rm_containerregistryreplication_facts
 version_added: "2.5"
-short_description: Get Replications facts.
+short_description: Get Replication facts.
 description:
-    - Get facts of Replications.
+    - Get facts of Replication.
 
 options:
     resource_group:
@@ -44,7 +44,7 @@ author:
 '''
 
 EXAMPLES = '''
-  - name: Get instance of Replications
+  - name: Get instance of Replication
     azure_rm_containerregistryreplication_facts:
       resource_group: resource_group_name
       registry_name: registry_name
@@ -105,9 +105,9 @@ class AzureRMReplicationsFacts(AzureRMModuleBase):
 
     def get(self):
         '''
-        Gets facts of the specified Replications.
+        Gets facts of the specified Replication.
 
-        :return: deserialized Replicationsinstance state dictionary
+        :return: deserialized Replicationinstance state dictionary
         '''
         response = None
         results = False

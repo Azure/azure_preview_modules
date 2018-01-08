@@ -15,7 +15,7 @@
     admin_username: zimxyz
     admin_password: Testpasswordxyz12!
 
-- name: Create instance of Configurations -- check mode
+- name: Create instance of Configuration -- check mode
   azure_rm_postgresqlconfiguration:
     resource_group: "{{ resource_group }}"
     server_name: "postgresqlsrv{{ rpfx }}"
@@ -29,7 +29,7 @@
     that:
       - output.changed
 
-- name: Create instance of Configurations
+- name: Create instance of Configuration
   azure_rm_postgresqlconfiguration:
     resource_group: "{{ resource_group }}"
     server_name: "postgresqlsrv{{ rpfx }}"
@@ -42,7 +42,7 @@
     that:
       - output.changed
 
-- name: Create again instance of Configurations
+- name: Create again instance of Configuration
   azure_rm_postgresqlconfiguration:
     resource_group: "{{ resource_group }}"
     server_name: "postgresqlsrv{{ rpfx }}"

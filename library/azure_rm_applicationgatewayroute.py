@@ -17,9 +17,9 @@ DOCUMENTATION = '''
 ---
 module: azure_rm_applicationgatewayroute
 version_added: "2.5"
-short_description: Manage Routes instance.
+short_description: Manage Route instance.
 description:
-    - Create, update and delete instance of Routes.
+    - Create, update and delete instance of Route.
 
 options:
     resource_group:
@@ -67,7 +67,7 @@ author:
 '''
 
 EXAMPLES = '''
-  - name: Create (or update) Routes
+  - name: Create (or update) Route
     azure_rm_applicationgatewayroute:
       resource_group: rg1
       route_table_name: testrt
@@ -80,7 +80,7 @@ id:
         - Resource ID.
     returned: always
     type: str
-    sample: id
+    sample: /subscriptions/subid/resourceGroups/rg1/providers/Microsoft.Network/routeTables/testrt/routes/route1
 '''
 
 import time
@@ -101,7 +101,7 @@ class Actions:
 
 
 class AzureRMRoutes(AzureRMModuleBase):
-    """Configuration class for an Azure RM Routes resource"""
+    """Configuration class for an Azure RM Route resource"""
 
     def __init__(self):
         self.module_arg_spec = dict(
@@ -201,30 +201,30 @@ class AzureRMRoutes(AzureRMModuleBase):
 
         resource_group = self.get_resource_group(self.resource_group)
 
-        old_response = self.get_routes()
+        old_response = self.get_route()
 
         if not old_response:
-            self.log("Routes instance doesn't exist")
+            self.log("Route instance doesn't exist")
             if self.state == 'absent':
                 self.log("Old instance didn't exist")
             else:
                 self.to_do = Actions.Create
         else:
-            self.log("Routes instance already exists")
+            self.log("Route instance already exists")
             if self.state == 'absent':
                 self.to_do = Actions.Delete
             elif self.state == 'present':
-                self.log("Need to check if Routes instance has to be deleted or may be updated")
+                self.log("Need to check if Route instance has to be deleted or may be updated")
                 self.to_do = Actions.Update
 
         if (self.to_do == Actions.Create) or (self.to_do == Actions.Update):
-            self.log("Need to Create / Update the Routes instance")
+            self.log("Need to Create / Update the Route instance")
 
             if self.check_mode:
                 self.results['changed'] = True
                 return self.results
 
-            response = self.create_update_routes()
+            response = self.create_update_route()
 
             if not old_response:
                 self.results['changed'] = True
@@ -232,19 +232,19 @@ class AzureRMRoutes(AzureRMModuleBase):
                 self.results['changed'] = old_response.__ne__(response)
             self.log("Creation / Update done")
         elif self.to_do == Actions.Delete:
-            self.log("Routes instance deleted")
+            self.log("Route instance deleted")
             self.results['changed'] = True
 
             if self.check_mode:
                 return self.results
 
-            self.delete_routes()
+            self.delete_route()
             # make sure instance is actually deleted, for some Azure resources, instance is hanging around
             # for some time after deletion -- this should be really fixed in Azure
-            while self.get_routes():
+            while self.get_route():
                 time.sleep(20)
         else:
-            self.log("Routes instance unchanged")
+            self.log("Route instance unchanged")
             self.results['changed'] = False
             response = old_response
 
@@ -253,13 +253,13 @@ class AzureRMRoutes(AzureRMModuleBase):
 
         return self.results
 
-    def create_update_routes(self):
+    def create_update_route(self):
         '''
-        Creates or updates Routes with the specified configuration.
+        Creates or updates Route with the specified configuration.
 
-        :return: deserialized Routes instance state dictionary
+        :return: deserialized Route instance state dictionary
         '''
-        self.log("Creating / Updating the Routes instance {0}".format(self.route_name))
+        self.log("Creating / Updating the Route instance {0}".format(self.route_name))
 
         try:
             response = self.mgmt_client.routes.create_or_update(resource_group_name=self.resource_group,
@@ -270,34 +270,34 @@ class AzureRMRoutes(AzureRMModuleBase):
                 response = self.get_poller_result(response)
 
         except CloudError as exc:
-            self.log('Error attempting to create the Routes instance.')
-            self.fail("Error creating the Routes instance: {0}".format(str(exc)))
+            self.log('Error attempting to create the Route instance.')
+            self.fail("Error creating the Route instance: {0}".format(str(exc)))
         return response.as_dict()
 
-    def delete_routes(self):
+    def delete_route(self):
         '''
-        Deletes specified Routes instance in the specified subscription and resource group.
+        Deletes specified Route instance in the specified subscription and resource group.
 
         :return: True
         '''
-        self.log("Deleting the Routes instance {0}".format(self.route_name))
+        self.log("Deleting the Route instance {0}".format(self.route_name))
         try:
             response = self.mgmt_client.routes.delete(resource_group_name=self.resource_group,
                                                       route_table_name=self.route_table_name,
                                                       route_name=self.route_name)
         except CloudError as e:
-            self.log('Error attempting to delete the Routes instance.')
-            self.fail("Error deleting the Routes instance: {0}".format(str(e)))
+            self.log('Error attempting to delete the Route instance.')
+            self.fail("Error deleting the Route instance: {0}".format(str(e)))
 
         return True
 
-    def get_routes(self):
+    def get_route(self):
         '''
-        Gets the properties of the specified Routes.
+        Gets the properties of the specified Route.
 
-        :return: deserialized Routes instance state dictionary
+        :return: deserialized Route instance state dictionary
         '''
-        self.log("Checking if the Routes instance {0} is present".format(self.route_name))
+        self.log("Checking if the Route instance {0} is present".format(self.route_name))
         found = False
         try:
             response = self.mgmt_client.routes.get(resource_group_name=self.resource_group,
@@ -305,9 +305,9 @@ class AzureRMRoutes(AzureRMModuleBase):
                                                    route_name=self.route_name)
             found = True
             self.log("Response : {0}".format(response))
-            self.log("Routes instance : {0} found".format(response.name))
+            self.log("Route instance : {0} found".format(response.name))
         except CloudError as e:
-            self.log('Did not find the Routes instance.')
+            self.log('Did not find the Route instance.')
         if found is True:
             return response.as_dict()
 

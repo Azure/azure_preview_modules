@@ -14,7 +14,7 @@
     tags:
         Release: beta1
         Environment: Production
-- name: Create Webhooks
+- name: Create Webhook
   azure_rm_containerregistrywebhook:
     resource_group: "{{ resource_group }}"
     registry_name: acr{{ rpfx }}
@@ -24,7 +24,7 @@
     actions:
       - push
 
-- name: Gather facts Webhooks
+- name: Gather facts Webhook
   azure_rm_containerregistrywebhook_facts:
     resource_group: "{{ resource_group }}"
     registry_name: acr{{ rpfx }}
@@ -35,7 +35,7 @@
     that:
       - output.changed == False
 
-- name: Gather facts Webhooks
+- name: Gather facts Webhook
   azure_rm_containerregistrywebhook_facts:
     resource_group: "{{ resource_group }}"
     registry_name: acr{{ rpfx }}
@@ -46,7 +46,7 @@
     that:
       - output.changed == False
 
-- name: Delete instance of Webhooks
+- name: Delete instance of Webhook
   azure_rm_containerregistrywebhook:
     resource_group: "{{ resource_group }}"
     registry_name: acr{{ rpfx }}

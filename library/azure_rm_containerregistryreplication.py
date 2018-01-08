@@ -17,9 +17,9 @@ DOCUMENTATION = '''
 ---
 module: azure_rm_containerregistryreplication
 version_added: "2.5"
-short_description: Manage Replications instance.
+short_description: Manage Replication instance.
 description:
-    - Create, update and delete instance of Replications.
+    - Create, update and delete instance of Replication.
 
 options:
     resource_group:
@@ -50,7 +50,7 @@ author:
 '''
 
 EXAMPLES = '''
-  - name: Create (or update) Replications
+  - name: Create (or update) Replication
     azure_rm_containerregistryreplication:
       resource_group: myResourceGroup
       registry_name: myRegistry
@@ -65,7 +65,7 @@ id:
         - The resource ID.
     returned: always
     type: str
-    sample: id
+    sample: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/myResourceGroup/providers/Microsoft.ContainerRegistry/registries/myRegistry/replications/myReplication
 status:
     description:
         - The status of the replication at the time the operation was called.
@@ -93,7 +93,7 @@ class Actions:
 
 
 class AzureRMReplications(AzureRMModuleBase):
-    """Configuration class for an Azure RM Replications resource"""
+    """Configuration class for an Azure RM Replication resource"""
 
     def __init__(self):
         self.module_arg_spec = dict(
@@ -154,30 +154,30 @@ class AzureRMReplications(AzureRMModuleBase):
         #if "location" not in self.parameters:
         #    self.parameters["location"] = resource_group.location
 
-        old_response = self.get_replications()
+        old_response = self.get_replication()
 
         if not old_response:
-            self.log("Replications instance doesn't exist")
+            self.log("Replication instance doesn't exist")
             if self.state == 'absent':
                 self.log("Old instance didn't exist")
             else:
                 self.to_do = Actions.Create
         else:
-            self.log("Replications instance already exists")
+            self.log("Replication instance already exists")
             if self.state == 'absent':
                 self.to_do = Actions.Delete
             elif self.state == 'present':
-                self.log("Need to check if Replications instance has to be deleted or may be updated")
+                self.log("Need to check if Replication instance has to be deleted or may be updated")
                 self.to_do = Actions.Update
 
         if (self.to_do == Actions.Create) or (self.to_do == Actions.Update):
-            self.log("Need to Create / Update the Replications instance")
+            self.log("Need to Create / Update the Replication instance")
 
             if self.check_mode:
                 self.results['changed'] = True
                 return self.results
 
-            response = self.create_update_replications()
+            response = self.create_update_replication()
 
             if not old_response:
                 self.results['changed'] = True
@@ -185,19 +185,19 @@ class AzureRMReplications(AzureRMModuleBase):
                 self.results['changed'] = old_response.__ne__(response)
             self.log("Creation / Update done")
         elif self.to_do == Actions.Delete:
-            self.log("Replications instance deleted")
+            self.log("Replication instance deleted")
             self.results['changed'] = True
 
             if self.check_mode:
                 return self.results
 
-            self.delete_replications()
+            self.delete_replication()
             # make sure instance is actually deleted, for some Azure resources, instance is hanging around
             # for some time after deletion -- this should be really fixed in Azure
-            while self.get_replications():
+            while self.get_replication():
                 time.sleep(20)
         else:
-            self.log("Replications instance unchanged")
+            self.log("Replication instance unchanged")
             self.results['changed'] = False
             response = old_response
 
@@ -207,13 +207,13 @@ class AzureRMReplications(AzureRMModuleBase):
 
         return self.results
 
-    def create_update_replications(self):
+    def create_update_replication(self):
         '''
-        Creates or updates Replications with the specified configuration.
+        Creates or updates Replication with the specified configuration.
 
-        :return: deserialized Replications instance state dictionary
+        :return: deserialized Replication instance state dictionary
         '''
-        self.log("Creating / Updating the Replications instance {0}".format(self.replication_name))
+        self.log("Creating / Updating the Replication instance {0}".format(self.replication_name))
 
         try:
             if self.to_do == Actions.Create:
@@ -230,34 +230,34 @@ class AzureRMReplications(AzureRMModuleBase):
                 response = self.get_poller_result(response)
 
         except CloudError as exc:
-            self.log('Error attempting to create the Replications instance.')
-            self.fail("Error creating the Replications instance: {0}".format(str(exc)))
+            self.log('Error attempting to create the Replication instance.')
+            self.fail("Error creating the Replication instance: {0}".format(str(exc)))
         return response.as_dict()
 
-    def delete_replications(self):
+    def delete_replication(self):
         '''
-        Deletes specified Replications instance in the specified subscription and resource group.
+        Deletes specified Replication instance in the specified subscription and resource group.
 
         :return: True
         '''
-        self.log("Deleting the Replications instance {0}".format(self.replication_name))
+        self.log("Deleting the Replication instance {0}".format(self.replication_name))
         try:
             response = self.mgmt_client.replications.delete(resource_group_name=self.resource_group,
                                                             registry_name=self.registry_name,
                                                             replication_name=self.replication_name)
         except CloudError as e:
-            self.log('Error attempting to delete the Replications instance.')
-            self.fail("Error deleting the Replications instance: {0}".format(str(e)))
+            self.log('Error attempting to delete the Replication instance.')
+            self.fail("Error deleting the Replication instance: {0}".format(str(e)))
 
         return True
 
-    def get_replications(self):
+    def get_replication(self):
         '''
-        Gets the properties of the specified Replications.
+        Gets the properties of the specified Replication.
 
-        :return: deserialized Replications instance state dictionary
+        :return: deserialized Replication instance state dictionary
         '''
-        self.log("Checking if the Replications instance {0} is present".format(self.replication_name))
+        self.log("Checking if the Replication instance {0} is present".format(self.replication_name))
         found = False
         try:
             response = self.mgmt_client.replications.get(resource_group_name=self.resource_group,
@@ -265,9 +265,9 @@ class AzureRMReplications(AzureRMModuleBase):
                                                          replication_name=self.replication_name)
             found = True
             self.log("Response : {0}".format(response))
-            self.log("Replications instance : {0} found".format(response.name))
+            self.log("Replication instance : {0} found".format(response.name))
         except CloudError as e:
-            self.log('Did not find the Replications instance.')
+            self.log('Did not find the Replication instance.')
         if found is True:
             return response.as_dict()
 

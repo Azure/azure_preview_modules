@@ -17,9 +17,9 @@ DOCUMENTATION = '''
 ---
 module: azure_rm_applicationgatewayroute_facts
 version_added: "2.5"
-short_description: Get Routes facts.
+short_description: Get Route facts.
 description:
-    - Get facts of Routes.
+    - Get facts of Route.
 
 options:
     resource_group:
@@ -44,7 +44,7 @@ author:
 '''
 
 EXAMPLES = '''
-  - name: Get instance of Routes
+  - name: Get instance of Route
     azure_rm_applicationgatewayroute_facts:
       resource_group: resource_group_name
       route_table_name: route_table_name
@@ -105,9 +105,9 @@ class AzureRMRoutesFacts(AzureRMModuleBase):
 
     def get(self):
         '''
-        Gets facts of the specified Routes.
+        Gets facts of the specified Route.
 
-        :return: deserialized Routesinstance state dictionary
+        :return: deserialized Routeinstance state dictionary
         '''
         response = None
         results = False

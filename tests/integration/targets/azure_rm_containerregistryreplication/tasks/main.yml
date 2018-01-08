@@ -15,7 +15,7 @@
         Release: beta1
         Environment: Production
 
-- name: Create instance of Replications -- check mode
+- name: Create instance of Replication -- check mode
   azure_rm_containerregistryreplication:
     resource_group: "{{ resource_group }}"
     registry_name: acr{{ rpfx }}
@@ -28,7 +28,7 @@
     that:
       - output.changed
 
-- name: Create instance of Replications
+- name: Create instance of Replication
   azure_rm_containerregistryreplication:
     resource_group: "{{ resource_group }}"
     registry_name: acr{{ rpfx }}
@@ -40,7 +40,7 @@
     that:
       - output.changed
 
-- name: Create again instance of Replications
+- name: Create again instance of Replication
   azure_rm_containerregistryreplication:
     resource_group: "{{ resource_group }}"
     registry_name: acr{{ rpfx }}
@@ -52,7 +52,7 @@
     that:
       - output.changed == false
 
-- name: Delete instance of Replications -- check mode
+- name: Delete instance of Replication -- check mode
   azure_rm_containerregistryreplication:
     resource_group: "{{ resource_group }}"
     registry_name: acr{{ rpfx }}
@@ -65,7 +65,7 @@
     that:
       - output.changed
 
-- name: Delete instance of Replications
+- name: Delete instance of Replication
   azure_rm_containerregistryreplication:
     resource_group: "{{ resource_group }}"
     registry_name: acr{{ rpfx }}
@@ -77,7 +77,7 @@
     that:
       - output.changed
 
-- name: Delete unexisting instance of Replications
+- name: Delete unexisting instance of Replication
   azure_rm_containerregistryreplication:
     resource_group: "{{ resource_group }}"
     registry_name: acr{{ rpfx }}

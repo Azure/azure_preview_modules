@@ -3,12 +3,12 @@
     rpfx: "{{ 1000 | random }}{{ resource_group | hash('md5') | truncate(7, True, '') }}"
   run_once: yes
 
-- name: Create RouteTables
+- name: Create Route Table
   azure_rm_applicationgatewayroutetable:
     resource_group: "{{ resource_group }}"
     route_table_name: routetablename{{ rpfx }}
 
-- name: Gather facts RouteTables
+- name: Gather facts Route Table
   azure_rm_applicationgatewayroutetable_facts:
     resource_group: "{{ resource_group }}"
     route_table_name: routetablename{{ rpfx }}
@@ -18,7 +18,7 @@
     that:
       - output.changed == False
 
-- name: Gather facts RouteTables
+- name: Gather facts Route Table
   azure_rm_applicationgatewayroutetable_facts:
   register: output
 - name: Assert that facts are returned
@@ -26,7 +26,7 @@
     that:
       - output.changed == False
 
-- name: Delete instance of RouteTables
+- name: Delete instance of Route Table
   azure_rm_applicationgatewayroutetable:
     resource_group: "{{ resource_group }}"
     route_table_name: routetablename{{ rpfx }}

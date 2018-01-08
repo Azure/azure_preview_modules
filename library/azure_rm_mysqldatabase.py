@@ -63,13 +63,13 @@ id:
         - Resource ID
     returned: always
     type: str
-    sample: id
+    sample: /subscriptions/ffffffff-ffff-ffff-ffff-ffffffffffff/resourceGroups/TestGroup/providers/Microsoft.DBforMySQL/servers/testserver/databases/db1
 name:
     description:
         - Resource name.
     returned: always
     type: str
-    sample: name
+    sample: db1
 '''
 
 import time
