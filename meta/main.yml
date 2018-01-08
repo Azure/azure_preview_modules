@@ -6,7 +6,7 @@ galaxy_info:
   description: "latest Azure modules for provisioning Azure resources"
   galaxy_tags: ["Azure", "cloud", "system", "development", "networking", "docker", "container", "kubernetes"]
   license: MIT
-  min_ansible_version: "2.5.0"
+  min_ansible_version: "2.4.0"
   platforms:
     - name: GenericLinux
       versions:
