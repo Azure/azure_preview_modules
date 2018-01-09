@@ -55,6 +55,46 @@ EXAMPLES = '''
       server_name: server_name
 '''
 
+RETURN = '''
+    id:
+        description:
+            - Resource ID
+        returned: always
+        type: str
+        sample: "/subscriptions/ffffffff-ffff-ffff-ffff-ffffffffffff/resourceGroups/TestGroup/providers/Microsoft.DBforPostgreSQL/servers/testserver/configurations/
+                 array_nulls"
+    name:
+        description:
+            - Resource name.
+        returned: always
+        type: str
+        sample: array_nulls
+    type:
+        description:
+            - Resource type.
+        returned: always
+        type: str
+        sample: Microsoft.DBforPostgreSQL/servers/configurations
+    value:
+        description:
+            - Value of the configuration.
+        returned: always
+        type: str
+        sample: on
+    description:
+        description:
+            - Description of the configuration.
+        returned: always
+        type: str
+        sample: Enable input of NULL elements in arrays.
+    source:
+        description:
+            - Source of the configuration.
+        returned: always
+        type: str
+        sample: system-default
+'''
+
 from ansible.module_utils.azure_rm_common import AzureRMModuleBase
 
 try:

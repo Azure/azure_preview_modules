@@ -81,13 +81,14 @@ id:
         - Resource ID.
     returned: always
     type: str
-    sample: /subscriptions/00000000-1111-2222-3333-444444444444/resourceGroups/sqlcrudtest-2369/providers/Microsoft.Sql/servers/sqlcrudtest-8069/elasticPools/sqlcrudtest-8102
+    sample: "/subscriptions/00000000-1111-2222-3333-444444444444/resourceGroups/sqlcrudtest-2369/providers/Microsoft.Sql/servers/sqlcrudtest-8069/elasticPools/s
+             qlcrudtest-8102"
 state:
     description:
         - The state of the elastic pool. Possible values include: C(Creating), C(Ready), C(Disabled)
     returned: always
     type: str
-    sample: state
+    sample: Ready
 '''
 
 import time

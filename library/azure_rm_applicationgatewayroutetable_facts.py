@@ -51,6 +51,40 @@ EXAMPLES = '''
     azure_rm_applicationgatewayroutetable_facts:
 '''
 
+RETURN = '''
+    id:
+        description:
+            - Resource ID.
+        returned: always
+        type: str
+        sample: /subscriptions/subid/resourceGroups/rg1/providers/Microsoft.Network/routeTables/testrt
+    name:
+        description:
+            - Resource name.
+        returned: always
+        type: str
+        sample: testrt
+    type:
+        description:
+            - Resource type.
+        returned: always
+        type: str
+        sample: Microsoft.Network/routeTables
+    location:
+        description:
+            - Resource location.
+        returned: always
+        type: str
+        sample: westus
+    routes:
+        description:
+            - Collection of routes contained within a route table.
+        returned: always
+        type: complex
+        sample: routes
+        suboptions:
+'''
+
 from ansible.module_utils.azure_rm_common import AzureRMModuleBase
 
 try:

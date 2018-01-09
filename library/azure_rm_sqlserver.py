@@ -83,7 +83,7 @@ state:
         - The state of the server.
     returned: always
     type: str
-    sample: state
+    sample: Ready
 fully_qualified_domain_name:
     description:
         - The fully qualified domain name of the server.

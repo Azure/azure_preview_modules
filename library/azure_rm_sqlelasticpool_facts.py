@@ -71,6 +71,58 @@ EXAMPLES = '''
       server_name: server_name
 '''
 
+RETURN = '''
+    id:
+        description:
+            - Resource ID.
+        returned: always
+        type: str
+        sample: "/subscriptions/00000000-1111-2222-3333-444444444444/resourceGroups/sqlcrudtest-2369/providers/Microsoft.Sql/servers/sqlcrudtest-8069/elasticPools/s
+                 qlcrudtest-8102"
+    name:
+        description:
+            - Resource name.
+        returned: always
+        type: str
+        sample: sqlcrudtest-8102
+    type:
+        description:
+            - Resource type.
+        returned: always
+        type: str
+        sample: Microsoft.Sql/servers/elasticPools
+    location:
+        description:
+            - Resource location.
+        returned: always
+        type: str
+        sample: Japan East
+    state:
+        description:
+            - The state of the elastic pool. Possible values include: C(Creating), C(Ready), C(Disabled)
+        returned: always
+        type: str
+        sample: Ready
+    edition:
+        description:
+            - The edition of the elastic pool. Possible values include: C(Basic), C(Standard), C(Premium)
+        returned: always
+        type: str
+        sample: Basic
+    dtu:
+        description:
+            - The total shared DTU for the database elastic pool.
+        returned: always
+        type: int
+        sample: 50
+    kind:
+        description:
+            - Kind of elastic pool.  This is metadata used for the Azure portal experience.
+        returned: always
+        type: str
+        sample: kind
+'''
+
 from ansible.module_utils.azure_rm_common import AzureRMModuleBase
 
 try:
@@ -129,10 +181,10 @@ class AzureRMElasticPoolsFacts(AzureRMModuleBase):
               self.server_name is not None and
               self.elastic_pool_name is not None):
             self.results['ansible_facts']['list_metric_definitions'] = self.list_metric_definitions()
-        #elif (self.resource_group is not None and
-        #      self.server_name is not None and
-        #      self.elastic_pool_name is not None):
-        #    self.results['ansible_facts']['get'] = self.get()
+        elif (self.resource_group is not None and
+              self.server_name is not None and
+              self.elastic_pool_name is not None):
+            self.results['ansible_facts']['get'] = self.get()
         elif (self.resource_group is not None and
               self.server_name is not None):
             self.results['ansible_facts']['list_by_server'] = self.list_by_server()

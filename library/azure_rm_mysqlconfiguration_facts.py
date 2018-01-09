@@ -55,6 +55,46 @@ EXAMPLES = '''
       server_name: server_name
 '''
 
+RETURN = '''
+    id:
+        description:
+            - Resource ID
+        returned: always
+        type: str
+        sample: "/subscriptions/ffffffff-ffff-ffff-ffff-ffffffffffff/resourceGroups/TestGroup/providers/Microsoft.DBforMySQL/servers/testserver/configurations/event
+                 _scheduler"
+    name:
+        description:
+            - Resource name.
+        returned: always
+        type: str
+        sample: event_scheduler
+    type:
+        description:
+            - Resource type.
+        returned: always
+        type: str
+        sample: Microsoft.DBforMySQL/servers/configurations
+    value:
+        description:
+            - Value of the configuration.
+        returned: always
+        type: str
+        sample: OFF
+    description:
+        description:
+            - Description of the configuration.
+        returned: always
+        type: str
+        sample: Indicates the status of the Event Scheduler.
+    source:
+        description:
+            - Source of the configuration.
+        returned: always
+        type: str
+        sample: system-default
+'''
+
 from ansible.module_utils.azure_rm_common import AzureRMModuleBase
 
 try:
