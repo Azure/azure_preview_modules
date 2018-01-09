@@ -87,7 +87,7 @@ state:
         - The state of the elastic pool. Possible values include: C(Creating), C(Ready), C(Disabled)
     returned: always
     type: str
-    sample: state
+    sample: Ready
 '''
 
 import time
