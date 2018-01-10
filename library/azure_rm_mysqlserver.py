@@ -40,7 +40,9 @@ options:
             tier:
                 description:
                     - The tier of the particular SKU, e.g. Basic.
-                choices: ['basic', 'standard']
+                choices:
+                    - 'basic'
+                    - 'standard'
             capacity:
                 description:
                     - "The scale up/out capacity, representing server's compute units."
@@ -56,7 +58,9 @@ options:
     version:
         description:
             - Server version.
-        choices: ['5.6', '5.7']
+        choices:
+            - '5.6'
+            - '5.7'
     enforce_ssl:
         description:
             - Enable SSL enforcement.
@@ -161,7 +165,8 @@ class AzureRMServers(AzureRMModuleBase):
             ),
             version=dict(
                 type='str',
-                choices=['5.6', '5.7']
+                choices=['5.6',
+                         '5.7']
             ),
             enforce_ssl=dict(
                 type='bool',

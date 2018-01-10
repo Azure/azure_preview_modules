@@ -46,7 +46,9 @@ options:
     status:
         description:
             - The status of the webhook at the time the operation was called.
-        choices: ['enabled', 'disabled']
+        choices:
+            - 'enabled'
+            - 'disabled'
     scope:
         description:
             - "The scope of repositories where the event can be triggered. For example, C(foo:*) means events for all tags under repository C(foo). C(foo:bar
@@ -134,7 +136,8 @@ class AzureRMWebhooks(AzureRMModuleBase):
             ),
             status=dict(
                 type='str',
-                choices=['enabled', 'disabled']
+                choices=['enabled',
+                         'disabled']
             ),
             scope=dict(
                 type='str'
