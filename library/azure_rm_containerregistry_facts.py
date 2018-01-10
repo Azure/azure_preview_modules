@@ -84,14 +84,6 @@ location:
     returned: always
     type: str
     sample: westus
-tags:
-    description:
-        - The tags of the resource.
-    returned: always
-    type: complex
-    sample: {
-  "key": "value"
-}
 sku:
     description:
         - The SKU of the container registry.
@@ -101,13 +93,14 @@ sku:
     contains:
         name:
             description:
-                - The SKU name of the container registry. Required for registry creation. Possible values include: C(Classic), C(Basic), C(Standard), C(Premium)
+                - "The SKU name of the container registry. Required for registry creation. Possible values include: C(Classic), C(Basic), C(Standard), C(Prem
+                   ium)"
             returned: always
             type: str
             sample: Standard
         tier:
             description:
-                - The SKU tier based on the SKU name. Possible values include: C(Classic), C(Basic), C(Standard), C(Premium)
+                - "The SKU tier based on the SKU name. Possible values include: C(Classic), C(Basic), C(Standard), C(Premium)"
             returned: always
             type: str
             sample: Standard

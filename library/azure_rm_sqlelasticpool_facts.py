@@ -99,13 +99,13 @@ location:
     sample: Japan East
 state:
     description:
-        - The state of the elastic pool. Possible values include: C(Creating), C(Ready), C(Disabled)
+        - "The state of the elastic pool. Possible values include: C(Creating), C(Ready), C(Disabled)"
     returned: always
     type: str
     sample: Ready
 edition:
     description:
-        - The edition of the elastic pool. Possible values include: C(Basic), C(Standard), C(Premium)
+        - "The edition of the elastic pool. Possible values include: C(Basic), C(Standard), C(Premium)"
     returned: always
     type: str
     sample: Basic

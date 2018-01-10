@@ -74,14 +74,6 @@ location:
     returned: always
     type: str
     sample: onebox
-tags:
-    description:
-        - Application-specific metadata in the form of key-value pairs.
-    returned: always
-    type: complex
-    sample: {
-  "elasticServer": "1"
-}
 sku:
     description:
         - The SKU (pricing tier) of the server.
@@ -97,7 +89,7 @@ sku:
             sample: MYSQLS3M100
         tier:
             description:
-                - The tier of the particular SKU, e.g. Basic. Possible values include: C(Basic), C(Standard)
+                - "The tier of the particular SKU, e.g. Basic. Possible values include: C(Basic), C(Standard)"
             returned: always
             type: str
             sample: Basic
@@ -109,13 +101,13 @@ sku:
             sample: 100
 version:
     description:
-        - Server version. Possible values include: C(5.6), C(5.7)
+        - "Server version. Possible values include: C(5.6), C(5.7)"
     returned: always
     type: str
     sample: version
 user_visible_state:
     description:
-        - A state of a server that is visible to user. Possible values include: C(Ready), C(Dropping), C(Disabled)
+        - "A state of a server that is visible to user. Possible values include: C(Ready), C(Dropping), C(Disabled)"
     returned: always
     type: str
     sample: user_visible_state

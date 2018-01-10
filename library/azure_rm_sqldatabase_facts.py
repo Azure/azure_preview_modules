@@ -38,7 +38,7 @@ options:
             - An OData filter expression that describes a subset of metrics to return.
     expand:
         description:
-            - A comma separated list of child objects to expand in the response. Possible properties: serviceTierAdvisors, transparentDataEncryption.
+            - "A comma separated list of child objects to expand in the response. Possible properties: serviceTierAdvisors, transparentDataEncryption."
     elastic_pool_name:
         description:
             - The name of the elastic pool to be retrieved.
@@ -115,14 +115,6 @@ type:
     returned: always
     type: str
     sample: Microsoft.Sql/servers/databases
-tags:
-    description:
-        - Resource tags.
-    returned: always
-    type: complex
-    sample: {
-  "tagKey1": "TagValue1"
-}
 location:
     description:
         - Resource location.
