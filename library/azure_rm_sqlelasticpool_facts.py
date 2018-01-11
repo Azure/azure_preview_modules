@@ -77,8 +77,8 @@ id:
         - Resource ID.
     returned: always
     type: str
-    sample: "/subscriptions/00000000-1111-2222-3333-444444444444/resourceGroups/sqlcrudtest-2369/providers/Microsoft.Sql/servers/sqlcrudtest-8069/elasticPools/s
-             qlcrudtest-8102"
+    sample: "/subscriptions/00000000-1111-2222-3333-444444444444/resourceGroups/sqlcrudtest-2369/providers/Microsoft.Sql/servers/sqlcrudtest-8069/elasticPool
+            s/sqlcrudtest-8102"
 name:
     description:
         - Resource name.

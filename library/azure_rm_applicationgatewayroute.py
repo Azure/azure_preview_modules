@@ -43,7 +43,7 @@ options:
     next_hop_type:
         description:
             - "The type of Azure hop the packet should be sent to. Possible values are: C(VirtualNetworkGateway), C(VnetLocal), C(Internet), C(VirtualApplian
-               ce), and C(None)."
+              ce), and C(None)."
         choices:
             - 'virtual_network_gateway'
             - 'vnet_local'

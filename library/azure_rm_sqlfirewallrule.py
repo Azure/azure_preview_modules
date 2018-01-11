@@ -40,7 +40,7 @@ options:
     end_ip_address:
         description:
             - "The end IP address of the firewall rule. Must be IPv4 format. Must be greater than or equal to startIpAddress. Use value C(0.0.0.0) to represe
-               nt all Azure-internal IP addresses."
+              nt all Azure-internal IP addresses."
 
 extends_documentation_fragment:
     - azure
@@ -66,8 +66,8 @@ id:
         - Resource ID.
     returned: always
     type: str
-    sample: "/subscriptions/00000000-1111-2222-3333-444444444444/resourceGroups/firewallrulecrudtest-12/providers/Microsoft.Sql/servers/firewallrulecrudtest-628
-             5/firewallRules/firewallrulecrudtest-5370"
+    sample: "/subscriptions/00000000-1111-2222-3333-444444444444/resourceGroups/firewallrulecrudtest-12/providers/Microsoft.Sql/servers/firewallrulecrudtest-
+            6285/firewallRules/firewallrulecrudtest-5370"
 '''
 
 import time

@@ -101,8 +101,8 @@ id:
         - Resource ID.
     returned: always
     type: str
-    sample: "/subscriptions/00000000-1111-2222-3333-444444444444/resourceGroups/sqlcrudtest-6852/providers/Microsoft.Sql/servers/sqlcrudtest-2080/databases/sqlc
-             rudtest-9187"
+    sample: "/subscriptions/00000000-1111-2222-3333-444444444444/resourceGroups/sqlcrudtest-6852/providers/Microsoft.Sql/servers/sqlcrudtest-2080/databases/s
+            qlcrudtest-9187"
 name:
     description:
         - Resource name.
@@ -136,9 +136,9 @@ collation:
 edition:
     description:
         - "The edition of the database. The DatabaseEditions enumeration contains all the valid editions. If createMode is NonReadableSecondary or OnlineSeco
-           ndary, this value is ignored. To see possible values, query the capabilities API (/subscriptions/{subscriptionId}/providers/Microsoft.Sql/location
-           s/{locationID}/capabilities) referred to by operationId: 'Capabilities_ListByLocation.'. Possible values include: C(Web), C(Business), C(Basic), C
-           (Standard), C(Premium), C(Free), C(Stretch), C(DataWarehouse), C(System), C(System2)"
+          ndary, this value is ignored. To see possible values, query the capabilities API (/subscriptions/{subscriptionId}/providers/Microsoft.Sql/location
+          s/{locationID}/capabilities) referred to by operationId: 'Capabilities_ListByLocation.'. Possible values include: C(Web), C(Business), C(Basic), C
+          (Standard), C(Premium), C(Free), C(Stretch), C(DataWarehouse), C(System), C(System2)"
     returned: always
     type: str
     sample: Basic
