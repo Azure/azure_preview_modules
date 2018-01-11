@@ -57,8 +57,8 @@ id:
         - The resource ID.
     returned: always
     type: str
-    sample: "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/myResourceGroup/providers/Microsoft.ContainerRegistry/registries/myRegistry/repl
-             ications/myReplication"
+    sample: "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/myResourceGroup/providers/Microsoft.ContainerRegistry/registries/myRegistry/r
+            eplications/myReplication"
 name:
     description:
         - The name of the resource.
@@ -95,7 +95,7 @@ status:
                 - The timestamp when the status was changed to the current value.
             returned: always
             type: datetime
-            sample: 2017-03-01T23:15:37.0707808Z
+            sample: "2017-03-01T23:15:37.0707808Z"
 '''
 
 from ansible.module_utils.azure_rm_common import AzureRMModuleBase

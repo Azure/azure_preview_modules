@@ -52,7 +52,7 @@ options:
     scope:
         description:
             - "The scope of repositories where the event can be triggered. For example, C(foo:*) means events for all tags under repository C(foo). C(foo:bar
-               ) means events for C(foo:bar) only. C(foo) is equivalent to C(foo:latest). Empty means all events."
+              ) means events for C(foo:bar) only. C(foo) is equivalent to C(foo:latest). Empty means all events."
     actions:
         description:
             - The list of actions that trigger the webhook to post notifications.
@@ -81,8 +81,8 @@ id:
         - The resource ID.
     returned: always
     type: str
-    sample: "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/myResourceGroup/providers/Microsoft.ContainerRegistry/registries/myRegistry/webh
-             ooks/myWebhook"
+    sample: "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/myResourceGroup/providers/Microsoft.ContainerRegistry/registries/myRegistry/w
+            ebhooks/myWebhook"
 status:
     description:
         - "The status of the webhook at the time the operation was called. Possible values include: C(enabled), C(disabled)"

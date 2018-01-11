@@ -258,15 +258,15 @@ options:
             interval:
                 description:
                     - "The probing interval in seconds. This is the time interval between two consecutive probes. Acceptable values are from 1 second to 8640
-                       0 seconds."
+                      0 seconds."
             timeout:
                 description:
                     - "the probe timeout in seconds. Probe marked as failed if valid response is not received with this timeout period. Acceptable values are
-                        from 1 second to 86400 seconds."
+                       from 1 second to 86400 seconds."
             unhealthy_threshold:
                 description:
                     - "The probe retry count. Backend server is marked down after consecutive probe failure count reaches UnhealthyThreshold. Acceptable valu
-                       es are from 1 second to 20."
+                      es are from 1 second to 20."
             pick_host_name_from_backend_http_settings:
                 description:
                     - Whether the host header should be picked from the backend http settings. Default value is false.
@@ -352,7 +352,7 @@ options:
                                     private_ip_address_version:
                                         description:
                                             - "Available from Api-Version 2016-03-30 onwards, it represents whether the specific ipconfiguration is IPv4 or I
-                                               Pv6. Default is taken as IPv4.  Possible values are: C(IPv4) and C(IPv6)."
+                                              Pv6. Default is taken as IPv4.  Possible values are: C(IPv4) and C(IPv6)."
                                         choices:
                                             - 'ipv4'
                                             - 'ipv6'
@@ -372,7 +372,7 @@ options:
                                     provisioning_state:
                                         description:
                                             - "The provisioning state of the network interface IP configuration. Possible values are: C(Updating), C(Deleting
-                                               ), and C(Failed)."
+                                              ), and C(Failed)."
                                     name:
                                         description:
                                             - The name of the resource that is unique within a resource group. This name can be used to access the resource.
@@ -444,19 +444,19 @@ options:
                             frontend_port:
                                 description:
                                     - "The port for the external endpoint. Port numbers for each rule must be unique within the Load Balancer. Acceptable val
-                                       ues range from 1 to 65534."
+                                      ues range from 1 to 65534."
                             backend_port:
                                 description:
                                     - The port used for the internal endpoint. Acceptable values range from 1 to 65535.
                             idle_timeout_in_minutes:
                                 description:
                                     - "The timeout for the TCP idle connection. The value can be set between 4 and 30 minutes. The default value is 4 minutes
-                                       . This element is only used when the protocol is set to TCP."
+                                      . This element is only used when the protocol is set to TCP."
                             enable_floating_ip:
                                 description:
                                     - "Configures a virtual machineC(s endpoint for the floating IP capability required to configure a SQL AlwaysOn Availabil
-                                       ity Group. This setting is required when using the SQL AlwaysOn Availability Groups in SQL server. This setting can)t
-                                       be changed after you create the endpoint."
+                                      ity Group. This setting is required when using the SQL AlwaysOn Availability Groups in SQL server. This setting can)t
+                                      be changed after you create the endpoint."
                             provisioning_state:
                                 description:
                                     - "Gets the provisioning state of the public IP resource. Possible values are: C(Updating), C(Deleting), and C(Failed)."
@@ -478,7 +478,7 @@ options:
                     private_ip_address_version:
                         description:
                             - "Available from Api-Version 2016-03-30 onwards, it represents whether the specific ipconfiguration is IPv4 or IPv6. Default is
-                               taken as IPv4.  Possible values are: C(IPv4) and C(IPv6)."
+                              taken as IPv4.  Possible values are: C(IPv4) and C(IPv6)."
                         choices:
                             - 'ipv4'
                             - 'ipv6'
@@ -516,7 +516,7 @@ options:
                                     provisioning_state:
                                         description:
                                             - "The provisioning state of the public IP resource. Possible values are: C(Updating), C(Deleting), and C(Failed)
-                                               ."
+                                              ."
                                     etag:
                                         description:
                                             - A unique read-only string that changes whenever the resource is updated.
@@ -626,17 +626,17 @@ options:
                                     domain_name_label:
                                         description:
                                             - "Gets or sets the Domain name label.The concatenation of the domain name label and the regionalized DNS zone ma
-                                               ke up the fully qualified domain name associated with the public IP address. If a domain name label is specifi
-                                               ed, an A DNS record is created for the public IP in the Microsoft Azure DNS system."
+                                              ke up the fully qualified domain name associated with the public IP address. If a domain name label is specifi
+                                              ed, an A DNS record is created for the public IP in the Microsoft Azure DNS system."
                                     fqdn:
                                         description:
                                             - "Gets the FQDN, Fully qualified domain name of the A DNS record associated with the public IP. This is the conc
-                                               atenation of the domainNameLabel and the regionalized DNS zone."
+                                              atenation of the domainNameLabel and the regionalized DNS zone."
                                     reverse_fqdn:
                                         description:
                                             - "Gets or Sets the Reverse FQDN. A user-visible, fully qualified domain name that resolves to this public IP add
-                                               ress. If the reverseFqdn is specified, then a PTR DNS record is created pointing from the IP address in the in
-                                               -addr.arpa domain to the reverse FQDN. "
+                                              ress. If the reverseFqdn is specified, then a PTR DNS record is created pointing from the IP address in the in
+                                              -addr.arpa domain to the reverse FQDN. "
                             ip_address:
                                 description:
                                     - The IP address associated with the public IP address resource.
@@ -670,7 +670,7 @@ options:
                     provisioning_state:
                         description:
                             - "The provisioning state of the network interface IP configuration. Possible values are: C(Updating), C(Deleting), and C(Failed)
-                               ."
+                              ."
                     name:
                         description:
                             - The name of the resource that is unique within a resource group. This name can be used to access the resource.
@@ -726,7 +726,7 @@ options:
             request_timeout:
                 description:
                     - "Request timeout in seconds. Application Gateway will fail the request if response is not received within RequestTimeout. Acceptable va
-                       lues are from 1 second to 86400 seconds."
+                      lues are from 1 second to 86400 seconds."
             probe:
                 description:
                     - Probe resource of an application gateway.
