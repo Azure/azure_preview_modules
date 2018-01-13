@@ -50,73 +50,82 @@ EXAMPLES = '''
 '''
 
 RETURN = '''
-id:
-    description:
-        - Resource ID
-    returned: always
-    type: str
-    sample: /subscriptions/ffffffff-ffff-ffff-ffff-ffffffffffff/resourceGroups/TestGroup/providers/Microsoft.DBforPostgreSQL/servers/testserver
-name:
-    description:
-        - Resource name.
-    returned: always
-    type: str
-    sample: testserver
-type:
-    description:
-        - Resource type.
-    returned: always
-    type: str
-    sample: Microsoft.DBforPostgreSQL/servers
-location:
-    description:
-        - The location the resource resides in.
-    returned: always
-    type: str
-    sample: onebox
-sku:
-    description:
-        - The SKU (pricing tier) of the server.
+servers:
+    description: A list of dict results where the key is the name of the MySQL Server and the values are the facts for that MySQL Server.
     returned: always
     type: complex
-    sample: sku
     contains:
-        name:
-            description:
-                - The name of the sku, typically, a letter + Number code, e.g. P3.
-            returned: always
-            type: str
-            sample: PGSQLB100
-        tier:
-            description:
-                - "The tier of the particular SKU, e.g. Basic. Possible values include: C(Basic), C(Standard)"
-            returned: always
-            type: str
-            sample: Basic
-        capacity:
-            description:
-                - "The scale up/out capacity, representing server's compute units."
-            returned: always
-            type: int
-            sample: 100
-version:
-    description:
-        - "Server version. Possible values include: C(9.5), C(9.6)"
-    returned: always
-    type: str
-    sample: version
-user_visible_state:
-    description:
-        - "A state of a server that is visible to user. Possible values include: C(Ready), C(Dropping), C(Disabled)"
-    returned: always
-    type: str
-    sample: user_visible_state
-fully_qualified_domain_name:
-    description:
-        - The fully qualified domain name of a server.
-    returned: always
-    type: str
-    sample: fully_qualified_domain_name
+        mysqlserver_name:
+            description: The key is the name of the server that the values relate to.
+            type: complex
+            contains:
+                id:
+                    description:
+                        - Resource ID
+                    returned: always
+                    type: str
+                    sample: /subscriptions/ffffffff-ffff-ffff-ffff-ffffffffffff/resourceGroups/TestGroup/providers/Microsoft.DBforPostgreSQL/servers/testserver
+                name:
+                    description:
+                        - Resource name.
+                    returned: always
+                    type: str
+                    sample: testserver
+                type:
+                    description:
+                        - Resource type.
+                    returned: always
+                    type: str
+                    sample: Microsoft.DBforPostgreSQL/servers
+                location:
+                    description:
+                        - The location the resource resides in.
+                    returned: always
+                    type: str
+                    sample: onebox
+                sku:
+                    description:
+                        - The SKU (pricing tier) of the server.
+                    returned: always
+                    type: complex
+                    sample: sku
+                    contains:
+                        name:
+                            description:
+                                - The name of the sku, typically, a letter + Number code, e.g. P3.
+                            returned: always
+                            type: str
+                            sample: PGSQLB100
+                        tier:
+                            description:
+                                - "The tier of the particular SKU, e.g. Basic. Possible values include: C(Basic), C(Standard)"
+                            returned: always
+                            type: str
+                            sample: Basic
+                        capacity:
+                            description:
+                                - "The scale up/out capacity, representing server's compute units."
+                            returned: always
+                            type: int
+                            sample: 100
+                version:
+                    description:
+                        - "Server version. Possible values include: C(9.5), C(9.6)"
+                    returned: always
+                    type: str
+                    sample: version
+                user_visible_state:
+                    description:
+                        - "A state of a server that is visible to user. Possible values include: C(Ready), C(Dropping), C(Disabled)"
+                    returned: always
+                    type: str
+                    sample: user_visible_state
+                fully_qualified_domain_name:
+                    description:
+                        - The fully qualified domain name of a server.
+                    returned: always
+                    type: str
+                    sample: fully_qualified_domain_name
 '''
 
 from ansible.module_utils.azure_rm_common import AzureRMModuleBase
@@ -161,9 +170,9 @@ class AzureRMServersFacts(AzureRMModuleBase):
 
         if (self.resource_group is not None and
                 self.server_name is not None):
-            self.results['ansible_facts']['get'] = self.get()
+            self.results['servers'] = self.get()
         elif (self.resource_group is not None):
-            self.results['ansible_facts']['list_by_resource_group'] = self.list_by_resource_group()
+            self.results['servers'] = self.list_by_resource_group()
         return self.results
 
     def get(self):
@@ -182,7 +191,8 @@ class AzureRMServersFacts(AzureRMModuleBase):
             self.log('Could not get facts for Servers.')
 
         if response is not None:
-            results = response.as_dict()
+            results = {}
+            results[response.name] = response.as_dict()
 
         return results
 
@@ -201,9 +211,9 @@ class AzureRMServersFacts(AzureRMModuleBase):
             self.log('Could not get facts for Servers.')
 
         if response is not None:
-            results = []
+            results = {}
             for item in response:
-                results.append(item.as_dict())
+                results[item.name] = item.as_dict()
 
         return results
 

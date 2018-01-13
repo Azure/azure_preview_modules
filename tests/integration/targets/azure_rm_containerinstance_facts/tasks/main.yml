@@ -31,6 +31,7 @@
   assert:
     that:
       - output.changed == False
+      - output.container_groups.xxxunknownxxx.id != None
 
 - name: Gather facts Container Group
   azure_rm_containerinstance_facts:
@@ -40,6 +41,7 @@
   assert:
     that:
       - output.changed == False
+      - output.container_groups.xxxunknownxxx.id != None
 
     resource_group: "{{ resource_group }}"
     name: aci{{ rpfx }}

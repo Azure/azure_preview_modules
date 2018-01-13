@@ -32,6 +32,7 @@
   assert:
     that:
       - output.changed == False
+      - output.configurations.event_scheduler.id != None
 
 - name: Gather facts PostgreSQL Configuration
   azure_rm_postgresqlconfiguration_facts:
@@ -42,6 +43,7 @@
   assert:
     that:
       - output.changed == False
+      - output.configurations.event_scheduler.id != None
 
 - name: Delete instance of PostgreSQL Server
   azure_rm_postgresqlserver:

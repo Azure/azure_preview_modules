@@ -32,6 +32,7 @@
   assert:
     that:
       - output.changed == False
+      - output.firewall_rules.xxxunknownxxx.id != None
 
 - name: Gather facts MySQL Firewall Rule
   azure_rm_mysqlfirewallrule_facts:
@@ -42,6 +43,7 @@
   assert:
     that:
       - output.changed == False
+      - output.firewall_rules.xxxunknownxxx.id != None
 
 - name: Delete instance of Firewall Rule
   azure_rm_mysqlfirewallrule:

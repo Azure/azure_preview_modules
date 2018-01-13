@@ -27,6 +27,7 @@
   assert:
     that:
       - output.changed == False
+      - output.firewall_rules.xxxunknownxxx.id != None
 
 - name: Gather facts SQL Firewall Rule
   azure_rm_sqlfirewallrule_facts:
@@ -37,6 +38,7 @@
   assert:
     that:
       - output.changed == False
+      - output.firewall_rules.xxxunknownxxx.id != None
 
 - name: Delete instance of Firewall Rule
   azure_rm_sqlfirewallrule:

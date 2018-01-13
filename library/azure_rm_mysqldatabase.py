@@ -36,10 +36,10 @@ options:
         required: True
     charset:
         description:
-            - The charset of the database.
+            - The charset of the database. Check MySQL documentation for possible values.
     collation:
         description:
-            - The collation of the database.
+            - The collation of the database. Check MySQL documentation for possible values.
 
 extends_documentation_fragment:
     - azure
@@ -167,7 +167,10 @@ class AzureRMDatabases(AzureRMModuleBase):
                 self.to_do = Actions.Delete
             elif self.state == 'present':
                 self.log("Need to check if MySQL Database instance has to be deleted or may be updated")
-                self.to_do = Actions.Update
+                if (self.collation is not None) and (self.collation != old_response['collation']):
+                    self.to_do = Actions.Update
+                if (self.charset is not None) and (self.charset != old_response['charset']):
+                    self.to_do = Actions.Update
                 self.delete_mysqldatabase()
 
         if (self.to_do == Actions.Create) or (self.to_do == Actions.Update):

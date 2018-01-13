@@ -27,6 +27,7 @@
   assert:
     that:
       - output.changed == False
+      - output.databases.test-database.id != None
 
 - name: Gather facts SQL Database
   azure_rm_sqldatabase_facts:
@@ -38,6 +39,7 @@
   assert:
     that:
       - output.changed == False
+      - output.databases.test-database.id != None
 
 - name: Gather facts SQL Database
   azure_rm_sqldatabase_facts:
@@ -48,6 +50,7 @@
   assert:
     that:
       - output.changed == False
+      - output.databases.test-database.id != None
 
 - name: Gather facts SQL Database
   azure_rm_sqldatabase_facts:
@@ -59,6 +62,7 @@
   assert:
     that:
       - output.changed == False
+      - output.databases.test-database.id != None
 
 - name: Gather facts SQL Database
   azure_rm_sqldatabase_facts:
@@ -69,6 +73,7 @@
   assert:
     that:
       - output.changed == False
+      - output.databases.test-database.id != None
 
 - name: Gather facts SQL Database
   azure_rm_sqldatabase_facts:
@@ -79,6 +84,7 @@
   assert:
     that:
       - output.changed == False
+      - output.databases.test-database.id != None
 
 - name: Delete instance of SQL Database
   azure_rm_sqldatabase:

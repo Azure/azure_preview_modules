@@ -50,37 +50,47 @@ EXAMPLES = '''
 '''
 
 RETURN = '''
-id:
-    description:
-        - The resource id.
-    returned: always
-    type: str
-    sample: /subscriptions/ae43b1e3-c35d-4c8c-bc0d-f148b4c52b78/resourceGroups/demo/providers/Microsoft.ContainerInstance/containerGroups/mycontainers
-name:
-    description:
-        - The resource name.
-    returned: always
-    type: str
-    sample: mycontainers
-type:
-    description:
-        - The resource type.
-    returned: always
-    type: str
-    sample: Microsoft.ContainerInstance/containerGroups
-location:
-    description:
-        - The resource location.
-    returned: always
-    type: str
-    sample: westus
-containers:
-    description:
-        - The containers within the container group.
+container_groups:
+    description: A list of dict results where the key is the name of the Container Group and the values are the facts for that Container Group.
     returned: always
     type: complex
-    sample: containers
     contains:
+        containergroup_name:
+            description: The key is the name of the server that the values relate to.
+            type: complex
+            contains:
+                id:
+                    description:
+                        - The resource id.
+                    returned: always
+                    type: str
+                    sample: "/subscriptions/ae43b1e3-c35d-4c8c-bc0d-f148b4c52b78/resourceGroups/demo/providers/Microsoft.ContainerInstance/containerGroups/my
+                            containers"
+                name:
+                    description:
+                        - The resource name.
+                    returned: always
+                    type: str
+                    sample: mycontainers
+                type:
+                    description:
+                        - The resource type.
+                    returned: always
+                    type: str
+                    sample: Microsoft.ContainerInstance/containerGroups
+                location:
+                    description:
+                        - The resource location.
+                    returned: always
+                    type: str
+                    sample: westus
+                containers:
+                    description:
+                        - The containers within the container group.
+                    returned: always
+                    type: complex
+                    sample: containers
+                    contains:
 '''
 
 from ansible.module_utils.azure_rm_common import AzureRMModuleBase
@@ -125,9 +135,9 @@ class AzureRMContainerGroupsFacts(AzureRMModuleBase):
 
         if (self.resource_group is not None and
                 self.container_group_name is not None):
-            self.results['ansible_facts']['get'] = self.get()
+            self.results['container_groups'] = self.get()
         elif (self.resource_group is not None):
-            self.results['ansible_facts']['list_by_resource_group'] = self.list_by_resource_group()
+            self.results['container_groups'] = self.list_by_resource_group()
         return self.results
 
     def get(self):
@@ -146,7 +156,8 @@ class AzureRMContainerGroupsFacts(AzureRMModuleBase):
             self.log('Could not get facts for ContainerGroups.')
 
         if response is not None:
-            results = response.as_dict()
+            results = {}
+            results[response.name] = response.as_dict()
 
         return results
 
@@ -165,9 +176,9 @@ class AzureRMContainerGroupsFacts(AzureRMModuleBase):
             self.log('Could not get facts for ContainerGroups.')
 
         if response is not None:
-            results = []
+            results = {}
             for item in response:
-                results.append(item.as_dict())
+                results[item.name] = item.as_dict()
 
         return results
 

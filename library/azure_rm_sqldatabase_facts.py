@@ -96,58 +96,68 @@ EXAMPLES = '''
 '''
 
 RETURN = '''
-id:
-    description:
-        - Resource ID.
+databases:
+    description: A list of dict results where the key is the name of the SQL Database and the values are the facts for that SQL Database.
     returned: always
-    type: str
-    sample: "/subscriptions/00000000-1111-2222-3333-444444444444/resourceGroups/sqlcrudtest-6852/providers/Microsoft.Sql/servers/sqlcrudtest-2080/databases/s
-            qlcrudtest-9187"
-name:
-    description:
-        - Resource name.
-    returned: always
-    type: str
-    sample: sqlcrudtest-9187
-type:
-    description:
-        - Resource type.
-    returned: always
-    type: str
-    sample: Microsoft.Sql/servers/databases
-location:
-    description:
-        - Resource location.
-    returned: always
-    type: str
-    sample: Japan East
-kind:
-    description:
-        - Kind of database.  This is metadata used for the Azure portal experience.
-    returned: always
-    type: str
-    sample: v12.0,user
-collation:
-    description:
-        - The collation of the database. If createMode is not Default, this value is ignored.
-    returned: always
-    type: str
-    sample: SQL_Latin1_General_CP1_CI_AS
-edition:
-    description:
-        - "The edition of the database. The DatabaseEditions enumeration contains all the valid editions. If createMode is NonReadableSecondary or OnlineSeco
-          ndary, this value is ignored. To see possible values, query the capabilities API (/subscriptions/{subscriptionId}/providers/Microsoft.Sql/location
-          s/{locationID}/capabilities) referred to by operationId: 'Capabilities_ListByLocation.'. Possible values include: C(Web), C(Business), C(Basic), C
-          (Standard), C(Premium), C(Free), C(Stretch), C(DataWarehouse), C(System), C(System2)"
-    returned: always
-    type: str
-    sample: Basic
-status:
-    description:
-        - The status of the database.
-    returned: always
-    type: str
-    sample: Online
+    type: complex
+    contains:
+        sqldatabase_name:
+            description: The key is the name of the server that the values relate to.
+            type: complex
+            contains:
+                id:
+                    description:
+                        - Resource ID.
+                    returned: always
+                    type: str
+                    sample: "/subscriptions/00000000-1111-2222-3333-444444444444/resourceGroups/sqlcrudtest-6852/providers/Microsoft.Sql/servers/sqlcrudtest-
+                            2080/databases/sqlcrudtest-9187"
+                name:
+                    description:
+                        - Resource name.
+                    returned: always
+                    type: str
+                    sample: sqlcrudtest-9187
+                type:
+                    description:
+                        - Resource type.
+                    returned: always
+                    type: str
+                    sample: Microsoft.Sql/servers/databases
+                location:
+                    description:
+                        - Resource location.
+                    returned: always
+                    type: str
+                    sample: Japan East
+                kind:
+                    description:
+                        - Kind of database.  This is metadata used for the Azure portal experience.
+                    returned: always
+                    type: str
+                    sample: v12.0,user
+                collation:
+                    description:
+                        - The collation of the database. If createMode is not Default, this value is ignored.
+                    returned: always
+                    type: str
+                    sample: SQL_Latin1_General_CP1_CI_AS
+                edition:
+                    description:
+                        - "The edition of the database. The DatabaseEditions enumeration contains all the valid editions. If createMode is NonReadableSeconda
+                          ry or OnlineSecondary, this value is ignored. To see possible values, query the capabilities API (/subscriptions/{subscriptionId}/
+                          providers/Microsoft.Sql/locations/{locationID}/capabilities) referred to by operationId: 'Capabilities_ListByLocation.'. Possible
+                          values include: C(Web), C(Business), C(Basic), C(Standard), C(Premium), C(Free), C(Stretch), C(DataWarehouse), C(System), C(System
+                          2)"
+                    returned: always
+                    type: str
+                    sample: Basic
+                status:
+                    description:
+                        - The status of the database.
+                    returned: always
+                    type: str
+                    sample: Online
 '''
 
 from ansible.module_utils.azure_rm_common import AzureRMModuleBase
@@ -215,26 +225,26 @@ class AzureRMDatabasesFacts(AzureRMModuleBase):
                 self.server_name is not None and
                 self.database_name is not None and
                 self.filter is not None):
-            self.results['ansible_facts']['list_metrics'] = self.list_metrics()
+            self.results['databases'] = self.list_metrics()
         elif (self.resource_group is not None and
               self.server_name is not None and
               self.database_name is not None):
-            self.results['ansible_facts']['get'] = self.get()
+            self.results['databases'] = self.get()
         elif (self.resource_group is not None and
               self.server_name is not None):
-            self.results['ansible_facts']['list_by_server'] = self.list_by_server()
+            self.results['databases'] = self.list_by_server()
         elif (self.resource_group is not None and
               self.server_name is not None and
               self.database_name is not None):
-            self.results['ansible_facts']['list_metric_definitions'] = self.list_metric_definitions()
+            self.results['databases'] = self.list_metric_definitions()
         elif (self.resource_group is not None and
               self.server_name is not None and
               self.elastic_pool_name is not None):
-            self.results['ansible_facts']['list_by_elastic_pool'] = self.list_by_elastic_pool()
+            self.results['databases'] = self.list_by_elastic_pool()
         elif (self.resource_group is not None and
               self.server_name is not None and
               self.recommended_elastic_pool_name is not None):
-            self.results['ansible_facts']['list_by_recommended_elastic_pool'] = self.list_by_recommended_elastic_pool()
+            self.results['databases'] = self.list_by_recommended_elastic_pool()
         return self.results
 
     def list_metrics(self):
@@ -255,9 +265,9 @@ class AzureRMDatabasesFacts(AzureRMModuleBase):
             self.log('Could not get facts for Databases.')
 
         if response is not None:
-            results = []
+            results = {}
             for item in response:
-                results.append(item.as_dict())
+                results[item.name] = item.as_dict()
 
         return results
 
@@ -278,7 +288,8 @@ class AzureRMDatabasesFacts(AzureRMModuleBase):
             self.log('Could not get facts for Databases.')
 
         if response is not None:
-            results = response.as_dict()
+            results = {}
+            results[response.name] = response.as_dict()
 
         return results
 
@@ -298,9 +309,9 @@ class AzureRMDatabasesFacts(AzureRMModuleBase):
             self.log('Could not get facts for Databases.')
 
         if response is not None:
-            results = []
+            results = {}
             for item in response:
-                results.append(item.as_dict())
+                results[item.name] = item.as_dict()
 
         return results
 
@@ -321,9 +332,9 @@ class AzureRMDatabasesFacts(AzureRMModuleBase):
             self.log('Could not get facts for Databases.')
 
         if response is not None:
-            results = []
+            results = {}
             for item in response:
-                results.append(item.as_dict())
+                results[item.name] = item.as_dict()
 
         return results
 
@@ -344,9 +355,9 @@ class AzureRMDatabasesFacts(AzureRMModuleBase):
             self.log('Could not get facts for Databases.')
 
         if response is not None:
-            results = []
+            results = {}
             for item in response:
-                results.append(item.as_dict())
+                results[item.name] = item.as_dict()
 
         return results
 
@@ -367,9 +378,9 @@ class AzureRMDatabasesFacts(AzureRMModuleBase):
             self.log('Could not get facts for Databases.')
 
         if response is not None:
-            results = []
+            results = {}
             for item in response:
-                results.append(item.as_dict())
+                results[item.name] = item.as_dict()
 
         return results
 

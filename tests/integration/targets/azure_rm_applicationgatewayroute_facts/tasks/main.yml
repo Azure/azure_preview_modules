@@ -25,6 +25,7 @@
   assert:
     that:
       - output.changed == False
+      - output.routes.testroute{{ rpfx }}.id != None
 
 - name: Delete instance of Route
   azure_rm_applicationgatewayroute:

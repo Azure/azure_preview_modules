@@ -25,6 +25,7 @@
   assert:
     that:
       - output.changed == False
+      - output.servers.mysqlsrv{{ rpfx }}.id != None
 
 - name: Gather facts MySQL Server
   azure_rm_mysqlserver_facts:
@@ -34,6 +35,7 @@
   assert:
     that:
       - output.changed == False
+      - output.servers.mysqlsrv{{ rpfx }}.id != None
 
 - name: Delete instance of MySQL Server
   azure_rm_mysqlserver:

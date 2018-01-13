@@ -52,18 +52,27 @@ EXAMPLES = '''
 '''
 
 RETURN = '''
-id:
-    description:
-        - Resource ID.
+routes:
+    description: A list of dict results where the key is the name of the Route and the values are the facts for that Route.
     returned: always
-    type: str
-    sample: /subscriptions/subid/resourceGroups/rg1/providers/Microsoft.Network/routeTables/testrt/routes/route1
-name:
-    description:
-        - The name of the resource that is unique within a resource group. This name can be used to access the resource.
-    returned: always
-    type: str
-    sample: route1
+    type: complex
+    contains:
+        route_name:
+            description: The key is the name of the server that the values relate to.
+            type: complex
+            contains:
+                id:
+                    description:
+                        - Resource ID.
+                    returned: always
+                    type: str
+                    sample: /subscriptions/subid/resourceGroups/rg1/providers/Microsoft.Network/routeTables/testrt/routes/route1
+                name:
+                    description:
+                        - The name of the resource that is unique within a resource group. This name can be used to access the resource.
+                    returned: always
+                    type: str
+                    sample: route1
 '''
 
 from ansible.module_utils.azure_rm_common import AzureRMModuleBase
@@ -115,7 +124,7 @@ class AzureRMRoutesFacts(AzureRMModuleBase):
         if (self.resource_group is not None and
                 self.route_table_name is not None and
                 self.route_name is not None):
-            self.results['ansible_facts']['get'] = self.get()
+            self.results['routes'] = self.get()
         return self.results
 
     def get(self):
@@ -135,7 +144,8 @@ class AzureRMRoutesFacts(AzureRMModuleBase):
             self.log('Could not get facts for Routes.')
 
         if response is not None:
-            results = response.as_dict()
+            results = {}
+            results[response.name] = response.as_dict()
 
         return results
 

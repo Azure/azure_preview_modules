@@ -56,36 +56,46 @@ EXAMPLES = '''
 '''
 
 RETURN = '''
-id:
-    description:
-        - Resource ID
+databases:
+    description: A list of dict results where the key is the name of the MySQL Database and the values are the facts for that MySQL Database.
     returned: always
-    type: str
-    sample: /subscriptions/ffffffff-ffff-ffff-ffff-ffffffffffff/resourceGroups/TestGroup/providers/Microsoft.DBforMySQL/servers/testserver/databases/db1
-name:
-    description:
-        - Resource name.
-    returned: always
-    type: str
-    sample: db1
-type:
-    description:
-        - Resource type.
-    returned: always
-    type: str
-    sample: Microsoft.DBforMySQL/servers/databases
-charset:
-    description:
-        - The charset of the database.
-    returned: always
-    type: str
-    sample: utf8
-collation:
-    description:
-        - The collation of the database.
-    returned: always
-    type: str
-    sample: utf8_general_ci
+    type: complex
+    contains:
+        mysqldatabase_name:
+            description: The key is the name of the server that the values relate to.
+            type: complex
+            contains:
+                id:
+                    description:
+                        - Resource ID
+                    returned: always
+                    type: str
+                    sample: "/subscriptions/ffffffff-ffff-ffff-ffff-ffffffffffff/resourceGroups/TestGroup/providers/Microsoft.DBforMySQL/servers/testserver/d
+                            atabases/db1"
+                name:
+                    description:
+                        - Resource name.
+                    returned: always
+                    type: str
+                    sample: db1
+                type:
+                    description:
+                        - Resource type.
+                    returned: always
+                    type: str
+                    sample: Microsoft.DBforMySQL/servers/databases
+                charset:
+                    description:
+                        - The charset of the database.
+                    returned: always
+                    type: str
+                    sample: utf8
+                collation:
+                    description:
+                        - The collation of the database.
+                    returned: always
+                    type: str
+                    sample: utf8_general_ci
 '''
 
 from ansible.module_utils.azure_rm_common import AzureRMModuleBase
@@ -136,10 +146,10 @@ class AzureRMDatabasesFacts(AzureRMModuleBase):
         if (self.resource_group is not None and
                 self.server_name is not None and
                 self.database_name is not None):
-            self.results['ansible_facts']['get'] = self.get()
+            self.results['databases'] = self.get()
         elif (self.resource_group is not None and
               self.server_name is not None):
-            self.results['ansible_facts']['list_by_server'] = self.list_by_server()
+            self.results['databases'] = self.list_by_server()
         return self.results
 
     def get(self):
@@ -159,7 +169,8 @@ class AzureRMDatabasesFacts(AzureRMModuleBase):
             self.log('Could not get facts for Databases.')
 
         if response is not None:
-            results = response.as_dict()
+            results = {}
+            results[response.name] = response.as_dict()
 
         return results
 
@@ -179,9 +190,9 @@ class AzureRMDatabasesFacts(AzureRMModuleBase):
             self.log('Could not get facts for Databases.')
 
         if response is not None:
-            results = []
+            results = {}
             for item in response:
-                results.append(item.as_dict())
+                results[item.name] = item.as_dict()
 
         return results
 
