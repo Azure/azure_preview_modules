@@ -25,9 +25,11 @@ options:
     resource_group:
         description:
             - The name of the resource group.
+        required: True
     route_table_name:
         description:
             - The name of the route table.
+        required: True
     expand:
         description:
             - Expands referenced resources.
@@ -46,9 +48,6 @@ EXAMPLES = '''
       resource_group: resource_group_name
       route_table_name: route_table_name
       expand: expand
-
-  - name: List instances of Route Table
-    azure_rm_applicationgatewayroutetable_facts:
 '''
 
 RETURN = '''
@@ -111,10 +110,12 @@ class AzureRMRouteTablesFacts(AzureRMModuleBase):
         # define user inputs into argument
         self.module_arg_spec = dict(
             resource_group=dict(
-                type='str'
+                type='str',
+                required=True
             ),
             route_table_name=dict(
-                type='str'
+                type='str',
+                required=True
             ),
             expand=dict(
                 type='str'
@@ -140,7 +141,6 @@ class AzureRMRouteTablesFacts(AzureRMModuleBase):
         if (self.resource_group is not None and
                 self.route_table_name is not None):
             self.results['route_tables'] = self.get()
-            self.results['route_tables'] = self.list_all()
         return self.results
 
     def get(self):
@@ -161,27 +161,6 @@ class AzureRMRouteTablesFacts(AzureRMModuleBase):
         if response is not None:
             results = {}
             results[response.name] = response.as_dict()
-
-        return results
-
-    def list_all(self):
-        '''
-        Gets facts of the specified Route Table.
-
-        :return: deserialized Route Tableinstance state dictionary
-        '''
-        response = None
-        results = False
-        try:
-            response = self.mgmt_client.route_tables.list_all()
-            self.log("Response : {0}".format(response))
-        except CloudError as e:
-            self.log('Could not get facts for RouteTables.')
-
-        if response is not None:
-            results = {}
-            for item in response:
-                results[item.name] = item.as_dict()
 
         return results
 
