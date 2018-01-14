@@ -167,9 +167,9 @@ class AzureRMDatabases(AzureRMModuleBase):
                 self.to_do = Actions.Delete
             elif self.state == 'present':
                 self.log("Need to check if MySQL Database instance has to be deleted or may be updated")
-                if (self.collation is not None) and (self.collation != old_response['collation']):
+                if ('collation' in self.parameters) and (self.parameters['collation'] != old_response['collation']):
                     self.to_do = Actions.Update
-                if (self.charset is not None) and (self.charset != old_response['charset']):
+                if ('charset' in self.parameters) and (self.parameters['charset'] != old_response['charset']):
                     self.to_do = Actions.Update
                 self.delete_mysqldatabase()
 
