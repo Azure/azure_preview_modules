@@ -152,6 +152,9 @@ class AzureRMReplications(AzureRMModuleBase):
 
         resource_group = self.get_resource_group(self.resource_group)
 
+        if self.location is None:
+            self.location = resource_group.location
+
         old_response = self.get_replication()
 
         if not old_response:
