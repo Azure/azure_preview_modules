@@ -189,10 +189,6 @@ class AzureRMElasticPoolsFacts(AzureRMModuleBase):
         elif (self.resource_group is not None and
               self.server_name is not None and
               self.elastic_pool_name is not None):
-            self.results['elastic_pools'] = self.list_metric_definitions()
-        elif (self.resource_group is not None and
-              self.server_name is not None and
-              self.elastic_pool_name is not None):
             self.results['elastic_pools'] = self.get()
         elif (self.resource_group is not None and
               self.server_name is not None):
