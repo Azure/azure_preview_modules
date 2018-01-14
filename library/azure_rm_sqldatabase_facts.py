@@ -80,12 +80,6 @@ EXAMPLES = '''
     azure_rm_sqldatabase_facts:
       resource_group: resource_group_name
       server_name: server_name
-      database_name: database_name
-
-  - name: List instances of SQL Database
-    azure_rm_sqldatabase_facts:
-      resource_group: resource_group_name
-      server_name: server_name
       elastic_pool_name: elastic_pool_name
 
   - name: List instances of SQL Database
@@ -235,10 +229,6 @@ class AzureRMDatabasesFacts(AzureRMModuleBase):
             self.results['databases'] = self.list_by_server()
         elif (self.resource_group is not None and
               self.server_name is not None and
-              self.database_name is not None):
-            self.results['databases'] = self.list_metric_definitions()
-        elif (self.resource_group is not None and
-              self.server_name is not None and
               self.elastic_pool_name is not None):
             self.results['databases'] = self.list_by_elastic_pool()
         elif (self.resource_group is not None and
@@ -304,29 +294,6 @@ class AzureRMDatabasesFacts(AzureRMModuleBase):
         try:
             response = self.mgmt_client.databases.list_by_server(resource_group_name=self.resource_group,
                                                                  server_name=self.server_name)
-            self.log("Response : {0}".format(response))
-        except CloudError as e:
-            self.log('Could not get facts for Databases.')
-
-        if response is not None:
-            results = {}
-            for item in response:
-                results[item.name] = item.as_dict()
-
-        return results
-
-    def list_metric_definitions(self):
-        '''
-        Gets facts of the specified SQL Database.
-
-        :return: deserialized SQL Databaseinstance state dictionary
-        '''
-        response = None
-        results = False
-        try:
-            response = self.mgmt_client.databases.list_metric_definitions(resource_group_name=self.resource_group,
-                                                                          server_name=self.server_name,
-                                                                          database_name=self.database_name)
             self.log("Response : {0}".format(response))
         except CloudError as e:
             self.log('Could not get facts for Databases.')

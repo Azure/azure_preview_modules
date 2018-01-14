@@ -53,12 +53,6 @@ EXAMPLES = '''
       elastic_pool_name: elastic_pool_name
       filter: filter
 
-  - name: List instances of SQL Elastic Pool
-    azure_rm_sqlelasticpool_facts:
-      resource_group: resource_group_name
-      server_name: server_name
-      elastic_pool_name: elastic_pool_name
-
   - name: Get instance of SQL Elastic Pool
     azure_rm_sqlelasticpool_facts:
       resource_group: resource_group_name
@@ -208,29 +202,6 @@ class AzureRMElasticPoolsFacts(AzureRMModuleBase):
                                                                    server_name=self.server_name,
                                                                    elastic_pool_name=self.elastic_pool_name,
                                                                    filter=self.filter)
-            self.log("Response : {0}".format(response))
-        except CloudError as e:
-            self.log('Could not get facts for ElasticPools.')
-
-        if response is not None:
-            results = {}
-            for item in response:
-                results[item.name] = item.as_dict()
-
-        return results
-
-    def list_metric_definitions(self):
-        '''
-        Gets facts of the specified SQL Elastic Pool.
-
-        :return: deserialized SQL Elastic Poolinstance state dictionary
-        '''
-        response = None
-        results = False
-        try:
-            response = self.mgmt_client.elastic_pools.list_metric_definitions(resource_group_name=self.resource_group,
-                                                                              server_name=self.server_name,
-                                                                              elastic_pool_name=self.elastic_pool_name)
             self.log("Response : {0}".format(response))
         except CloudError as e:
             self.log('Could not get facts for ElasticPools.')
