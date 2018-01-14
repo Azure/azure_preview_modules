@@ -20,7 +20,7 @@
   azure_rm_mysqlfirewallrule:
     resource_group: "{{ resource_group }}"
     server_name: "mysqlsrv{{ rpfx }}"
-    name: test-firewall-rule
+    name: firewallrule{{ rpfx }}
     start_ip_address: 172.28.10.136
     end_ip_address: 172.28.10.138
   check_mode: yes
@@ -34,7 +34,7 @@
   azure_rm_mysqlfirewallrule:
     resource_group: "{{ resource_group }}"
     server_name: "mysqlsrv{{ rpfx }}"
-    name: test-firewall-rule
+    name: firewallrule{{ rpfx }}
     start_ip_address: 172.28.10.136
     end_ip_address: 172.28.10.138
   register: output
@@ -47,7 +47,7 @@
   azure_rm_mysqlfirewallrule:
     resource_group: "{{ resource_group }}"
     server_name: "mysqlsrv{{ rpfx }}"
-    name: test-firewall-rule
+    name: firewallrule{{ rpfx }}
     start_ip_address: 172.28.10.136
     end_ip_address: 172.28.10.138
   register: output
@@ -60,7 +60,7 @@
   azure_rm_mysqlfirewallrule:
     resource_group: "{{ resource_group }}"
     server_name: "mysqlsrv{{ rpfx }}"
-    name: test-firewall-rule
+    name: firewallrule{{ rpfx }}
     state: absent
   check_mode: yes
   register: output
@@ -73,7 +73,7 @@
   azure_rm_mysqlfirewallrule:
     resource_group: "{{ resource_group }}"
     server_name: "mysqlsrv{{ rpfx }}"
-    name: test-firewall-rule
+    name: firewallrule{{ rpfx }}
     state: absent
   register: output
 - name: Assert the state has changed
@@ -85,7 +85,7 @@
   azure_rm_mysqlfirewallrule:
     resource_group: "{{ resource_group }}"
     server_name: "mysqlsrv{{ rpfx }}"
-    name: test-firewall-rule
+    name: firewallrule{{ rpfx }}
     state: absent
   register: output
 - name: Assert the state has changed

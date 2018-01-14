@@ -52,50 +52,59 @@ EXAMPLES = '''
 '''
 
 RETURN = '''
-id:
-    description:
-        - The resource ID.
-    returned: always
-    type: str
-    sample: "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/myResourceGroup/providers/Microsoft.ContainerRegistry/registries/myRegistry/r
-            eplications/myReplication"
-name:
-    description:
-        - The name of the resource.
-    returned: always
-    type: str
-    sample: myReplication
-type:
-    description:
-        - The type of the resource.
-    returned: always
-    type: str
-    sample: Microsoft.ContainerRegistry/registries/replications
-location:
-    description:
-        - The location of the resource. This cannot be changed after the resource is created.
-    returned: always
-    type: str
-    sample: eastus
-status:
-    description:
-        - The status of the replication at the time the operation was called.
+replications:
+    description: A list of dict results where the key is the name of the Replication and the values are the facts for that Replication.
     returned: always
     type: complex
-    sample: status
     contains:
-        message:
-            description:
-                - The detailed message for the status, including alerts and error messages.
-            returned: always
-            type: str
-            sample: The replication is ready.
-        timestamp:
-            description:
-                - The timestamp when the status was changed to the current value.
-            returned: always
-            type: datetime
-            sample: "2017-03-01T23:15:37.0707808Z"
+        replication_name:
+            description: The key is the name of the server that the values relate to.
+            type: complex
+            contains:
+                id:
+                    description:
+                        - The resource ID.
+                    returned: always
+                    type: str
+                    sample: "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/myResourceGroup/providers/Microsoft.ContainerRegistry/registr
+                            ies/myRegistry/replications/myReplication"
+                name:
+                    description:
+                        - The name of the resource.
+                    returned: always
+                    type: str
+                    sample: myReplication
+                type:
+                    description:
+                        - The type of the resource.
+                    returned: always
+                    type: str
+                    sample: Microsoft.ContainerRegistry/registries/replications
+                location:
+                    description:
+                        - The location of the resource. This cannot be changed after the resource is created.
+                    returned: always
+                    type: str
+                    sample: eastus
+                status:
+                    description:
+                        - The status of the replication at the time the operation was called.
+                    returned: always
+                    type: complex
+                    sample: status
+                    contains:
+                        message:
+                            description:
+                                - The detailed message for the status, including alerts and error messages.
+                            returned: always
+                            type: str
+                            sample: The replication is ready.
+                        timestamp:
+                            description:
+                                - The timestamp when the status was changed to the current value.
+                            returned: always
+                            type: datetime
+                            sample: "2017-03-01T23:15:37.0707808Z"
 '''
 
 from ansible.module_utils.azure_rm_common import AzureRMModuleBase
@@ -147,7 +156,7 @@ class AzureRMReplicationsFacts(AzureRMModuleBase):
         if (self.resource_group is not None and
                 self.registry_name is not None and
                 self.replication_name is not None):
-            self.results['ansible_facts']['get'] = self.get()
+            self.results['replications'] = self.get()
         return self.results
 
     def get(self):
@@ -167,7 +176,8 @@ class AzureRMReplicationsFacts(AzureRMModuleBase):
             self.log('Could not get facts for Replications.')
 
         if response is not None:
-            results = response.as_dict()
+            results = {}
+            results[response.name] = response.as_dict()
 
         return results
 

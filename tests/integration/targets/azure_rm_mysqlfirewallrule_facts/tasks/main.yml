@@ -19,7 +19,7 @@
   azure_rm_mysqlfirewallrule:
     resource_group: "{{ resource_group }}"
     server_name: "mysqlsrv{{ rpfx }}"
-    name: test-firewall-rule
+    name: firewallrule{{ rpfx }}
     start_ip_address: 172.28.10.136
     end_ip_address: 172.28.10.138
 
@@ -27,11 +27,13 @@
   azure_rm_mysqlfirewallrule_facts:
     resource_group: "{{ resource_group }}"
     server_name: "mysqlsrv{{ rpfx }}"
+    firewall_rule_name: firewallrule{{ rpfx }}
   register: output
 - name: Assert that facts are returned
   assert:
     that:
       - output.changed == False
+      - output.firewall_rules.firewallrule{{ rpfx }}.id != None
 
 - name: Gather facts MySQL Firewall Rule
   azure_rm_mysqlfirewallrule_facts:
@@ -42,12 +44,13 @@
   assert:
     that:
       - output.changed == False
+      - output.firewall_rules.firewallrule{{ rpfx }}.id != None
 
 - name: Delete instance of Firewall Rule
   azure_rm_mysqlfirewallrule:
     resource_group: "{{ resource_group }}"
     server_name: "mysqlsrv{{ rpfx }}"
-    name: test-firewall-rule
+    name: firewallrule{{ rpfx }}
     state: absent
 - name: Delete instance of MySQL Server
   azure_rm_mysqlserver:

@@ -34,6 +34,7 @@
   assert:
     that:
       - output.changed == False
+      - output.webhooks.webhook{{ rpfx }}.id != None
 
 - name: Gather facts Webhook
   azure_rm_containerregistrywebhook_facts:
@@ -45,6 +46,7 @@
   assert:
     that:
       - output.changed == False
+      - output.webhooks.webhook{{ rpfx }}.id != None
 
 - name: Delete instance of Webhook
   azure_rm_containerregistrywebhook:

@@ -30,6 +30,7 @@
   assert:
     that:
       - output.changed == False
+      - output.databases.testdatabase.id != None
 
 - name: Gather facts PostgreSQL Database
   azure_rm_postgresqldatabase_facts:
@@ -40,6 +41,7 @@
   assert:
     that:
       - output.changed == False
+      - output.databases.testdatabase.id != None
 
 - name: Delete instance of PostgreSQL Database
   azure_rm_postgresqldatabase:

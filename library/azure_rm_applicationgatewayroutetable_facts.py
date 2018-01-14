@@ -52,37 +52,46 @@ EXAMPLES = '''
 '''
 
 RETURN = '''
-id:
-    description:
-        - Resource ID.
-    returned: always
-    type: str
-    sample: /subscriptions/subid/resourceGroups/rg1/providers/Microsoft.Network/routeTables/testrt
-name:
-    description:
-        - Resource name.
-    returned: always
-    type: str
-    sample: testrt
-type:
-    description:
-        - Resource type.
-    returned: always
-    type: str
-    sample: Microsoft.Network/routeTables
-location:
-    description:
-        - Resource location.
-    returned: always
-    type: str
-    sample: westus
-routes:
-    description:
-        - Collection of routes contained within a route table.
+route_tables:
+    description: A list of dict results where the key is the name of the Route Table and the values are the facts for that Route Table.
     returned: always
     type: complex
-    sample: routes
     contains:
+        routetable_name:
+            description: The key is the name of the server that the values relate to.
+            type: complex
+            contains:
+                id:
+                    description:
+                        - Resource ID.
+                    returned: always
+                    type: str
+                    sample: /subscriptions/subid/resourceGroups/rg1/providers/Microsoft.Network/routeTables/testrt
+                name:
+                    description:
+                        - Resource name.
+                    returned: always
+                    type: str
+                    sample: testrt
+                type:
+                    description:
+                        - Resource type.
+                    returned: always
+                    type: str
+                    sample: Microsoft.Network/routeTables
+                location:
+                    description:
+                        - Resource location.
+                    returned: always
+                    type: str
+                    sample: westus
+                routes:
+                    description:
+                        - Collection of routes contained within a route table.
+                    returned: always
+                    type: complex
+                    sample: routes
+                    contains:
 '''
 
 from ansible.module_utils.azure_rm_common import AzureRMModuleBase
@@ -130,8 +139,8 @@ class AzureRMRouteTablesFacts(AzureRMModuleBase):
 
         if (self.resource_group is not None and
                 self.route_table_name is not None):
-            self.results['ansible_facts']['get'] = self.get()
-            self.results['ansible_facts']['list_all'] = self.list_all()
+            self.results['route_tables'] = self.get()
+            self.results['route_tables'] = self.list_all()
         return self.results
 
     def get(self):
@@ -150,7 +159,8 @@ class AzureRMRouteTablesFacts(AzureRMModuleBase):
             self.log('Could not get facts for RouteTables.')
 
         if response is not None:
-            results = response.as_dict()
+            results = {}
+            results[response.name] = response.as_dict()
 
         return results
 
@@ -169,9 +179,9 @@ class AzureRMRouteTablesFacts(AzureRMModuleBase):
             self.log('Could not get facts for RouteTables.')
 
         if response is not None:
-            results = []
+            results = {}
             for item in response:
-                results.append(item.as_dict())
+                results[item.name] = item.as_dict()
 
         return results
 

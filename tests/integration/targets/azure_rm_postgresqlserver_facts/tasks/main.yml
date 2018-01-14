@@ -24,6 +24,7 @@
   assert:
     that:
       - output.changed == False
+      - output.servers.postgresqlsrv{{ rpfx }}.id != None
 
 - name: Gather facts MySQL Server
   azure_rm_postgresqlserver_facts:
@@ -33,6 +34,7 @@
   assert:
     that:
       - output.changed == False
+      - output.servers.postgresqlsrv{{ rpfx }}.id != None
 
 - name: Delete instance of PostgreSQL Server
   azure_rm_postgresqlserver:

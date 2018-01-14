@@ -56,43 +56,52 @@ EXAMPLES = '''
 '''
 
 RETURN = '''
-id:
-    description:
-        - Resource ID
+configurations:
+    description: A list of dict results where the key is the name of the PostgreSQL Configuration and the values are the facts for that PostgreSQL Configuration.
     returned: always
-    type: str
-    sample: "/subscriptions/ffffffff-ffff-ffff-ffff-ffffffffffff/resourceGroups/TestGroup/providers/Microsoft.DBforPostgreSQL/servers/testserver/configuratio
-            ns/array_nulls"
-name:
-    description:
-        - Resource name.
-    returned: always
-    type: str
-    sample: array_nulls
-type:
-    description:
-        - Resource type.
-    returned: always
-    type: str
-    sample: Microsoft.DBforPostgreSQL/servers/configurations
-value:
-    description:
-        - Value of the configuration.
-    returned: always
-    type: str
-    sample: on
-description:
-    description:
-        - Description of the configuration.
-    returned: always
-    type: str
-    sample: Enable input of NULL elements in arrays.
-source:
-    description:
-        - Source of the configuration.
-    returned: always
-    type: str
-    sample: system-default
+    type: complex
+    contains:
+        postgresqlconfiguration_name:
+            description: The key is the name of the server that the values relate to.
+            type: complex
+            contains:
+                id:
+                    description:
+                        - Resource ID
+                    returned: always
+                    type: str
+                    sample: "/subscriptions/ffffffff-ffff-ffff-ffff-ffffffffffff/resourceGroups/TestGroup/providers/Microsoft.DBforPostgreSQL/servers/testser
+                            ver/configurations/array_nulls"
+                name:
+                    description:
+                        - Resource name.
+                    returned: always
+                    type: str
+                    sample: array_nulls
+                type:
+                    description:
+                        - Resource type.
+                    returned: always
+                    type: str
+                    sample: Microsoft.DBforPostgreSQL/servers/configurations
+                value:
+                    description:
+                        - Value of the configuration.
+                    returned: always
+                    type: str
+                    sample: on
+                description:
+                    description:
+                        - Description of the configuration.
+                    returned: always
+                    type: str
+                    sample: Enable input of NULL elements in arrays.
+                source:
+                    description:
+                        - Source of the configuration.
+                    returned: always
+                    type: str
+                    sample: system-default
 '''
 
 from ansible.module_utils.azure_rm_common import AzureRMModuleBase
@@ -143,10 +152,10 @@ class AzureRMConfigurationsFacts(AzureRMModuleBase):
         if (self.resource_group is not None and
                 self.server_name is not None and
                 self.configuration_name is not None):
-            self.results['ansible_facts']['get'] = self.get()
+            self.results['configurations'] = self.get()
         elif (self.resource_group is not None and
               self.server_name is not None):
-            self.results['ansible_facts']['list_by_server'] = self.list_by_server()
+            self.results['configurations'] = self.list_by_server()
         return self.results
 
     def get(self):
@@ -166,7 +175,8 @@ class AzureRMConfigurationsFacts(AzureRMModuleBase):
             self.log('Could not get facts for Configurations.')
 
         if response is not None:
-            results = response.as_dict()
+            results = {}
+            results[response.name] = response.as_dict()
 
         return results
 
@@ -186,9 +196,9 @@ class AzureRMConfigurationsFacts(AzureRMModuleBase):
             self.log('Could not get facts for Configurations.')
 
         if response is not None:
-            results = []
+            results = {}
             for item in response:
-                results.append(item.as_dict())
+                results[item.name] = item.as_dict()
 
         return results
 

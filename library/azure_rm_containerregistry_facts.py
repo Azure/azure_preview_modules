@@ -60,69 +60,79 @@ EXAMPLES = '''
 '''
 
 RETURN = '''
-id:
-    description:
-        - The resource ID.
-    returned: always
-    type: str
-    sample: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/myResourceGroup/providers/Microsoft.ContainerRegistry/registries/myRegistry
-name:
-    description:
-        - The name of the resource.
-    returned: always
-    type: str
-    sample: myRegistry
-type:
-    description:
-        - The type of the resource.
-    returned: always
-    type: str
-    sample: Microsoft.ContainerRegistry/registries
-location:
-    description:
-        - The location of the resource. This cannot be changed after the resource is created.
-    returned: always
-    type: str
-    sample: westus
-sku:
-    description:
-        - The SKU of the container registry.
+registries:
+    description: A list of dict results where the key is the name of the Registry and the values are the facts for that Registry.
     returned: always
     type: complex
-    sample: sku
     contains:
-        name:
-            description:
-                - "The SKU name of the container registry. Required for registry creation. Possible values include: C(Classic), C(Basic), C(Standard), C(Prem
-                  ium)"
-            returned: always
-            type: str
-            sample: Standard
-        tier:
-            description:
-                - "The SKU tier based on the SKU name. Possible values include: C(Classic), C(Basic), C(Standard), C(Premium)"
-            returned: always
-            type: str
-            sample: Standard
-status:
-    description:
-        - The status of the container registry at the time the operation was called.
-    returned: always
-    type: complex
-    sample: status
-    contains:
-        message:
-            description:
-                - The detailed message for the status, including alerts and error messages.
-            returned: always
-            type: str
-            sample: The registry is ready.
-        timestamp:
-            description:
-                - The timestamp when the status was changed to the current value.
-            returned: always
-            type: datetime
-            sample: "2017-03-01T23:15:37.0707808Z"
+        registry_name:
+            description: The key is the name of the server that the values relate to.
+            type: complex
+            contains:
+                id:
+                    description:
+                        - The resource ID.
+                    returned: always
+                    type: str
+                    sample: "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/myResourceGroup/providers/Microsoft.ContainerRegistry/registr
+                            ies/myRegistry"
+                name:
+                    description:
+                        - The name of the resource.
+                    returned: always
+                    type: str
+                    sample: myRegistry
+                type:
+                    description:
+                        - The type of the resource.
+                    returned: always
+                    type: str
+                    sample: Microsoft.ContainerRegistry/registries
+                location:
+                    description:
+                        - The location of the resource. This cannot be changed after the resource is created.
+                    returned: always
+                    type: str
+                    sample: westus
+                sku:
+                    description:
+                        - The SKU of the container registry.
+                    returned: always
+                    type: complex
+                    sample: sku
+                    contains:
+                        name:
+                            description:
+                                - "The SKU name of the container registry. Required for registry creation. Possible values include: C(Classic), C(Basic), C(S
+                                  tandard), C(Premium)"
+                            returned: always
+                            type: str
+                            sample: Standard
+                        tier:
+                            description:
+                                - "The SKU tier based on the SKU name. Possible values include: C(Classic), C(Basic), C(Standard), C(Premium)"
+                            returned: always
+                            type: str
+                            sample: Standard
+                status:
+                    description:
+                        - The status of the container registry at the time the operation was called.
+                    returned: always
+                    type: complex
+                    sample: status
+                    contains:
+                        message:
+                            description:
+                                - The detailed message for the status, including alerts and error messages.
+                            returned: always
+                            type: str
+                            sample: The registry is ready.
+                        timestamp:
+                            description:
+                                - The timestamp when the status was changed to the current value.
+                            returned: always
+                            type: datetime
+                            sample: "2017-03-01T23:15:37.0707808Z"
 '''
 
 from ansible.module_utils.azure_rm_common import AzureRMModuleBase
@@ -167,15 +177,15 @@ class AzureRMRegistriesFacts(AzureRMModuleBase):
 
         if (self.resource_group is not None and
                 self.registry_name is not None):
-            self.results['ansible_facts']['get'] = self.get()
+            self.results['registries'] = self.get()
         elif (self.resource_group is not None and
               self.registry_name is not None):
-            self.results['ansible_facts']['list_credentials'] = self.list_credentials()
+            self.results['registries'] = self.list_credentials()
         elif (self.resource_group is not None and
               self.registry_name is not None):
-            self.results['ansible_facts']['list_usages'] = self.list_usages()
+            self.results['registries'] = self.list_usages()
         elif (self.resource_group is not None):
-            self.results['ansible_facts']['list_by_resource_group'] = self.list_by_resource_group()
+            self.results['registries'] = self.list_by_resource_group()
         return self.results
 
     def get(self):
@@ -194,7 +204,8 @@ class AzureRMRegistriesFacts(AzureRMModuleBase):
             self.log('Could not get facts for Registries.')
 
         if response is not None:
-            results = response.as_dict()
+            results = {}
+            results[response.name] = response.as_dict()
 
         return results
 
@@ -214,9 +225,9 @@ class AzureRMRegistriesFacts(AzureRMModuleBase):
             self.log('Could not get facts for Registries.')
 
         if response is not None:
-            results = []
+            results = {}
             for item in response:
-                results.append(item.as_dict())
+                results[item.name] = item.as_dict()
 
         return results
 
@@ -236,9 +247,9 @@ class AzureRMRegistriesFacts(AzureRMModuleBase):
             self.log('Could not get facts for Registries.')
 
         if response is not None:
-            results = []
+            results = {}
             for item in response:
-                results.append(item.as_dict())
+                results[item.name] = item.as_dict()
 
         return results
 
@@ -257,9 +268,9 @@ class AzureRMRegistriesFacts(AzureRMModuleBase):
             self.log('Could not get facts for Registries.')
 
         if response is not None:
-            results = []
+            results = {}
             for item in response:
-                results.append(item.as_dict())
+                results[item.name] = item.as_dict()
 
         return results
 
