@@ -18,12 +18,35 @@
 - name: Gather facts Registry
   azure_rm_containerregistry_facts:
     resource_group: "{{ resource_group }}"
+    registry_name: acr{{ rpfx }}
   register: output
 - name: Assert that facts are returned
   assert:
     that:
       - output.changed == False
-      - output.registries.xxxunknownxxx.id != None
+      - output.registries.acr{{ rpfx }}.id != None
+
+- name: Gather facts Registry
+  azure_rm_containerregistry_facts:
+    resource_group: "{{ resource_group }}"
+    registry_name: acr{{ rpfx }}
+  register: output
+- name: Assert that facts are returned
+  assert:
+    that:
+      - output.changed == False
+      - output.registries.acr{{ rpfx }}.id != None
+
+- name: Gather facts Registry
+  azure_rm_containerregistry_facts:
+    resource_group: "{{ resource_group }}"
+    registry_name: acr{{ rpfx }}
+  register: output
+- name: Assert that facts are returned
+  assert:
+    that:
+      - output.changed == False
+      - output.registries.acr{{ rpfx }}.id != None
 
 - name: Gather facts Registry
   azure_rm_containerregistry_facts:
@@ -33,27 +56,7 @@
   assert:
     that:
       - output.changed == False
-      - output.registries.xxxunknownxxx.id != None
-
-- name: Gather facts Registry
-  azure_rm_containerregistry_facts:
-    resource_group: "{{ resource_group }}"
-  register: output
-- name: Assert that facts are returned
-  assert:
-    that:
-      - output.changed == False
-      - output.registries.xxxunknownxxx.id != None
-
-- name: Gather facts Registry
-  azure_rm_containerregistry_facts:
-    resource_group: "{{ resource_group }}"
-  register: output
-- name: Assert that facts are returned
-  assert:
-    that:
-      - output.changed == False
-      - output.registries.xxxunknownxxx.id != None
+      - output.registries.acr{{ rpfx }}.id != None
 
 - name: Delete container registry
   azure_rm_containerregistry:

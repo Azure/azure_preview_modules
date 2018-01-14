@@ -15,7 +15,7 @@
   azure_rm_sqldatabase:
     resource_group: "{{ resource_group }}"
     server_name: "sqlsrv{{ rpfx }}"
-    name: test-database
+    name: database{{ rpfx }}
     location: eastus
   check_mode: yes
   register: output
@@ -28,7 +28,7 @@
   azure_rm_sqldatabase:
     resource_group: "{{ resource_group }}"
     server_name: "sqlsrv{{ rpfx }}"
-    name: test-database
+    name: database{{ rpfx }}
     location: eastus
   register: output
 - name: Assert the resource instance is well created
@@ -41,7 +41,7 @@
   azure_rm_sqldatabase:
     resource_group: "{{ resource_group }}"
     server_name: "sqlsrv{{ rpfx }}"
-    name: test-database
+    name: database{{ rpfx }}
     location: eastus
   register: output
 - name: Assert the state has not changed
@@ -54,7 +54,7 @@
   azure_rm_sqldatabase:
     resource_group: "{{ resource_group }}"
     server_name: "sqlsrv{{ rpfx }}"
-    name: test-database
+    name: database{{ rpfx }}
     state: absent
   check_mode: yes
   register: output
@@ -67,7 +67,7 @@
   azure_rm_sqldatabase:
     resource_group: "{{ resource_group }}"
     server_name: "sqlsrv{{ rpfx }}"
-    name: test-database
+    name: database{{ rpfx }}
     state: absent
   register: output
 - name: Assert the state has changed
@@ -79,7 +79,7 @@
   azure_rm_sqldatabase:
     resource_group: "{{ resource_group }}"
     server_name: "sqlsrv{{ rpfx }}"
-    name: test-database
+    name: database{{ rpfx }}
     state: absent
   register: output
 - name: Assert the state has changed

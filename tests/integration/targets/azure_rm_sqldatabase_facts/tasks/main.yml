@@ -14,55 +14,32 @@
   azure_rm_sqldatabase:
     resource_group: "{{ resource_group }}"
     server_name: "sqlsrv{{ rpfx }}"
-    name: test-database
+    name: database{{ rpfx }}
     location: eastus
 
 - name: Gather facts SQL Database
   azure_rm_sqldatabase_facts:
     resource_group: "{{ resource_group }}"
     server_name: "sqlsrv{{ rpfx }}"
-    database_name: test-database
+    database_name: database{{ rpfx }}
   register: output
 - name: Assert that facts are returned
   assert:
     that:
       - output.changed == False
-      - output.databases.test-database.id != None
+      - output.databases.database{{ rpfx }}.id != None
 
 - name: Gather facts SQL Database
   azure_rm_sqldatabase_facts:
     resource_group: "{{ resource_group }}"
     server_name: "sqlsrv{{ rpfx }}"
-    database_name: test-database
+    database_name: database{{ rpfx }}
   register: output
 - name: Assert that facts are returned
   assert:
     that:
       - output.changed == False
-      - output.databases.test-database.id != None
-
-- name: Gather facts SQL Database
-  azure_rm_sqldatabase_facts:
-    resource_group: "{{ resource_group }}"
-    server_name: "sqlsrv{{ rpfx }}"
-  register: output
-- name: Assert that facts are returned
-  assert:
-    that:
-      - output.changed == False
-      - output.databases.test-database.id != None
-
-- name: Gather facts SQL Database
-  azure_rm_sqldatabase_facts:
-    resource_group: "{{ resource_group }}"
-    server_name: "sqlsrv{{ rpfx }}"
-    database_name: test-database
-  register: output
-- name: Assert that facts are returned
-  assert:
-    that:
-      - output.changed == False
-      - output.databases.test-database.id != None
+      - output.databases.database{{ rpfx }}.id != None
 
 - name: Gather facts SQL Database
   azure_rm_sqldatabase_facts:
@@ -73,7 +50,19 @@
   assert:
     that:
       - output.changed == False
-      - output.databases.test-database.id != None
+      - output.databases.database{{ rpfx }}.id != None
+
+- name: Gather facts SQL Database
+  azure_rm_sqldatabase_facts:
+    resource_group: "{{ resource_group }}"
+    server_name: "sqlsrv{{ rpfx }}"
+    database_name: database{{ rpfx }}
+  register: output
+- name: Assert that facts are returned
+  assert:
+    that:
+      - output.changed == False
+      - output.databases.database{{ rpfx }}.id != None
 
 - name: Gather facts SQL Database
   azure_rm_sqldatabase_facts:
@@ -84,13 +73,24 @@
   assert:
     that:
       - output.changed == False
-      - output.databases.test-database.id != None
+      - output.databases.database{{ rpfx }}.id != None
+
+- name: Gather facts SQL Database
+  azure_rm_sqldatabase_facts:
+    resource_group: "{{ resource_group }}"
+    server_name: "sqlsrv{{ rpfx }}"
+  register: output
+- name: Assert that facts are returned
+  assert:
+    that:
+      - output.changed == False
+      - output.databases.database{{ rpfx }}.id != None
 
 - name: Delete instance of SQL Database
   azure_rm_sqldatabase:
     resource_group: "{{ resource_group }}"
     server_name: "sqlsrv{{ rpfx }}"
-    name: test-database
+    name: database{{ rpfx }}
     state: absent
 - name: Delete instance of SQL Server
   azure_rm_sqlserver:
