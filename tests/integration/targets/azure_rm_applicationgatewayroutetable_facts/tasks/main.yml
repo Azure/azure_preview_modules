@@ -19,15 +19,6 @@
       - output.changed == False
       - output.route_tables.routetablename{{ rpfx }}.id != None
 
-- name: Gather facts Route Table
-  azure_rm_applicationgatewayroutetable_facts:
-  register: output
-- name: Assert that facts are returned
-  assert:
-    that:
-      - output.changed == False
-      - output.route_tables.routetablename{{ rpfx }}.id != None
-
 - name: Delete instance of Route Table
   azure_rm_applicationgatewayroutetable:
     resource_group: "{{ resource_group }}"

@@ -26,12 +26,13 @@
 - name: Gather facts Container Group
   azure_rm_containerinstance_facts:
     resource_group: "{{ resource_group }}"
+    container_group_name: aci{{ rpfx }}
   register: output
 - name: Assert that facts are returned
   assert:
     that:
       - output.changed == False
-      - output.container_groups.xxxunknownxxx.id != None
+      - output.container_groups.aci{{ rpfx }}.id != None
 
 - name: Gather facts Container Group
   azure_rm_containerinstance_facts:
@@ -41,7 +42,7 @@
   assert:
     that:
       - output.changed == False
-      - output.container_groups.xxxunknownxxx.id != None
+      - output.container_groups.aci{{ rpfx }}.id != None
 
     resource_group: "{{ resource_group }}"
     name: aci{{ rpfx }}
