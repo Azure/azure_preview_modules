@@ -27,6 +27,17 @@
       - output.changed == False
       - output.routes.testroute{{ rpfx }}.id != None
 
+- name: Gather facts Route
+  azure_rm_applicationgatewayroute_facts:
+    resource_group: "{{ resource_group }}"
+    route_table_name: routetablename{{ rpfx }}
+  register: output
+- name: Assert that facts are returned
+  assert:
+    that:
+      - output.changed == False
+      - output.routes.testroute{{ rpfx }}.id != None
+
 - name: Delete instance of Route
   azure_rm_applicationgatewayroute:
     resource_group: "{{ resource_group }}"

@@ -32,13 +32,13 @@ options:
         required: True
     database_name:
         description:
-            - The name of the database.
-    filter:
-        description:
-            - An OData filter expression that describes a subset of metrics to return.
+            - The name of the database to be retrieved.
     expand:
         description:
             - "A comma separated list of child objects to expand in the response. Possible properties: serviceTierAdvisors, transparentDataEncryption."
+    filter:
+        description:
+            - An OData filter expression that describes a subset of databases to return.
     elastic_pool_name:
         description:
             - The name of the elastic pool to be retrieved.
@@ -55,13 +55,6 @@ author:
 '''
 
 EXAMPLES = '''
-  - name: List instances of SQL Database
-    azure_rm_sqldatabase_facts:
-      resource_group: resource_group_name
-      server_name: server_name
-      database_name: database_name
-      filter: filter
-
   - name: Get instance of SQL Database
     azure_rm_sqldatabase_facts:
       resource_group: resource_group_name
@@ -181,10 +174,10 @@ class AzureRMDatabasesFacts(AzureRMModuleBase):
             database_name=dict(
                 type='str'
             ),
-            filter=dict(
+            expand=dict(
                 type='str'
             ),
-            expand=dict(
+            filter=dict(
                 type='str'
             ),
             elastic_pool_name=dict(
@@ -203,8 +196,8 @@ class AzureRMDatabasesFacts(AzureRMModuleBase):
         self.resource_group = None
         self.server_name = None
         self.database_name = None
-        self.filter = None
         self.expand = None
+        self.filter = None
         self.elastic_pool_name = None
         self.recommended_elastic_pool_name = None
         super(AzureRMDatabasesFacts, self).__init__(self.module_arg_spec)
@@ -217,12 +210,7 @@ class AzureRMDatabasesFacts(AzureRMModuleBase):
 
         if (self.resource_group is not None and
                 self.server_name is not None and
-                self.database_name is not None and
-                self.filter is not None):
-            self.results['databases'] = self.list_metrics()
-        elif (self.resource_group is not None and
-              self.server_name is not None and
-              self.database_name is not None):
+                self.database_name is not None):
             self.results['databases'] = self.get()
         elif (self.resource_group is not None and
               self.server_name is not None):
@@ -236,29 +224,6 @@ class AzureRMDatabasesFacts(AzureRMModuleBase):
               self.recommended_elastic_pool_name is not None):
             self.results['databases'] = self.list_by_recommended_elastic_pool()
         return self.results
-
-    def list_metrics(self):
-        '''
-        Gets facts of the specified SQL Database.
-
-        :return: deserialized SQL Databaseinstance state dictionary
-        '''
-        response = None
-        results = {}
-        try:
-            response = self.mgmt_client.databases.list_metrics(resource_group_name=self.resource_group,
-                                                               server_name=self.server_name,
-                                                               database_name=self.database_name,
-                                                               filter=self.filter)
-            self.log("Response : {0}".format(response))
-        except CloudError as e:
-            self.log('Could not get facts for Databases.')
-
-        if response is not None:
-            for item in response:
-                results[item.name] = item.as_dict()
-
-        return results
 
     def get(self):
         '''

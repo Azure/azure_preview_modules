@@ -33,6 +33,17 @@
       - output.changed == False
       - output.replications.replication{{ rpfx }}.id != None
 
+- name: Gather facts Replication
+  azure_rm_containerregistryreplication_facts:
+    resource_group: "{{ resource_group }}"
+    registry_name: acr{{ rpfx }}
+  register: output
+- name: Assert that facts are returned
+  assert:
+    that:
+      - output.changed == False
+      - output.replications.replication{{ rpfx }}.id != None
+
 - name: Delete instance of Replication
   azure_rm_containerregistryreplication:
     resource_group: "{{ resource_group }}"

@@ -33,7 +33,6 @@ options:
     replication_name:
         description:
             - The name of the replication.
-        required: True
 
 extends_documentation_fragment:
     - azure
@@ -49,6 +48,11 @@ EXAMPLES = '''
       resource_group: resource_group_name
       registry_name: registry_name
       replication_name: replication_name
+
+  - name: List instances of Replication
+    azure_rm_containerregistryreplication_facts:
+      resource_group: resource_group_name
+      registry_name: registry_name
 '''
 
 RETURN = '''
@@ -132,8 +136,7 @@ class AzureRMReplicationsFacts(AzureRMModuleBase):
                 required=True
             ),
             replication_name=dict(
-                type='str',
-                required=True
+                type='str'
             )
         )
         # store the results of the module operation
@@ -157,6 +160,9 @@ class AzureRMReplicationsFacts(AzureRMModuleBase):
                 self.registry_name is not None and
                 self.replication_name is not None):
             self.results['replications'] = self.get()
+        elif (self.resource_group is not None and
+              self.registry_name is not None):
+            self.results['replications'] = self.list()
         return self.results
 
     def get(self):
@@ -177,6 +183,27 @@ class AzureRMReplicationsFacts(AzureRMModuleBase):
 
         if response is not None:
             results[response.name] = response.as_dict()
+
+        return results
+
+    def list(self):
+        '''
+        Gets facts of the specified Replication.
+
+        :return: deserialized Replicationinstance state dictionary
+        '''
+        response = None
+        results = {}
+        try:
+            response = self.mgmt_client.replications.list(resource_group_name=self.resource_group,
+                                                          registry_name=self.registry_name)
+            self.log("Response : {0}".format(response))
+        except CloudError as e:
+            self.log('Could not get facts for Replications.')
+
+        if response is not None:
+            for item in response:
+                results[item.name] = item.as_dict()
 
         return results
 

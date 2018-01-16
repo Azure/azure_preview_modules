@@ -33,7 +33,6 @@ options:
     webhook_name:
         description:
             - The name of the webhook.
-        required: True
 
 extends_documentation_fragment:
     - azure
@@ -54,7 +53,6 @@ EXAMPLES = '''
     azure_rm_containerregistrywebhook_facts:
       resource_group: resource_group_name
       registry_name: registry_name
-      webhook_name: webhook_name
 '''
 
 RETURN = '''
@@ -138,8 +136,7 @@ class AzureRMWebhooksFacts(AzureRMModuleBase):
                 required=True
             ),
             webhook_name=dict(
-                type='str',
-                required=True
+                type='str'
             )
         )
         # store the results of the module operation
@@ -164,9 +161,8 @@ class AzureRMWebhooksFacts(AzureRMModuleBase):
                 self.webhook_name is not None):
             self.results['webhooks'] = self.get()
         elif (self.resource_group is not None and
-              self.registry_name is not None and
-              self.webhook_name is not None):
-            self.results['webhooks'] = self.list_events()
+              self.registry_name is not None):
+            self.results['webhooks'] = self.list()
         return self.results
 
     def get(self):
@@ -190,7 +186,7 @@ class AzureRMWebhooksFacts(AzureRMModuleBase):
 
         return results
 
-    def list_events(self):
+    def list(self):
         '''
         Gets facts of the specified Webhook.
 
@@ -199,9 +195,8 @@ class AzureRMWebhooksFacts(AzureRMModuleBase):
         response = None
         results = {}
         try:
-            response = self.mgmt_client.webhooks.list_events(resource_group_name=self.resource_group,
-                                                             registry_name=self.registry_name,
-                                                             webhook_name=self.webhook_name)
+            response = self.mgmt_client.webhooks.list(resource_group_name=self.resource_group,
+                                                      registry_name=self.registry_name)
             self.log("Response : {0}".format(response))
         except CloudError as e:
             self.log('Could not get facts for Webhooks.')

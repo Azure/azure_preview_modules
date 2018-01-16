@@ -29,7 +29,6 @@ options:
     route_table_name:
         description:
             - The name of the route table.
-        required: True
     expand:
         description:
             - Expands referenced resources.
@@ -48,6 +47,10 @@ EXAMPLES = '''
       resource_group: resource_group_name
       route_table_name: route_table_name
       expand: expand
+
+  - name: List instances of Route Table
+    azure_rm_applicationgatewayroutetable_facts:
+      resource_group: resource_group_name
 '''
 
 RETURN = '''
@@ -114,8 +117,7 @@ class AzureRMRouteTablesFacts(AzureRMModuleBase):
                 required=True
             ),
             route_table_name=dict(
-                type='str',
-                required=True
+                type='str'
             ),
             expand=dict(
                 type='str'
@@ -141,6 +143,8 @@ class AzureRMRouteTablesFacts(AzureRMModuleBase):
         if (self.resource_group is not None and
                 self.route_table_name is not None):
             self.results['route_tables'] = self.get()
+        elif (self.resource_group is not None):
+            self.results['route_tables'] = self.list()
         return self.results
 
     def get(self):
@@ -160,6 +164,26 @@ class AzureRMRouteTablesFacts(AzureRMModuleBase):
 
         if response is not None:
             results[response.name] = response.as_dict()
+
+        return results
+
+    def list(self):
+        '''
+        Gets facts of the specified Route Table.
+
+        :return: deserialized Route Tableinstance state dictionary
+        '''
+        response = None
+        results = {}
+        try:
+            response = self.mgmt_client.route_tables.list(resource_group_name=self.resource_group)
+            self.log("Response : {0}".format(response))
+        except CloudError as e:
+            self.log('Could not get facts for RouteTables.')
+
+        if response is not None:
+            for item in response:
+                results[item.name] = item.as_dict()
 
         return results
 
