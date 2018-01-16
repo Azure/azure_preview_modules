@@ -176,7 +176,7 @@ class AzureRMWebhooksFacts(AzureRMModuleBase):
         :return: deserialized Webhookinstance state dictionary
         '''
         response = None
-        results = False
+        results = {}
         try:
             response = self.mgmt_client.webhooks.get(resource_group_name=self.resource_group,
                                                      registry_name=self.registry_name,
@@ -186,7 +186,6 @@ class AzureRMWebhooksFacts(AzureRMModuleBase):
             self.log('Could not get facts for Webhooks.')
 
         if response is not None:
-            results = {}
             results[response.name] = response.as_dict()
 
         return results
@@ -198,7 +197,7 @@ class AzureRMWebhooksFacts(AzureRMModuleBase):
         :return: deserialized Webhookinstance state dictionary
         '''
         response = None
-        results = False
+        results = {}
         try:
             response = self.mgmt_client.webhooks.list_events(resource_group_name=self.resource_group,
                                                              registry_name=self.registry_name,
@@ -208,7 +207,6 @@ class AzureRMWebhooksFacts(AzureRMModuleBase):
             self.log('Could not get facts for Webhooks.')
 
         if response is not None:
-            results = {}
             for item in response:
                 results[item.name] = item.as_dict()
 

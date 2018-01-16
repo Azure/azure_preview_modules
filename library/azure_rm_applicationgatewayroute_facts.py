@@ -134,7 +134,7 @@ class AzureRMRoutesFacts(AzureRMModuleBase):
         :return: deserialized Routeinstance state dictionary
         '''
         response = None
-        results = False
+        results = {}
         try:
             response = self.mgmt_client.routes.get(resource_group_name=self.resource_group,
                                                    route_table_name=self.route_table_name,
@@ -144,7 +144,6 @@ class AzureRMRoutesFacts(AzureRMModuleBase):
             self.log('Could not get facts for Routes.')
 
         if response is not None:
-            results = {}
             results[response.name] = response.as_dict()
 
         return results

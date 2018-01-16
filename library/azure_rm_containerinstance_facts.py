@@ -147,7 +147,7 @@ class AzureRMContainerGroupsFacts(AzureRMModuleBase):
         :return: deserialized Container Groupinstance state dictionary
         '''
         response = None
-        results = False
+        results = {}
         try:
             response = self.mgmt_client.container_groups.get(resource_group_name=self.resource_group,
                                                              container_group_name=self.container_group_name)
@@ -156,7 +156,6 @@ class AzureRMContainerGroupsFacts(AzureRMModuleBase):
             self.log('Could not get facts for ContainerGroups.')
 
         if response is not None:
-            results = {}
             results[response.name] = response.as_dict()
 
         return results
@@ -168,7 +167,7 @@ class AzureRMContainerGroupsFacts(AzureRMModuleBase):
         :return: deserialized Container Groupinstance state dictionary
         '''
         response = None
-        results = False
+        results = {}
         try:
             response = self.mgmt_client.container_groups.list_by_resource_group(resource_group_name=self.resource_group)
             self.log("Response : {0}".format(response))
@@ -176,7 +175,6 @@ class AzureRMContainerGroupsFacts(AzureRMModuleBase):
             self.log('Could not get facts for ContainerGroups.')
 
         if response is not None:
-            results = {}
             for item in response:
                 results[item.name] = item.as_dict()
 

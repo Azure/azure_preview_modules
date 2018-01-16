@@ -166,7 +166,7 @@ class AzureRMReplicationsFacts(AzureRMModuleBase):
         :return: deserialized Replicationinstance state dictionary
         '''
         response = None
-        results = False
+        results = {}
         try:
             response = self.mgmt_client.replications.get(resource_group_name=self.resource_group,
                                                          registry_name=self.registry_name,
@@ -176,7 +176,6 @@ class AzureRMReplicationsFacts(AzureRMModuleBase):
             self.log('Could not get facts for Replications.')
 
         if response is not None:
-            results = {}
             results[response.name] = response.as_dict()
 
         return results
