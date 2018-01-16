@@ -64,6 +64,8 @@
       - output.container_groups.aci{{ rpfx }}.id != None
       - output.container_groups.aci{{ rpfx }}second.id != None
 
+- name: Create sample container instance
+  azure_rm_containerinstance:
     resource_group: "{{ resource_group }}"
     name: aci{{ rpfx }}
     os_type: linux
@@ -82,6 +84,9 @@
         image: httpd
         memory: 1.5
     state: absent
+
+- name: Create sample container instance
+  azure_rm_containerinstance:
     resource_group: "{{ resource_group }}"
     name: aci{{ rpfx }}second
     os_type: linux
