@@ -19,14 +19,7 @@
   azure_rm_mysqlconfiguration:
     resource_group: "{{ resource_group }}"
     server_name: mysqlsrv{{ rpfx }}
-    name: event_scheduler
-    value: "ON"
-    source: user-override
-- name: Create Configuration
-  azure_rm_mysqlconfiguration:
-    resource_group: "{{ resource_group }}"
-    server_name: mysqlsrv{{ rpfx }}
-    name: event_schedulersecond
+    name: event_schedulerfirst
     value: "ON"
     source: user-override
 
@@ -52,39 +45,3 @@
     that:
       - output.changed == False
       - output.configurations.event_scheduler.id != None
-      - output.configurations.event_schedulersecond.id != None
-
-
-- name: Gather facts MySQL Configuration
-  azure_rm_mysqlconfiguration_facts:
-    resource_group: "{{ resource_group }}"
-    server_name: mysqlsrv{{ rpfx }}
-    configuration_name: event_scheduler
-  register: output
-- name: Assert that empty dictionary was returned
-  assert:
-    that:
-      - output.changed == False
-      - output.configurations == {}
-
-- name: Gather facts MySQL Configuration
-  azure_rm_mysqlconfiguration_facts:
-    resource_group: "{{ resource_group }}"
-    server_name: mysqlsrv{{ rpfx }}
-  register: output
-- name: Assert that empty dictionary was returned
-  assert:
-    that:
-      - output.changed == False
-      - output.configurations == {}
-
-- name: Delete instance of MySQL Server
-  azure_rm_mysqlserver:
-    resource_group: "{{ resource_group }}"
-    name: mysqlsrv{{ rpfx }}
-    state: absent
-- name: Delete instance of MySQL Server
-  azure_rm_mysqlserver:
-    resource_group: "{{ resource_group }}"
-    name: mysqlsrv{{ rpfx }}
-    state: absent

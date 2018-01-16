@@ -14,6 +14,7 @@
     route_name: testroute{{ rpfx }}
     address_prefix: 208.128.0.0/11
     next_hop_type: virtual_network_gateway
+    name: first
 - name: Create Route
   azure_rm_applicationgatewayroute:
     resource_group: "{{ resource_group }}"

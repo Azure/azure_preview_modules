@@ -18,7 +18,7 @@
   azure_rm_postgresqldatabase:
     resource_group: "{{ resource_group }}"
     server_name: "postgresqlsrv{{ rpfx }}"
-    name: testdatabase
+    name: testdatabasefirst
 - name: Create PostgreSQL Database
   azure_rm_postgresqldatabase:
     resource_group: "{{ resource_group }}"
@@ -53,7 +53,7 @@
   azure_rm_postgresqldatabase:
     resource_group: "{{ resource_group }}"
     server_name: "postgresqlsrv{{ rpfx }}"
-    name: testdatabase
+    name: testdatabasefirst
     state: absent
 - name: Delete instance of PostgreSQL Database
   azure_rm_postgresqldatabase:

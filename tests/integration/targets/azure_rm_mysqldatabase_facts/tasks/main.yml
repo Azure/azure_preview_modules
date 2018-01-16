@@ -19,7 +19,7 @@
   azure_rm_mysqldatabase:
     resource_group: "{{ resource_group }}"
     server_name: mysqlsrv{{ rpfx }}
-    name: testdatabase
+    name: testdatabasefirst
 - name: Create MySQL Database
   azure_rm_mysqldatabase:
     resource_group: "{{ resource_group }}"
@@ -54,7 +54,7 @@
   azure_rm_mysqldatabase:
     resource_group: "{{ resource_group }}"
     server_name: mysqlsrv{{ rpfx }}
-    name: testdatabase
+    name: testdatabasefirst
     state: absent
 - name: Delete instance of MySQL Database
   azure_rm_mysqldatabase:

@@ -14,7 +14,7 @@
   azure_rm_sqldatabase:
     resource_group: "{{ resource_group }}"
     server_name: sqlsrv{{ rpfx }}
-    name: database{{ rpfx }}
+    name: database{{ rpfx }}first
     location: eastus
 - name: Create SQL Database
   azure_rm_sqldatabase:
@@ -75,7 +75,7 @@
   azure_rm_sqldatabase:
     resource_group: "{{ resource_group }}"
     server_name: sqlsrv{{ rpfx }}
-    name: database{{ rpfx }}
+    name: database{{ rpfx }}first
     state: absent
 - name: Delete instance of SQL Database
   azure_rm_sqldatabase:

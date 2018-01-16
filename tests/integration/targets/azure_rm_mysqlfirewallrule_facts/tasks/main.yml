@@ -19,7 +19,7 @@
   azure_rm_mysqlfirewallrule:
     resource_group: "{{ resource_group }}"
     server_name: mysqlsrv{{ rpfx }}
-    name: firewallrule{{ rpfx }}
+    name: firewallrule{{ rpfx }}first
     start_ip_address: 172.28.10.136
     end_ip_address: 172.28.10.138
 - name: Create Firewall Rule
@@ -58,7 +58,7 @@
   azure_rm_mysqlfirewallrule:
     resource_group: "{{ resource_group }}"
     server_name: mysqlsrv{{ rpfx }}
-    name: firewallrule{{ rpfx }}
+    name: firewallrule{{ rpfx }}first
     state: absent
 - name: Delete instance of Firewall Rule
   azure_rm_mysqlfirewallrule:

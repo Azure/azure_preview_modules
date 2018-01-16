@@ -14,7 +14,7 @@
   azure_rm_sqlelasticpool:
     resource_group: "{{ resource_group }}"
     server_name: sqlsrv{{ rpfx }}
-    name: elasticpool{{ rpfx }}
+    name: elasticpool{{ rpfx }}first
     location: eastus
 - name: Create ElasticPool
   azure_rm_sqlelasticpool:
@@ -51,7 +51,7 @@
   azure_rm_sqlelasticpool:
     resource_group: "{{ resource_group }}"
     server_name: sqlsrv{{ rpfx }}
-    name: elasticpool{{ rpfx }}
+    name: elasticpool{{ rpfx }}first
     state: absent
 - name: Delete instance of ElasticPool
   azure_rm_sqlelasticpool:

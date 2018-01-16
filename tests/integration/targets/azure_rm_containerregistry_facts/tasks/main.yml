@@ -5,7 +5,7 @@
 
 - name: Create an container registry
   azure_rm_containerregistry:
-    name: acr{{ rpfx }}
+    name: acr{{ rpfx }}first
     resource_group: "{{ resource_group }}"
     location: eastus2
     state: present
@@ -16,7 +16,7 @@
         Environment: Production
 - name: Create an container registry
   azure_rm_containerregistry:
-    name: acr{{ rpfx }}
+    name: acr{{ rpfx }}second
     resource_group: "{{ resource_group }}"
     location: eastus2
     state: present
@@ -50,12 +50,12 @@
 
 - name: Delete container registry
   azure_rm_containerregistry:
-    name: acr{{ rpfx }}
+    name: acr{{ rpfx }}first
     resource_group: "{{ resource_group }}"
     state: absent
 - name: Delete container registry
   azure_rm_containerregistry:
-    name: acr{{ rpfx }}
+    name: acr{{ rpfx }}second
     resource_group: "{{ resource_group }}"
     state: absent
 
