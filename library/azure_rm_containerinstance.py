@@ -57,7 +57,6 @@ options:
     location:
         description:
             - Valid azure location. Defaults to location of the resource group.
-        default: resource_group location
     registry_login_server:
         description:
             - The container image registry login server.
@@ -92,13 +91,12 @@ options:
                     - List of ports exposed within the container group.
     force_update:
         description:
-            - Force update of existing container instance.
+            - Force update of existing container instance. Any update will result in deletion and recreation of existing containers.
         type: bool
         default: False
 
 extends_documentation_fragment:
     - azure
-    - azure_tags
 
 author:
     - "Zim Kalinowski (@zikalino)"
@@ -108,30 +106,39 @@ author:
 EXAMPLES = '''
   - name: Create sample container group
     azure_rm_containerinstance:
-    resource_group: testrg
-    name: mynewcontainergroup
-    os_type: linux
-    ip_address: public
-    ports:
-      - 80
-      - 81
-    containers:
-      - name: mycontainer1
-        image: httpd
-        memory: 1.5
-        ports:
-          - 80
-      - name: mycontainer2
-        image: httpd
-        memory: 1.5
-        ports:
-          - 81
+      resource_group: testrg
+      name: mynewcontainergroup
+      os_type: linux
+      ip_address: public
+      ports:
+        - 80
+        - 81
+      containers:
+        - name: mycontainer1
+          image: httpd
+          memory: 1.5
+          ports:
+            - 80
 '''
 RETURN = '''
-state:
-    description: Current state of the azure instance
+id:
+    description:
+        - Resource ID
     returned: always
-    type: dict
+    type: str
+    sample: /subscriptions/ffffffff-ffff-ffff-ffff-ffffffffffff/resourceGroups/TestGroup/providers/Microsoft.ContainerInstance/containerGroups/aci1b6dd89
+provisioning_state:
+    description:
+        - Provisioning state of the container.
+    returned: always
+    type: str
+    sample: Creating
+ip_address:
+    description:
+        - Public IP Address of created container group.
+    returned: if address is public
+    type: str
+    sample: 175.12.233.11
 '''
 
 from ansible.module_utils.azure_rm_common import AzureRMModuleBase
@@ -235,7 +242,8 @@ class AzureRMContainerInstance(AzureRMModuleBase):
             ),
             registry_password=dict(
                 type='str',
-                default=None
+                default=None,
+                no_log=True
             ),
             containers=dict(
                 type='list',
@@ -250,7 +258,6 @@ class AzureRMContainerInstance(AzureRMModuleBase):
         self.resource_group = None
         self.name = None
         self.location = None
-        self.tags = None
         self.state = None
         self.ip_address = None
 
@@ -261,26 +268,23 @@ class AzureRMContainerInstance(AzureRMModuleBase):
 
         super(AzureRMContainerInstance, self).__init__(derived_arg_spec=self.module_arg_spec,
                                                        supports_check_mode=True,
-                                                       supports_tags=True)
+                                                       supports_tags=False)
 
     def exec_module(self, **kwargs):
         """Main module execution method"""
 
-        for key in list(self.module_arg_spec.keys()) + ['tags']:
+        for key in list(self.module_arg_spec.keys()):
             setattr(self, key, kwargs[key])
 
         resource_group = None
         response = None
         results = dict()
-        to_be_updated = False
 
         self.mgmt_client = self.get_mgmt_svc_client(ContainerInstanceManagementClient,
                                                     base_url=self._cloud_environment.endpoints.resource_manager)
 
-        try:
-            resource_group = self.get_resource_group(self.resource_group)
-        except CloudError:
-            self.fail('resource group {} not found'.format(self.resource_group))
+        resource_group = self.get_resource_group(self.resource_group)
+
         if not self.location:
             self.location = resource_group.location
 
@@ -292,18 +296,18 @@ class AzureRMContainerInstance(AzureRMModuleBase):
             if self.state == 'absent':
                 self.log("Nothing to delete")
             else:
-                to_be_updated = True
+                self.force_update = True
         else:
             self.log("Container instance already exists")
 
             if self.state == 'absent':
-                self.delete_containerinstance()
+                if not self.check_mode:
+                    self.delete_containerinstance()
                 self.results['changed'] = True
                 self.log("Container instance deleted")
             elif self.state == 'present':
                 self.log("Need to check if container group has to be deleted or may be updated")
-                to_be_updated = self.force_update
-                if to_be_updated:
+                if self.force_update:
                     self.log('Deleting container instance before update')
                     if not self.check_mode:
                         self.delete_containerinstance()
@@ -312,16 +316,15 @@ class AzureRMContainerInstance(AzureRMModuleBase):
 
             self.log("Need to Create / Update the container instance")
 
-            if self.check_mode:
-                return self.results
-
-            if to_be_updated:
-                response = self.create_update_containerinstance()
+            if self.force_update:
                 self.results['changed'] = True
+                if self.check_mode:
+                    return self.results
+                response = self.create_update_containerinstance()
 
             self.results['id'] = response['id']
-            self.results['provisioning_state'] = response['provisioning_state'] 
-            self.results['ip_address'] = response.get('ip_address', None) 
+            self.results['provisioning_state'] = response['provisioning_state']
+            self.results['ip_address'] = response['ip_address']['ip']
 
             self.log("Creation / Update done")
 
@@ -349,8 +352,8 @@ class AzureRMContainerInstance(AzureRMModuleBase):
             if self.ports:
                 ports = []
                 for port in self.ports:
-                    ports.append(Port(port, "TCP"))
-                ip_address = IpAddress(ports, self.ip_address)
+                    ports.append(Port(port=port, protocol="TCP"))
+                ip_address = IpAddress(ports=ports, ip=self.ip_address)
 
         containers = []
 
@@ -366,10 +369,12 @@ class AzureRMContainerInstance(AzureRMModuleBase):
                 for port in port_list:
                     ports.append(ContainerPort(port))
 
-            containers.append(Container(name, image, ResourceRequirements(ResourceRequests(memory, cpu)), None, ports))
+            containers.append(Container(name=name,
+                                        image=image,
+                                        resources=ResourceRequirements(ResourceRequests(memory_in_gb=memory, cpu=cpu)),
+                                        ports=ports))
 
         parameters = ContainerGroup(location=self.location,
-                                    tags=self.tags,
                                     containers=containers,
                                     image_registry_credentials=registry_credentials,
                                     restart_policy=None,
@@ -377,12 +382,8 @@ class AzureRMContainerInstance(AzureRMModuleBase):
                                     os_type=self.os_type,
                                     volumes=None)
 
-        try:
-            response = self.mgmt_client.container_groups.create_or_update(self.resource_group, self.name, parameters)
+        response = self.mgmt_client.container_groups.create_or_update(self.resource_group, self.name, parameters)
 
-        except CloudError as exc:
-            self.log('Error attempting to create the container instance.')
-            self.fail("Error creating the container instance: {0}".format(str(exc)))
         return response.as_dict()
 
     def delete_containerinstance(self):
@@ -392,12 +393,7 @@ class AzureRMContainerInstance(AzureRMModuleBase):
         :return: True
         '''
         self.log("Deleting the container instance {0}".format(self.name))
-        try:
-            response = self.mgmt_client.container_groups.delete(self.resource_group, self.name)
-        except CloudError as e:
-            self.log('Error attempting to delete the container instance.')
-            self.fail("Error deleting the container instance: {0}".format(str(e)))
-
+        response = self.mgmt_client.container_groups.delete(self.resource_group, self.name)
         return True
 
     def get_containerinstance(self):
