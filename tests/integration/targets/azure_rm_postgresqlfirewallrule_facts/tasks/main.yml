@@ -6,7 +6,7 @@
 - name: Create PostgreSQL Server
   azure_rm_postgresqlserver:
     resource_group: "{{ resource_group }}"
-    name: "postgresqlsrv{{ rpfx }}"
+    name: postgresqlsrv{{ rpfx }}
     sku:
       name: PGSQLS100
       tier: basic
@@ -17,14 +17,14 @@
 - name: Create Firewall Rule
   azure_rm_postgresqlfirewallrule:
     resource_group: "{{ resource_group }}"
-    server_name: "postgresqlsrv{{ rpfx }}"
+    server_name: postgresqlsrv{{ rpfx }}
     name: firewallrule{{ rpfx }}
     start_ip_address: 172.28.10.136
     end_ip_address: 172.28.10.138
 - name: Create Firewall Rule
   azure_rm_postgresqlfirewallrule:
     resource_group: "{{ resource_group }}"
-    server_name: "postgresqlsrv{{ rpfx }}"
+    server_name: postgresqlsrv{{ rpfx }}
     name: firewallrule{{ rpfx }}second
     start_ip_address: 172.28.10.136
     end_ip_address: 172.28.10.138
@@ -32,7 +32,7 @@
 - name: Gather facts PostgreSQL Firewall Rule
   azure_rm_postgresqlfirewallrule_facts:
     resource_group: "{{ resource_group }}"
-    server_name: "postgresqlsrv{{ rpfx }}"
+    server_name: postgresqlsrv{{ rpfx }}
     firewall_rule_name: firewallrule{{ rpfx }}
   register: output
 - name: Assert that facts are returned
@@ -44,7 +44,7 @@
 - name: Gather facts PostgreSQL Firewall Rule
   azure_rm_postgresqlfirewallrule_facts:
     resource_group: "{{ resource_group }}"
-    server_name: "postgresqlsrv{{ rpfx }}"
+    server_name: postgresqlsrv{{ rpfx }}
   register: output
 - name: Assert that facts are returned
   assert:
@@ -56,20 +56,20 @@
 - name: Delete instance of Firewall Rule
   azure_rm_postgresqlfirewallrule:
     resource_group: "{{ resource_group }}"
-    server_name: "postgresqlsrv{{ rpfx }}"
+    server_name: postgresqlsrv{{ rpfx }}
     name: firewallrule{{ rpfx }}
     state: absent
 - name: Delete instance of Firewall Rule
   azure_rm_postgresqlfirewallrule:
     resource_group: "{{ resource_group }}"
-    server_name: "postgresqlsrv{{ rpfx }}"
+    server_name: postgresqlsrv{{ rpfx }}
     name: firewallrule{{ rpfx }}second
     state: absent
 
 - name: Gather facts PostgreSQL Firewall Rule
   azure_rm_postgresqlfirewallrule_facts:
     resource_group: "{{ resource_group }}"
-    server_name: "postgresqlsrv{{ rpfx }}"
+    server_name: postgresqlsrv{{ rpfx }}
     firewall_rule_name: firewallrule{{ rpfx }}
   register: output
 - name: Assert that empty dictionary was returned
@@ -81,7 +81,7 @@
 - name: Gather facts PostgreSQL Firewall Rule
   azure_rm_postgresqlfirewallrule_facts:
     resource_group: "{{ resource_group }}"
-    server_name: "postgresqlsrv{{ rpfx }}"
+    server_name: postgresqlsrv{{ rpfx }}
   register: output
 - name: Assert that empty dictionary was returned
   assert:
@@ -92,10 +92,10 @@
 - name: Delete instance of PostgreSQL Server
   azure_rm_postgresqlserver:
     resource_group: "{{ resource_group }}"
-    name: "postgresqlsrv{{ rpfx }}"
+    name: postgresqlsrv{{ rpfx }}
     state: absent
 - name: Delete instance of PostgreSQL Server
   azure_rm_postgresqlserver:
     resource_group: "{{ resource_group }}"
-    name: "postgresqlsrv{{ rpfx }}"
+    name: postgresqlsrv{{ rpfx }}
     state: absent

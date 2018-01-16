@@ -6,7 +6,7 @@
 - name: Create PostgreSQL Server
   azure_rm_postgresqlserver:
     resource_group: "{{ resource_group }}"
-    name: "postgresqlsrv{{ rpfx }}"
+    name: postgresqlsrv{{ rpfx }}
     sku:
       name: PGSQLS100
       tier: basic
@@ -17,18 +17,18 @@
 - name: Create PostgreSQL Database
   azure_rm_postgresqldatabase:
     resource_group: "{{ resource_group }}"
-    server_name: "postgresqlsrv{{ rpfx }}"
+    server_name: postgresqlsrv{{ rpfx }}
     name: testdatabase
 - name: Create PostgreSQL Database
   azure_rm_postgresqldatabase:
     resource_group: "{{ resource_group }}"
-    server_name: "postgresqlsrv{{ rpfx }}"
+    server_name: postgresqlsrv{{ rpfx }}
     name: testdatabasesecond
 
 - name: Gather facts PostgreSQL Database
   azure_rm_postgresqldatabase_facts:
     resource_group: "{{ resource_group }}"
-    server_name: "postgresqlsrv{{ rpfx }}"
+    server_name: postgresqlsrv{{ rpfx }}
     database_name: testdatabase
   register: output
 - name: Assert that facts are returned
@@ -40,7 +40,7 @@
 - name: Gather facts PostgreSQL Database
   azure_rm_postgresqldatabase_facts:
     resource_group: "{{ resource_group }}"
-    server_name: "postgresqlsrv{{ rpfx }}"
+    server_name: postgresqlsrv{{ rpfx }}
   register: output
 - name: Assert that facts are returned
   assert:
@@ -52,20 +52,20 @@
 - name: Delete instance of PostgreSQL Database
   azure_rm_postgresqldatabase:
     resource_group: "{{ resource_group }}"
-    server_name: "postgresqlsrv{{ rpfx }}"
+    server_name: postgresqlsrv{{ rpfx }}
     name: testdatabase
     state: absent
 - name: Delete instance of PostgreSQL Database
   azure_rm_postgresqldatabase:
     resource_group: "{{ resource_group }}"
-    server_name: "postgresqlsrv{{ rpfx }}"
+    server_name: postgresqlsrv{{ rpfx }}
     name: testdatabasesecond
     state: absent
 
 - name: Gather facts PostgreSQL Database
   azure_rm_postgresqldatabase_facts:
     resource_group: "{{ resource_group }}"
-    server_name: "postgresqlsrv{{ rpfx }}"
+    server_name: postgresqlsrv{{ rpfx }}
     database_name: testdatabase
   register: output
 - name: Assert that empty dictionary was returned
@@ -77,7 +77,7 @@
 - name: Gather facts PostgreSQL Database
   azure_rm_postgresqldatabase_facts:
     resource_group: "{{ resource_group }}"
-    server_name: "postgresqlsrv{{ rpfx }}"
+    server_name: postgresqlsrv{{ rpfx }}
   register: output
 - name: Assert that empty dictionary was returned
   assert:
@@ -88,10 +88,10 @@
 - name: Delete instance of PostgreSQL Server
   azure_rm_postgresqlserver:
     resource_group: "{{ resource_group }}"
-    name: "postgresqlsrv{{ rpfx }}"
+    name: postgresqlsrv{{ rpfx }}
     state: absent
 - name: Delete instance of PostgreSQL Server
   azure_rm_postgresqlserver:
     resource_group: "{{ resource_group }}"
-    name: "postgresqlsrv{{ rpfx }}"
+    name: postgresqlsrv{{ rpfx }}
     state: absent
