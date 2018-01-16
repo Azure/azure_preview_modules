@@ -6,7 +6,7 @@
 - name: Create MySQL Server
   azure_rm_mysqlserver:
     resource_group: "{{ resource_group }}"
-    name: "mysqlsrv{{ rpfx }}"
+    name: mysqlsrv{{ rpfx }}
     sku:
       name: MYSQLB50
       tier: basic
@@ -19,7 +19,7 @@
 - name: Create instance of Firewall Rule -- check mode
   azure_rm_mysqlfirewallrule:
     resource_group: "{{ resource_group }}"
-    server_name: "mysqlsrv{{ rpfx }}"
+    server_name: mysqlsrv{{ rpfx }}
     name: firewallrule{{ rpfx }}
     start_ip_address: 172.28.10.136
     end_ip_address: 172.28.10.138
@@ -33,7 +33,7 @@
 - name: Create instance of Firewall Rule
   azure_rm_mysqlfirewallrule:
     resource_group: "{{ resource_group }}"
-    server_name: "mysqlsrv{{ rpfx }}"
+    server_name: mysqlsrv{{ rpfx }}
     name: firewallrule{{ rpfx }}
     start_ip_address: 172.28.10.136
     end_ip_address: 172.28.10.138
@@ -46,7 +46,7 @@
 - name: Create again instance of Firewall Rule
   azure_rm_mysqlfirewallrule:
     resource_group: "{{ resource_group }}"
-    server_name: "mysqlsrv{{ rpfx }}"
+    server_name: mysqlsrv{{ rpfx }}
     name: firewallrule{{ rpfx }}
     start_ip_address: 172.28.10.136
     end_ip_address: 172.28.10.138
@@ -59,7 +59,7 @@
 - name: Delete instance of Firewall Rule -- check mode
   azure_rm_mysqlfirewallrule:
     resource_group: "{{ resource_group }}"
-    server_name: "mysqlsrv{{ rpfx }}"
+    server_name: mysqlsrv{{ rpfx }}
     name: firewallrule{{ rpfx }}
     state: absent
   check_mode: yes
@@ -72,7 +72,7 @@
 - name: Delete instance of Firewall Rule
   azure_rm_mysqlfirewallrule:
     resource_group: "{{ resource_group }}"
-    server_name: "mysqlsrv{{ rpfx }}"
+    server_name: mysqlsrv{{ rpfx }}
     name: firewallrule{{ rpfx }}
     state: absent
   register: output
@@ -84,7 +84,7 @@
 - name: Delete unexisting instance of Firewall Rule
   azure_rm_mysqlfirewallrule:
     resource_group: "{{ resource_group }}"
-    server_name: "mysqlsrv{{ rpfx }}"
+    server_name: mysqlsrv{{ rpfx }}
     name: firewallrule{{ rpfx }}
     state: absent
   register: output
@@ -96,5 +96,5 @@
 - name: Delete instance of MySQL Server
   azure_rm_mysqlserver:
     resource_group: "{{ resource_group }}"
-    name: "mysqlsrv{{ rpfx }}"
+    name: mysqlsrv{{ rpfx }}
     state: absent

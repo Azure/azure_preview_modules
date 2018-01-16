@@ -3,29 +3,6 @@
     rpfx: "{{ 1000 | random }}{{ resource_group | hash('md5') | truncate(7, True, '') }}"
   run_once: yes
 
-- name: Gather facts PostgreSQL Database
-  azure_rm_postgresqldatabase_facts:
-    resource_group: "{{ resource_group }}"
-    server_name: "postgresqlsrv{{ rpfx }}"
-    database_name: testdatabase
-  register: output
-- name: Assert that empty dictionary was returned
-  assert:
-    that:
-      - output.changed == False
-      - output.databases == {}
-
-- name: Gather facts PostgreSQL Database
-  azure_rm_postgresqldatabase_facts:
-    resource_group: "{{ resource_group }}"
-    server_name: "postgresqlsrv{{ rpfx }}"
-  register: output
-- name: Assert that empty dictionary was returned
-  assert:
-    that:
-      - output.changed == False
-      - output.databases == {}
-
 - name: Create PostgreSQL Server
   azure_rm_postgresqlserver:
     resource_group: "{{ resource_group }}"
@@ -42,6 +19,11 @@
     resource_group: "{{ resource_group }}"
     server_name: "postgresqlsrv{{ rpfx }}"
     name: testdatabase
+- name: Create PostgreSQL Database
+  azure_rm_postgresqldatabase:
+    resource_group: "{{ resource_group }}"
+    server_name: "postgresqlsrv{{ rpfx }}"
+    name: testdatabasesecond
 
 - name: Gather facts PostgreSQL Database
   azure_rm_postgresqldatabase_facts:
@@ -65,12 +47,48 @@
     that:
       - output.changed == False
       - output.databases.testdatabase.id != None
+      - output.databases.testdatabasesecond.id != None
 
 - name: Delete instance of PostgreSQL Database
   azure_rm_postgresqldatabase:
     resource_group: "{{ resource_group }}"
     server_name: "postgresqlsrv{{ rpfx }}"
     name: testdatabase
+    state: absent
+- name: Delete instance of PostgreSQL Database
+  azure_rm_postgresqldatabase:
+    resource_group: "{{ resource_group }}"
+    server_name: "postgresqlsrv{{ rpfx }}"
+    name: testdatabasesecond
+    state: absent
+
+- name: Gather facts PostgreSQL Database
+  azure_rm_postgresqldatabase_facts:
+    resource_group: "{{ resource_group }}"
+    server_name: "postgresqlsrv{{ rpfx }}"
+    database_name: testdatabase
+  register: output
+- name: Assert that empty dictionary was returned
+  assert:
+    that:
+      - output.changed == False
+      - output.databases == {}
+
+- name: Gather facts PostgreSQL Database
+  azure_rm_postgresqldatabase_facts:
+    resource_group: "{{ resource_group }}"
+    server_name: "postgresqlsrv{{ rpfx }}"
+  register: output
+- name: Assert that empty dictionary was returned
+  assert:
+    that:
+      - output.changed == False
+      - output.databases == {}
+
+- name: Delete instance of PostgreSQL Server
+  azure_rm_postgresqlserver:
+    resource_group: "{{ resource_group }}"
+    name: "postgresqlsrv{{ rpfx }}"
     state: absent
 - name: Delete instance of PostgreSQL Server
   azure_rm_postgresqlserver:

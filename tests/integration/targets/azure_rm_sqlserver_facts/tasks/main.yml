@@ -3,31 +3,17 @@
     rpfx: "{{ 1000 | random }}{{ resource_group | hash('md5') | truncate(7, True, '') }}"
   run_once: yes
 
-- name: Gather facts SQL Server
-  azure_rm_sqlserver_facts:
-    resource_group: "{{ resource_group }}"
-    server_name: "sqlsrv{{ rpfx }}"
-  register: output
-- name: Assert that empty dictionary was returned
-  assert:
-    that:
-      - output.changed == False
-      - output.servers == {}
-
-- name: Gather facts SQL Server
-  azure_rm_sqlserver_facts:
-    resource_group: "{{ resource_group }}"
-  register: output
-- name: Assert that empty dictionary was returned
-  assert:
-    that:
-      - output.changed == False
-      - output.servers == {}
-
 - name: Create SQL Server
   azure_rm_sqlserver:
     resource_group: "{{ resource_group }}"
-    name: "sqlsrv{{ rpfx }}"
+    name: sqlsrv{{ rpfx }}
+    location: eastus
+    admin_username: mylogin
+    admin_password: Testpasswordxyz12!
+- name: Create SQL Server
+  azure_rm_sqlserver:
+    resource_group: "{{ resource_group }}"
+    name: sqlsrv{{ rpfx }}second
     location: eastus
     admin_username: mylogin
     admin_password: Testpasswordxyz12!
@@ -35,7 +21,7 @@
 - name: Gather facts SQL Server
   azure_rm_sqlserver_facts:
     resource_group: "{{ resource_group }}"
-    server_name: "sqlsrv{{ rpfx }}"
+    server_name: sqlsrv{{ rpfx }}
   register: output
 - name: Assert that facts are returned
   assert:
@@ -52,9 +38,37 @@
     that:
       - output.changed == False
       - output.servers.sqlsrv{{ rpfx }}.id != None
+      - output.servers.sqlsrv{{ rpfx }}second.id != None
 
 - name: Delete instance of SQL Server
   azure_rm_sqlserver:
     resource_group: "{{ resource_group }}"
-    name: "sqlsrv{{ rpfx }}"
+    name: sqlsrv{{ rpfx }}
     state: absent
+- name: Delete instance of SQL Server
+  azure_rm_sqlserver:
+    resource_group: "{{ resource_group }}"
+    name: sqlsrv{{ rpfx }}second
+    state: absent
+
+- name: Gather facts SQL Server
+  azure_rm_sqlserver_facts:
+    resource_group: "{{ resource_group }}"
+    server_name: sqlsrv{{ rpfx }}
+  register: output
+- name: Assert that empty dictionary was returned
+  assert:
+    that:
+      - output.changed == False
+      - output.servers == {}
+
+- name: Gather facts SQL Server
+  azure_rm_sqlserver_facts:
+    resource_group: "{{ resource_group }}"
+  register: output
+- name: Assert that empty dictionary was returned
+  assert:
+    that:
+      - output.changed == False
+      - output.servers == {}
+
