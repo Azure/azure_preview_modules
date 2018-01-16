@@ -6,7 +6,19 @@
 - name: Create MySQL Server
   azure_rm_mysqlserver:
     resource_group: "{{ resource_group }}"
-    name: "mysqlsrv{{ rpfx }}"
+    name: mysqlsrv{{ rpfx }}
+    sku:
+      name: MYSQLB50
+      tier: basic
+    location: westus
+    version: 5.6
+    enforce_ssl: True
+    admin_username: zimxyz
+    admin_password: Testpasswordxyz12!
+- name: Create MySQL Server
+  azure_rm_mysqlserver:
+    resource_group: "{{ resource_group }}"
+    name: mysqlsrv{{ rpfx }}second
     sku:
       name: MYSQLB50
       tier: basic
@@ -19,7 +31,7 @@
 - name: Gather facts MySQL Server
   azure_rm_mysqlserver_facts:
     resource_group: "{{ resource_group }}"
-    server_name: "mysqlsrv{{ rpfx }}"
+    server_name: mysqlsrv{{ rpfx }}
   register: output
 - name: Assert that facts are returned
   assert:
@@ -36,9 +48,37 @@
     that:
       - output.changed == False
       - output.servers.mysqlsrv{{ rpfx }}.id != None
+      - output.servers.mysqlsrv{{ rpfx }}second.id != None
 
 - name: Delete instance of MySQL Server
   azure_rm_mysqlserver:
     resource_group: "{{ resource_group }}"
-    name: "mysqlsrv{{ rpfx }}"
+    name: mysqlsrv{{ rpfx }}
     state: absent
+- name: Delete instance of MySQL Server
+  azure_rm_mysqlserver:
+    resource_group: "{{ resource_group }}"
+    name: mysqlsrv{{ rpfx }}second
+    state: absent
+
+- name: Gather facts MySQL Server
+  azure_rm_mysqlserver_facts:
+    resource_group: "{{ resource_group }}"
+    server_name: mysqlsrv{{ rpfx }}
+  register: output
+- name: Assert that empty dictionary was returned
+  assert:
+    that:
+      - output.changed == False
+      - output.servers == {}
+
+- name: Gather facts MySQL Server
+  azure_rm_mysqlserver_facts:
+    resource_group: "{{ resource_group }}"
+  register: output
+- name: Assert that empty dictionary was returned
+  assert:
+    that:
+      - output.changed == False
+      - output.servers == {}
+

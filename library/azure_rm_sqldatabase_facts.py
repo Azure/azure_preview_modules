@@ -134,8 +134,7 @@ databases:
                         - "The edition of the database. The DatabaseEditions enumeration contains all the valid editions. If createMode is NonReadableSeconda
                           ry or OnlineSecondary, this value is ignored. To see possible values, query the capabilities API (/subscriptions/{subscriptionId}/
                           providers/Microsoft.Sql/locations/{locationID}/capabilities) referred to by operationId: 'Capabilities_ListByLocation.'. Possible
-                          values include: C(Web), C(Business), C(Basic), C(Standard), C(Premium), C(Free), C(Stretch), C(DataWarehouse), C(System), C(System
-                          2)"
+                          values include: 'Web', 'Business', 'Basic', 'Standard', 'Premium', 'Free', 'Stretch', 'DataWarehouse', 'System', 'System2'"
                     returned: always
                     type: str
                     sample: Basic

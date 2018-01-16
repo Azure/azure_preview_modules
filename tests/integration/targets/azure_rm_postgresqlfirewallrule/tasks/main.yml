@@ -6,7 +6,7 @@
 - name: Create PostgreSQL Server
   azure_rm_postgresqlserver:
     resource_group: "{{ resource_group }}"
-    name: "postgresqlsrv{{ rpfx }}"
+    name: postgresqlsrv{{ rpfx }}
     sku:
       name: PGSQLS100
       tier: basic
@@ -18,7 +18,7 @@
 - name: Create instance of Firewall Rule -- check mode
   azure_rm_postgresqlfirewallrule:
     resource_group: "{{ resource_group }}"
-    server_name: "postgresqlsrv{{ rpfx }}"
+    server_name: postgresqlsrv{{ rpfx }}
     name: firewallrule{{ rpfx }}
     start_ip_address: 172.28.10.136
     end_ip_address: 172.28.10.138
@@ -32,7 +32,7 @@
 - name: Create instance of Firewall Rule
   azure_rm_postgresqlfirewallrule:
     resource_group: "{{ resource_group }}"
-    server_name: "postgresqlsrv{{ rpfx }}"
+    server_name: postgresqlsrv{{ rpfx }}
     name: firewallrule{{ rpfx }}
     start_ip_address: 172.28.10.136
     end_ip_address: 172.28.10.138
@@ -45,7 +45,7 @@
 - name: Create again instance of Firewall Rule
   azure_rm_postgresqlfirewallrule:
     resource_group: "{{ resource_group }}"
-    server_name: "postgresqlsrv{{ rpfx }}"
+    server_name: postgresqlsrv{{ rpfx }}
     name: firewallrule{{ rpfx }}
     start_ip_address: 172.28.10.136
     end_ip_address: 172.28.10.138
@@ -58,7 +58,7 @@
 - name: Delete instance of Firewall Rule -- check mode
   azure_rm_postgresqlfirewallrule:
     resource_group: "{{ resource_group }}"
-    server_name: "postgresqlsrv{{ rpfx }}"
+    server_name: postgresqlsrv{{ rpfx }}
     name: firewallrule{{ rpfx }}
     state: absent
   check_mode: yes
@@ -71,7 +71,7 @@
 - name: Delete instance of Firewall Rule
   azure_rm_postgresqlfirewallrule:
     resource_group: "{{ resource_group }}"
-    server_name: "postgresqlsrv{{ rpfx }}"
+    server_name: postgresqlsrv{{ rpfx }}
     name: firewallrule{{ rpfx }}
     state: absent
   register: output
@@ -83,7 +83,7 @@
 - name: Delete unexisting instance of Firewall Rule
   azure_rm_postgresqlfirewallrule:
     resource_group: "{{ resource_group }}"
-    server_name: "postgresqlsrv{{ rpfx }}"
+    server_name: postgresqlsrv{{ rpfx }}
     name: firewallrule{{ rpfx }}
     state: absent
   register: output
@@ -95,5 +95,5 @@
 - name: Delete instance of PostgreSQL Server
   azure_rm_postgresqlserver:
     resource_group: "{{ resource_group }}"
-    name: "postgresqlsrv{{ rpfx }}"
+    name: postgresqlsrv{{ rpfx }}
     state: absent

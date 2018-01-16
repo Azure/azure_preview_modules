@@ -6,7 +6,7 @@
 - name: Create instance of PostgreSQL Server -- check mode
   azure_rm_postgresqlserver:
     resource_group: "{{ resource_group }}"
-    name: "postgresqlsrv{{ rpfx }}"
+    name: postgresqlsrv{{ rpfx }}
     sku:
       name: PGSQLS100
       tier: basic
@@ -24,7 +24,7 @@
 - name: Create instance of PostgreSQL Server
   azure_rm_postgresqlserver:
     resource_group: "{{ resource_group }}"
-    name: "postgresqlsrv{{ rpfx }}"
+    name: postgresqlsrv{{ rpfx }}
     sku:
       name: PGSQLS100
       tier: basic
@@ -42,7 +42,7 @@
 - name: Create again instance of PostgreSQL Server
   azure_rm_postgresqlserver:
     resource_group: "{{ resource_group }}"
-    name: "postgresqlsrv{{ rpfx }}"
+    name: postgresqlsrv{{ rpfx }}
     sku:
       name: PGSQLS100
       tier: basic
@@ -60,7 +60,7 @@
 - name: Delete instance of PostgreSQL Server -- check mode
   azure_rm_postgresqlserver:
     resource_group: "{{ resource_group }}"
-    name: "postgresqlsrv{{ rpfx }}"
+    name: postgresqlsrv{{ rpfx }}
     state: absent
   check_mode: yes
   register: output
@@ -72,7 +72,7 @@
 - name: Delete instance of PostgreSQL Server
   azure_rm_postgresqlserver:
     resource_group: "{{ resource_group }}"
-    name: "postgresqlsrv{{ rpfx }}"
+    name: postgresqlsrv{{ rpfx }}
     state: absent
   register: output
 - name: Assert the state has changed
@@ -83,7 +83,7 @@
 - name: Delete unexisting instance of PostgreSQL Server
   azure_rm_postgresqlserver:
     resource_group: "{{ resource_group }}"
-    name: "postgresqlsrv{{ rpfx }}"
+    name: postgresqlsrv{{ rpfx }}
     state: absent
   register: output
 - name: Assert the state has changed

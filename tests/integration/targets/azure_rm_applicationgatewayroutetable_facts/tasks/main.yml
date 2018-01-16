@@ -7,6 +7,10 @@
   azure_rm_applicationgatewayroutetable:
     resource_group: "{{ resource_group }}"
     route_table_name: routetablename{{ rpfx }}
+- name: Create Route Table
+  azure_rm_applicationgatewayroutetable:
+    resource_group: "{{ resource_group }}"
+    route_table_name: routetablename{{ rpfx }}
 
 - name: Gather facts Route Table
   azure_rm_applicationgatewayroutetable_facts:
@@ -24,3 +28,20 @@
     resource_group: "{{ resource_group }}"
     route_table_name: routetablename{{ rpfx }}
     state: absent
+- name: Delete instance of Route Table
+  azure_rm_applicationgatewayroutetable:
+    resource_group: "{{ resource_group }}"
+    route_table_name: routetablename{{ rpfx }}
+    state: absent
+
+- name: Gather facts Route Table
+  azure_rm_applicationgatewayroutetable_facts:
+    resource_group: "{{ resource_group }}"
+    route_table_name: routetablename{{ rpfx }}
+  register: output
+- name: Assert that empty dictionary was returned
+  assert:
+    that:
+      - output.changed == False
+      - output.route_tables == {}
+

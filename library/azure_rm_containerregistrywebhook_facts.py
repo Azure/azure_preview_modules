@@ -88,14 +88,14 @@ webhooks:
                     sample: westus
                 status:
                     description:
-                        - "The status of the webhook at the time the operation was called. Possible values include: C(enabled), C(disabled)"
+                        - "The status of the webhook at the time the operation was called. Possible values include: 'enabled', 'disabled'"
                     returned: always
                     type: str
                     sample: enabled
                 scope:
                     description:
-                        - "The scope of repositories where the event can be triggered. For example, C(foo:*) means events for all tags under repository C(foo
-                          ). C(foo:bar) means events for C(foo:bar) only. C(foo) is equivalent to C(foo:latest). Empty means all events."
+                        - "The scope of repositories where the event can be triggered. For example, 'foo:*' means events for all tags under repository 'foo'.
+                           'foo:bar' means events for 'foo:bar' only. 'foo' is equivalent to 'foo:latest'. Empty means all events."
                     returned: always
                     type: str
                     sample: myRepository

@@ -6,7 +6,7 @@
 - name: Create SQL Server
   azure_rm_sqlserver:
     resource_group: "{{ resource_group }}"
-    name: "sqlsrv{{ rpfx }}"
+    name: sqlsrv{{ rpfx }}
     location: eastus
     admin_username: mylogin
     admin_password: Testpasswordxyz12!
@@ -14,7 +14,7 @@
 - name: Create instance of SQL Database -- check mode
   azure_rm_sqldatabase:
     resource_group: "{{ resource_group }}"
-    server_name: "sqlsrv{{ rpfx }}"
+    server_name: sqlsrv{{ rpfx }}
     name: database{{ rpfx }}
     location: eastus
   check_mode: yes
@@ -27,7 +27,7 @@
 - name: Create instance of SQL Database
   azure_rm_sqldatabase:
     resource_group: "{{ resource_group }}"
-    server_name: "sqlsrv{{ rpfx }}"
+    server_name: sqlsrv{{ rpfx }}
     name: database{{ rpfx }}
     location: eastus
   register: output
@@ -40,7 +40,7 @@
 - name: Create again instance of SQL Database
   azure_rm_sqldatabase:
     resource_group: "{{ resource_group }}"
-    server_name: "sqlsrv{{ rpfx }}"
+    server_name: sqlsrv{{ rpfx }}
     name: database{{ rpfx }}
     location: eastus
   register: output
@@ -53,7 +53,7 @@
 - name: Delete instance of SQL Database -- check mode
   azure_rm_sqldatabase:
     resource_group: "{{ resource_group }}"
-    server_name: "sqlsrv{{ rpfx }}"
+    server_name: sqlsrv{{ rpfx }}
     name: database{{ rpfx }}
     state: absent
   check_mode: yes
@@ -66,7 +66,7 @@
 - name: Delete instance of SQL Database
   azure_rm_sqldatabase:
     resource_group: "{{ resource_group }}"
-    server_name: "sqlsrv{{ rpfx }}"
+    server_name: sqlsrv{{ rpfx }}
     name: database{{ rpfx }}
     state: absent
   register: output
@@ -78,7 +78,7 @@
 - name: Delete unexisting instance of SQL Database
   azure_rm_sqldatabase:
     resource_group: "{{ resource_group }}"
-    server_name: "sqlsrv{{ rpfx }}"
+    server_name: sqlsrv{{ rpfx }}
     name: database{{ rpfx }}
     state: absent
   register: output
@@ -90,5 +90,5 @@
 - name: Delete instance of SQL Server
   azure_rm_sqlserver:
     resource_group: "{{ resource_group }}"
-    name: "sqlsrv{{ rpfx }}"
+    name: sqlsrv{{ rpfx }}
     state: absent

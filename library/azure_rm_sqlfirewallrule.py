@@ -36,11 +36,11 @@ options:
         required: True
     start_ip_address:
         description:
-            - The start IP address of the firewall rule. Must be IPv4 format. Use value C(0.0.0.0) to represent all Azure-internal IP addresses.
+            - "The start IP address of the firewall rule. Must be IPv4 format. Use value '0.0.0.0' to represent all Azure-internal IP addresses."
     end_ip_address:
         description:
-            - "The end IP address of the firewall rule. Must be IPv4 format. Must be greater than or equal to startIpAddress. Use value C(0.0.0.0) to represe
-              nt all Azure-internal IP addresses."
+            - "The end IP address of the firewall rule. Must be IPv4 format. Must be greater than or equal to startIpAddress. Use value '0.0.0.0' to represen
+              t all Azure-internal IP addresses."
 
 extends_documentation_fragment:
     - azure

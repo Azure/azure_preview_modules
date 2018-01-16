@@ -6,21 +6,27 @@
 - name: Create SQL Server
   azure_rm_sqlserver:
     resource_group: "{{ resource_group }}"
-    name: "sqlsrv{{ rpfx }}"
+    name: sqlsrv{{ rpfx }}
     location: eastus
     admin_username: mylogin
     admin_password: Testpasswordxyz12!
 - name: Create SQL Database
   azure_rm_sqldatabase:
     resource_group: "{{ resource_group }}"
-    server_name: "sqlsrv{{ rpfx }}"
+    server_name: sqlsrv{{ rpfx }}
     name: database{{ rpfx }}
+    location: eastus
+- name: Create SQL Database
+  azure_rm_sqldatabase:
+    resource_group: "{{ resource_group }}"
+    server_name: sqlsrv{{ rpfx }}
+    name: database{{ rpfx }}second
     location: eastus
 
 - name: Gather facts SQL Database
   azure_rm_sqldatabase_facts:
     resource_group: "{{ resource_group }}"
-    server_name: "sqlsrv{{ rpfx }}"
+    server_name: sqlsrv{{ rpfx }}
     database_name: database{{ rpfx }}
   register: output
 - name: Assert that facts are returned
@@ -32,44 +38,107 @@
 - name: Gather facts SQL Database
   azure_rm_sqldatabase_facts:
     resource_group: "{{ resource_group }}"
-    server_name: "sqlsrv{{ rpfx }}"
+    server_name: sqlsrv{{ rpfx }}
   register: output
 - name: Assert that facts are returned
   assert:
     that:
       - output.changed == False
       - output.databases.database{{ rpfx }}.id != None
+      - output.databases.database{{ rpfx }}second.id != None
 
 - name: Gather facts SQL Database
   azure_rm_sqldatabase_facts:
     resource_group: "{{ resource_group }}"
-    server_name: "sqlsrv{{ rpfx }}"
+    server_name: sqlsrv{{ rpfx }}
   register: output
 - name: Assert that facts are returned
   assert:
     that:
       - output.changed == False
       - output.databases.database{{ rpfx }}.id != None
+      - output.databases.database{{ rpfx }}second.id != None
 
 - name: Gather facts SQL Database
   azure_rm_sqldatabase_facts:
     resource_group: "{{ resource_group }}"
-    server_name: "sqlsrv{{ rpfx }}"
+    server_name: sqlsrv{{ rpfx }}
   register: output
 - name: Assert that facts are returned
   assert:
     that:
       - output.changed == False
       - output.databases.database{{ rpfx }}.id != None
+      - output.databases.database{{ rpfx }}second.id != None
 
 - name: Delete instance of SQL Database
   azure_rm_sqldatabase:
     resource_group: "{{ resource_group }}"
-    server_name: "sqlsrv{{ rpfx }}"
+    server_name: sqlsrv{{ rpfx }}
     name: database{{ rpfx }}
+    state: absent
+- name: Delete instance of SQL Database
+  azure_rm_sqldatabase:
+    resource_group: "{{ resource_group }}"
+    server_name: sqlsrv{{ rpfx }}
+    name: database{{ rpfx }}second
+    state: absent
+
+- name: Gather facts SQL Database
+  azure_rm_sqldatabase_facts:
+    resource_group: "{{ resource_group }}"
+    server_name: sqlsrv{{ rpfx }}
+    database_name: database{{ rpfx }}
+  register: output
+- name: Assert that empty dictionary was returned
+  assert:
+    that:
+      - output.changed == False
+      - output.databases == {}
+
+- name: Gather facts SQL Database
+  azure_rm_sqldatabase_facts:
+    resource_group: "{{ resource_group }}"
+    server_name: sqlsrv{{ rpfx }}
+  register: output
+- name: Assert that empty dictionary was returned
+  assert:
+    that:
+      - output.changed == False
+      - "'database{{ rpfx }}' not in output.databases"
+      - "'database{{ rpfx }}second' not in output.databases"
+
+- name: Gather facts SQL Database
+  azure_rm_sqldatabase_facts:
+    resource_group: "{{ resource_group }}"
+    server_name: sqlsrv{{ rpfx }}
+  register: output
+- name: Assert that empty dictionary was returned
+  assert:
+    that:
+      - output.changed == False
+      - "'database{{ rpfx }}' not in output.databases"
+      - "'database{{ rpfx }}second' not in output.databases"
+
+- name: Gather facts SQL Database
+  azure_rm_sqldatabase_facts:
+    resource_group: "{{ resource_group }}"
+    server_name: sqlsrv{{ rpfx }}
+  register: output
+- name: Assert that empty dictionary was returned
+  assert:
+    that:
+      - output.changed == False
+      - "'database{{ rpfx }}' not in output.databases"
+      - "'database{{ rpfx }}second' not in output.databases"
+
+- name: Delete instance of SQL Server
+  azure_rm_sqlserver:
+    resource_group: "{{ resource_group }}"
+    name: sqlsrv{{ rpfx }}
     state: absent
 - name: Delete instance of SQL Server
   azure_rm_sqlserver:
     resource_group: "{{ resource_group }}"
-    name: "sqlsrv{{ rpfx }}"
+    name: sqlsrv{{ rpfx }}
     state: absent

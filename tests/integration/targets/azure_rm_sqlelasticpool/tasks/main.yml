@@ -6,7 +6,7 @@
 - name: Create SQL Server
   azure_rm_sqlserver:
     resource_group: "{{ resource_group }}"
-    name: "sqlsrv{{ rpfx }}"
+    name: sqlsrv{{ rpfx }}
     location: eastus
     admin_username: mylogin
     admin_password: Testpasswordxyz12!
@@ -14,8 +14,8 @@
 - name: Create instance of ElasticPool -- check mode
   azure_rm_sqlelasticpool:
     resource_group: "{{ resource_group }}"
-    server_name: "sqlsrv{{ rpfx }}"
-    name: "elasticpool{{ rpfx }}"
+    server_name: sqlsrv{{ rpfx }}
+    name: elasticpool{{ rpfx }}
     location: eastus
   check_mode: yes
   register: output
@@ -27,8 +27,8 @@
 - name: Create instance of ElasticPool
   azure_rm_sqlelasticpool:
     resource_group: "{{ resource_group }}"
-    server_name: "sqlsrv{{ rpfx }}"
-    name: "elasticpool{{ rpfx }}"
+    server_name: sqlsrv{{ rpfx }}
+    name: elasticpool{{ rpfx }}
     location: eastus
   register: output
 - name: Assert the resource instance is well created
@@ -39,8 +39,8 @@
 - name: Create again instance of ElasticPool
   azure_rm_sqlelasticpool:
     resource_group: "{{ resource_group }}"
-    server_name: "sqlsrv{{ rpfx }}"
-    name: "elasticpool{{ rpfx }}"
+    server_name: sqlsrv{{ rpfx }}
+    name: elasticpool{{ rpfx }}
     location: eastus
   register: output
 - name: Assert the state has not changed
@@ -51,8 +51,8 @@
 - name: Delete instance of ElasticPool -- check mode
   azure_rm_sqlelasticpool:
     resource_group: "{{ resource_group }}"
-    server_name: "sqlsrv{{ rpfx }}"
-    name: "elasticpool{{ rpfx }}"
+    server_name: sqlsrv{{ rpfx }}
+    name: elasticpool{{ rpfx }}
     state: absent
   check_mode: yes
   register: output
@@ -64,8 +64,8 @@
 - name: Delete instance of ElasticPool
   azure_rm_sqlelasticpool:
     resource_group: "{{ resource_group }}"
-    server_name: "sqlsrv{{ rpfx }}"
-    name: "elasticpool{{ rpfx }}"
+    server_name: sqlsrv{{ rpfx }}
+    name: elasticpool{{ rpfx }}
     state: absent
   register: output
 - name: Assert the state has changed
@@ -76,8 +76,8 @@
 - name: Delete unexisting instance of ElasticPool
   azure_rm_sqlelasticpool:
     resource_group: "{{ resource_group }}"
-    server_name: "sqlsrv{{ rpfx }}"
-    name: "elasticpool{{ rpfx }}"
+    server_name: sqlsrv{{ rpfx }}
+    name: elasticpool{{ rpfx }}
     state: absent
   register: output
 - name: Assert the state has changed
@@ -88,5 +88,5 @@
 - name: Delete instance of SQL Server
   azure_rm_sqlserver:
     resource_group: "{{ resource_group }}"
-    name: "sqlsrv{{ rpfx }}"
+    name: sqlsrv{{ rpfx }}
     state: absent

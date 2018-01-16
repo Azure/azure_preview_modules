@@ -22,6 +22,25 @@
       - name: mycontainer2
         image: httpd
         memory: 1.5
+- name: Create sample container instance
+  azure_rm_containerinstance:
+    resource_group: "{{ resource_group }}"
+    name: aci{{ rpfx }}second
+    os_type: linux
+    ip_address: public
+    location: eastus
+    ports:
+      - 80
+    containers:
+      - name: mycontainer1
+        image: httpd
+        memory: 1.5
+        ports:
+          - 80
+          - 81
+      - name: mycontainer2
+        image: httpd
+        memory: 1.5
 
 - name: Gather facts Container Group
   azure_rm_containerinstance_facts:
@@ -43,7 +62,10 @@
     that:
       - output.changed == False
       - output.container_groups.aci{{ rpfx }}.id != None
+      - output.container_groups.aci{{ rpfx }}second.id != None
 
+- name: Create sample container instance
+  azure_rm_containerinstance:
     resource_group: "{{ resource_group }}"
     name: aci{{ rpfx }}
     os_type: linux
@@ -62,3 +84,46 @@
         image: httpd
         memory: 1.5
     state: absent
+
+- name: Create sample container instance
+  azure_rm_containerinstance:
+    resource_group: "{{ resource_group }}"
+    name: aci{{ rpfx }}second
+    os_type: linux
+    ip_address: public
+    location: eastus
+    ports:
+      - 80
+    containers:
+      - name: mycontainer1
+        image: httpd
+        memory: 1.5
+        ports:
+          - 80
+          - 81
+      - name: mycontainer2
+        image: httpd
+        memory: 1.5
+    state: absent
+
+- name: Gather facts Container Group
+  azure_rm_containerinstance_facts:
+    resource_group: "{{ resource_group }}"
+    container_group_name: aci{{ rpfx }}
+  register: output
+- name: Assert that empty dictionary was returned
+  assert:
+    that:
+      - output.changed == False
+      - output.container_groups == {}
+
+- name: Gather facts Container Group
+  azure_rm_containerinstance_facts:
+    resource_group: "{{ resource_group }}"
+  register: output
+- name: Assert that empty dictionary was returned
+  assert:
+    that:
+      - output.changed == False
+      - output.container_groups == {}
+
