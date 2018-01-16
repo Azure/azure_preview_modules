@@ -88,7 +88,7 @@ id:
             s/sqlcrudtest-8102"
 state:
     description:
-        - "The state of the elastic pool. Possible values include: C(Creating), C(Ready), C(Disabled)"
+        - "The state of the elastic pool. Possible values include: 'Creating', 'Ready', 'Disabled'"
     returned: always
     type: str
     sample: Ready

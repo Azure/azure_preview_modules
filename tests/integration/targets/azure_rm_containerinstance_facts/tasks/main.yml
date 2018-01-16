@@ -3,6 +3,27 @@
     rpfx: "{{ 1000 | random }}{{ resource_group | hash('md5') | truncate(7, True, '') }}"
   run_once: yes
 
+- name: Gather facts Container Group
+  azure_rm_containerinstance_facts:
+    resource_group: "{{ resource_group }}"
+    container_group_name: aci{{ rpfx }}
+  register: output
+- name: Assert that empty dictionary was returned
+  assert:
+    that:
+      - output.changed == False
+      - output.container_groups == {}
+
+- name: Gather facts Container Group
+  azure_rm_containerinstance_facts:
+    resource_group: "{{ resource_group }}"
+  register: output
+- name: Assert that empty dictionary was returned
+  assert:
+    that:
+      - output.changed == False
+      - output.container_groups == {}
+
 - name: Create sample container instance
   azure_rm_containerinstance:
     resource_group: "{{ resource_group }}"

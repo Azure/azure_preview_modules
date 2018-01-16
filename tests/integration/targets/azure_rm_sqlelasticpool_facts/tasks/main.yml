@@ -3,6 +3,29 @@
     rpfx: "{{ 1000 | random }}{{ resource_group | hash('md5') | truncate(7, True, '') }}"
   run_once: yes
 
+- name: Gather facts SQL Elastic Pool
+  azure_rm_sqlelasticpool_facts:
+    resource_group: "{{ resource_group }}"
+    server_name: "sqlsrv{{ rpfx }}"
+    elastic_pool_name: elasticpool{{ rpfx }}
+  register: output
+- name: Assert that empty dictionary was returned
+  assert:
+    that:
+      - output.changed == False
+      - output.elastic_pools == {}
+
+- name: Gather facts SQL Elastic Pool
+  azure_rm_sqlelasticpool_facts:
+    resource_group: "{{ resource_group }}"
+    server_name: "sqlsrv{{ rpfx }}"
+  register: output
+- name: Assert that empty dictionary was returned
+  assert:
+    that:
+      - output.changed == False
+      - output.elastic_pools == {}
+
 - name: Create SQL Server
   azure_rm_sqlserver:
     resource_group: "{{ resource_group }}"
