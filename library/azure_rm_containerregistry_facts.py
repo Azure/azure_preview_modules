@@ -195,7 +195,7 @@ class AzureRMRegistriesFacts(AzureRMModuleBase):
         :return: deserialized Registryinstance state dictionary
         '''
         response = None
-        results = False
+        results = {}
         try:
             response = self.mgmt_client.registries.get(resource_group_name=self.resource_group,
                                                        registry_name=self.registry_name)
@@ -204,7 +204,6 @@ class AzureRMRegistriesFacts(AzureRMModuleBase):
             self.log('Could not get facts for Registries.')
 
         if response is not None:
-            results = {}
             results[response.name] = response.as_dict()
 
         return results
@@ -216,7 +215,7 @@ class AzureRMRegistriesFacts(AzureRMModuleBase):
         :return: deserialized Registryinstance state dictionary
         '''
         response = None
-        results = False
+        results = {}
         try:
             response = self.mgmt_client.registries.list_credentials(resource_group_name=self.resource_group,
                                                                     registry_name=self.registry_name)
@@ -225,7 +224,6 @@ class AzureRMRegistriesFacts(AzureRMModuleBase):
             self.log('Could not get facts for Registries.')
 
         if response is not None:
-            results = {}
             for item in response:
                 results[item.name] = item.as_dict()
 
@@ -238,7 +236,7 @@ class AzureRMRegistriesFacts(AzureRMModuleBase):
         :return: deserialized Registryinstance state dictionary
         '''
         response = None
-        results = False
+        results = {}
         try:
             response = self.mgmt_client.registries.list_usages(resource_group_name=self.resource_group,
                                                                registry_name=self.registry_name)
@@ -247,7 +245,6 @@ class AzureRMRegistriesFacts(AzureRMModuleBase):
             self.log('Could not get facts for Registries.')
 
         if response is not None:
-            results = {}
             for item in response:
                 results[item.name] = item.as_dict()
 
@@ -260,7 +257,7 @@ class AzureRMRegistriesFacts(AzureRMModuleBase):
         :return: deserialized Registryinstance state dictionary
         '''
         response = None
-        results = False
+        results = {}
         try:
             response = self.mgmt_client.registries.list_by_resource_group(resource_group_name=self.resource_group)
             self.log("Response : {0}".format(response))
@@ -268,7 +265,6 @@ class AzureRMRegistriesFacts(AzureRMModuleBase):
             self.log('Could not get facts for Registries.')
 
         if response is not None:
-            results = {}
             for item in response:
                 results[item.name] = item.as_dict()
 

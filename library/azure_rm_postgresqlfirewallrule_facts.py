@@ -147,7 +147,7 @@ class AzureRMFirewallRulesFacts(AzureRMModuleBase):
         :return: deserialized PostgreSQL Firewall Ruleinstance state dictionary
         '''
         response = None
-        results = False
+        results = {}
         try:
             response = self.mgmt_client.firewall_rules.get(resource_group_name=self.resource_group,
                                                            server_name=self.server_name,
@@ -157,7 +157,6 @@ class AzureRMFirewallRulesFacts(AzureRMModuleBase):
             self.log('Could not get facts for FirewallRules.')
 
         if response is not None:
-            results = {}
             results[response.name] = response.as_dict()
 
         return results
@@ -169,7 +168,7 @@ class AzureRMFirewallRulesFacts(AzureRMModuleBase):
         :return: deserialized PostgreSQL Firewall Ruleinstance state dictionary
         '''
         response = None
-        results = False
+        results = {}
         try:
             response = self.mgmt_client.firewall_rules.list_by_server(resource_group_name=self.resource_group,
                                                                       server_name=self.server_name)
@@ -178,7 +177,6 @@ class AzureRMFirewallRulesFacts(AzureRMModuleBase):
             self.log('Could not get facts for FirewallRules.')
 
         if response is not None:
-            results = {}
             for item in response:
                 results[item.name] = item.as_dict()
 

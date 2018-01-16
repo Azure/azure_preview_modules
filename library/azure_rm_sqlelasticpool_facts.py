@@ -196,7 +196,7 @@ class AzureRMElasticPoolsFacts(AzureRMModuleBase):
         :return: deserialized SQL Elastic Poolinstance state dictionary
         '''
         response = None
-        results = False
+        results = {}
         try:
             response = self.mgmt_client.elastic_pools.list_metrics(resource_group_name=self.resource_group,
                                                                    server_name=self.server_name,
@@ -207,7 +207,6 @@ class AzureRMElasticPoolsFacts(AzureRMModuleBase):
             self.log('Could not get facts for ElasticPools.')
 
         if response is not None:
-            results = {}
             for item in response:
                 results[item.name] = item.as_dict()
 
@@ -220,7 +219,7 @@ class AzureRMElasticPoolsFacts(AzureRMModuleBase):
         :return: deserialized SQL Elastic Poolinstance state dictionary
         '''
         response = None
-        results = False
+        results = {}
         try:
             response = self.mgmt_client.elastic_pools.get(resource_group_name=self.resource_group,
                                                           server_name=self.server_name,
@@ -230,7 +229,6 @@ class AzureRMElasticPoolsFacts(AzureRMModuleBase):
             self.log('Could not get facts for ElasticPools.')
 
         if response is not None:
-            results = {}
             results[response.name] = response.as_dict()
 
         return results
@@ -242,7 +240,7 @@ class AzureRMElasticPoolsFacts(AzureRMModuleBase):
         :return: deserialized SQL Elastic Poolinstance state dictionary
         '''
         response = None
-        results = False
+        results = {}
         try:
             response = self.mgmt_client.elastic_pools.list_by_server(resource_group_name=self.resource_group,
                                                                      server_name=self.server_name)
@@ -251,7 +249,6 @@ class AzureRMElasticPoolsFacts(AzureRMModuleBase):
             self.log('Could not get facts for ElasticPools.')
 
         if response is not None:
-            results = {}
             for item in response:
                 results[item.name] = item.as_dict()
 
