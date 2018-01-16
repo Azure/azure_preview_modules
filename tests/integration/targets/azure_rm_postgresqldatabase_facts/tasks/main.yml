@@ -83,7 +83,8 @@
   assert:
     that:
       - output.changed == False
-      - output.databases == {}
+      - "'testdatabase' not in output.databases"
+      - "'testdatabasesecond' not in output.databases"
 
 - name: Delete instance of PostgreSQL Server
   azure_rm_postgresqlserver:
