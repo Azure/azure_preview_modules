@@ -25,6 +25,7 @@ options:
     resource_group:
         description:
             - The name of the resource group.
+        required: True
     container_group_name:
         description:
             - The name of the container group.
@@ -46,9 +47,6 @@ EXAMPLES = '''
   - name: List instances of Container Group
     azure_rm_containerinstance_facts:
       resource_group: resource_group_name
-
-  - name: List instances of Container Group
-    azure_rm_containerinstance_facts:
 '''
 
 RETURN = '''
@@ -112,7 +110,8 @@ class AzureRMContainerGroupsFacts(AzureRMModuleBase):
         # define user inputs into argument
         self.module_arg_spec = dict(
             resource_group=dict(
-                type='str'
+                type='str',
+                required=True
             ),
             container_group_name=dict(
                 type='str'
@@ -139,7 +138,6 @@ class AzureRMContainerGroupsFacts(AzureRMModuleBase):
             self.results['container_groups'] = self.get()
         elif (self.resource_group is not None):
             self.results['container_groups'] = self.list_by_resource_group()
-            self.results['container_groups'] = self.list()
         return self.results
 
     def get(self):
@@ -172,26 +170,6 @@ class AzureRMContainerGroupsFacts(AzureRMModuleBase):
         results = {}
         try:
             response = self.mgmt_client.container_groups.list_by_resource_group(resource_group_name=self.resource_group)
-            self.log("Response : {0}".format(response))
-        except CloudError as e:
-            self.log('Could not get facts for ContainerGroups.')
-
-        if response is not None:
-            for item in response:
-                results[item.name] = item.as_dict()
-
-        return results
-
-    def list(self):
-        '''
-        Gets facts of the specified Container Group.
-
-        :return: deserialized Container Groupinstance state dictionary
-        '''
-        response = None
-        results = {}
-        try:
-            response = self.mgmt_client.container_groups.list()
             self.log("Response : {0}".format(response))
         except CloudError as e:
             self.log('Could not get facts for ContainerGroups.')

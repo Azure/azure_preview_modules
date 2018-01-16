@@ -33,6 +33,7 @@ options:
     route_name:
         description:
             - The name of the route.
+        required: True
 
 extends_documentation_fragment:
     - azure
@@ -48,11 +49,6 @@ EXAMPLES = '''
       resource_group: resource_group_name
       route_table_name: route_table_name
       route_name: route_name
-
-  - name: List instances of Route
-    azure_rm_applicationgatewayroute_facts:
-      resource_group: resource_group_name
-      route_table_name: route_table_name
 '''
 
 RETURN = '''
@@ -104,7 +100,8 @@ class AzureRMRoutesFacts(AzureRMModuleBase):
                 required=True
             ),
             route_name=dict(
-                type='str'
+                type='str',
+                required=True
             )
         )
         # store the results of the module operation
@@ -128,9 +125,6 @@ class AzureRMRoutesFacts(AzureRMModuleBase):
                 self.route_table_name is not None and
                 self.route_name is not None):
             self.results['routes'] = self.get()
-        elif (self.resource_group is not None and
-              self.route_table_name is not None):
-            self.results['routes'] = self.list()
         return self.results
 
     def get(self):
@@ -151,27 +145,6 @@ class AzureRMRoutesFacts(AzureRMModuleBase):
 
         if response is not None:
             results[response.name] = response.as_dict()
-
-        return results
-
-    def list(self):
-        '''
-        Gets facts of the specified Route.
-
-        :return: deserialized Routeinstance state dictionary
-        '''
-        response = None
-        results = {}
-        try:
-            response = self.mgmt_client.routes.list(resource_group_name=self.resource_group,
-                                                    route_table_name=self.route_table_name)
-            self.log("Response : {0}".format(response))
-        except CloudError as e:
-            self.log('Could not get facts for Routes.')
-
-        if response is not None:
-            for item in response:
-                results[item.name] = item.as_dict()
 
         return results
 

@@ -25,6 +25,7 @@ options:
     resource_group:
         description:
             - The name of the resource group that contains the resource. You can obtain this value from the Azure Resource Manager API or the portal.
+        required: True
     server_name:
         description:
             - The name of the server.
@@ -46,9 +47,6 @@ EXAMPLES = '''
   - name: List instances of MySQL Server
     azure_rm_mysqlserver_facts:
       resource_group: resource_group_name
-
-  - name: List instances of MySQL Server
-    azure_rm_mysqlserver_facts:
 '''
 
 RETURN = '''
@@ -147,7 +145,8 @@ class AzureRMServersFacts(AzureRMModuleBase):
         # define user inputs into argument
         self.module_arg_spec = dict(
             resource_group=dict(
-                type='str'
+                type='str',
+                required=True
             ),
             server_name=dict(
                 type='str'
@@ -174,7 +173,6 @@ class AzureRMServersFacts(AzureRMModuleBase):
             self.results['servers'] = self.get()
         elif (self.resource_group is not None):
             self.results['servers'] = self.list_by_resource_group()
-            self.results['servers'] = self.list()
         return self.results
 
     def get(self):
@@ -207,26 +205,6 @@ class AzureRMServersFacts(AzureRMModuleBase):
         results = {}
         try:
             response = self.mgmt_client.servers.list_by_resource_group(resource_group_name=self.resource_group)
-            self.log("Response : {0}".format(response))
-        except CloudError as e:
-            self.log('Could not get facts for Servers.')
-
-        if response is not None:
-            for item in response:
-                results[item.name] = item.as_dict()
-
-        return results
-
-    def list(self):
-        '''
-        Gets facts of the specified MySQL Server.
-
-        :return: deserialized MySQL Serverinstance state dictionary
-        '''
-        response = None
-        results = {}
-        try:
-            response = self.mgmt_client.servers.list()
             self.log("Response : {0}".format(response))
         except CloudError as e:
             self.log('Could not get facts for Servers.')

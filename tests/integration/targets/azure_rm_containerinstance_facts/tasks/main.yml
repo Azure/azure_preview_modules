@@ -44,15 +44,6 @@
       - output.changed == False
       - output.container_groups.aci{{ rpfx }}.id != None
 
-- name: Gather facts Container Group
-  azure_rm_containerinstance_facts:
-  register: output
-- name: Assert that facts are returned
-  assert:
-    that:
-      - output.changed == False
-      - output.container_groups.aci{{ rpfx }}.id != None
-
     resource_group: "{{ resource_group }}"
     name: aci{{ rpfx }}
     os_type: linux
