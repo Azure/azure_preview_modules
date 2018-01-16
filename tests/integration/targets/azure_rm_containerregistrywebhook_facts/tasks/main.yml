@@ -36,18 +36,6 @@
       - output.changed == False
       - output.webhooks.webhook{{ rpfx }}.id != None
 
-- name: Gather facts Webhook
-  azure_rm_containerregistrywebhook_facts:
-    resource_group: "{{ resource_group }}"
-    registry_name: acr{{ rpfx }}
-    webhook_name: webhook{{ rpfx }}
-  register: output
-- name: Assert that facts are returned
-  assert:
-    that:
-      - output.changed == False
-      - output.webhooks.webhook{{ rpfx }}.id != None
-
 - name: Delete instance of Webhook
   azure_rm_containerregistrywebhook:
     resource_group: "{{ resource_group }}"

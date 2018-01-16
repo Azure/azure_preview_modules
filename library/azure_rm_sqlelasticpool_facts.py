@@ -32,10 +32,7 @@ options:
         required: True
     elastic_pool_name:
         description:
-            - The name of the elastic pool.
-    filter:
-        description:
-            - An OData filter expression that describes a subset of metrics to return.
+            - The name of the elastic pool to be retrieved.
 
 extends_documentation_fragment:
     - azure
@@ -46,13 +43,6 @@ author:
 '''
 
 EXAMPLES = '''
-  - name: List instances of SQL Elastic Pool
-    azure_rm_sqlelasticpool_facts:
-      resource_group: resource_group_name
-      server_name: server_name
-      elastic_pool_name: elastic_pool_name
-      filter: filter
-
   - name: Get instance of SQL Elastic Pool
     azure_rm_sqlelasticpool_facts:
       resource_group: resource_group_name
@@ -152,9 +142,6 @@ class AzureRMElasticPoolsFacts(AzureRMModuleBase):
             ),
             elastic_pool_name=dict(
                 type='str'
-            ),
-            filter=dict(
-                type='str'
             )
         )
         # store the results of the module operation
@@ -166,7 +153,6 @@ class AzureRMElasticPoolsFacts(AzureRMModuleBase):
         self.resource_group = None
         self.server_name = None
         self.elastic_pool_name = None
-        self.filter = None
         super(AzureRMElasticPoolsFacts, self).__init__(self.module_arg_spec)
 
     def exec_module(self, **kwargs):
@@ -177,40 +163,12 @@ class AzureRMElasticPoolsFacts(AzureRMModuleBase):
 
         if (self.resource_group is not None and
                 self.server_name is not None and
-                self.elastic_pool_name is not None and
-                self.filter is not None):
-            self.results['elastic_pools'] = self.list_metrics()
-        elif (self.resource_group is not None and
-              self.server_name is not None and
-              self.elastic_pool_name is not None):
+                self.elastic_pool_name is not None):
             self.results['elastic_pools'] = self.get()
         elif (self.resource_group is not None and
               self.server_name is not None):
             self.results['elastic_pools'] = self.list_by_server()
         return self.results
-
-    def list_metrics(self):
-        '''
-        Gets facts of the specified SQL Elastic Pool.
-
-        :return: deserialized SQL Elastic Poolinstance state dictionary
-        '''
-        response = None
-        results = {}
-        try:
-            response = self.mgmt_client.elastic_pools.list_metrics(resource_group_name=self.resource_group,
-                                                                   server_name=self.server_name,
-                                                                   elastic_pool_name=self.elastic_pool_name,
-                                                                   filter=self.filter)
-            self.log("Response : {0}".format(response))
-        except CloudError as e:
-            self.log('Could not get facts for ElasticPools.')
-
-        if response is not None:
-            for item in response:
-                results[item.name] = item.as_dict()
-
-        return results
 
     def get(self):
         '''

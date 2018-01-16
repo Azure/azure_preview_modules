@@ -33,18 +33,6 @@
   azure_rm_sqlelasticpool_facts:
     resource_group: "{{ resource_group }}"
     server_name: "sqlsrv{{ rpfx }}"
-    elastic_pool_name: elasticpool{{ rpfx }}
-  register: output
-- name: Assert that facts are returned
-  assert:
-    that:
-      - output.changed == False
-      - output.elastic_pools.elasticpool{{ rpfx }}.id != None
-
-- name: Gather facts SQL Elastic Pool
-  azure_rm_sqlelasticpool_facts:
-    resource_group: "{{ resource_group }}"
-    server_name: "sqlsrv{{ rpfx }}"
   register: output
 - name: Assert that facts are returned
   assert:

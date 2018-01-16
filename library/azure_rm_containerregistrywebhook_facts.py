@@ -49,12 +49,6 @@ EXAMPLES = '''
       resource_group: resource_group_name
       registry_name: registry_name
       webhook_name: webhook_name
-
-  - name: List instances of Webhook
-    azure_rm_containerregistrywebhook_facts:
-      resource_group: resource_group_name
-      registry_name: registry_name
-      webhook_name: webhook_name
 '''
 
 RETURN = '''
@@ -163,10 +157,6 @@ class AzureRMWebhooksFacts(AzureRMModuleBase):
                 self.registry_name is not None and
                 self.webhook_name is not None):
             self.results['webhooks'] = self.get()
-        elif (self.resource_group is not None and
-              self.registry_name is not None and
-              self.webhook_name is not None):
-            self.results['webhooks'] = self.list_events()
         return self.results
 
     def get(self):
@@ -187,28 +177,6 @@ class AzureRMWebhooksFacts(AzureRMModuleBase):
 
         if response is not None:
             results[response.name] = response.as_dict()
-
-        return results
-
-    def list_events(self):
-        '''
-        Gets facts of the specified Webhook.
-
-        :return: deserialized Webhookinstance state dictionary
-        '''
-        response = None
-        results = {}
-        try:
-            response = self.mgmt_client.webhooks.list_events(resource_group_name=self.resource_group,
-                                                             registry_name=self.registry_name,
-                                                             webhook_name=self.webhook_name)
-            self.log("Response : {0}".format(response))
-        except CloudError as e:
-            self.log('Could not get facts for Webhooks.')
-
-        if response is not None:
-            for item in response:
-                results[item.name] = item.as_dict()
 
         return results
 

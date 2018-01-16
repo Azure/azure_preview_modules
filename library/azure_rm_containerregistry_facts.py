@@ -47,16 +47,6 @@ EXAMPLES = '''
   - name: List instances of Registry
     azure_rm_containerregistry_facts:
       resource_group: resource_group_name
-      registry_name: registry_name
-
-  - name: List instances of Registry
-    azure_rm_containerregistry_facts:
-      resource_group: resource_group_name
-      registry_name: registry_name
-
-  - name: List instances of Registry
-    azure_rm_containerregistry_facts:
-      resource_group: resource_group_name
 '''
 
 RETURN = '''
@@ -178,12 +168,6 @@ class AzureRMRegistriesFacts(AzureRMModuleBase):
         if (self.resource_group is not None and
                 self.registry_name is not None):
             self.results['registries'] = self.get()
-        elif (self.resource_group is not None and
-              self.registry_name is not None):
-            self.results['registries'] = self.list_credentials()
-        elif (self.resource_group is not None and
-              self.registry_name is not None):
-            self.results['registries'] = self.list_usages()
         elif (self.resource_group is not None):
             self.results['registries'] = self.list_by_resource_group()
         return self.results
@@ -205,48 +189,6 @@ class AzureRMRegistriesFacts(AzureRMModuleBase):
 
         if response is not None:
             results[response.name] = response.as_dict()
-
-        return results
-
-    def list_credentials(self):
-        '''
-        Gets facts of the specified Registry.
-
-        :return: deserialized Registryinstance state dictionary
-        '''
-        response = None
-        results = {}
-        try:
-            response = self.mgmt_client.registries.list_credentials(resource_group_name=self.resource_group,
-                                                                    registry_name=self.registry_name)
-            self.log("Response : {0}".format(response))
-        except CloudError as e:
-            self.log('Could not get facts for Registries.')
-
-        if response is not None:
-            for item in response:
-                results[item.name] = item.as_dict()
-
-        return results
-
-    def list_usages(self):
-        '''
-        Gets facts of the specified Registry.
-
-        :return: deserialized Registryinstance state dictionary
-        '''
-        response = None
-        results = {}
-        try:
-            response = self.mgmt_client.registries.list_usages(resource_group_name=self.resource_group,
-                                                               registry_name=self.registry_name)
-            self.log("Response : {0}".format(response))
-        except CloudError as e:
-            self.log('Could not get facts for Registries.')
-
-        if response is not None:
-            for item in response:
-                results[item.name] = item.as_dict()
 
         return results
 
