@@ -6,7 +6,7 @@
 - name: Create sample container instance
   azure_rm_containerinstance:
     resource_group: "{{ resource_group }}"
-    name: aci{{ rpfx }}first
+    name: aci{{ rpfx }}
     os_type: linux
     ip_address: public
     location: eastus
@@ -65,7 +65,7 @@
       - output.container_groups.aci{{ rpfx }}second.id != None
 
     resource_group: "{{ resource_group }}"
-    name: aci{{ rpfx }}first
+    name: aci{{ rpfx }}
     os_type: linux
     ip_address: public
     location: eastus

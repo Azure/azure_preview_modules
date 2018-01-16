@@ -5,7 +5,7 @@
 
 - name: Create an container registry
   azure_rm_containerregistry:
-    name: acr{{ rpfx }}first
+    name: acr{{ rpfx }}
     resource_group: "{{ resource_group }}"
     location: eastus2
     state: present
@@ -50,7 +50,7 @@
 
 - name: Delete container registry
   azure_rm_containerregistry:
-    name: acr{{ rpfx }}first
+    name: acr{{ rpfx }}
     resource_group: "{{ resource_group }}"
     state: absent
 - name: Delete container registry

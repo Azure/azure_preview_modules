@@ -19,7 +19,7 @@
   azure_rm_mysqlconfiguration:
     resource_group: "{{ resource_group }}"
     server_name: mysqlsrv{{ rpfx }}
-    name: event_schedulerfirst
+    name: event_scheduler
     value: "ON"
     source: user-override
 

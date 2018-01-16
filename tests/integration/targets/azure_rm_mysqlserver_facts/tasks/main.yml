@@ -6,7 +6,7 @@
 - name: Create MySQL Server
   azure_rm_mysqlserver:
     resource_group: "{{ resource_group }}"
-    name: mysqlsrv{{ rpfx }}first
+    name: mysqlsrv{{ rpfx }}
     sku:
       name: MYSQLB50
       tier: basic
@@ -53,7 +53,7 @@
 - name: Delete instance of MySQL Server
   azure_rm_mysqlserver:
     resource_group: "{{ resource_group }}"
-    name: mysqlsrv{{ rpfx }}first
+    name: mysqlsrv{{ rpfx }}
     state: absent
 - name: Delete instance of MySQL Server
   azure_rm_mysqlserver:
