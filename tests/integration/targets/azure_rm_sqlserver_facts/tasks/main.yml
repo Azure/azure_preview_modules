@@ -60,7 +60,8 @@
   assert:
     that:
       - output.changed == False
-      - output.servers == {}
+      - "'sqlsrv{{ rpfx }}' not in output.servers"
+      - "'sqlsrv{{ rpfx }}second' not in output.servers"
 
 - name: Gather facts SQL Server
   azure_rm_sqlserver_facts:
@@ -70,5 +71,6 @@
   assert:
     that:
       - output.changed == False
-      - output.servers == {}
+      - "'sqlsrv{{ rpfx }}' not in output.servers"
+      - "'sqlsrv{{ rpfx }}second' not in output.servers"
 

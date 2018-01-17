@@ -58,7 +58,8 @@
   assert:
     that:
       - output.changed == False
-      - output.routes == {}
+      - "'testroute{{ rpfx }}' not in output.routes"
+      - "'testroute{{ rpfx }}second' not in output.routes"
 
 - name: Delete instance of Route Table
   azure_rm_applicationgatewayroutetable:

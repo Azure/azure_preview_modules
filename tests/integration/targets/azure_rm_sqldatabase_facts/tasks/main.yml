@@ -94,7 +94,8 @@
   assert:
     that:
       - output.changed == False
-      - output.databases == {}
+      - "'database{{ rpfx }}' not in output.databases"
+      - "'database{{ rpfx }}second' not in output.databases"
 
 - name: Gather facts SQL Database
   azure_rm_sqldatabase_facts:

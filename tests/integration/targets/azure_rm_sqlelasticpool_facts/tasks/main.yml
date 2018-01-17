@@ -70,7 +70,8 @@
   assert:
     that:
       - output.changed == False
-      - output.elastic_pools == {}
+      - "'elasticpool{{ rpfx }}' not in output.elastic_pools"
+      - "'elasticpool{{ rpfx }}second' not in output.elastic_pools"
 
 - name: Gather facts SQL Elastic Pool
   azure_rm_sqlelasticpool_facts:
@@ -81,7 +82,8 @@
   assert:
     that:
       - output.changed == False
-      - output.elastic_pools == {}
+      - "'elasticpool{{ rpfx }}' not in output.elastic_pools"
+      - "'elasticpool{{ rpfx }}second' not in output.elastic_pools"
 
 - name: Delete instance of SQL Server
   azure_rm_sqlserver:

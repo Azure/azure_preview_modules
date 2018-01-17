@@ -72,7 +72,8 @@
   assert:
     that:
       - output.changed == False
-      - output.databases == {}
+      - "'testdatabase' not in output.databases"
+      - "'testdatabasesecond' not in output.databases"
 
 - name: Gather facts PostgreSQL Database
   azure_rm_postgresqldatabase_facts:

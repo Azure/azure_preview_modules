@@ -62,7 +62,8 @@
   assert:
     that:
       - output.changed == False
-      - output.replications == {}
+      - "'replication{{ rpfx }}' not in output.replications"
+      - "'replication{{ rpfx }}second' not in output.replications"
 
 - name: Delete container registry
   azure_rm_containerregistry:

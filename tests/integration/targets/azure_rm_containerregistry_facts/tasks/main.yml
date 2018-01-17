@@ -68,7 +68,8 @@
   assert:
     that:
       - output.changed == False
-      - output.registries == {}
+      - "'acr{{ rpfx }}' not in output.registries"
+      - "'acr{{ rpfx }}second' not in output.registries"
 
 - name: Gather facts Registry
   azure_rm_containerregistry_facts:
@@ -78,5 +79,6 @@
   assert:
     that:
       - output.changed == False
-      - output.registries == {}
+      - "'acr{{ rpfx }}' not in output.registries"
+      - "'acr{{ rpfx }}second' not in output.registries"
 
