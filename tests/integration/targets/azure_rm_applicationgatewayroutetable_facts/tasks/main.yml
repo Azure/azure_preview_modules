@@ -43,5 +43,6 @@
   assert:
     that:
       - output.changed == False
-      - output.route_tables == {}
+      - "'routetablename{{ rpfx }}' not in output.route_tables"
+      - "'routetablename{{ rpfx }}second' not in output.route_tables"
 

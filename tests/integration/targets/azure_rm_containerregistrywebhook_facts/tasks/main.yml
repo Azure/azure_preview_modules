@@ -68,7 +68,8 @@
   assert:
     that:
       - output.changed == False
-      - output.webhooks == {}
+      - "'webhook{{ rpfx }}' not in output.webhooks"
+      - "'webhook{{ rpfx }}second' not in output.webhooks"
 
 - name: Delete container registry
   azure_rm_containerregistry:

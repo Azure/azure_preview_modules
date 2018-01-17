@@ -72,7 +72,8 @@
   assert:
     that:
       - output.changed == False
-      - output.firewall_rules == {}
+      - "'firewallrule{{ rpfx }}' not in output.firewall_rules"
+      - "'firewallrule{{ rpfx }}second' not in output.firewall_rules"
 
 - name: Gather facts SQL Firewall Rule
   azure_rm_sqlfirewallrule_facts:
@@ -83,7 +84,8 @@
   assert:
     that:
       - output.changed == False
-      - output.firewall_rules == {}
+      - "'firewallrule{{ rpfx }}' not in output.firewall_rules"
+      - "'firewallrule{{ rpfx }}second' not in output.firewall_rules"
 
 - name: Delete instance of SQL Server
   azure_rm_sqlserver:

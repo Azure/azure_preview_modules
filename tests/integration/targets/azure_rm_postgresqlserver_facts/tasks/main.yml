@@ -68,7 +68,8 @@
   assert:
     that:
       - output.changed == False
-      - output.servers == {}
+      - "'postgresqlsrv{{ rpfx }}' not in output.servers"
+      - "'postgresqlsrv{{ rpfx }}second' not in output.servers"
 
 - name: Gather facts MySQL Server
   azure_rm_postgresqlserver_facts:
@@ -78,5 +79,6 @@
   assert:
     that:
       - output.changed == False
-      - output.servers == {}
+      - "'postgresqlsrv{{ rpfx }}' not in output.servers"
+      - "'postgresqlsrv{{ rpfx }}second' not in output.servers"
 

@@ -64,7 +64,7 @@
       - output.container_groups.aci{{ rpfx }}.id != None
       - output.container_groups.aci{{ rpfx }}second.id != None
 
-- name: Create sample container instance
+- name: Delete sample container instance
   azure_rm_containerinstance:
     resource_group: "{{ resource_group }}"
     name: aci{{ rpfx }}
@@ -84,8 +84,7 @@
         image: httpd
         memory: 1.5
     state: absent
-
-- name: Create sample container instance
+- name: Delete sample container instance
   azure_rm_containerinstance:
     resource_group: "{{ resource_group }}"
     name: aci{{ rpfx }}second
@@ -115,7 +114,8 @@
   assert:
     that:
       - output.changed == False
-      - output.container_groups == {}
+      - "'aci{{ rpfx }}' not in output.container_groups"
+      - "'aci{{ rpfx }}second' not in output.container_groups"
 
 - name: Gather facts Container Group
   azure_rm_containerinstance_facts:
@@ -125,5 +125,6 @@
   assert:
     that:
       - output.changed == False
-      - output.container_groups == {}
+      - "'aci{{ rpfx }}' not in output.container_groups"
+      - "'aci{{ rpfx }}second' not in output.container_groups"
 

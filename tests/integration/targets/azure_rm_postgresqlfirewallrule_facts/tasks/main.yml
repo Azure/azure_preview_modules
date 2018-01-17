@@ -76,7 +76,8 @@
   assert:
     that:
       - output.changed == False
-      - output.firewall_rules == {}
+      - "'firewallrule{{ rpfx }}' not in output.firewall_rules"
+      - "'firewallrule{{ rpfx }}second' not in output.firewall_rules"
 
 - name: Gather facts PostgreSQL Firewall Rule
   azure_rm_postgresqlfirewallrule_facts:
@@ -87,7 +88,8 @@
   assert:
     that:
       - output.changed == False
-      - output.firewall_rules == {}
+      - "'firewallrule{{ rpfx }}' not in output.firewall_rules"
+      - "'firewallrule{{ rpfx }}second' not in output.firewall_rules"
 
 - name: Delete instance of PostgreSQL Server
   azure_rm_postgresqlserver:
