@@ -111,7 +111,7 @@ elastic_pools:
                 kind:
                     description:
                         - Kind of elastic pool.  This is metadata used for the Azure portal experience.
-                    returned: always
+                    returned:
                     type: str
                     sample: kind
 '''

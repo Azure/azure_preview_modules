@@ -34,6 +34,11 @@
     that:
       - output.changed == False
       - output.configurations.event_scheduler.id != None
+      - output.configurations.event_scheduler.name != None
+      - output.configurations.event_scheduler.type != None
+      - output.configurations.event_scheduler.value != None
+      - output.configurations.event_scheduler.description != None
+      - output.configurations.event_scheduler.source != None
 
 - name: Gather facts MySQL Configuration
   azure_rm_mysqlconfiguration_facts:
@@ -45,3 +50,8 @@
     that:
       - output.changed == False
       - output.configurations.event_scheduler.id != None
+      - output.configurations.event_scheduler.name != None
+      - output.configurations.event_scheduler.type != None
+      - output.configurations.event_scheduler.value != None
+      - output.configurations.event_scheduler.description != None
+      - output.configurations.event_scheduler.source != None

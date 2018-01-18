@@ -40,6 +40,8 @@
     that:
       - output.changed == False
       - output.firewall_rules.firewallrule{{ rpfx }}.id != None
+      - output.firewall_rules.firewallrule{{ rpfx }}.name != None
+      - output.firewall_rules.firewallrule{{ rpfx }}.type != None
 
 - name: Gather facts PostgreSQL Firewall Rule
   azure_rm_postgresqlfirewallrule_facts:
@@ -51,7 +53,11 @@
     that:
       - output.changed == False
       - output.firewall_rules.firewallrule{{ rpfx }}.id != None
+      - output.firewall_rules.firewallrule{{ rpfx }}.name != None
+      - output.firewall_rules.firewallrule{{ rpfx }}.type != None
       - output.firewall_rules.firewallrule{{ rpfx }}second.id != None
+      - output.firewall_rules.firewallrule{{ rpfx }}second.name != None
+      - output.firewall_rules.firewallrule{{ rpfx }}second.type != None
 
 - name: Delete instance of Firewall Rule
   azure_rm_postgresqlfirewallrule:

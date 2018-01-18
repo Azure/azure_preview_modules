@@ -34,6 +34,13 @@
     that:
       - output.changed == False
       - output.databases.database{{ rpfx }}.id != None
+      - output.databases.database{{ rpfx }}.name != None
+      - output.databases.database{{ rpfx }}.type != None
+      - output.databases.database{{ rpfx }}.location != None
+      - output.databases.database{{ rpfx }}.kind != None
+      - output.databases.database{{ rpfx }}.collation != None
+      - output.databases.database{{ rpfx }}.edition != None
+      - output.databases.database{{ rpfx }}.status != None
 
 - name: Gather facts SQL Database
   azure_rm_sqldatabase_facts:
@@ -45,7 +52,21 @@
     that:
       - output.changed == False
       - output.databases.database{{ rpfx }}.id != None
+      - output.databases.database{{ rpfx }}.name != None
+      - output.databases.database{{ rpfx }}.type != None
+      - output.databases.database{{ rpfx }}.location != None
+      - output.databases.database{{ rpfx }}.kind != None
+      - output.databases.database{{ rpfx }}.collation != None
+      - output.databases.database{{ rpfx }}.edition != None
+      - output.databases.database{{ rpfx }}.status != None
       - output.databases.database{{ rpfx }}second.id != None
+      - output.databases.database{{ rpfx }}second.name != None
+      - output.databases.database{{ rpfx }}second.type != None
+      - output.databases.database{{ rpfx }}second.location != None
+      - output.databases.database{{ rpfx }}second.kind != None
+      - output.databases.database{{ rpfx }}second.collation != None
+      - output.databases.database{{ rpfx }}second.edition != None
+      - output.databases.database{{ rpfx }}second.status != None
 
 - name: Gather facts SQL Database
   azure_rm_sqldatabase_facts:
@@ -57,7 +78,21 @@
     that:
       - output.changed == False
       - output.databases.database{{ rpfx }}.id != None
+      - output.databases.database{{ rpfx }}.name != None
+      - output.databases.database{{ rpfx }}.type != None
+      - output.databases.database{{ rpfx }}.location != None
+      - output.databases.database{{ rpfx }}.kind != None
+      - output.databases.database{{ rpfx }}.collation != None
+      - output.databases.database{{ rpfx }}.edition != None
+      - output.databases.database{{ rpfx }}.status != None
       - output.databases.database{{ rpfx }}second.id != None
+      - output.databases.database{{ rpfx }}second.name != None
+      - output.databases.database{{ rpfx }}second.type != None
+      - output.databases.database{{ rpfx }}second.location != None
+      - output.databases.database{{ rpfx }}second.kind != None
+      - output.databases.database{{ rpfx }}second.collation != None
+      - output.databases.database{{ rpfx }}second.edition != None
+      - output.databases.database{{ rpfx }}second.status != None
 
 - name: Gather facts SQL Database
   azure_rm_sqldatabase_facts:
@@ -69,7 +104,21 @@
     that:
       - output.changed == False
       - output.databases.database{{ rpfx }}.id != None
+      - output.databases.database{{ rpfx }}.name != None
+      - output.databases.database{{ rpfx }}.type != None
+      - output.databases.database{{ rpfx }}.location != None
+      - output.databases.database{{ rpfx }}.kind != None
+      - output.databases.database{{ rpfx }}.collation != None
+      - output.databases.database{{ rpfx }}.edition != None
+      - output.databases.database{{ rpfx }}.status != None
       - output.databases.database{{ rpfx }}second.id != None
+      - output.databases.database{{ rpfx }}second.name != None
+      - output.databases.database{{ rpfx }}second.type != None
+      - output.databases.database{{ rpfx }}second.location != None
+      - output.databases.database{{ rpfx }}second.kind != None
+      - output.databases.database{{ rpfx }}second.collation != None
+      - output.databases.database{{ rpfx }}second.edition != None
+      - output.databases.database{{ rpfx }}second.status != None
 
 - name: Delete instance of SQL Database
   azure_rm_sqldatabase:

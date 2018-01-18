@@ -52,6 +52,9 @@
     that:
       - output.changed == False
       - output.container_groups.aci{{ rpfx }}.id != None
+      - output.container_groups.aci{{ rpfx }}.name != None
+      - output.container_groups.aci{{ rpfx }}.type != None
+      - output.container_groups.aci{{ rpfx }}.location != None
 
 - name: Gather facts Container Group
   azure_rm_containerinstance_facts:
@@ -62,7 +65,13 @@
     that:
       - output.changed == False
       - output.container_groups.aci{{ rpfx }}.id != None
+      - output.container_groups.aci{{ rpfx }}.name != None
+      - output.container_groups.aci{{ rpfx }}.type != None
+      - output.container_groups.aci{{ rpfx }}.location != None
       - output.container_groups.aci{{ rpfx }}second.id != None
+      - output.container_groups.aci{{ rpfx }}second.name != None
+      - output.container_groups.aci{{ rpfx }}second.type != None
+      - output.container_groups.aci{{ rpfx }}second.location != None
 
 - name: Delete sample container instance
   azure_rm_containerinstance:

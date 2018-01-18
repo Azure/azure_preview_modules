@@ -96,7 +96,7 @@ replications:
                         message:
                             description:
                                 - The detailed message for the status, including alerts and error messages.
-                            returned: always
+                            returned:
                             type: str
                             sample: The replication is ready.
                         timestamp:

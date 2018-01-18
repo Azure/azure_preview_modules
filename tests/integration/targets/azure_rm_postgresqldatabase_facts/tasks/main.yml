@@ -36,6 +36,10 @@
     that:
       - output.changed == False
       - output.databases.testdatabase.id != None
+      - output.databases.testdatabase.name != None
+      - output.databases.testdatabase.type != None
+      - output.databases.testdatabase.charset != None
+      - output.databases.testdatabase.collation != None
 
 - name: Gather facts PostgreSQL Database
   azure_rm_postgresqldatabase_facts:
@@ -47,7 +51,15 @@
     that:
       - output.changed == False
       - output.databases.testdatabase.id != None
+      - output.databases.testdatabase.name != None
+      - output.databases.testdatabase.type != None
+      - output.databases.testdatabase.charset != None
+      - output.databases.testdatabase.collation != None
       - output.databases.testdatabasesecond.id != None
+      - output.databases.testdatabasesecond.name != None
+      - output.databases.testdatabasesecond.type != None
+      - output.databases.testdatabasesecond.charset != None
+      - output.databases.testdatabasesecond.collation != None
 
 - name: Delete instance of PostgreSQL Database
   azure_rm_postgresqldatabase:

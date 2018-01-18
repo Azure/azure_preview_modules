@@ -22,6 +22,9 @@
     that:
       - output.changed == False
       - output.route_tables.routetablename{{ rpfx }}.id != None
+      - output.route_tables.routetablename{{ rpfx }}.name != None
+      - output.route_tables.routetablename{{ rpfx }}.type != None
+      - output.route_tables.routetablename{{ rpfx }}.location != None
 
 - name: Delete instance of Route Table
   azure_rm_applicationgatewayroutetable:

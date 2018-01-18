@@ -44,6 +44,11 @@
     that:
       - output.changed == False
       - output.webhooks.webhook{{ rpfx }}.id != None
+      - output.webhooks.webhook{{ rpfx }}.name != None
+      - output.webhooks.webhook{{ rpfx }}.type != None
+      - output.webhooks.webhook{{ rpfx }}.location != None
+      - output.webhooks.webhook{{ rpfx }}.status != None
+      - output.webhooks.webhook{{ rpfx }}.actions != None
 
 - name: Delete instance of Webhook
   azure_rm_containerregistrywebhook:
