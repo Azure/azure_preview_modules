@@ -35,7 +35,6 @@
   assert:
     that:
       - output.changed == False
-      - output.firewall_rules.firewallrule{{ rpfx }}.id != None
 
 - name: Gather facts SQL Firewall Rule
   azure_rm_sqlfirewallrule_facts:
@@ -46,8 +45,13 @@
   assert:
     that:
       - output.changed == False
-      - output.firewall_rules.firewallrule{{ rpfx }}.id != None
-      - output.firewall_rules.firewallrule{{ rpfx }}second.id != None
+      - output.firewall_rules.firewallrule{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.firewall_rules.firewallrule{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.firewall_rules.firewallrule{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.firewall_rules.firewallrule{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.firewall_rules.firewallrule{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.firewall_rules.firewallrule{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.firewall_rules.firewallrule{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
 
 - name: Delete instance of Firewall Rule
   azure_rm_sqlfirewallrule:

@@ -37,7 +37,6 @@
   assert:
     that:
       - output.changed == False
-      - output.servers.mysqlsrv{{ rpfx }}.id != None
 
 - name: Gather facts MySQL Server
   azure_rm_mysqlserver_facts:
@@ -47,8 +46,18 @@
   assert:
     that:
       - output.changed == False
-      - output.servers.mysqlsrv{{ rpfx }}.id != None
-      - output.servers.mysqlsrv{{ rpfx }}second.id != None
+      - output.servers.mysqlsrv{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.servers.mysqlsrv{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.servers.mysqlsrv{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.servers.mysqlsrv{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.servers.mysqlsrv{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.servers.mysqlsrv{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.servers.mysqlsrv{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.servers.mysqlsrv{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.servers.mysqlsrv{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.servers.mysqlsrv{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.servers.mysqlsrv{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.servers.mysqlsrv{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
 
 - name: Delete instance of MySQL Server
   azure_rm_mysqlserver:

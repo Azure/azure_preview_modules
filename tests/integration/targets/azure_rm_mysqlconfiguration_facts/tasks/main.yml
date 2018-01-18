@@ -33,7 +33,6 @@
   assert:
     that:
       - output.changed == False
-      - output.configurations.event_scheduler.id != None
 
 - name: Gather facts MySQL Configuration
   azure_rm_mysqlconfiguration_facts:
@@ -44,4 +43,3 @@
   assert:
     that:
       - output.changed == False
-      - output.configurations.event_scheduler.id != None

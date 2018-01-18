@@ -36,7 +36,6 @@
   assert:
     that:
       - output.changed == False
-      - output.databases.testdatabase.id != None
 
 - name: Gather facts MySQL Database
   azure_rm_mysqldatabase_facts:
@@ -47,8 +46,11 @@
   assert:
     that:
       - output.changed == False
-      - output.databases.testdatabase.id != None
-      - output.databases.testdatabasesecond.id != None
+      - output.databases.testdatabasesecond.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.testdatabasesecond.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.testdatabasesecond.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.testdatabasesecond.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.testdatabasesecond.AutoRest.Ansible.Model.ModuleResponseField != None
 
 - name: Delete instance of MySQL Database
   azure_rm_mysqldatabase:

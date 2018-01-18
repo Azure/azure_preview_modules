@@ -33,7 +33,6 @@
   assert:
     that:
       - output.changed == False
-      - output.databases.database{{ rpfx }}.id != None
 
 - name: Gather facts SQL Database
   azure_rm_sqldatabase_facts:
@@ -44,8 +43,38 @@
   assert:
     that:
       - output.changed == False
-      - output.databases.database{{ rpfx }}.id != None
-      - output.databases.database{{ rpfx }}second.id != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
 
 - name: Gather facts SQL Database
   azure_rm_sqldatabase_facts:
@@ -56,8 +85,38 @@
   assert:
     that:
       - output.changed == False
-      - output.databases.database{{ rpfx }}.id != None
-      - output.databases.database{{ rpfx }}second.id != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
 
 - name: Gather facts SQL Database
   azure_rm_sqldatabase_facts:
@@ -68,8 +127,38 @@
   assert:
     that:
       - output.changed == False
-      - output.databases.database{{ rpfx }}.id != None
-      - output.databases.database{{ rpfx }}second.id != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.databases.database{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
 
 - name: Delete instance of SQL Database
   azure_rm_sqldatabase:

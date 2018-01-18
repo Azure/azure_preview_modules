@@ -32,7 +32,6 @@
   assert:
     that:
       - output.changed == False
-      - output.configurations.deadlock_timeout.id != None
 
 - name: Gather facts PostgreSQL Configuration
   azure_rm_postgresqlconfiguration_facts:
@@ -43,4 +42,3 @@
   assert:
     that:
       - output.changed == False
-      - output.configurations.deadlock_timeout.id != None

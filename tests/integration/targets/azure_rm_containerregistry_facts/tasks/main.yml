@@ -35,7 +35,6 @@
   assert:
     that:
       - output.changed == False
-      - output.registries.acr{{ rpfx }}.id != None
 
 - name: Gather facts Registry
   azure_rm_containerregistry_facts:
@@ -45,8 +44,18 @@
   assert:
     that:
       - output.changed == False
-      - output.registries.acr{{ rpfx }}.id != None
-      - output.registries.acr{{ rpfx }}second.id != None
+      - output.registries.acr{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.registries.acr{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.registries.acr{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.registries.acr{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.registries.acr{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.registries.acr{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.registries.acr{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.registries.acr{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.registries.acr{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.registries.acr{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.registries.acr{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.registries.acr{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
 
 - name: Delete container registry
   azure_rm_containerregistry:

@@ -35,7 +35,6 @@
   assert:
     that:
       - output.changed == False
-      - output.servers.postgresqlsrv{{ rpfx }}.id != None
 
 - name: Gather facts MySQL Server
   azure_rm_postgresqlserver_facts:
@@ -45,8 +44,18 @@
   assert:
     that:
       - output.changed == False
-      - output.servers.postgresqlsrv{{ rpfx }}.id != None
-      - output.servers.postgresqlsrv{{ rpfx }}second.id != None
+      - output.servers.postgresqlsrv{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.servers.postgresqlsrv{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.servers.postgresqlsrv{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.servers.postgresqlsrv{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.servers.postgresqlsrv{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.servers.postgresqlsrv{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.servers.postgresqlsrv{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.servers.postgresqlsrv{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.servers.postgresqlsrv{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.servers.postgresqlsrv{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.servers.postgresqlsrv{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.servers.postgresqlsrv{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
 
 - name: Delete instance of PostgreSQL Server
   azure_rm_postgresqlserver:

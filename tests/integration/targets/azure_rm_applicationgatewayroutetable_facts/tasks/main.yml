@@ -21,7 +21,6 @@
   assert:
     that:
       - output.changed == False
-      - output.route_tables.routetablename{{ rpfx }}.id != None
 
 - name: Delete instance of Route Table
   azure_rm_applicationgatewayroutetable:

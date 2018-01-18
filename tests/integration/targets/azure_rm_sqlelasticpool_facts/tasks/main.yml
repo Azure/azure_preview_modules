@@ -33,7 +33,6 @@
   assert:
     that:
       - output.changed == False
-      - output.elastic_pools.elasticpool{{ rpfx }}.id != None
 
 - name: Gather facts SQL Elastic Pool
   azure_rm_sqlelasticpool_facts:
@@ -44,8 +43,20 @@
   assert:
     that:
       - output.changed == False
-      - output.elastic_pools.elasticpool{{ rpfx }}.id != None
-      - output.elastic_pools.elasticpool{{ rpfx }}second.id != None
+      - output.elastic_pools.elasticpool{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.elastic_pools.elasticpool{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.elastic_pools.elasticpool{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.elastic_pools.elasticpool{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.elastic_pools.elasticpool{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.elastic_pools.elasticpool{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.elastic_pools.elasticpool{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.elastic_pools.elasticpool{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.elastic_pools.elasticpool{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.elastic_pools.elasticpool{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.elastic_pools.elasticpool{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.elastic_pools.elasticpool{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.elastic_pools.elasticpool{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.elastic_pools.elasticpool{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
 
 - name: Delete instance of ElasticPool
   azure_rm_sqlelasticpool:
