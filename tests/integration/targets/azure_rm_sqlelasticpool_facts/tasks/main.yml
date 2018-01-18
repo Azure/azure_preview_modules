@@ -40,7 +40,6 @@
       - output.elastic_pools.elasticpool{{ rpfx }}.state != None
       - output.elastic_pools.elasticpool{{ rpfx }}.edition != None
       - output.elastic_pools.elasticpool{{ rpfx }}.dtu != None
-      - output.elastic_pools.elasticpool{{ rpfx }}.kind != None
 
 - name: Gather facts SQL Elastic Pool
   azure_rm_sqlelasticpool_facts:
@@ -58,7 +57,6 @@
       - output.elastic_pools.elasticpool{{ rpfx }}.state != None
       - output.elastic_pools.elasticpool{{ rpfx }}.edition != None
       - output.elastic_pools.elasticpool{{ rpfx }}.dtu != None
-      - output.elastic_pools.elasticpool{{ rpfx }}.kind != None
       - output.elastic_pools.elasticpool{{ rpfx }}second.id != None
       - output.elastic_pools.elasticpool{{ rpfx }}second.name != None
       - output.elastic_pools.elasticpool{{ rpfx }}second.type != None
@@ -66,7 +64,6 @@
       - output.elastic_pools.elasticpool{{ rpfx }}second.state != None
       - output.elastic_pools.elasticpool{{ rpfx }}second.edition != None
       - output.elastic_pools.elasticpool{{ rpfx }}second.dtu != None
-      - output.elastic_pools.elasticpool{{ rpfx }}second.kind != None
 
 - name: Delete instance of ElasticPool
   azure_rm_sqlelasticpool:
