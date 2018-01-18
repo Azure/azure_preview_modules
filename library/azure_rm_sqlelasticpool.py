@@ -183,14 +183,7 @@ class AzureRMElasticPools(AzureRMModuleBase):
                 if key == "location":
                     self.parameters["location"] = kwargs[key]
                 elif key == "edition":
-                    ev = kwargs[key]
-                    if ev == 'basic':
-                        ev = 'Basic'
-                    elif ev == 'standard':
-                        ev = 'Standard'
-                    elif ev == 'premium':
-                        ev = 'Premium'
-                    self.parameters["edition"] = ev
+                    self.parameters["edition"] = _snake_to_camel(kwargs[key], True)
                 elif key == "dtu":
                     self.parameters["dtu"] = kwargs[key]
                 elif key == "database_dtu_max":
@@ -325,6 +318,13 @@ class AzureRMElasticPools(AzureRMModuleBase):
             return response.as_dict()
 
         return False
+
+
+def _snake_to_camel(snake, capitalize_first= False):
+    if capitalize_first:
+        return ''.join(x.capitalize() or '_' for x in snake.split('_'))
+    else:
+        return snake.split('_')[0] + ''.join(x.capitalize() or '_' for x in snake.split('_')[1:])
 
 
 def main():
