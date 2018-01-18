@@ -41,7 +41,6 @@
       - output.replications.replication{{ rpfx }}.name != None
       - output.replications.replication{{ rpfx }}.type != None
       - output.replications.replication{{ rpfx }}.location != None
-      - output.replications.replication{{ rpfx }}.status.message != None
       - output.replications.replication{{ rpfx }}.status.timestamp != None
 
 - name: Delete instance of Replication

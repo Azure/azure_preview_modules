@@ -107,7 +107,7 @@ registries:
                 status:
                     description:
                         - The status of the container registry at the time the operation was called.
-                    returned: always
+                    returned:
                     type: complex
                     sample: status
                     contains:
