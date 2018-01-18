@@ -181,18 +181,7 @@ class AzureRMRoutes(AzureRMModuleBase):
                 elif key == "address_prefix":
                     self.parameters["address_prefix"] = kwargs[key]
                 elif key == "next_hop_type":
-                    ev = kwargs[key]
-                    if ev == 'virtual_network_gateway':
-                        ev = 'VirtualNetworkGateway'
-                    elif ev == 'vnet_local':
-                        ev = 'VnetLocal'
-                    elif ev == 'internet':
-                        ev = 'Internet'
-                    elif ev == 'virtual_appliance':
-                        ev = 'VirtualAppliance'
-                    elif ev == 'none':
-                        ev = 'None'
-                    self.parameters["next_hop_type"] = ev
+                    self.parameters["next_hop_type"] = _snake_to_camel(kwargs[key], True)
                 elif key == "next_hop_ip_address":
                     self.parameters["next_hop_ip_address"] = kwargs[key]
                 elif key == "provisioning_state":
@@ -321,6 +310,13 @@ class AzureRMRoutes(AzureRMModuleBase):
             return response.as_dict()
 
         return False
+
+
+def _snake_to_camel(snake, capitalize_first= False):
+    if capitalize_first:
+        return ''.join(x.capitalize() or '_' for x in snake.split('_'))
+    else:
+        return snake.split('_')[0] + ''.join(x.capitalize() or '_' for x in snake.split('_')[1:])
 
 
 def main():

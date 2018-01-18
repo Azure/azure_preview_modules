@@ -177,10 +177,7 @@ class AzureRMServers(AzureRMModuleBase):
                 elif key == "version":
                     self.parameters["version"] = kwargs[key]
                 elif key == "identity":
-                    ev = kwargs[key]
-                    if ev == 'system_assigned':
-                        ev = 'SystemAssigned'
-                    self.parameters.setdefault("identity", {})["type"] = ev
+                    self.parameters.setdefault("identity", {})["type"] = _snake_to_camel(kwargs[key], True)
 
         old_response = None
         response = None
@@ -305,6 +302,13 @@ class AzureRMServers(AzureRMModuleBase):
             return response.as_dict()
 
         return False
+
+
+def _snake_to_camel(snake, capitalize_first= False):
+    if capitalize_first:
+        return ''.join(x.capitalize() or '_' for x in snake.split('_'))
+    else:
+        return snake.split('_')[0] + ''.join(x.capitalize() or '_' for x in snake.split('_')[1:])
 
 
 def main():
