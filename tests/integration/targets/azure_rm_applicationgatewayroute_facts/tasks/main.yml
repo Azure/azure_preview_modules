@@ -33,6 +33,8 @@
   assert:
     that:
       - output.changed == False
+      - output.routes.testroute{{ rpfx }}.id != None
+      - output.routes.testroute{{ rpfx }}.name != None
 
 - name: Delete instance of Route
   azure_rm_applicationgatewayroute:

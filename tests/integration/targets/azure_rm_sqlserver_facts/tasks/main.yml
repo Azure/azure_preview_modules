@@ -27,6 +27,14 @@
   assert:
     that:
       - output.changed == False
+      - output.servers.sqlsrv{{ rpfx }}.id != None
+      - output.servers.sqlsrv{{ rpfx }}.name != None
+      - output.servers.sqlsrv{{ rpfx }}.type != None
+      - output.servers.sqlsrv{{ rpfx }}.location != None
+      - output.servers.sqlsrv{{ rpfx }}.kind != None
+      - output.servers.sqlsrv{{ rpfx }}.version != None
+      - output.servers.sqlsrv{{ rpfx }}.state != None
+      - output.servers.sqlsrv{{ rpfx }}.fully_qualified_domain_name != None
 
 - name: Gather facts SQL Server
   azure_rm_sqlserver_facts:
@@ -36,18 +44,22 @@
   assert:
     that:
       - output.changed == False
-      - output.servers.sqlsrv{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
-      - output.servers.sqlsrv{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
-      - output.servers.sqlsrv{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
-      - output.servers.sqlsrv{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
-      - output.servers.sqlsrv{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
-      - output.servers.sqlsrv{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
-      - output.servers.sqlsrv{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
-      - output.servers.sqlsrv{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
-      - output.servers.sqlsrv{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
-      - output.servers.sqlsrv{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
-      - output.servers.sqlsrv{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
-      - output.servers.sqlsrv{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.servers.sqlsrv{{ rpfx }}.id != None
+      - output.servers.sqlsrv{{ rpfx }}.name != None
+      - output.servers.sqlsrv{{ rpfx }}.type != None
+      - output.servers.sqlsrv{{ rpfx }}.location != None
+      - output.servers.sqlsrv{{ rpfx }}.kind != None
+      - output.servers.sqlsrv{{ rpfx }}.version != None
+      - output.servers.sqlsrv{{ rpfx }}.state != None
+      - output.servers.sqlsrv{{ rpfx }}.fully_qualified_domain_name != None
+      - output.servers.sqlsrv{{ rpfx }}second.id != None
+      - output.servers.sqlsrv{{ rpfx }}second.name != None
+      - output.servers.sqlsrv{{ rpfx }}second.type != None
+      - output.servers.sqlsrv{{ rpfx }}second.location != None
+      - output.servers.sqlsrv{{ rpfx }}second.kind != None
+      - output.servers.sqlsrv{{ rpfx }}second.version != None
+      - output.servers.sqlsrv{{ rpfx }}second.state != None
+      - output.servers.sqlsrv{{ rpfx }}second.fully_qualified_domain_name != None
 
 - name: Delete instance of SQL Server
   azure_rm_sqlserver:

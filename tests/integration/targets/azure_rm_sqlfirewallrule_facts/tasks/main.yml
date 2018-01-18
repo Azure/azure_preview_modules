@@ -35,6 +35,11 @@
   assert:
     that:
       - output.changed == False
+      - output.firewall_rules.firewallrule{{ rpfx }}.id != None
+      - output.firewall_rules.firewallrule{{ rpfx }}.name != None
+      - output.firewall_rules.firewallrule{{ rpfx }}.type != None
+      - output.firewall_rules.firewallrule{{ rpfx }}.kind != None
+      - output.firewall_rules.firewallrule{{ rpfx }}.location != None
 
 - name: Gather facts SQL Firewall Rule
   azure_rm_sqlfirewallrule_facts:
@@ -45,13 +50,16 @@
   assert:
     that:
       - output.changed == False
-      - output.firewall_rules.firewallrule{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
-      - output.firewall_rules.firewallrule{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
-      - output.firewall_rules.firewallrule{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
-      - output.firewall_rules.firewallrule{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
-      - output.firewall_rules.firewallrule{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
-      - output.firewall_rules.firewallrule{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
-      - output.firewall_rules.firewallrule{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.firewall_rules.firewallrule{{ rpfx }}.id != None
+      - output.firewall_rules.firewallrule{{ rpfx }}.name != None
+      - output.firewall_rules.firewallrule{{ rpfx }}.type != None
+      - output.firewall_rules.firewallrule{{ rpfx }}.kind != None
+      - output.firewall_rules.firewallrule{{ rpfx }}.location != None
+      - output.firewall_rules.firewallrule{{ rpfx }}second.id != None
+      - output.firewall_rules.firewallrule{{ rpfx }}second.name != None
+      - output.firewall_rules.firewallrule{{ rpfx }}second.type != None
+      - output.firewall_rules.firewallrule{{ rpfx }}second.kind != None
+      - output.firewall_rules.firewallrule{{ rpfx }}second.location != None
 
 - name: Delete instance of Firewall Rule
   azure_rm_sqlfirewallrule:

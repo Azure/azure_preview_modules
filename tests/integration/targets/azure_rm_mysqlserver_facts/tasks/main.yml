@@ -37,6 +37,16 @@
   assert:
     that:
       - output.changed == False
+      - output.servers.mysqlsrv{{ rpfx }}.id != None
+      - output.servers.mysqlsrv{{ rpfx }}.name != None
+      - output.servers.mysqlsrv{{ rpfx }}.type != None
+      - output.servers.mysqlsrv{{ rpfx }}.location != None
+      - output.servers.mysqlsrv{{ rpfx }}.sku.name != None
+      - output.servers.mysqlsrv{{ rpfx }}.sku.tier != None
+      - output.servers.mysqlsrv{{ rpfx }}.sku.capacity != None
+      - output.servers.mysqlsrv{{ rpfx }}.version != None
+      - output.servers.mysqlsrv{{ rpfx }}.user_visible_state != None
+      - output.servers.mysqlsrv{{ rpfx }}.fully_qualified_domain_name != None
 
 - name: Gather facts MySQL Server
   azure_rm_mysqlserver_facts:
@@ -46,18 +56,26 @@
   assert:
     that:
       - output.changed == False
-      - output.servers.mysqlsrv{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
-      - output.servers.mysqlsrv{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
-      - output.servers.mysqlsrv{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
-      - output.servers.mysqlsrv{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
-      - output.servers.mysqlsrv{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
-      - output.servers.mysqlsrv{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
-      - output.servers.mysqlsrv{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
-      - output.servers.mysqlsrv{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
-      - output.servers.mysqlsrv{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
-      - output.servers.mysqlsrv{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
-      - output.servers.mysqlsrv{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
-      - output.servers.mysqlsrv{{ rpfx }}second.AutoRest.Ansible.Model.ModuleResponseField != None
+      - output.servers.mysqlsrv{{ rpfx }}.id != None
+      - output.servers.mysqlsrv{{ rpfx }}.name != None
+      - output.servers.mysqlsrv{{ rpfx }}.type != None
+      - output.servers.mysqlsrv{{ rpfx }}.location != None
+      - output.servers.mysqlsrv{{ rpfx }}.sku.name != None
+      - output.servers.mysqlsrv{{ rpfx }}.sku.tier != None
+      - output.servers.mysqlsrv{{ rpfx }}.sku.capacity != None
+      - output.servers.mysqlsrv{{ rpfx }}.version != None
+      - output.servers.mysqlsrv{{ rpfx }}.user_visible_state != None
+      - output.servers.mysqlsrv{{ rpfx }}.fully_qualified_domain_name != None
+      - output.servers.mysqlsrv{{ rpfx }}second.id != None
+      - output.servers.mysqlsrv{{ rpfx }}second.name != None
+      - output.servers.mysqlsrv{{ rpfx }}second.type != None
+      - output.servers.mysqlsrv{{ rpfx }}second.location != None
+      - output.servers.mysqlsrv{{ rpfx }}second.sku.name != None
+      - output.servers.mysqlsrv{{ rpfx }}second.sku.tier != None
+      - output.servers.mysqlsrv{{ rpfx }}second.sku.capacity != None
+      - output.servers.mysqlsrv{{ rpfx }}second.version != None
+      - output.servers.mysqlsrv{{ rpfx }}second.user_visible_state != None
+      - output.servers.mysqlsrv{{ rpfx }}second.fully_qualified_domain_name != None
 
 - name: Delete instance of MySQL Server
   azure_rm_mysqlserver:
