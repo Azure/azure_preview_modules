@@ -140,11 +140,10 @@ options:
               ServiceObjectiveName is ignored. Not supported for DataWarehouse edition."
     read_scale:
         description:
-            - "Conditional. If the database is a geo-secondary, readScale indicates whether read-only connections are allowed to this database or not. Not su
-              pported for DataWarehouse edition."
-        choices:
-            - 'enabled'
-            - 'disabled'
+            - "If the database is a geo-secondary, readScale indicates whether read-only connections are allowed to this database or not. Not supported for D
+              ataWarehouse edition."
+        type: bool
+        default: False
     sample_name:
         description:
             - "Indicates the name of the sample schema to apply when creating this database. If createMode is not Default, this value is ignored. Not support
@@ -153,7 +152,13 @@ options:
             - 'adventure_works_lt'
     zone_redundant:
         description:
-            - Whether or not this database is zone redundant, which means the replicas of this database will be spread across multiple availability zones.
+            - Is this database is zone redundant? It means the replicas of this database will be spread across multiple availability zones.
+        type: bool
+        default: False
+    force_update:
+      description:
+          - Needs to be set to True in order to SQL Database to be updated.
+      type: bool
 
 extends_documentation_fragment:
     - azure
@@ -298,16 +303,19 @@ class AzureRMDatabases(AzureRMModuleBase):
                 type='str'
             ),
             read_scale=dict(
-                type='str',
-                choices=['enabled',
-                         'disabled']
+                type='bool',
+                default=False
             ),
             sample_name=dict(
                 type='str',
                 choices=['adventure_works_lt']
             ),
             zone_redundant=dict(
-                type='str'
+                type='bool',
+                default=False
+            ),
+            force_update=dict(
+                type='bool'
             ),
             state=dict(
                 type='str',
@@ -362,14 +370,14 @@ class AzureRMDatabases(AzureRMModuleBase):
                 elif key == "elastic_pool_name":
                     self.parameters["elastic_pool_name"] = kwargs[key]
                 elif key == "read_scale":
-                    self.parameters["read_scale"] = _snake_to_camel(kwargs[key], True)
+                    self.parameters["read_scale"] = 'Enabled' if kwargs[key] else 'Disabled'
                 elif key == "sample_name":
                     ev = kwargs[key]
                     if ev == 'adventure_works_lt':
                         ev = 'AdventureWorksLT'
                     self.parameters["sample_name"] = ev
                 elif key == "zone_redundant":
-                    self.parameters["zone_redundant"] = kwargs[key]
+                    self.parameters["zone_redundant"] = 'Enabled' if kwargs[key] else 'Disabled'
 
         old_response = None
         response = None
@@ -396,7 +404,18 @@ class AzureRMDatabases(AzureRMModuleBase):
                 self.to_do = Actions.Delete
             elif self.state == 'present':
                 self.log("Need to check if SQL Database instance has to be deleted or may be updated")
-                self.to_do = Actions.Update
+                if (self.location is not None) and (self.location != old_response['location']):
+                    self.to_do = Actions.Update
+                if ('read_scale' in self.parameters) and (self.parameters['read_scale'] != old_response['read_scale']):
+                    self.to_do = Actions.Update
+                if (self.requested_service_objective_id is not None) and (self.requested_service_objective_id != old_response['requested_service_objective_id']):
+                    self.to_do = Actions.Update
+                if (self.requested_service_objective_name is not None) and (self.requested_service_objective_name != old_response['requested_service_objective_name']):
+                    self.to_do = Actions.Update
+                if (self.max_size_bytes is not None) and (self.max_size_bytes != old_response['max_size_bytes']):
+                    self.to_do = Actions.Update
+                if (self.edition is not None) and (self.edition != old_response['edition']):
+                    self.to_do = Actions.Update
 
         if (self.to_do == Actions.Create) or (self.to_do == Actions.Update):
             self.log("Need to Create / Update the SQL Database instance")
