@@ -49,10 +49,10 @@ options:
             - The total shared DTU for the database elastic pool.
     database_dtu_max:
         description:
-            - The maximum DTU any one database can consume.
+            - The maximum I(dtu) any one database can consume.
     database_dtu_min:
         description:
-            - The minimum DTU all databases are guaranteed.
+            - The minimum I(dtu) all databases are guaranteed.
     storage_mb:
         description:
             - Gets storage limit for the database elastic pool in MB.

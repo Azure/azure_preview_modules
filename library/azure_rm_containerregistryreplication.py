@@ -32,7 +32,7 @@ options:
         required: True
     replication_name:
         description:
-            - The name of the replication.
+            - The name of the I(replication).
         required: True
     replication:
         description:

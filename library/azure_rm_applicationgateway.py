@@ -74,7 +74,7 @@ options:
                     - 'custom'
             policy_name:
                 description:
-                    - Name of Ssl predefined policy.
+                    - Name of Ssl C(predefined) policy.
                 choices:
                     - 'app_gw_ssl_policy20150501'
                     - 'app_gw_ssl_policy20170401'
@@ -107,7 +107,7 @@ options:
                             - Resource ID.
             provisioning_state:
                 description:
-                    - "Provisioning state of the application gateway subnet resource. Possible values are: 'Updating', 'Deleting', and 'Failed'."
+                    - "Provisioning state of the application gateway I(subnet) resource. Possible values are: 'Updating', 'Deleting', and 'Failed'."
             name:
                 description:
                     - Name of the resource that is unique within a resource group. This name can be used to access the resource.
@@ -153,10 +153,10 @@ options:
                     - Base-64 encoded pfx certificate. Only applicable in PUT Request.
             password:
                 description:
-                    - Password for the pfx file specified in data. Only applicable in PUT request.
+                    - Password for the pfx file specified in I(data). Only applicable in PUT request.
             public_cert_data:
                 description:
-                    - Base-64 encoded Public cert data corresponding to pfx specified in data. Only applicable in GET request.
+                    - Base-64 encoded Public cert I(data) corresponding to pfx specified in I(data). Only applicable in GET request.
             provisioning_state:
                 description:
                     - "Provisioning state of the SSL certificate resource Possible values are: 'Updating', 'Deleting', and 'Failed'."
@@ -225,7 +225,7 @@ options:
                     - Frontend port
             provisioning_state:
                 description:
-                    - "Provisioning state of the frontend port resource. Possible values are: 'Updating', 'Deleting', and 'Failed'."
+                    - "Provisioning state of the frontend I(port) resource. Possible values are: 'Updating', 'Deleting', and 'Failed'."
             name:
                 description:
                     - Name of the resource that is unique within a resource group. This name can be used to access the resource.
@@ -254,7 +254,7 @@ options:
                     - Host name to send the probe to.
             path:
                 description:
-                    - "Relative path of probe. Valid path starts from '/'. Probe is sent to <Protocol>://<host>:<port><path>"
+                    - "Relative path of probe. Valid path starts from '/'. Probe is sent to <I(protocol)>://<I(host)>:<port><path>"
             interval:
                 description:
                     - "The probing interval in seconds. This is the time interval between two consecutive probes. Acceptable values are from 1 second to 8640
@@ -269,7 +269,7 @@ options:
                       es are from 1 second to 20."
             pick_host_name_from_backend_http_settings:
                 description:
-                    - Whether the host header should be picked from the backend http settings. Default value is false.
+                    - Whether the I(host) header should be picked from the backend C(http) settings. Default value is false.
             min_servers:
                 description:
                     - Minimum number of servers that are always marked healthy. Default value is 0.
@@ -286,7 +286,7 @@ options:
                         type: list
             provisioning_state:
                 description:
-                    - "Provisioning state of the backend http settings resource. Possible values are: 'Updating', 'Deleting', and 'Failed'."
+                    - "Provisioning state of the backend C(http) settings resource. Possible values are: 'Updating', 'Deleting', and 'Failed'."
             name:
                 description:
                     - Name of the resource that is unique within a resource group. This name can be used to access the resource.
@@ -345,14 +345,14 @@ options:
                                             - Private IP address of the IP configuration.
                                     private_ip_allocation_method:
                                         description:
-                                            - "Defines how a private IP address is assigned. Possible values are: C(static) and C(dynamic)."
+                                            - "Defines how a private IP address is assigned. Possible values are: 'C(static)' and 'C(dynamic)'."
                                         choices:
                                             - 'static'
                                             - 'dynamic'
                                     private_ip_address_version:
                                         description:
                                             - "Available from Api-Version 2016-03-30 onwards, it represents whether the specific ipconfiguration is C(ipv4) o
-                                              r C(ipv6). Default is taken as C(ipv4).  Possible values are: C(ipv4) and C(ipv6)."
+                                              r C(ipv6). Default is taken as C(ipv4).  Possible values are: 'C(ipv4)' and 'C(ipv6)'."
                                         choices:
                                             - 'ipv4'
                                             - 'ipv6'
@@ -436,7 +436,7 @@ options:
                                             - Resource ID.
                             protocol:
                                 description:
-                                    - "Possible values include: C(udp), C(tcp), C(all)"
+                                    - "Possible values include: 'C(udp)', 'C(tcp)', 'C(all)'"
                                 choices:
                                     - 'udp'
                                     - 'tcp'
@@ -450,8 +450,8 @@ options:
                                     - The port used for the internal endpoint. Acceptable values range from 1 to 65535.
                             idle_timeout_in_minutes:
                                 description:
-                                    - "The timeout for the TCP idle connection. The value can be set between 4 and 30 minutes. The default value is 4 minutes
-                                      . This element is only used when the protocol is set to TCP."
+                                    - "The timeout for the C(tcp) idle connection. The value can be set between 4 and 30 minutes. The default value is 4 minu
+                                      tes. This element is only used when the I(protocol) is set to C(tcp)."
                             enable_floating_ip:
                                 description:
                                     - "Configures a virtual machine's endpoint for the floating IP capability required to configure a SQL AlwaysOn Availabili
@@ -471,14 +471,14 @@ options:
                             - Private IP address of the IP configuration.
                     private_ip_allocation_method:
                         description:
-                            - "Defines how a private IP address is assigned. Possible values are: C(static) and C(dynamic)."
+                            - "Defines how a private IP address is assigned. Possible values are: 'C(static)' and 'C(dynamic)'."
                         choices:
                             - 'static'
                             - 'dynamic'
                     private_ip_address_version:
                         description:
                             - "Available from Api-Version 2016-03-30 onwards, it represents whether the specific ipconfiguration is C(ipv4) or C(ipv6). Defau
-                              lt is taken as C(ipv4).  Possible values are: C(ipv4) and C(ipv6)."
+                              lt is taken as C(ipv4).  Possible values are: 'C(ipv4)' and 'C(ipv6)'."
                         choices:
                             - 'ipv4'
                             - 'ipv6'
@@ -535,7 +535,7 @@ options:
                                         type: list
                                     disable_bgp_route_propagation:
                                         description:
-                                            - Gets or sets whether to disable the routes learned by BGP on that route table. True means disable.
+                                            - Gets or sets whether to disable the I(routes) learned by BGP on that route table. True means disable.
                                     provisioning_state:
                                         description:
                                             - "The provisioning state of the resource. Possible values are: 'Updating', 'Deleting', and 'Failed'."
@@ -608,13 +608,13 @@ options:
                                             - 'standard'
                             public_ip_allocation_method:
                                 description:
-                                    - "The public IP allocation method. Possible values are: C(static) and C(dynamic)."
+                                    - "The public IP allocation method. Possible values are: 'C(static)' and 'C(dynamic)'."
                                 choices:
                                     - 'static'
                                     - 'dynamic'
                             public_ip_address_version:
                                 description:
-                                    - "The public IP address version. Possible values are: C(ipv4) and C(ipv6)."
+                                    - "The public IP address version. Possible values are: 'C(ipv4)' and 'C(ipv6)'."
                                 choices:
                                     - 'ipv4'
                                     - 'ipv6'
@@ -630,12 +630,12 @@ options:
                                     fqdn:
                                         description:
                                             - "Gets the FQDN, Fully qualified domain name of the A DNS record associated with the public IP. This is the conc
-                                              atenation of the domainNameLabel and the regionalized DNS zone."
+                                              atenation of the I(domain_name_label) and the regionalized DNS zone."
                                     reverse_fqdn:
                                         description:
-                                            - "Gets or Sets the Reverse FQDN. A user-visible, fully qualified domain name that resolves to this public IP add
-                                              ress. If the reverseFqdn is specified, then a PTR DNS record is created pointing from the IP address in the in
-                                              -addr.arpa domain to the reverse FQDN. "
+                                            - "Gets or Sets the Reverse I(fqdn). A user-visible, fully qualified domain name that resolves to this public IP
+                                              address. If the reverseFqdn is specified, then a PTR DNS record is created pointing from the IP address in the
+                                               in-addr.arpa domain to the reverse I(fqdn). "
                             ip_address:
                                 description:
                                     - The IP address associated with the public IP address resource.
@@ -742,7 +742,7 @@ options:
                             - Resource ID.
             connection_draining:
                 description:
-                    - Connection draining of the backend http settings resource.
+                    - Connection draining of the backend C(http) settings resource.
                 suboptions:
                     enabled:
                         description:
@@ -763,13 +763,13 @@ options:
                     - Cookie name to use for the affinity cookie.
             probe_enabled:
                 description:
-                    - Whether the probe is enabled. Default value is false.
+                    - Whether the I(probe) is C(enabled). Default value is false.
             path:
                 description:
-                    - Path which should be used as a prefix for all HTTP requests. Null means no path will be prefixed. Default value is null.
+                    - Path which should be used as a prefix for all C(http) requests. Null means no path will be prefixed. Default value is null.
             provisioning_state:
                 description:
-                    - "Provisioning state of the backend http settings resource. Possible values are: 'Updating', 'Deleting', and 'Failed'."
+                    - "Provisioning state of the backend C(http) settings resource. Possible values are: 'Updating', 'Deleting', and 'Failed'."
             name:
                 description:
                     - Name of the resource that is unique within a resource group. This name can be used to access the resource.
@@ -809,7 +809,7 @@ options:
                     - 'https'
             host_name:
                 description:
-                    - Host name of HTTP listener.
+                    - Host name of C(http) listener.
             ssl_certificate:
                 description:
                     - SSL certificate resource of an application gateway.
@@ -819,10 +819,10 @@ options:
                             - Resource ID.
             require_server_name_indication:
                 description:
-                    - Applicable only if protocol is https. Enables SNI for multi-hosting.
+                    - Applicable only if I(protocol) is C(https). Enables SNI for multi-hosting.
             provisioning_state:
                 description:
-                    - "Provisioning state of the HTTP listener resource. Possible values are: 'Updating', 'Deleting', and 'Failed'."
+                    - "Provisioning state of the C(http) listener resource. Possible values are: 'Updating', 'Deleting', and 'Failed'."
             name:
                 description:
                     - Name of the resource that is unique within a resource group. This name can be used to access the resource.
@@ -928,7 +928,7 @@ options:
                     - Resource ID.
             rule_type:
                 description:
-                    - Rule type.
+                    - Rule I(type).
                 choices:
                     - 'basic'
                     - 'path_based_routing'
