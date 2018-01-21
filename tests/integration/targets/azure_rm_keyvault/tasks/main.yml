@@ -33,10 +33,9 @@
     access_policies:
       - tenant_id: 72f98888-8666-4144-9199-2d7cd0111111
         object_id: 99998888-8666-4144-9199-2d7cd0111111
-        permissions:
-          keys:
-            - Get
-            - List
+        keys:
+          - Get
+          - List
   register: output
 - name: Assert the resource instance is well created
   assert:
@@ -55,10 +54,9 @@
     access_policies:
       - tenant_id: 72f98888-8666-4144-9199-2d7cd0111111
         object_id: 99998888-8666-4144-9199-2d7cd0111111
-        permissions:
-          keys:
-            - Get
-            - List
+        keys:
+          - Get
+          - List
   register: output
 - name: Assert the state has not changed
   assert:

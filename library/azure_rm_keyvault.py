@@ -69,10 +69,6 @@ options:
             application_id:
                 description:
                     -  Application ID of the client making request on behalf of a principal
-            permissions:
-                description:
-                    - Permissions the identity has for keys, secrets and certificates.
-                required: True
             keys:
                 description:
                     - Permissions to keys
@@ -232,7 +228,21 @@ class AzureRMVaults(AzureRMModuleBase):
                 elif key == "sku":
                     self.parameters.setdefault("properties", {})["sku"] = kwargs[key]
                 elif key == "access_policies":
-                    self.parameters.setdefault("properties", {})["access_policies"] = kwargs[key]
+                    access_policies = kwargs[key]
+                    for policy in access_policies:
+                        if 'keys' in policy:
+                            policy.setdefault("permissions", {})["keys"] = policy["keys"]
+                            policy.pop("keys", None)
+                        if 'secrets' in policy:
+                            policy.setdefault("permissions", {})["keys"] = policy["keys"]
+                            policy.pop("secrets", None)
+                        if 'certificates' in policy:
+                            policy.setdefault("permissions", {})["keys"] = policy["keys"]
+                            policy.pop("certificates", None)
+                        if 'storage' in policy:
+                            policy.setdefault("permissions", {})["keys"] = policy["keys"]
+                            policy.pop("storage", None)
+                    self.parameters.setdefault("properties", {})["access_policies"] = access_policies
                 elif key == "vault_uri":
                     self.parameters.setdefault("properties", {})["vault_uri"] = kwargs[key]
                 elif key == "enabled_for_deployment":
