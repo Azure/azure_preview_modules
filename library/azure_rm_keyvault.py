@@ -336,8 +336,8 @@ class AzureRMVaults(AzureRMModuleBase):
                     self.to_do = Actions.Update
                 elif ('enabled_for_deployment' in self.parameters) and (self.parameters['enabled_for_deployment'] != old_response['enabled_for_deployment']):
                     self.to_do = Actions.Update
-                elif ('enabled_for_disk_encryption' in self.parameters) and
-                        (self.parameters['enabled_for_deployment'] != old_response['enabled_for_deployment']):
+                elif (('enabled_for_disk_encryption' in self.parameters) and
+                        (self.parameters['enabled_for_deployment'] != old_response['enabled_for_deployment'])):
                     self.to_do = Actions.Update
                 elif (('enabled_for_template_deployment' in self.parameters) and
                         (self.parameters['enabled_for_template_deployment'] != old_response['enabled_for_template_deployment'])):
