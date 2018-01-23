@@ -218,7 +218,7 @@ class AzureRMVaults(AzureRMModuleBase):
             location=dict(
                 type='str'
             ),
-            tenant_id=dict(
+            vault_tenant=dict(
                 type='str'
             ),
             sku=dict(
