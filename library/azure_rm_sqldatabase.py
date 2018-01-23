@@ -44,21 +44,14 @@ options:
         description:
             - Specifies the mode of database creation.
             - "C(default): regular database creation."
-            - "C(copy): creates a database as a C(copy) of an existing database. I(source_database_id) must be specified as the resource ID of the source dat
-              abase."
-            - "C(online_secondary)/C(non_readable_secondary): creates a database as a (readable or nonreadable) secondary replica of an existing database. I(
-              source_database_id) must be specified as the resource ID of the existing primary database."
-            - "C(point_in_time_restore): Creates a database by restoring a point in time backup of an existing database. I(source_database_id) must be specif
-              ied as the resource ID of the existing database, and I(restore_point_in_time) must be specified."
-            - "C(recovery): Creates a database by restoring a geo-replicated backup. I(source_database_id) must be specified as the recoverable database reso
-              urce ID to C(restore)."
-            - "C(restore): Creates a database by restoring a backup of a deleted database. I(source_database_id) must be specified. If I(source_database_id)
-              is the database's original resource ID, then I(source_database_deletion_date) must be specified. Otherwise I(source_database_id) must be the r
-              estorable dropped database resource ID and I(source_database_deletion_date) is ignored. I(restore_point_in_time) may also be specified to C(re
-              store) from an earlier point in time."
-            - "C(restore_long_term_retention_backup): Creates a database by restoring from a long term retention vault. I(recovery_services_recovery_point_re
-              source_id) must be specified as the C(recovery) point resource ID."
-            - C(copy), C(non_readable_secondary), C(online_secondary) and C(restore_long_term_retention_backup) are not supported for C(data_warehouse) edition.
+            - "C(copy): creates a database as a copy of an existing database."
+            - "C(online_secondary)/C(non_readable_secondary): creates a database as a (readable or nonreadable) secondary replica of an existing database."
+            - "C(point_in_time_restore): Creates a database by restoring a point in time backup of an existing database."
+            - "C(recovery): Creates a database by restoring a geo-replicated backup."
+            - "C(restore): Creates a database by restoring a backup of a deleted database."
+            - "C(restore_long_term_retention_backup): Creates a database by restoring from a long term retention vault."
+            - "C(copy), C(non_readable_secondary), C(online_secondary) and C(restore_long_term_retention_backup) are not supported for C(data_warehouse)
+               edition."
         choices:
             - 'copy'
             - 'default'
@@ -70,27 +63,27 @@ options:
             - 'restore_long_term_retention_backup'
     source_database_id:
         description:
-            - "Conditional. If I(create_mode) is C(copy), C(non_readable_secondary), C(online_secondary), C(point_in_time_restore), C(recovery), or C(restore
-              ), then this value is required. Specifies the resource ID of the source database. If I(create_mode) is C(non_readable_secondary) or C(online_s
-              econdary), the name of the source database must be the same as the new database being created."
+            - Required unless I(create_mode) is C(default) or C(restore_long_term_retention_backup).
+            - Specifies the resource ID of the source database
     source_database_deletion_date:
         description:
-            - "Conditional. If I(create_mode) is C(restore) and I(source_database_id) is the deleted database's original resource id when it existed (as oppo
-              sed to its current restorable dropped database id), then this value is required. Specifies the time that the database was deleted."
+            - "Required if I(create_mode) is C(restore) and I(source_database_id) is the deleted database's original resource id when it existed (as
+               opposed to its current restorable dropped database id), then this value is required. Specifies the time that the database was deleted."
     restore_point_in_time:
         description:
-            - "Conditional. If I(create_mode) is C(point_in_time_restore), this value is required. If I(create_mode) is C(restore), this value is optional. S
-              pecifies the point in time (ISO8601 format) of the source database that will be restored to create the new database. Must be greater than or e
-              qual to the source database's earliestRestoreDate value."
+            - "Required if I(create_mode) is C(point_in_time_restore), this value is required. If I(create_mode) is C(restore), this value is optional.
+               Specifies the point in time (ISO8601 format) of the source database that will be restored to create the new database. Must be greater than
+               or equal to the source database's earliestRestoreDate value."
     recovery_services_recovery_point_resource_id:
         description:
-            - "Conditional. If I(create_mode) is C(restore_long_term_retention_backup), then this value is required. Specifies the resource ID of the C(recov
-              ery) point to C(restore) from."
+            - "Required if I(create_mode) is C(restore_long_term_retention_backup), then this value is required. Specifies the resource ID of the
+               recovery point to restore from."
     edition:
         description:
             - "The edition of the database. The DatabaseEditions enumeration contains all the valid editions. If I(create_mode) is C(non_readable_secondary)
-              or C(online_secondary), this value is ignored. To see possible values, query the capabilities API (/subscriptions/{subscriptionId}/providers/M
-              icrosoft.Sql/locations/{locationID}/capabilities) referred to by operationId: 'Capabilities_ListByLocation.'."
+              or C(online_secondary), this value is ignored. To see possible values, query the capabilities API
+               (/subscriptions/{subscriptionId}/providers/Microsoft.Sql/locations/{locationID}/capabilities) referred to by operationId:
+               'Capabilities_ListByLocation.'."
         choices:
             - 'web'
             - 'business'
@@ -105,21 +98,22 @@ options:
     max_size_bytes:
         description:
             - "The max size of the database expressed in bytes. If I(create_mode) is not C(default), this value is ignored. To see possible values, query the
-               capabilities API (/subscriptions/{subscriptionId}/providers/Microsoft.Sql/locations/{locationID}/capabilities) referred to by operationId: 'C
-              apabilities_ListByLocation.'"
+               capabilities API (/subscriptions/{subscriptionId}/providers/Microsoft.Sql/locations/{locationID}/capabilities) referred to by operationId:
+               'Capabilities_ListByLocation.'"
     requested_service_objective_id:
         description:
             - "The configured service level objective ID of the database. This is the service level objective that is in the process of being applied to the
-              database. Once successfully updated, it will match the value of currentServiceObjectiveId property. If requestedServiceObjectiveId and I(reque
-              sted_service_objective_name) are both updated, the value of requestedServiceObjectiveId overrides the value of I(requested_service_objective_n
-              ame). To see possible values, query the capabilities API (/subscriptions/{subscriptionId}/providers/Microsoft.Sql/locations/{locationID}/capab
-              ilities) referred to by operationId: 'Capabilities_ListByLocation.'"
+               database. Once successfully updated, it will match the value of currentServiceObjectiveId property. If requestedServiceObjectiveId and
+               I(requested_service_objective_name) are both updated, the value of requestedServiceObjectiveId overrides the value of
+               I(requested_service_objective_name). To see possible values, query the capabilities API
+               (/subscriptions/{subscriptionId}/providers/Microsoft.Sql/locations/{locationID}/capabilities) referred to by operationId:
+               'Capabilities_ListByLocation.'"
     requested_service_objective_name:
         description:
-            - "The name of the configured service level objective of the database. This is the service level objective that is in the process of being applie
-              d to the database. Once successfully updated, it will match the value of serviceLevelObjective property. To see possible values, query the cap
-              abilities API (/subscriptions/{subscriptionId}/providers/Microsoft.Sql/locations/{locationID}/capabilities) referred to by operationId: 'Capab
-              ilities_ListByLocation.'."
+            - "The name of the configured service level objective of the database. This is the service level objective that is in the process of being applied
+               to the database. Once successfully updated, it will match the value of I(service_level_objective) property. To see possible values, query the
+               capabilities API (/subscriptions/{subscriptionId}/providers/Microsoft.Sql/locations/{locationID}/capabilities) referred to by operationId:
+                'Capabilities_ListByLocation.'."
         choices:
             - 'basic'
             - 's0'
@@ -138,18 +132,18 @@ options:
             - 'elastic_pool'
     elastic_pool_name:
         description:
-            - "The name of the elastic pool the database is in. If elasticPoolName and I(requested_service_objective_name) are both updated, the value of I(r
-              equested_service_objective_name) is ignored. Not supported for C(data_warehouse) edition."
+            - "The name of the elastic pool the database is in. If C(elastic_pool_name) and I(requested_service_objective_name) are both set, the value of
+               I(requested_service_objective_name) is ignored. Not supported for C(data_warehouse) edition."
     read_scale:
         description:
-            - "If the database is a geo-secondary, readScale indicates whether read-only connections are allowed to this database or not. Not supported for C
-              (data_warehouse) edition."
+            - "If the database is a geo-secondary, indicates whether read-only connections are allowed to this database or not. Not supported for
+               C(data_warehouse) edition."
         type: bool
         default: False
     sample_name:
         description:
             - "Indicates the name of the sample schema to apply when creating this database. If I(create_mode) is not C(default), this value is ignored. Not
-              supported for C(data_warehouse) edition."
+               supported for C(data_warehouse) edition."
         choices:
             - 'adventure_works_lt'
     zone_redundant:
@@ -159,8 +153,16 @@ options:
         default: False
     force_update:
       description:
-          - Needs to be set to True in order to SQL Database to be updated.
+          - SQL Database will be updated if given parameters differ from existing resource state.
+          - To force SQL Database update in any circumstances set this parameter to True. 
       type: bool
+    state:
+      description:
+        - Assert the state of the SQL Database. Use 'present' to create or update an SQL Database and 'absent' to delete it.
+      default: present
+      choices:
+        - absent
+        - present
 
 extends_documentation_fragment:
     - azure
@@ -177,6 +179,27 @@ EXAMPLES = '''
       server_name: sqlcrudtest-5961
       name: testdb
       location: eastus
+
+  - name: Restore SQL Database
+    azure_rm_sqldatabase:
+      resource_group: sqlcrudtest-4799
+      server_name: sqlcrudtest-5961
+      name: restoreddb
+      location: eastus
+      create_mode: restore
+      restorable_dropped_database_id: "/subscriptions/00000000-1111-2222-3333-444444444444/resourceGroups/Default-SQL-SouthEastAsia/providers/Microsoft.Sql/s
+                                      ervers/testsvr/restorableDroppedDatabases/testdb2,131444841315030000"
+
+  - name: Create SQL Database in Copy Mode
+    azure_rm_sqldatabase:
+      resource_group: sqlcrudtest-4799
+      server_name: sqlcrudtest-5961
+      name: copydb
+      location: eastus
+      create_mode: copy
+      source_database_id: "/subscriptions/00000000-1111-2222-3333-444444444444/resourceGroups/Default-SQL-SouthEastAsia/providers/Microsoft.Sql/servers/tests
+                          vr/databases/testdb"
+
 '''
 
 RETURN = '''
