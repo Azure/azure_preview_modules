@@ -25,6 +25,14 @@
           - recover
           - backup
           - restore
+        secrets:
+          - get
+          - list
+          - set
+          - delete
+          - recover
+          - backup
+          - restore
   register: output
 
 - name: create a kevyault key
