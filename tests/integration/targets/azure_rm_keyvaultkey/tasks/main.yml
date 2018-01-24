@@ -16,10 +16,15 @@
       - tenant_id: "{{ azure_tenant }}"
         object_id: "{{ azure_client_id }}"
         keys:
-          - create
-          - delete
           - get
           - list
+          - update
+          - create
+          - import
+          - delete
+          - recover
+          - backup
+          - restore
   register: output
 
 - name: create a kevyault key
