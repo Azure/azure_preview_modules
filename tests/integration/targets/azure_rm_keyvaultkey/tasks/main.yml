@@ -14,7 +14,7 @@
       family: S
     access_policies:
       - tenant_id: "{{ azure_tenant }}"
-        object_id: 99998888-8666-4144-9199-2d7cd0111111
+        object_id: {{ azure_client_id }}
         keys:
           - create
           - delete
