@@ -47,6 +47,8 @@
 - name: Debug facts
   debug:
     msg: "RESPONSE: {{ output.vaults }}"
+    msg: "TENANT ID: {{ azure_tenant }}"
+    msg: "OBJECT ID: {{ azure_client_id }}"
 
 - name: Gather facts Vault
   azure_rm_keyvault_facts:
