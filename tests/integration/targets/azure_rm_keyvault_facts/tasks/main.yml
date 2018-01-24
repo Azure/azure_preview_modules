@@ -44,6 +44,10 @@
       - output.changed == False
       - output.vaults.vault{{ rpfx }}.id != None
 
+- name: Debug facts
+  debug:
+    msg: "RESPONSE: {{ output.vaults }}"
+
 - name: Gather facts Vault
   azure_rm_keyvault_facts:
     resource_group: "{{ resource_group }}"
