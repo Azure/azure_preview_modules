@@ -1,0 +1,35 @@
+# - name: Create KeyVault
+#   azure_rm_keyvault:
+#     name: mykeyvaulttmp
+#     tags:
+#       testing: testing
+#       delete: on-exit
+#     resource_group: "{{ resource_group }}"
+
+- name: create a kevyault secret
+  block:
+    - azure_rm_keyvaultsecret:
+        keyvault_uri: https://tmpkeyvault.vault.azure.net
+        secret_name: testsecret
+        secret_value: 'mysecret'
+        tags:
+          testing: test
+          delete: on-exit
+      register: output
+    - assert:
+        that: output.changed
+  rescue:
+    - azure_rm_keyvaultsecret:
+        keyvault_uri: https://tmpkeyvault.vault.azure.net
+        state: absent
+        secret_name: testsecret
+
+- name: delete a kevyault secret
+  azure_rm_keyvaultsecret:
+    keyvault_uri: https://tmpkeyvault.vault.azure.net
+    state: absent
+    secret_name: testsecret
+  register: output
+
+- assert:
+    that: output.changed
