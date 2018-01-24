@@ -14,7 +14,7 @@
       family: A
     access_policies:
       - tenant_id: "{{ azure_tenant }}"
-        object_id: "{{ azure_client_id }}"
+        object_id: 97567bfa-cf13-4217-8fa3-cc56bc1867fe
         keys:
           - get
           - list
