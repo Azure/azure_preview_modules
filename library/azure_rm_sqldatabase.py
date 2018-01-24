@@ -102,18 +102,18 @@ options:
                'Capabilities_ListByLocation.'"
     requested_service_objective_id:
         description:
-            - "The configured service level objective ID of the database. This is the service level objective that is in the process of being applied to the
-               database. Once successfully updated, it will match the value of currentServiceObjectiveId property. If requestedServiceObjectiveId and
-               I(requested_service_objective_name) are both updated, the value of requestedServiceObjectiveId overrides the value of
+            - "The configured I(service_level_objective) ID of the database. This is the service level objective that is in the process of being applied to the
+               database. Once successfully updated, it will match the value of I(current_service_objective_id) property. If I(requested_service_objective_id)
+               and I(requested_service_objective_name) are both updated, the value of I(requested_service_objective_id) overrides the value of
                I(requested_service_objective_name). To see possible values, query the capabilities API
                (/subscriptions/{subscriptionId}/providers/Microsoft.Sql/locations/{locationID}/capabilities) referred to by operationId:
                'Capabilities_ListByLocation.'"
     requested_service_objective_name:
         description:
-            - "The name of the configured service level objective of the database. This is the service level objective that is in the process of being applied
-               to the database. Once successfully updated, it will match the value of I(service_level_objective) property. To see possible values, query the
-               capabilities API (/subscriptions/{subscriptionId}/providers/Microsoft.Sql/locations/{locationID}/capabilities) referred to by operationId:
-                'Capabilities_ListByLocation.'."
+            - "The name of the configured I(service_level_objective) of the database. This is the service level objective that is in the process of being
+               applied to the database. Once successfully updated, it will match the value of I(service_level_objective) property. To see possible values,
+               query the capabilities API (/subscriptions/{subscriptionId}/providers/Microsoft.Sql/locations/{locationID}/capabilities) referred to by
+               operationId: 'Capabilities_ListByLocation.'."
         choices:
             - 'basic'
             - 's0'
@@ -154,7 +154,7 @@ options:
     force_update:
       description:
           - SQL Database will be updated if given parameters differ from existing resource state.
-          - To force SQL Database update in any circumstances set this parameter to True. 
+          - To force SQL Database update in any circumstances set this parameter to True.
       type: bool
     state:
       description:

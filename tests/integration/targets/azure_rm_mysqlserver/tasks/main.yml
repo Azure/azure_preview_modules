@@ -15,6 +15,7 @@
     enforce_ssl: True
     admin_username: zimxyz
     admin_password: Testpasswordxyz12!
+    storage_mb: 51200
   check_mode: yes
   register: output
 - name: Assert the resource instance is well created
@@ -34,6 +35,7 @@
     enforce_ssl: True
     admin_username: zimxyz
     admin_password: Testpasswordxyz12!
+    storage_mb: 51200
   register: output
 - name: Assert the resource instance is well created
   assert:
@@ -53,6 +55,7 @@
     enforce_ssl: True
     admin_username: zimxyz
     admin_password: Testpasswordxyz12!
+    storage_mb: 51200
   register: output
 - name: Assert the state has not changed
   assert:
