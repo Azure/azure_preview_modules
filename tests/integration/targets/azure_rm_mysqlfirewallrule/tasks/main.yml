@@ -15,6 +15,7 @@
     enforce_ssl: True
     admin_username: zimxyz
     admin_password: Testpasswordxyz12!
+    storage_mb: 51200
 
 - name: Create instance of Firewall Rule -- check mode
   azure_rm_mysqlfirewallrule:
