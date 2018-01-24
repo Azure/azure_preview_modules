@@ -137,12 +137,10 @@ options:
         description:
             - Property to specify whether the soft delete functionality is enabled for this key vault.
         type: bool
-    create_mode:
+    recover_mode:
         description:
-            - "The vault's create mode to indicate whether the vault need to be recovered or not."
-        choices:
-            - 'recover'
-            - 'default'
+            - Create vault in recovery mode.
+        type: bool
     state:
         description:
             - Assert the state of the KeyVault. Use 'present' to create or update an KeyVault and 'absent' to delete it.
@@ -239,10 +237,8 @@ class AzureRMVaults(AzureRMModuleBase):
             enable_soft_delete=dict(
                 type='bool'
             ),
-            create_mode=dict(
-                type='str',
-                choices=['recover',
-                         'default']
+            recover_mode=dict(
+                type='bool'
             ),
             state=dict(
                 type='str',
@@ -284,13 +280,13 @@ class AzureRMVaults(AzureRMModuleBase):
                             policy.setdefault("permissions", {})["keys"] = policy["keys"]
                             policy.pop("keys", None)
                         if 'secrets' in policy:
-                            policy.setdefault("permissions", {})["keys"] = policy["keys"]
+                            policy.setdefault("permissions", {})["secrets"] = policy["secrets"]
                             policy.pop("secrets", None)
                         if 'certificates' in policy:
-                            policy.setdefault("permissions", {})["keys"] = policy["keys"]
+                            policy.setdefault("permissions", {})["certificates"] = policy["certificates"]
                             policy.pop("certificates", None)
                         if 'storage' in policy:
-                            policy.setdefault("permissions", {})["keys"] = policy["keys"]
+                            policy.setdefault("permissions", {})["storage"] = policy["storage"]
                             policy.pop("storage", None)
                     self.parameters.setdefault("properties", {})["access_policies"] = access_policies
                 elif key == "enabled_for_deployment":
@@ -301,8 +297,8 @@ class AzureRMVaults(AzureRMModuleBase):
                     self.parameters.setdefault("properties", {})["enabled_for_template_deployment"] = kwargs[key]
                 elif key == "enable_soft_delete":
                     self.parameters.setdefault("properties", {})["enable_soft_delete"] = kwargs[key]
-                elif key == "create_mode":
-                    self.parameters.setdefault("properties", {})["create_mode"] = kwargs[key]
+                elif key == "recover_mode":
+                    self.parameters.setdefault("properties", {})["create_mode"] = 'recover' if kwargs[key] else 'default'
 
         old_response = None
         response = None
@@ -329,7 +325,50 @@ class AzureRMVaults(AzureRMModuleBase):
                 self.to_do = Actions.Delete
             elif self.state == 'present':
                 self.log("Need to check if Key Vault instance has to be deleted or may be updated")
-                self.to_do = Actions.Update
+                if ('location' in self.parameters) and (self.parameters['location'] != old_response['location']):
+                    self.to_do = Actions.Update
+                elif ('tenant_id' in self.parameters) and (self.parameters['tenant_id'] != old_response['tenant_id']):
+                    self.to_do = Actions.Update
+                elif ('enabled_for_deployment' in self.parameters) and (self.parameters['enabled_for_deployment'] != old_response['enabled_for_deployment']):
+                    self.to_do = Actions.Update
+                elif (('enabled_for_disk_encryption' in self.parameters) and
+                        (self.parameters['enabled_for_deployment'] != old_response['enabled_for_deployment'])):
+                    self.to_do = Actions.Update
+                elif (('enabled_for_template_deployment' in self.parameters) and
+                        (self.parameters['enabled_for_template_deployment'] != old_response['enabled_for_template_deployment'])):
+                    self.to_do = Actions.Update
+                elif ('enable_soft_delete' in self.parameters) and (self.parameters['enabled_soft_delete'] != old_response['enable_soft_delete']):
+                    self.to_do = Actions.Update
+                elif ('create_mode' in self.parameters) and (self.parameters['create_mode'] != old_response['create_mode']):
+                    self.to_do = Actions.Update
+                elif 'access_policies' in self.parameters:
+                    if len(self.parameters['access_policies']) != len(old_response['access_policies']):
+                        self.to_do = Actions.Update
+                    else:
+                        for i in range(len(old_response['access_policies'])):
+                            n = self.parameters['access_policies'][i]
+                            o = old_response['access_policies'][i]
+                            if n.get('tenant_id', False) != o.get('tenant_id', False):
+                                self.to_do = Actions.Update
+                                break
+                            if n.get('object_id', False) != o.get('object_id', False):
+                                self.to_do = Actions.Update
+                                break
+                            if n.get('application_id', False) != o.get('application_id', False):
+                                self.to_do = Actions.Update
+                                break
+                            if sorted(n.get('keys', [])).cmp(sorted(o.get('keys', []))) != 0:
+                                self.to_do = Actions.Update
+                                break
+                            if sorted(n.get('secrets', [])).cmp(sorted(o.get('secrets', []))) != 0:
+                                self.to_do = Actions.Update
+                                break
+                            if sorted(n.get('certificates', [])).cmp(sorted(o.get('certificates', []))) != 0:
+                                self.to_do = Actions.Update
+                                break
+                            if sorted(n.get('storage', [])).cmp(sorted(o.get('storage', []))) != 0:
+                                self.to_do = Actions.Update
+                                break
 
         if (self.to_do == Actions.Create) or (self.to_do == Actions.Update):
             self.log("Need to Create / Update the Key Vault instance")
