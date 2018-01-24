@@ -11,7 +11,7 @@
     vault_tenant: "{{ azure_tenant }}"
     sku:
       name: standard
-      family: S
+      family: A
     access_policies:
       - tenant_id: "{{ azure_tenant }}"
         object_id: "{{ azure_client_id }}"
