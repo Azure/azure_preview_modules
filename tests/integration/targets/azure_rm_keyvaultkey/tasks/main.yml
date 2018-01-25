@@ -8,13 +8,11 @@
     resource_group: "{{ resource_group }}"
     vault_name: "vault{{ rpfx }}"
     enabled_for_deployment: yes
-    vault_tenant: "{{ azure_tenant }}"
     sku:
       name: standard
       family: A
     access_policies:
-      - tenant_id: "{{ azure_tenant }}"
-        object_id: 97567bfa-cf13-4217-8fa3-cc56bc1867fe
+      - object_id: 97567bfa-cf13-4217-8fa3-cc56bc1867fe
         keys:
           - get
           - list
