@@ -8,13 +8,11 @@
     resource_group: "{{ resource_group }}"
     vault_name: "vault{{ rpfx }}"
     enabled_for_deployment: yes
-    vault_tenant: {{ azure_tenant }}
     sku:
       name: standard
       family: A
     access_policies:
-      - tenant_id: {{ azure_tenant }}
-        object_id: {{ azure_client_id }}
+      - object_id: "{{ azure_client_id }}"
         keys:
           - get
           - list
@@ -42,15 +40,25 @@
   assert:
     that:
       - output.changed == False
-      - output.vaults.xxxunknownxxx.id != None
+      - output.vaults.vault{{ rpfx }}.id != None
+
+- name: Debug facts
+  debug:
+    msg: "RESPONSE: {{ output.vaults }}"
+- name: Debug facts -- details
+  debug:
+    msg: "TENANT: {{ azure_tenant[0:10] }}----{{ azure_tenant[10:100] }}"
+- name: Debug facts -- details
+  debug:
+    msg: "CLIENT ID: {{ azure_client_id[0:10] }}----{{ azure_client_id[10:100] }}"
 
 - name: Gather facts Vault
   azure_rm_keyvault_facts:
     resource_group: "{{ resource_group }}"
+    vault_name: vault{{ rpfx }}
   register: output
 - name: Assert that facts are returned
   assert:
     that:
       - output.changed == False
-      - output.vaults.xxxunknownxxx.id != None
-      - output.vaults.xxxunknownxxxsecond.id != None
+      - output.vaults.vault{{ rpfx }} != None
