@@ -8,8 +8,8 @@
     msg:
       - "Your Ansible version is lower than 2.5.0"
       - "You may need to perform additional steps to install this roles:"
-      - "  sudo pip install -r xxx/files/requirements-azure.txt"
+      - "  sudo pip install -r {{ role_path }}/files/requirements-azure.txt"
       - "or"
-      - "  pip install --user -r xxx/files/requirements-azure.txt"
+      - "  pip install --user -r {{ role_path }}/files/requirements-azure.txt"
       - "depending on your ansible setup."
   when: ansible_version.full < "2.5.0"
