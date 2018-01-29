@@ -14,13 +14,15 @@ The usage of this role assumes that you've already setup an Ansible environment 
 Installation
 ------------
 
-1. Install the role.
+1. Install the role
 
   ``` bash
   $ ansible-galaxy install Azure.azure_preview_modules
   ```
 
-2. Install Azure Python SDKs.
+2. Install Azure Python SDK Dependencies
+
+    Note: Instructions below apply to Ansible version 2.4 or earlier. If version of your Ansible is 2.5.0 or later, you shouldn't need to install any additional dependencies.
 
     Several reasons for installing Python SDKs are listed here.
 
