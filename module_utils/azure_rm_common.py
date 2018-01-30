@@ -115,9 +115,8 @@ except ImportError as exc:
 try:
     from enum import Enum
     from msrestazure.azure_exceptions import CloudError
+    from msrestazure.tools import resource_id, is_valid_resource_id
     from msrestazure import azure_cloud
-    from azure.mgmt.network.models import PublicIPAddress, NetworkSecurityGroup, SecurityRule, NetworkInterface, \
-        NetworkInterfaceIPConfiguration, Subnet
     from azure.common.credentials import ServicePrincipalCredentials, UserPassCredentials
     from azure.mgmt.network.version import VERSION as network_client_version
     from azure.mgmt.storage.version import VERSION as storage_client_version
@@ -137,7 +136,6 @@ except ImportError as exc:
     HAS_AZURE_EXC = exc
     HAS_AZURE = False
 
-
 try:
     from azure.cli.core.util import CLIError
     from azure.common.credentials import get_azure_cli_credentials, get_cli_profile
@@ -156,6 +154,13 @@ def azure_id_to_dict(id):
         index += 1
     return result
 
+
+def format_resource_id(val, subscription_id, namespace, types, resource_group):
+    return resource_id(name=val,
+                       resource_group=resource_group,
+                       namespace=namespace,
+                       type=types,
+                       subscription=subscription_id) if not is_valid_resource_id(val) else val
 
 AZURE_PKG_VERSIONS = {
     StorageManagementClient.__name__: {
@@ -350,6 +355,9 @@ class AzureRMModuleBase(object):
         :return: None
         '''
         self.module.fail_json(msg=msg, **kwargs)
+
+    def deprecate(self, msg, version=None):
+        self.module.deprecate(msg, version)
 
     def log(self, msg, pretty_print=False):
         pass
@@ -649,18 +657,17 @@ class AzureRMModuleBase(object):
             self.fail("Error creating blob service client for storage account {0} - {1}".format(storage_account_name,
                                                                                                 str(exc)))
 
-    def create_default_pip(self, resource_group, location, name, allocation_method='Dynamic'):
+    def create_default_pip(self, resource_group, location, public_ip_name, allocation_method='Dynamic'):
         '''
-        Create a default public IP address <name>01 to associate with a network interface.
-        If a PIP address matching <vm name>01 exists, return it. Otherwise, create one.
+        Create a default public IP address <public_ip_name> to associate with a network interface.
+        If a PIP address matching <public_ip_name> exists, return it. Otherwise, create one.
 
         :param resource_group: name of an existing resource group
         :param location: a valid azure location
-        :param name: base name to assign the public IP address
+        :param public_ip_name: base name to assign the public IP address
         :param allocation_method: one of 'Static' or 'Dynamic'
         :return: PIP object
         '''
-        public_ip_name = name + '01'
         pip = None
 
         self.log("Starting create_default_pip {0}".format(public_ip_name))
@@ -675,7 +682,7 @@ class AzureRMModuleBase(object):
             self.check_provisioning_state(pip)
             return pip
 
-        params = PublicIPAddress(
+        params = self.network_models.PublicIPAddress(
             location=location,
             public_ip_allocation_method=allocation_method,
         )
@@ -687,20 +694,19 @@ class AzureRMModuleBase(object):
 
         return self.get_poller_result(poller)
 
-    def create_default_securitygroup(self, resource_group, location, name, os_type, open_ports):
+    def create_default_securitygroup(self, resource_group, location, security_group_name, os_type, open_ports):
         '''
-        Create a default security group <name>01 to associate with a network interface. If a security group matching
-        <name>01 exists, return it. Otherwise, create one.
+        Create a default security group <security_group_name> to associate with a network interface. If a security group matching
+        <security_group_name> exists, return it. Otherwise, create one.
 
         :param resource_group: Resource group name
         :param location: azure location name
-        :param name: base name to use for the security group
+        :param security_group_name: base name to use for the security group
         :param os_type: one of 'Windows' or 'Linux'. Determins any default rules added to the security group.
         :param ssh_port: for os_type 'Linux' port used in rule allowing SSH access.
         :param rdp_port: for os_type 'Windows' port used in rule allowing RDP access.
         :return: security_group object
         '''
-        security_group_name = name + '01'
         group = None
 
         self.log("Create security group {0}".format(security_group_name))
@@ -715,7 +721,7 @@ class AzureRMModuleBase(object):
             self.check_provisioning_state(group)
             return group
 
-        parameters = NetworkSecurityGroup()
+        parameters = self.network_models.NetworkSecurityGroup()
         parameters.location = location
 
         if not open_ports:
@@ -723,17 +729,17 @@ class AzureRMModuleBase(object):
             if os_type == 'Linux':
                 # add an inbound SSH rule
                 parameters.security_rules = [
-                    SecurityRule('Tcp', '*', '*', 'Allow', 'Inbound', description='Allow SSH Access',
-                                 source_port_range='*', destination_port_range='22', priority=100, name='SSH')
+                    self.network_models.SecurityRule('Tcp', '*', '*', 'Allow', 'Inbound', description='Allow SSH Access',
+                                                     source_port_range='*', destination_port_range='22', priority=100, name='SSH')
                 ]
                 parameters.location = location
             else:
                 # for windows add inbound RDP and WinRM rules
                 parameters.security_rules = [
-                    SecurityRule('Tcp', '*', '*', 'Allow', 'Inbound', description='Allow RDP port 3389',
-                                 source_port_range='*', destination_port_range='3389', priority=100, name='RDP01'),
-                    SecurityRule('Tcp', '*', '*', 'Allow', 'Inbound', description='Allow WinRM HTTPS port 5986',
-                                 source_port_range='*', destination_port_range='5986', priority=101, name='WinRM01'),
+                    self.network_models.SecurityRule('Tcp', '*', '*', 'Allow', 'Inbound', description='Allow RDP port 3389',
+                                                     source_port_range='*', destination_port_range='3389', priority=100, name='RDP01'),
+                    self.network_models.SecurityRule('Tcp', '*', '*', 'Allow', 'Inbound', description='Allow WinRM HTTPS port 5986',
+                                                     source_port_range='*', destination_port_range='5986', priority=101, name='WinRM01'),
                 ]
         else:
             # Open custom ports
@@ -743,8 +749,8 @@ class AzureRMModuleBase(object):
                 priority += 1
                 rule_name = "Rule_{0}".format(priority)
                 parameters.security_rules.append(
-                    SecurityRule('Tcp', '*', '*', 'Allow', 'Inbound', source_port_range='*',
-                                 destination_port_range=str(port), priority=priority, name=rule_name)
+                    self.network_models.SecurityRule('Tcp', '*', '*', 'Allow', 'Inbound', source_port_range='*',
+                                                     destination_port_range=str(port), priority=priority, name=rule_name)
                 )
 
         self.log('Creating default security group {0}'.format(security_group_name))
@@ -812,6 +818,11 @@ class AzureRMModuleBase(object):
         return self._network_client
 
     @property
+    def network_models(self):
+        self.log("Getting network models...")
+        return NetworkManagementClient.models("2017-06-01")
+
+    @property
     def rm_client(self):
         self.log('Getting resource manager client')
         if not self._resource_client:
@@ -821,6 +832,11 @@ class AzureRMModuleBase(object):
         return self._resource_client
 
     @property
+    def rm_models(self):
+        self.log("Getting resource manager models")
+        return ResourceManagementClient.models("2017-05-10")
+
+    @property
     def compute_client(self):
         self.log('Getting compute client')
         if not self._compute_client:
@@ -828,6 +844,11 @@ class AzureRMModuleBase(object):
                                                             base_url=self._cloud_environment.endpoints.resource_manager,
                                                             api_version='2017-03-30')
         return self._compute_client
+
+    @property
+    def compute_models(self):
+        self.log("Getting compute models")
+        return ComputeManagementClient.models("2017-03-30")
 
     @property
     def dns_client(self):
