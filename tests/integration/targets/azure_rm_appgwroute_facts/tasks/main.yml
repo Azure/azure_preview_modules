@@ -1,0 +1,74 @@
+- name: Prepare random number
+  set_fact:
+    rpfx: "{{ 1000 | random }}{{ resource_group | hash('md5') | truncate(7, True, '') }}"
+  run_once: yes
+
+- name: Create Route Table
+  azure_rm_appgwroutetable:
+    resource_group: "{{ resource_group }}"
+    route_table_name: routetablename{{ rpfx }}
+- name: Create Route
+  azure_rm_appgwroute:
+    resource_group: "{{ resource_group }}"
+    route_table_name: routetablename{{ rpfx }}
+    route_name: testroute{{ rpfx }}
+    address_prefix: 208.128.0.0/11
+    next_hop_type: virtual_network_gateway
+- name: Create Route
+  azure_rm_appgwroute:
+    resource_group: "{{ resource_group }}"
+    route_table_name: routetablename{{ rpfx }}
+    route_name: testroute{{ rpfx }}
+    address_prefix: 208.128.0.0/11
+    next_hop_type: virtual_network_gateway
+    name: second
+
+- name: Gather facts Route
+  azure_rm_appgwroute_facts:
+    resource_group: "{{ resource_group }}"
+    route_table_name: routetablename{{ rpfx }}
+    route_name: testroute{{ rpfx }}
+  register: output
+- name: Assert that facts are returned
+  assert:
+    that:
+      - output.changed == False
+      - output.routes.testroute{{ rpfx }}.id != None
+      - output.routes.testroute{{ rpfx }}.name != None
+
+- name: Delete instance of Route
+  azure_rm_appgwroute:
+    resource_group: "{{ resource_group }}"
+    route_table_name: routetablename{{ rpfx }}
+    route_name: testroute{{ rpfx }}
+    state: absent
+- name: Delete instance of Route
+  azure_rm_appgwroute:
+    resource_group: "{{ resource_group }}"
+    route_table_name: routetablename{{ rpfx }}
+    route_name: testroute{{ rpfx }}
+    state: absent
+
+- name: Gather facts Route
+  azure_rm_appgwroute_facts:
+    resource_group: "{{ resource_group }}"
+    route_table_name: routetablename{{ rpfx }}
+    route_name: testroute{{ rpfx }}
+  register: output
+- name: Assert that empty dictionary was returned
+  assert:
+    that:
+      - output.changed == False
+      - "'testroute{{ rpfx }}' not in output.routes"
+      - "'testroute{{ rpfx }}second' not in output.routes"
+
+- name: Delete instance of Route Table
+  azure_rm_appgwroutetable:
+    resource_group: "{{ resource_group }}"
+    route_table_name: routetablename{{ rpfx }}
+    state: absent
+- name: Delete instance of Route Table
+  azure_rm_appgwroutetable:
+    resource_group: "{{ resource_group }}"
+    route_table_name: routetablename{{ rpfx }}
+    state: absent
