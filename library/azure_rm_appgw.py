@@ -15,7 +15,7 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 
 DOCUMENTATION = '''
 ---
-module: azure_rm_applicationgateway
+module: azure_rm_appgw
 version_added: "2.5"
 short_description: Manage Application Gateway instance.
 description:
@@ -1103,7 +1103,7 @@ author:
 
 EXAMPLES = '''
   - name: Create (or update) Application Gateway
-    azure_rm_applicationgateway:
+    azure_rm_appgw:
       resource_group: NOT FOUND
       name: NOT FOUND
       location: eastus

@@ -4,7 +4,7 @@
   run_once: yes
 
 - name: Create instance of Route Table -- check mode
-  azure_rm_applicationgatewayroutetable:
+  azure_rm_appgwroutetable:
     resource_group: "{{ resource_group }}"
     route_table_name: routetablename{{ rpfx }}
   check_mode: yes
@@ -15,7 +15,7 @@
       - output.changed
 
 - name: Create instance of Route Table
-  azure_rm_applicationgatewayroutetable:
+  azure_rm_appgwroutetable:
     resource_group: "{{ resource_group }}"
     route_table_name: routetablename{{ rpfx }}
   register: output
@@ -25,7 +25,7 @@
       - output.changed
 
 - name: Create again instance of Route Table
-  azure_rm_applicationgatewayroutetable:
+  azure_rm_appgwroutetable:
     resource_group: "{{ resource_group }}"
     route_table_name: routetablename{{ rpfx }}
   register: output
@@ -35,7 +35,7 @@
       - output.changed == false
 
 - name: Delete instance of Route Table -- check mode
-  azure_rm_applicationgatewayroutetable:
+  azure_rm_appgwroutetable:
     resource_group: "{{ resource_group }}"
     route_table_name: routetablename{{ rpfx }}
     state: absent
@@ -47,7 +47,7 @@
       - output.changed
 
 - name: Delete instance of Route Table
-  azure_rm_applicationgatewayroutetable:
+  azure_rm_appgwroutetable:
     resource_group: "{{ resource_group }}"
     route_table_name: routetablename{{ rpfx }}
     state: absent
@@ -58,7 +58,7 @@
       - output.changed
 
 - name: Delete unexisting instance of Route Table
-  azure_rm_applicationgatewayroutetable:
+  azure_rm_appgwroutetable:
     resource_group: "{{ resource_group }}"
     route_table_name: routetablename{{ rpfx }}
     state: absent

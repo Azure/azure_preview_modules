@@ -21,7 +21,7 @@
     address_prefix_cidr: 10.1.0.0/24
 
 - name: Create instance of Application Gateway -- check mode
-  azure_rm_applicationgateway:
+  azure_rm_appgw:
     resource_group: "{{ resource_group }}"
     name: "appgateway{{ rpfx }}"
     sku:
@@ -71,7 +71,7 @@
       - output.changed
 
 - name: Create instance of Application Gateway
-  azure_rm_applicationgateway:
+  azure_rm_appgw:
     resource_group: "{{ resource_group }}"
     name: "appgateway{{ rpfx }}"
     sku:
@@ -120,7 +120,7 @@
       - output.changed
 
 - name: Delete instance of Application Gateway -- check mode
-  azure_rm_applicationgateway:
+  azure_rm_appgw:
     resource_group: "{{ resource_group }}"
     name: "appgateway{{ rpfx }}"
     state: absent
@@ -132,7 +132,7 @@
       - output.changed
 
 - name: Delete instance of Application Gateway
-  azure_rm_applicationgateway:
+  azure_rm_appgw:
     resource_group: "{{ resource_group }}"
     name: "appgateway{{ rpfx }}"
     state: absent
@@ -143,7 +143,7 @@
       - output.changed
 
 - name: Delete unexisting instance of Application Gateway
-  azure_rm_applicationgateway:
+  azure_rm_appgw:
     resource_group: "{{ resource_group }}"
     name: "appgateway{{ rpfx }}"
     state: absent

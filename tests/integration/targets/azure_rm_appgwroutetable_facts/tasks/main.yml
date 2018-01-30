@@ -4,16 +4,16 @@
   run_once: yes
 
 - name: Create Route Table
-  azure_rm_applicationgatewayroutetable:
+  azure_rm_appgwroutetable:
     resource_group: "{{ resource_group }}"
     route_table_name: routetablename{{ rpfx }}
 - name: Create Route Table
-  azure_rm_applicationgatewayroutetable:
+  azure_rm_appgwroutetable:
     resource_group: "{{ resource_group }}"
     route_table_name: routetablename{{ rpfx }}
 
 - name: Gather facts Route Table
-  azure_rm_applicationgatewayroutetable_facts:
+  azure_rm_appgwroutetable_facts:
     resource_group: "{{ resource_group }}"
     route_table_name: routetablename{{ rpfx }}
   register: output
@@ -27,18 +27,18 @@
       - output.route_tables.routetablename{{ rpfx }}.location != None
 
 - name: Delete instance of Route Table
-  azure_rm_applicationgatewayroutetable:
+  azure_rm_appgwroutetable:
     resource_group: "{{ resource_group }}"
     route_table_name: routetablename{{ rpfx }}
     state: absent
 - name: Delete instance of Route Table
-  azure_rm_applicationgatewayroutetable:
+  azure_rm_appgwroutetable:
     resource_group: "{{ resource_group }}"
     route_table_name: routetablename{{ rpfx }}
     state: absent
 
 - name: Gather facts Route Table
-  azure_rm_applicationgatewayroutetable_facts:
+  azure_rm_appgwroutetable_facts:
     resource_group: "{{ resource_group }}"
     route_table_name: routetablename{{ rpfx }}
   register: output

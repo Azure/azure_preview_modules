@@ -15,7 +15,7 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 
 DOCUMENTATION = '''
 ---
-module: azure_rm_applicationgatewayroute
+module: azure_rm_appgwroute
 version_added: "2.5"
 short_description: Manage Route instance.
 description:
@@ -73,7 +73,7 @@ author:
 
 EXAMPLES = '''
   - name: Create (or update) Route
-    azure_rm_applicationgatewayroute:
+    azure_rm_appgwroute:
       resource_group: rg1
       route_table_name: testrt
       route_name: route1

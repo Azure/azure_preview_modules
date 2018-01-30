@@ -15,7 +15,7 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 
 DOCUMENTATION = '''
 ---
-module: azure_rm_applicationgatewayroutetable
+module: azure_rm_appgwroutetable
 version_added: "2.5"
 short_description: Manage Route Table instance.
 description:
@@ -90,7 +90,7 @@ author:
 
 EXAMPLES = '''
   - name: Create (or update) Route Table
-    azure_rm_applicationgatewayroutetable:
+    azure_rm_appgwroutetable:
       resource_group: rg1
       route_table_name: testrt
       location: eastus

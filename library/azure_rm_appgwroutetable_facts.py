@@ -15,7 +15,7 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 
 DOCUMENTATION = '''
 ---
-module: azure_rm_applicationgatewayroutetable_facts
+module: azure_rm_appgwroutetable_facts
 version_added: "2.5"
 short_description: Get Route Table facts.
 description:
@@ -44,7 +44,7 @@ author:
 
 EXAMPLES = '''
   - name: Get instance of Route Table
-    azure_rm_applicationgatewayroutetable_facts:
+    azure_rm_appgwroutetable_facts:
       resource_group: resource_group_name
       route_table_name: route_table_name
       expand: expand
