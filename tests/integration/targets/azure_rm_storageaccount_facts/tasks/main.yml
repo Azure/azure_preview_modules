@@ -1,0 +1,23 @@
+ - name: Create storage account name
+   set_fact:
+       storage_account: "{{ resource_group | hash('md5') | truncate(24, True, '') }}"
+
+ - name: Create new storage account
+   azure_rm_storageaccount:
+       resource_group: "{{ resource_group }}" 
+       name: "{{ storage_account }}"
+       account_type: Standard_LRS
+       tags:
+           test: test
+           galaxy: galaxy
+
+ - name: Gather facts for storage account
+   azure_rm_storageaccount_facts:
+       resource_group: "{{ resource_group }}" 
+       name: "{{ storage_account }}"
+   register: output
+
+ - name: Dump output
+   debug:
+     msg: output is {{ output }}     
+
