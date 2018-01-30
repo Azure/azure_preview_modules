@@ -24,5 +24,9 @@
  - name: Assert task failed
    assert:
     that:
-      - output.storage_accounts == "xxxx"
+      - output.azure_storageaccounts[0].name == "{{ storage_account }}"
 
+ - name: Assert task failed
+   assert:
+    that:
+      - output.azure_storageaccounts[0].name == "mooo"
