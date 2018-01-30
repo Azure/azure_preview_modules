@@ -35,7 +35,10 @@ except ImportError:
     ANSIBLE_VERSION = 'unknown'
 
 AZURE_COMMON_ARGS = dict(
-    cli_default_profile=dict(type='bool'),
+    auth_source=dict(
+        type='str',
+        choices=['auto', 'cli', 'env', 'credential_file']
+    ),
     profile=dict(type='str'),
     subscription_id=dict(type='str', no_log=True),
     client_id=dict(type='str', no_log=True),
@@ -44,11 +47,11 @@ AZURE_COMMON_ARGS = dict(
     ad_user=dict(type='str', no_log=True),
     password=dict(type='str', no_log=True),
     cloud_environment=dict(type='str'),
+    cert_validation_mode=dict(type='str', choices=['validate', 'ignore'])
     # debug=dict(type='bool', default=False),
 )
 
 AZURE_CREDENTIAL_ENV_MAPPING = dict(
-    cli_default_profile='AZURE_CLI_DEFAULT_PROFILE',
     profile='AZURE_PROFILE',
     subscription_id='AZURE_SUBSCRIPTION_ID',
     client_id='AZURE_CLIENT_ID',
@@ -57,6 +60,7 @@ AZURE_CREDENTIAL_ENV_MAPPING = dict(
     ad_user='AZURE_AD_USER',
     password='AZURE_PASSWORD',
     cloud_environment='AZURE_CLOUD_ENVIRONMENT',
+    cert_validation_mode='AZURE_CERT_VALIDATION_MODE',
 )
 
 AZURE_TAG_ARGS = dict(
@@ -70,6 +74,7 @@ AZURE_COMMON_REQUIRED_IF = [
 
 ANSIBLE_USER_AGENT = 'Ansible/{0}'.format(ANSIBLE_VERSION)
 CLOUDSHELL_USER_AGENT_KEY = 'AZURE_HTTP_USER_AGENT'
+VSCODEEXT_USER_AGENT_KEY = 'VSCODEEXT_USER_AGENT'
 
 CIDR_PATTERN = re.compile(r"(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1"
                           r"[0-9]{2}|2[0-4][0-9]|25[0-5])(/([0-9]|[1-2][0-9]|3[0-2]))")
@@ -139,6 +144,7 @@ try:
     from azure.common.cloud import get_cli_active_cloud
 except ImportError:
     HAS_AZURE_CLI_CORE = False
+    CLIError = Exception
 
 
 def azure_id_to_dict(id):
@@ -154,17 +160,17 @@ def azure_id_to_dict(id):
 AZURE_PKG_VERSIONS = {
     StorageManagementClient.__name__: {
         'package_name': 'storage',
-        'expected_version': '1.0.0',
+        'expected_version': '1.5.0',
         'installed_version': storage_client_version
     },
     ComputeManagementClient.__name__: {
         'package_name': 'compute',
-        'expected_version': '1.0.0',
+        'expected_version': '2.0.0',
         'installed_version': compute_client_version
     },
     NetworkManagementClient.__name__: {
         'package_name': 'network',
-        'expected_version': '1.0.0',
+        'expected_version': '1.3.0',
         'installed_version': network_client_version
     },
     ResourceManagementClient.__name__: {
@@ -190,7 +196,7 @@ AZURE_MIN_RELEASE = '2.0.0'
 
 class AzureRMModuleBase(object):
     def __init__(self, derived_arg_spec, bypass_checks=False, no_log=False,
-                 check_invalid_arguments=True, mutually_exclusive=None, required_together=None,
+                 check_invalid_arguments=None, mutually_exclusive=None, required_together=None,
                  required_one_of=None, add_file_common_args=False, supports_check_mode=False,
                  required_if=None, supports_tags=True, facts_module=False, skip_exec=False):
 
@@ -226,7 +232,7 @@ class AzureRMModuleBase(object):
                       "- {0}".format(HAS_MSRESTAZURE_EXC))
 
         if not HAS_AZURE:
-            self.fail("Do you have azure>={1} installed? Try `pip install 'azure>={1}' --upgrade`"
+            self.fail("Do you have azure>={1} installed? Try `pip install ansible[azure]`"
                       "- {0}".format(HAS_AZURE_EXC, AZURE_MIN_RELEASE))
 
         self._cloud_environment = None
@@ -245,12 +251,25 @@ class AzureRMModuleBase(object):
         # authenticate
         self.credentials = self._get_credentials(self.module.params)
         if not self.credentials:
-            self.fail("Failed to get credentials. Either pass as parameters, set environment variables, "
-                      "or define a profile in ~/.azure/credentials or be logged using AzureCLI.")
+            if HAS_AZURE_CLI_CORE:
+                self.fail("Failed to get credentials. Either pass as parameters, set environment variables, "
+                          "define a profile in ~/.azure/credentials, or log in with Azure CLI (`az login`).")
+            else:
+                self.fail("Failed to get credentials. Either pass as parameters, set environment variables, "
+                          "define a profile in ~/.azure/credentials, or install Azure CLI and log in (`az login`).")
+
+        # cert validation mode precedence: module-arg, credential profile, env, "validate"
+        self._cert_validation_mode = self.module.params['cert_validation_mode'] or self.credentials.get('cert_validation_mode') or \
+            os.environ.get('AZURE_CERT_VALIDATION_MODE') or 'validate'
+
+        if self._cert_validation_mode not in ['validate', 'ignore']:
+            self.fail('invalid cert_validation_mode: {0}'.format(self._cert_validation_mode))
 
         # if cloud_environment specified, look up/build Cloud object
         raw_cloud_env = self.credentials.get('cloud_environment')
-        if not raw_cloud_env:
+        if self.credentials.get('credentials') is not None and raw_cloud_env is not None:
+            self._cloud_environment = raw_cloud_env
+        elif not raw_cloud_env:
             self._cloud_environment = azure_cloud.AZURE_PUBLIC_CLOUD  # SDK default
         else:
             # try to look up "well-known" values via the name attribute on azure_cloud members
@@ -268,18 +287,22 @@ class AzureRMModuleBase(object):
                 except Exception as e:
                     self.fail("cloud_environment {0} could not be resolved: {1}".format(raw_cloud_env, e.message), exception=traceback.format_exc(e))
 
-        if self.credentials.get('subscription_id', None) is None:
+        if self.credentials.get('subscription_id', None) is None and self.credentials.get('credentials') is None:
             self.fail("Credentials did not include a subscription_id value.")
         self.log("setting subscription_id")
         self.subscription_id = self.credentials['subscription_id']
 
-        if self.credentials.get('client_id') is not None and \
-           self.credentials.get('secret') is not None and \
-           self.credentials.get('tenant') is not None:
-            self.azure_credentials = ServicePrincipalCredentials(client_id=self.credentials['client_id'],
-                                                                 secret=self.credentials['secret'],
-                                                                 tenant=self.credentials['tenant'],
-                                                                 cloud_environment=self._cloud_environment)
+        if self.credentials.get('credentials') is not None:
+            # AzureCLI credentials
+            self.azure_credentials = self.credentials['credentials']
+        elif self.credentials.get('client_id') is not None and \
+                self.credentials.get('secret') is not None and \
+                self.credentials.get('tenant') is not None:
+                self.azure_credentials = ServicePrincipalCredentials(client_id=self.credentials['client_id'],
+                                                                     secret=self.credentials['secret'],
+                                                                     tenant=self.credentials['tenant'],
+                                                                     cloud_environment=self._cloud_environment,
+                                                                     verify=self._cert_validation_mode == 'validate')
 
         elif self.credentials.get('ad_user') is not None and self.credentials.get('password') is not None:
             tenant = self.credentials.get('tenant')
@@ -289,7 +312,8 @@ class AzureRMModuleBase(object):
             self.azure_credentials = UserPassCredentials(self.credentials['ad_user'],
                                                          self.credentials['password'],
                                                          tenant=tenant,
-                                                         cloud_environment=self._cloud_environment)
+                                                         cloud_environment=self._cloud_environment,
+                                                         verify=self._cert_validation_mode == 'validate')
         else:
             self.fail("Failed to authenticate with provided credentials. Some attributes were missing. "
                       "Credentials must include client_id, secret and tenant or ad_user and password or "
@@ -312,8 +336,7 @@ class AzureRMModuleBase(object):
             expected_version = package_version.get('expected_version')
             if Version(client_version) < Version(expected_version):
                 self.fail("Installed {0} client version is {1}. The supported version is {2}. Try "
-                          "`pip install azure>={3} --upgrade`".format(client_name, client_version, expected_version,
-                                                                      AZURE_MIN_RELEASE))
+                          "`pip install ansible[azure]`".format(client_name, client_version, expected_version))
 
     def exec_module(self, **kwargs):
         self.fail("Error: {0} failed to implement exec_module method.".format(self.__class__.__name__))
@@ -420,19 +443,6 @@ class AzureRMModuleBase(object):
         except Exception as exc:
             self.fail("Error retrieving resource group {0} - {1}".format(resource_group, str(exc)))
 
-    def _get_azure_cli_profile(self):
-        if not HAS_AZURE_CLI_CORE:
-            self.fail("Do you have azure-cli-core installed? Try `pip install 'azure-cli-core' --upgrade`")
-        try:
-            credentials, subscription_id = get_azure_cli_credentials()
-            self._cloud_environment = get_cli_active_cloud()
-            return {
-                'credentials': credentials,
-                'subscription_id': subscription_id
-            }
-        except CLIError as err:
-            self.fail("AzureCLI profile cannot be loaded - {0}".format(err))
-
     def _get_profile(self, profile="default"):
         path = expanduser("~/.azure/credentials")
         try:
@@ -453,13 +463,21 @@ class AzureRMModuleBase(object):
 
         return None
 
+    def _get_azure_cli_credentials(self):
+        credentials, subscription_id = get_azure_cli_credentials()
+        cloud_environment = get_cli_active_cloud()
+
+        cli_credentials = {
+            'credentials': credentials,
+            'subscription_id': subscription_id,
+            'cloud_environment': cloud_environment
+        }
+        return cli_credentials
+
     def _get_env_credentials(self):
         env_credentials = dict()
         for attribute, env_variable in AZURE_CREDENTIAL_ENV_MAPPING.items():
             env_credentials[attribute] = os.environ.get(env_variable, None)
-
-        if (env_credentials['cli_default_profile'] or '').lower() in ["true", "yes", "1"]:
-            return self._get_azure_cli_profile()
 
         if env_credentials['profile']:
             credentials = self._get_profile(env_credentials['profile'])
@@ -472,18 +490,38 @@ class AzureRMModuleBase(object):
 
     def _get_credentials(self, params):
         # Get authentication credentials.
-        # Precedence: module parameters-> environment variables-> default profile in ~/.azure/credentials.
-
         self.log('Getting credentials')
 
         arg_credentials = dict()
         for attribute, env_variable in AZURE_CREDENTIAL_ENV_MAPPING.items():
             arg_credentials[attribute] = params.get(attribute, None)
 
-        if arg_credentials['cli_default_profile']:
-            self.log('Retrieving credentials from Azure CLI current profile')
-            return self._get_azure_cli_profile()
+        auth_source = params.get('auth_source', None)
+        if not auth_source:
+            auth_source = os.environ.get('ANSIBLE_AZURE_AUTH_SOURCE', 'auto')
 
+        if auth_source == 'cli':
+            if not HAS_AZURE_CLI_CORE:
+                self.fail("Azure auth_source is `cli`, but azure-cli package is not available. Try `pip install azure-cli --upgrade`")
+            try:
+                self.log('Retrieving credentials from Azure CLI profile')
+                cli_credentials = self._get_azure_cli_credentials()
+                return cli_credentials
+            except CLIError as err:
+                self.fail("Azure CLI profile cannot be loaded - {0}".format(err))
+
+        if auth_source == 'env':
+            self.log('Retrieving credentials from environment')
+            env_credentials = self._get_env_credentials()
+            return env_credentials
+
+        if auth_source == 'credential_file':
+            self.log("Retrieving credentials from credential file")
+            profile = params.get('profile', 'default')
+            default_credentials = self._get_profile(profile)
+            return default_credentials
+
+        # auto, precedence: module parameters -> environment variables -> default profile in ~/.azure/credentials
         # try module params
         if arg_credentials['profile'] is not None:
             self.log('Retrieving credentials with profile parameter.')
@@ -505,6 +543,14 @@ class AzureRMModuleBase(object):
         if default_credentials:
             self.log('Retrieved default profile credentials from ~/.azure/credentials.')
             return default_credentials
+
+        try:
+            if HAS_AZURE_CLI_CORE:
+                self.log('Retrieving credentials from AzureCLI profile')
+            cli_credentials = self._get_azure_cli_credentials()
+            return cli_credentials
+        except CLIError as ce:
+            self.log('Error getting AzureCLI profile credentials - {0}'.format(ce))
 
         return None
 
@@ -711,6 +757,10 @@ class AzureRMModuleBase(object):
 
         return self.get_poller_result(poller)
 
+    @staticmethod
+    def _validation_ignore_callback(session, global_config, local_config, **kwargs):
+        session.verify = False
+
     def get_mgmt_svc_client(self, client_type, base_url=None, api_version=None):
         self.log('Getting management service client {0}'.format(client_type.__name__))
         self.check_client_version(client_type)
@@ -729,6 +779,12 @@ class AzureRMModuleBase(object):
         # Add user agent when running from Cloud Shell
         if CLOUDSHELL_USER_AGENT_KEY in os.environ:
             client.config.add_user_agent(os.environ[CLOUDSHELL_USER_AGENT_KEY])
+        # Add user agent when running from VSCode extension
+        if VSCODEEXT_USER_AGENT_KEY in os.environ:
+            client.config.add_user_agent(os.environ[VSCODEEXT_USER_AGENT_KEY])
+
+        if self._cert_validation_mode == 'ignore':
+            client.config.session_configuration_callback = self._validation_ignore_callback
 
         return client
 
