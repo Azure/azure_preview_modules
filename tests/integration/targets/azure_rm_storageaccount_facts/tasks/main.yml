@@ -26,6 +26,20 @@
     that:
       - output.azure_storageaccounts[0].name == "{{ storage_account }}"
 
+ - name: Gather facts for storage account
+   azure_rm_storageaccount_facts:
+       resource_group: "{{ resource_group }}" 
+   register: output
+
+ - name: Dump output
+   debug:
+     msg: output is {{ output }}     
+
+ - name: Assert task failed
+   assert:
+    that:
+      - output.azure_storageaccounts[0].name == "{{ storage_account }}"
+
  - name: Assert task failed
    assert:
     that:
