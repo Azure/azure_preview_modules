@@ -21,3 +21,8 @@
    debug:
      msg: output is {{ output }}     
 
+ - name: Assert task failed
+   assert:
+    that:
+      - output.storage_accounts == "xxxx"
+
