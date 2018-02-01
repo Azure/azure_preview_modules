@@ -24,7 +24,13 @@ Installation
 
   ``` bash
   $ pip install -r ~/.ansible/roles/Azure.azure_preview_modules/files/requirements-azure.txt
-  ``` 
+  ```
+    
+  &nbsp;&nbsp;&nbsp;&nbsp;or
+      
+  ``` bash
+  $ sudo pip install -r ~/.ansible/roles/Azure.azure_preview_modules/files/requirements-azure.txt
+  ```
 
    Several reasons for installing Python SDKs are listed here.
 
@@ -36,8 +42,7 @@ Installation
     
    The tricky part is the installation location, which has to be the same as where existing Azure Python SDKs are installed. If you meet any error when executing above command, please read below part carefully to double check the installation location. 
 
-   Taking Ubuntu for example, the existing SDKs may be located in folders like
-    `/home/<your-user-name>/.local/lib/python2.7/site-packages` or `/usr/local/lib/python2.7/dist-packages`. The former is a user folder and the latter is a system folder, which requires sudo access. This depends on how you have installed `ansible`. In short, you should install the SDKs the same way as you installed `ansible` so that the SDKs are in the same `site-packages` folder.
+   Taking Ubuntu for example, the existing SDKs may be located in folders like `/home/<your-user-name>/.local/lib/python2.7/site-packages` or `/usr/local/lib/python2.7/dist-packages`. The former is a user folder and the latter is a system folder, which requires sudo access. This depends on how you have installed `ansible`. In short, you should install the SDKs the same way as you installed `ansible` so that the SDKs are in the same `site-packages` folder.
 
    On macOS, the existing SDKs may be located in folders like `/Users/<your-user-name>/Library/Python/2.7/lib/python/site-packages` or `/Library/Python/2.7/site-packages`. Like Ubuntu, the former is an user folder and the latter is a system folder.
 
@@ -62,7 +67,7 @@ Installation
   Requires: azure-common, azure-mgmt-nspkg, msrestazure
   ```
 
-From above information you can learn that the SDKs are installed in *user* `site-packages` folder and use below command to install the listed packages. 
+From above information you can learn that the SDKs are installed in *user* `site-packages` folder and use `pip install` to install the listed packages. If the SDKs are installed in *system* path, use `sudo pip install` to install the listed packages.
 
 
 Role Variables
