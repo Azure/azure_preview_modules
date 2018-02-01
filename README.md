@@ -62,7 +62,7 @@ Installation
   Requires: azure-common, azure-mgmt-nspkg, msrestazure
   ```
 
-    From above information you can learn that the SDKs are installed in *user* `site-packages` folder and use below command to install the listed packages. 
+From above information you can learn that the SDKs are installed in *user* `site-packages` folder and use below command to install the listed packages. 
 
 
 Role Variables
