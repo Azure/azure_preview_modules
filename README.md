@@ -43,24 +43,24 @@ Installation
 
    One way to figure out the correct `site-packages` path is to check the details of existing packages, say `azure-mgmt-storage` by running below command.
 
-      ``` bash
-      $ pip show azure-mgmt-storage
-      ```
+  ``` bash
+  $ pip show azure-mgmt-storage
+  ```
 
    You can get the output like below. 
 
-      ``` bash
-      your-user-name@ansible:~$ pip show azure-mgmt-storage
-      Name: azure-mgmt-storage
-      Version: 1.5.0
-      Summary: Microsoft Azure Storage Management Client Library for Python
-      Home-page: https://github.com/Azure/azure-sdk-for-python
-      Author: Microsoft Corporation
-      Author-email: azpysdkhelp@microsoft.com
-      License: MIT License
-      Location: /home/<your-user-name>/.local/lib/python2.7/site-packages
-      Requires: azure-common, azure-mgmt-nspkg, msrestazure
-      ```
+  ``` bash
+  your-user-name@ansible:~$ pip show azure-mgmt-storage
+  Name: azure-mgmt-storage
+  Version: 1.5.0
+  Summary: Microsoft Azure Storage Management Client Library for Python
+  Home-page: https://github.com/Azure/azure-sdk-for-python
+  Author: Microsoft Corporation
+  Author-email: azpysdkhelp@microsoft.com
+  License: MIT License
+  Location: /home/<your-user-name>/.local/lib/python2.7/site-packages
+  Requires: azure-common, azure-mgmt-nspkg, msrestazure
+  ```
 
     From above information you can learn that the SDKs are installed in *user* `site-packages` folder and use below command to install the listed packages. 
 
