@@ -150,7 +150,7 @@ class AzureRMLoadBalancerFacts(AzureRMModuleBase):
         results = {}
         try:
             response = self.network_client.load_balancers.get(resource_group_name=self.resource_group,
-                                                           load_balancer_name=self.name)
+                                                              load_balancer_name=self.name)
             self.log("Response : {0}".format(response))
         except CloudError as e:
             self.log('Could not get facts for LoadBalancers.')
@@ -169,7 +169,7 @@ class AzureRMLoadBalancerFacts(AzureRMModuleBase):
         response = None
         results = {}
         try:
-            response = self.network_client.load_balancers.list(resource_group=self.resource_group)
+            response = self.network_client.load_balancers.list(self.resource_group)
             self.log("Response : {0}".format(response))
         except CloudError as e:
             self.log('Could not get facts for Load Balancers.')
