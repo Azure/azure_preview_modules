@@ -132,7 +132,7 @@ class AzureRMLoadBalancerFacts(AzureRMModuleBase):
             self.results['loadbalancers'] = self.get()
         elif self.resource_group is not None:
             self.results['loadbalancers'] = self.list_by_resource_group()
-        else
+        else:
             self.results['loadbalancers'] = self.list_all()
 
         # old way of listing load balancers
