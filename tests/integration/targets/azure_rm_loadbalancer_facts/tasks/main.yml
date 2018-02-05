@@ -24,7 +24,17 @@
   assert:
     that:
       - output.changed == False
-      - output.loadbalancers.lb{{ rpfx }}.id != None
+#      - output.loadbalancers.lb{{ rpfx }}.id != None
+
+- name: get load balancer facts
+  azure_rm_loadbalancer_facts:
+    resource_group: '{{ resource_group }}'
+  register: output
+
+- name: Assert that facts are returned
+  assert:
+    that:
+      - output.changed == False
 
 - name: delete load balancer
   azure_rm_loadbalancer:
