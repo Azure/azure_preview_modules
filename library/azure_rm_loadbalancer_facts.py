@@ -149,7 +149,7 @@ class AzureRMLoadBalancerFacts(AzureRMModuleBase):
         response = None
         results = {}
         try:
-            response = self.mgmt_client.load_balancers.get(resource_group_name=self.resource_group,
+            response = self.network_client.load_balancers.get(resource_group_name=self.resource_group,
                                                            load_balancer_name=self.load_balancer_name)
             self.log("Response : {0}".format(response))
         except CloudError as e:
