@@ -135,8 +135,8 @@ class AzureRMLoadBalancerFacts(AzureRMModuleBase):
         else
             self.results['loadbalancers'] = self.list_all()
 
-        #self.results['ansible_facts']['azure_loadbalancers'] = (
-        )
+        # old way of listing load balancers
+        self.results['ansible_facts']['azure_loadbalancers'] = [k  for  k in self.results['loadbalancers']]
 
         return self.results
 
