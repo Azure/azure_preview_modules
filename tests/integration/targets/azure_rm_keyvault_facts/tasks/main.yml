@@ -7,6 +7,7 @@
   azure_rm_keyvault:
     resource_group: "{{ resource_group }}"
     vault_name: "vault{{ rpfx }}"
+    vault_tenant: "{{ azure_tenant }}"
     enabled_for_deployment: yes
     sku:
       name: standard
@@ -41,16 +42,6 @@
     that:
       - output.changed == False
       - output.vaults.vault{{ rpfx }}.id != None
-
-- name: Debug facts
-  debug:
-    msg: "RESPONSE: {{ output.vaults }}"
-- name: Debug facts -- details
-  debug:
-    msg: "TENANT: {{ azure_tenant[0:10] }}----{{ azure_tenant[10:100] }}"
-- name: Debug facts -- details
-  debug:
-    msg: "CLIENT ID: {{ azure_client_id[0:10] }}----{{ azure_client_id[10:100] }}"
 
 - name: Gather facts Vault
   azure_rm_keyvault_facts:
