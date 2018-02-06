@@ -7,6 +7,7 @@
   azure_rm_keyvault:
     resource_group: "{{ resource_group }}"
     vault_name: "vault{{ rpfx }}"
+    vault_tenant: "{{ azure_tenant }}"
     enabled_for_deployment: yes
     sku:
       name: standard
