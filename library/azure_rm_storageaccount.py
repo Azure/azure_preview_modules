@@ -223,7 +223,7 @@ class AzureRMStorageAccount(AzureRMModuleBase):
         self.account_dict = self.get_account()
 
         if self.state == 'present' and self.account_dict and \
-           self.account_dict['provisioning_state'] != AZURE_SUCCESS_STATE :
+           self.account_dict['provisioning_state'] != AZURE_SUCCESS_STATE:
             self.fail("Error: storage account {0} has not completed provisioning. State is {1}. Expecting state "
                       "to be {2}.".format(self.name, self.account_dict['provisioning_state'], AZURE_SUCCESS_STATE))
 
@@ -277,7 +277,7 @@ class AzureRMStorageAccount(AzureRMModuleBase):
             resource_group=self.resource_group,
             type=account_obj.type,
             access_tier=(account_obj.access_tier.value
-                        if account_obj.access_tier is not None else None),
+                         if account_obj.access_tier is not None else None),
             sku_tier=account_obj.sku.tier.value,
             sku_name=account_obj.sku.name.value,
             provisioning_state=account_obj.provisioning_state.value,
@@ -351,7 +351,7 @@ class AzureRMStorageAccount(AzureRMModuleBase):
 
             if self.results['changed'] and not self.check_mode:
                 new_domain = self.storage_models.CustomDomain(name=self.custom_domain['name'],
-                                          use_sub_domain=self.custom_domain['use_sub_domain'])
+                                                              use_sub_domain=self.custom_domain['use_sub_domain'])
                 parameters = self.storage_models.StorageAccountUpdateParameters(custom_domain=new_domain)
                 try:
                     self.storage_client.storage_accounts.update(self.resource_group, self.name, parameters)
@@ -410,7 +410,7 @@ class AzureRMStorageAccount(AzureRMModuleBase):
         sku.tier = self.storage_models.SkuTier.standard if 'Standard' in self.account_type else \
             self.storage_models.SkuTier.premium
         parameters = self.storage_models.StorageAccountCreateParameters(sku, self.kind, self.location,
-                                                                                 tags=self.tags, access_tier=self.access_tier)
+                                                                        tags=self.tags, access_tier=self.access_tier)
         self.log(str(parameters))
         try:
             poller = self.storage_client.storage_accounts.create(self.resource_group, self.name, parameters)
