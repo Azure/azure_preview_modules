@@ -51,6 +51,11 @@ options:
             - Valid azure location. Defaults to location of the resource group.
         default: resource_group location
         required: false
+    virtual_network_resource_group:
+        description:
+            - When creating a network interface, if a specific virtual network from another resource group should be
+              used, use this parameter to specify the resource group to use.
+        version_added: 2.6
     virtual_network_name:
         description:
             - Name or id of an existing virtual network with which the network interface will be associated. Required
@@ -369,6 +374,7 @@ class AzureRMNetworkInterface(AzureRMModuleBase):
             public_ip_address_name=dict(type='str', aliases=['public_ip_address', 'public_ip_name']),
             public_ip=dict(type='bool', default=True),
             subnet_name=dict(type='str', aliases=['subnet']),
+            virtual_network_resource_group=dict(type='str'),
             virtual_network_name=dict(type='str', aliases=['virtual_network']),
             public_ip_allocation_method=dict(type='str', choices=['Dynamic', 'Static'], default='Dynamic'),
             ip_configurations=dict(type='list', default=None, elements='dict', options=ip_configuration_spec),
@@ -389,6 +395,7 @@ class AzureRMNetworkInterface(AzureRMModuleBase):
         self.public_ip_address_name = None
         self.public_ip = None
         self.subnet_name = None
+        self.virtual_network_resource_group = None
         self.virtual_network_name = None
         self.public_ip_allocation_method = None
         self.state = None
@@ -425,7 +432,10 @@ class AzureRMNetworkInterface(AzureRMModuleBase):
         # parse the virtual network resource group and name
         virtual_network_dict = parse_resource_id(self.virtual_network_name)
         virtual_network_name = virtual_network_dict.get('name')
-        virtual_network_resource_group = virtual_network_dict.get('resource_group', self.resource_group)
+        virtual_network_resource_group = virtual_network_dict.get('resource_group', self.virtual_network_resource_group)
+
+        if virtual_network_resource_group is None:
+            virtual_network_resource_group = self.resource_group
 
         if self.state == 'present' and not self.ip_configurations:
             # construct the ip_configurations array for compatiable
@@ -573,6 +583,13 @@ class AzureRMNetworkInterface(AzureRMModuleBase):
         self.log("Fetching public ip address {0}".format(name))
         try:
             return self.network_client.public_ip_addresses.get(self.resource_group, name)
+        except Exception as exc:
+            return None
+
+    def get_subnet(self, resource_group, vnet_name, subnet_name):
+        self.log("Fetching subnet {0} in virtual network {1}".format(subnet_name, vnet_name))
+        try:
+            return self.network_client.subnets.get(resource_group, vnet_name, subnet_name)
         except Exception as exc:
             return None
 
