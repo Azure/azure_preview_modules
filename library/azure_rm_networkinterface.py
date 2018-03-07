@@ -504,10 +504,10 @@ class AzureRMNetworkInterface(AzureRMModuleBase):
             if self.state == 'present':
                 subnet = self.network_models.SubResource(
                     '/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.Network/virtualNetworks/{2}/subnets/{3}'.format(
-                        self.subscription_id,
-                        virtual_network_resource_group,
-                        virtual_network_name,
-                        self.subnet_name))
+                                                         self.subscription_id,
+                                                         virtual_network_resource_group,
+                                                         virtual_network_name,
+                                                         self.subnet_name))
 
                 nic_ip_configurations = [
                     self.network_models.NetworkInterfaceIPConfiguration(
@@ -515,7 +515,7 @@ class AzureRMNetworkInterface(AzureRMModuleBase):
                         private_ip_address=ip_config.get('private_ip_address'),
                         name=ip_config.get('name'),
                         subnet=subnet,
-                        public_ip_address=self.get_or_create_public_ip_address(ip_config),
+                        public_ip_address=(None if not self.public_ip else self.get_or_create_public_ip_address(ip_config)),
                         primary=ip_config.get('primary')
                     ) for ip_config in self.ip_configurations
                 ]
