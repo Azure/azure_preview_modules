@@ -376,7 +376,6 @@ class AzureRMModuleBase(object):
             self.module.exit_json(**res)
 
     def acquire_token_with_username_password(self, authority, resource, username, password, client_id):
-        # not adfs, normal username password authentication
         context = AuthenticationContext(authority)
         token_response = context.acquire_token_with_username_password(resource, username, password, client_id)
 
