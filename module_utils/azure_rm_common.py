@@ -35,7 +35,7 @@ AZURE_COMMON_ARGS = dict(
     cloud_environment=dict(type='str'),
     cert_validation_mode=dict(type='str', choices=['validate', 'ignore']),
     api_profile=dict(type='str', default='latest'),
-    authority=dict(type='str', default=None)
+    authority=dict(type='str')
     # debug=dict(type='bool', default=False),
 )
 
@@ -331,8 +331,8 @@ class AzureRMModuleBase(object):
             # AzureCLI credentials
             self.azure_credentials = self.credentials['credentials']
         elif self.credentials.get('client_id') is not None and \
-                self.credentials.get('secret') is not None and \
-                self.credentials.get('tenant') is not None:
+             self.credentials.get('secret') is not None and \
+             self.credentials.get('tenant') is not None:
                 self.azure_credentials = ServicePrincipalCredentials(client_id=self.credentials['client_id'],
                                                                      secret=self.credentials['secret'],
                                                                      tenant=self.credentials['tenant'],
@@ -340,7 +340,8 @@ class AzureRMModuleBase(object):
                                                                      verify=self._cert_validation_mode == 'validate')
 
         elif self.credentials.get('ad_user') is not None and \
-                self.credentials.get('password') is not None:
+             self.credentials.get('password') is not None and \
+             self.credentials.get('client_id') is None:
                 tenant = self.credentials.get('tenant')
                 if not tenant:
                     tenant = 'common'  # SDK default
@@ -352,16 +353,16 @@ class AzureRMModuleBase(object):
                                                              verify=self._cert_validation_mode == 'validate')
 
         elif self.credentials.get('ad_user') is not None and \
-                self.credentials.get('password') is not None and \
-                self.credentials.get('client_id') is not None:
-                tenant = self.credentials.get('tenant')
-
+             self.credentials.get('password') is not None and \
+             self.credentials.get('client_id') is not None:                
+                
                 self.azure_credentials = self.acquire_token_with_username_password(
                                                     self._authority,
                                                     self._resource,
                                                     self.credeitnals['ad_user'],
                                                     self.credentials['password'],
                                                     self.credentials['client_id'])
+
         else:
             self.fail("Failed to authenticate with provided credentials. Some attributes were missing. "
                       "Credentials must include client_id, secret and tenant or ad_user and password and "
@@ -377,10 +378,13 @@ class AzureRMModuleBase(object):
             self.module.exit_json(**res)
 
     def acquire_token_with_username_password(self, authority, resource, username, password, client_id):
-        context = AuthenticationContext(authority)
-        token_response = context.acquire_token_with_username_password(resource, username, password, client_id)
+        try:
+            context = AuthenticationContext(authority)
+            token_response = context.acquire_token_with_username_password(resource, username, password, client_id)
 
-        return AADTokenCredentials(token_response)
+            return AADTokenCredentials(token_response)
+        except Exception as exc:
+            self.fail("failed to authenticate by ad_user, password and client_id", exception=traceback.format_exception(exc))
 
     def check_client_version(self, client_type):
         # Ensure Azure modules are at least 2.0.0rc5.
