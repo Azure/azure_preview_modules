@@ -356,11 +356,12 @@ class AzureRMModuleBase(object):
                 self.credentials.get('client_id') is not None:
                 tenant = self.credentials.get('tenant')
 
-                self.azure_credentials = self.acquire_token_with_username_password(self._authority,
-                                                      self._resource,
-                                                      self.credeitnals['ad_user'],
-                                                      self.credentials['password'],
-                                                      self.credentials['client_id'])
+                self.azure_credentials = self.acquire_token_with_username_password(
+                                                    self._authority,
+                                                    self._resource,
+                                                    self.credeitnals['ad_user'],
+                                                    self.credentials['password'],
+                                                    self.credentials['client_id'])
         else:
             self.fail("Failed to authenticate with provided credentials. Some attributes were missing. "
                       "Credentials must include client_id, secret and tenant or ad_user and password and "
