@@ -354,14 +354,16 @@ class AzureRMModuleBase(object):
 
         elif self.credentials.get('ad_user') is not None and \
              self.credentials.get('password') is not None and \
-             self.credentials.get('client_id') is not None:                
-                
+             self.credentials.get('client_id') is not None:
+                tenant = self.credentials.get('tenant')
+
                 self.azure_credentials = self.acquire_token_with_username_password(
                                                     self._authority,
                                                     self._resource,
-                                                    self.credeitnals['ad_user'],
+                                                    self.credentials['ad_user'],
                                                     self.credentials['password'],
-                                                    self.credentials['client_id'])
+                                                    self.credentials['client_id'],
+                                                    tenant)
 
         else:
             self.fail("Failed to authenticate with provided credentials. Some attributes were missing. "
@@ -377,14 +379,15 @@ class AzureRMModuleBase(object):
             res = self.exec_module(**self.module.params)
             self.module.exit_json(**res)
 
-    def acquire_token_with_username_password(self, authority, resource, username, password, client_id):
-        try:
-            context = AuthenticationContext(authority)
-            token_response = context.acquire_token_with_username_password(resource, username, password, client_id)
+    def acquire_token_with_username_password(self, authority, resource, username, password, client_id, tenant):
+        authority_uri = authority
 
-            return AADTokenCredentials(token_response)
-        except Exception as exc:
-            self.fail("failed to authenticate by ad_user, password and client_id", exception=traceback.format_exception(exc))
+        if tenant is not None:
+            authority_uri = authority + '/' + tenant
+
+        context = AuthenticationContext(authority_uri)
+        token_response = context.acquire_token_with_username_password(resource, username, password, client_id)
+        return AADTokenCredentials(token_response)
 
     def check_client_version(self, client_type):
         # Ensure Azure modules are at least 2.0.0rc5.
