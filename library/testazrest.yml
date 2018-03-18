@@ -1,0 +1,12 @@
+- name: Try azure_rest module
+  hosts: localhost
+  connection: local
+  tasks:
+  - name: Create a resource group
+    azure_rm_rest:
+      url: https://management.azure.com//subscriptions/{{ lookup('env','AZURE_SUBSCRIPTION_ID') }}/resourcegroups
+      api_version: "2017-05-10"
+    register: output
+  - name: Dump output 
+    debug:
+      msg: "{{ output }}"
