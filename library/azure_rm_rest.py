@@ -187,7 +187,7 @@ class GenericRestClient(object):
             request = self._client.delete(url, query_parameters)
         elif method=='MERGE':
             request = self._client.merge(url, query_parameters)
-        response = self._client.send(request, header_parameters, **operation_config)
+        response = self._client.send(request, header_parameters, body, **operation_config)
 
         if response.status_code not in expected_status_codes:
             exp = CloudError(response)
