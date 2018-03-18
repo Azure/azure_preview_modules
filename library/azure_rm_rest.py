@@ -17,28 +17,30 @@ DOCUMENTATION = '''
 ---
 module: azure_rm_mysqldatabase_facts
 version_added: "2.5"
-short_description: Get MySQL Database facts.
+short_description: Call Azure RM REST API.
 description:
-    - Get facts of MySQL Database.
+  - Call Azure RM REST API.
 
 options:
-    resource_group:
-        description:
-            - The name of the resource group that contains the resource. You can obtain this value from the Azure Resource Manager API or the portal.
-        required: True
-    server_name:
-        description:
-            - The name of the server.
-        required: True
-    database_name:
-        description:
-            - The name of the database.
+  body:
+    description:
+      - The body of the http request/response to the web service.
+  method:
+    description:
+      - The HTTP method of the request or response. It MUST be uppercase.
+        choices: [ "GET", "PUT", "POST", "HEAD", "PATCH", "DELETE", "MERGE" ]
+        default: "GET"
+  status_code:
+    description:
+      - A valid, numeric, HTTP status code that signifies success of the
+        request. Can also be comma separated list of status codes.
+    default: 200
 
 extends_documentation_fragment:
-    - azure
+  - azure
 
 author:
-    - "Zim Kalinowski (@zikalino)"
+  - "Zim Kalinowski (@zikalino)"
 
 '''
 
@@ -167,13 +169,27 @@ class GenericRestClient(object):
         self._client = ServiceClient(self.config.credentials, self.config)
         self.models = None
 
-    def query(self, url, query_parameters, header_parameters):
+    def query(self, url, method, query_parameters, header_parameters, body, expected_status_codes):
         # Construct and send request
         operation_config = {}
-        request = self._client.get(url, query_parameters)
+
+        if method=='GET':
+            request = self._client.get(url, query_parameters)
+        elif method=='PUT':
+            request = self._client.put(url, query_parameters)
+        elif method=='POST':
+            request = self._client.post(url, query_parameters)
+        elif method=='HEAD':
+            request = self._client.head(url, query_parameters)
+        elif method=='PATCH':
+            request = self._client.patch(url, query_parameters)
+        elif method=='DELETE':
+            request = self._client.delete(url, query_parameters)
+        elif method=='MERGE':
+            request = self._client.merge(url, query_parameters)
         response = self._client.send(request, header_parameters, **operation_config)
 
-        if response.status_code not in [200]:
+        if response.status_code not in expected_status_codes:
             exp = CloudError(response)
             exp.request_id = response.headers.get('x-ms-request-id')
             raise exp
@@ -192,6 +208,18 @@ class AzureRMGenericRest(AzureRMModuleBase):
             api_version=dict(
                 type='str',
                 required=True
+            ),
+            method=dict(
+                type='str',
+                default='GET',
+                choices=[ "GET", "PUT", "POST", "HEAD", "PATCH", "DELETE", "MERGE" ]
+            ),
+            body=dict(
+                type='raw'
+            ),
+            status_code=dict(
+                type='list',
+                default=[200]
             )
         )
         # store the results of the module operation
@@ -202,6 +230,8 @@ class AzureRMGenericRest(AzureRMModuleBase):
         self.mgmt_client = None
         self.url = None
         self.api_version = None
+        self.method = None
+        self.status_code = []
         super(AzureRMGenericRest, self).__init__(self.module_arg_spec)
 
     def exec_module(self, **kwargs):
@@ -228,7 +258,7 @@ class AzureRMGenericRest(AzureRMModuleBase):
         #if self.config.accept_language is not None:
         #    header_parameters['accept-language'] = self._serialize.header("self.config.accept_language", self.config.accept_language, 'str')
 
-        response = self.mgmt_client.query(self.url, query_parameters, header_parameters)
+        response = self.mgmt_client.query(self.url, self.method, query_parameters, header_parameters, self.body, self.status_code)
         return json.loads(response.text)
 
 
