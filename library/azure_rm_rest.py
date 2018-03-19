@@ -22,6 +22,30 @@ description:
   - Call Azure RM REST API.
 
 options:
+  url:
+    description:
+      - Azure RM Resource URL.
+  provider:
+    description:
+      - Provider type, should be specified in no URL is given
+        choices: [ "containerservice",
+                   "containerinstance" ]
+                   # get list of providers here
+  resource_group:
+    description:
+      - Resource group to be used, should be specified if needed and URL is not specified
+  resource_type:
+    description:
+      - Resource type, should be valid for specified provider
+  resource_name:
+    description:
+      - Resource name, should be specified if needed and URL is not specified
+  subresource_type:
+    description:
+      - Sub-resource type, should be specified if needed and not specified via URL
+  subresource_name:
+    description:
+      - Resource name, should be specified if needed and not specified via URL
   body:
     description:
       - The body of the http request/response to the web service.
@@ -30,6 +54,12 @@ options:
       - The HTTP method of the request or response. It MUST be uppercase.
         choices: [ "GET", "PUT", "POST", "HEAD", "PATCH", "DELETE", "MERGE" ]
         default: "GET"
+  provider:
+    description:
+      - The HTTP method of the request or response. It MUST be uppercase.
+        choices: [ "GET", "PUT", "POST", "HEAD", "PATCH", "DELETE", "MERGE" ]
+        default: "GET"
+
   status_code:
     description:
       - A valid, numeric, HTTP status code that signifies success of the
@@ -58,46 +88,11 @@ EXAMPLES = '''
 '''
 
 RETURN = '''
-databases:
+xxxxxx:
     description: A list of dict results where the key is the name of the MySQL Database and the values are the facts for that MySQL Database.
     returned: always
     type: complex
     contains:
-        mysqldatabase_name:
-            description: The key is the name of the server that the values relate to.
-            type: complex
-            contains:
-                id:
-                    description:
-                        - Resource ID
-                    returned: always
-                    type: str
-                    sample: "/subscriptions/ffffffff-ffff-ffff-ffff-ffffffffffff/resourceGroups/TestGroup/providers/Microsoft.DBforMySQL/servers/testserver/d
-                            atabases/db1"
-                name:
-                    description:
-                        - Resource name.
-                    returned: always
-                    type: str
-                    sample: db1
-                type:
-                    description:
-                        - Resource type.
-                    returned: always
-                    type: str
-                    sample: Microsoft.DBforMySQL/servers/databases
-                charset:
-                    description:
-                        - The charset of the database.
-                    returned: always
-                    type: str
-                    sample: utf8
-                collation:
-                    description:
-                        - The collation of the database.
-                    returned: always
-                    type: str
-                    sample: utf8_general_ci
 '''
 
 from ansible.module_utils.azure_rm_common import AzureRMModuleBase
@@ -203,7 +198,31 @@ class AzureRMGenericRest(AzureRMModuleBase):
         self.module_arg_spec = dict(
             url=dict(
                 type='str',
-                required=True
+                required=False
+            ),
+            provider=dict(
+                type='str',
+                required=False
+            ),
+            resource_group=dict(
+                type='str',
+                required=False
+            ),
+            resource_type=dict(
+                type='str',
+                required=False
+            ),
+            resource_name=dict(
+                type='str',
+                required=False
+            ),
+            subresource_type=dict(
+                type='str',
+                required=False
+            ),
+            subresource_name=dict(
+                type='str',
+                required=False
             ),
             api_version=dict(
                 type='str',
@@ -230,6 +249,12 @@ class AzureRMGenericRest(AzureRMModuleBase):
         self.mgmt_client = None
         self.url = None
         self.api_version = None
+        self.provider = None
+        self.resource_group = None
+        self.resource_type = None
+        self.resource_name = None
+        self.subresource_type = None
+        self.subresource_name = None
         self.method = None
         self.status_code = []
         super(AzureRMGenericRest, self).__init__(self.module_arg_spec)
@@ -239,6 +264,30 @@ class AzureRMGenericRest(AzureRMModuleBase):
             setattr(self, key, kwargs[key])
         self.mgmt_client = self.get_mgmt_svc_client(GenericRestClient,
                                                     base_url=self._cloud_environment.endpoints.resource_manager)
+
+        if self.url is not None:
+            # check if subscription id is empty
+            # check if anything else is empty
+            # check if url is short?
+
+        else:
+            # URL is None, so we should construct URL from scratch
+            self.url = '/subscriptions/' + self.subscription_id
+
+            if self.resource_group is not None:
+                self.url += '/resourcegroups/' + self.resource_group
+
+            if self.provider is not None:
+                self.url += '/providers/Microsoft.' + self.provider
+
+            if self.resource_type is not None:
+                self.url += '/' + self.resource_type
+                if self.resource_name is not None:
+                    self.url += '/' + self.resource_name
+                    if self.subresource_type is not None:
+                        self.url += '/' + self.subresource_type
+                        if self.subresource_name is not None:
+                            self.url += '/' + self.subresource_name
 
         self.results['response'] = self.query()
 
