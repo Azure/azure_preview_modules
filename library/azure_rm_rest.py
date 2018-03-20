@@ -269,7 +269,7 @@ class AzureRMGenericRest(AzureRMModuleBase):
             # check if subscription id is empty
             # check if anything else is empty
             # check if url is short?
-
+            self.url = self.url
         else:
             # URL is None, so we should construct URL from scratch
             self.url = '/subscriptions/' + self.subscription_id
