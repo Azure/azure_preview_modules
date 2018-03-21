@@ -1,8 +1,5 @@
 #!/usr/bin/python
-#
-# Copyright (c) 2016 Matt Davis, <mdavis@ansible.com>
-#                    Chris Houseknecht, <house@redhat.com>
-#
+# Copyright: Ansible Project
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
@@ -17,7 +14,7 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = '''
 ---
 module: azure_rm_keyvaultkey
-version_added: "2.4"
+version_added: 2.5
 short_description: Use Azure KeyVault keys.
 description:
     - Create or delete a key within a given keyvault. By using Key Vault, you can encrypt
@@ -31,6 +28,15 @@ options:
         description:
             - Name of the keyvault key.
         required: true
+    byok_file:
+        description:
+            - BYOK file.
+    pem_file:
+        description:
+            - PEM file.
+    pem_password:
+        description:
+            - PEM password.
     state:
         description:
             - Assert the state of the key. Use 'present' to create a key and
@@ -199,7 +205,7 @@ class AzureRMKeyVaultKey(AzureRMModuleBase):
         def _to_bytes(hex_string):
             # zero pads and decodes a hex string
             if len(hex_string) % 2:
-                hex_string = '0{}'.format(hex_string)
+                hex_string = '{0}'.format(hex_string)
             return codecs.decode(hex_string, 'hex_codec')
 
         def _set_rsa_parameters(dest, src):
