@@ -384,8 +384,8 @@ class AzureRMContainerInstance(AzureRMModuleBase):
                                                                  container_group_name=self.name,
                                                                  container_group=parameters)
 
-        #if isinstance(response, AzureOperationPoller):
-        #    response = self.get_poller_result(response)
+        if isinstance(response, AzureOperationPoller):
+            response = self.get_poller_result(response)
 
         return response.as_dict()
 
