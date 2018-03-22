@@ -9,7 +9,7 @@
     name: aci{{ rpfx }}
     os_type: linux
     ip_address: public
-    location: westus
+    location: eastus
     ports:
       - 80
     containers:
@@ -28,7 +28,7 @@
     name: aci{{ rpfx }}second
     os_type: linux
     ip_address: public
-    location: westus
+    location: eastus
     ports:
       - 80
     containers:
@@ -79,7 +79,7 @@
     name: aci{{ rpfx }}
     os_type: linux
     ip_address: public
-    location: westus
+    location: eastus
     ports:
       - 80
     containers:
@@ -99,7 +99,7 @@
     name: aci{{ rpfx }}second
     os_type: linux
     ip_address: public
-    location: westus
+    location: eastus
     ports:
       - 80
     containers:
