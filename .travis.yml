@@ -56,7 +56,7 @@ before_install:
     }
 
   - run_test(){
-      i=0
+      i=0;
       retry=2;
       file=$1;
       filename=${file##tests/integration/};
