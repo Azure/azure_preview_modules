@@ -56,6 +56,7 @@ before_install:
     }
 
   - run_test(){
+      retry=2;
       file=$1;
       filename=${file##tests/integration/};
       test_name=${file##tests/integration/targets/};
@@ -65,12 +66,22 @@ before_install:
       resource_group="ansible-role-test-${test_name##azure_rm_}$(date +%s)";
       create_resource_group $resource_group;
 
-      travis_wait 50 ansible-playbook tests/integration/main.yml --extra-vars "{\"test\":$filename,\"resource_group\":$resource_group,\"azure_subscription_id\":$AZURE_SUBSCRIPTION_ID,\"azure_tenant\":$AZURE_TENANT,\"azure_client_id\":$AZURE_CLIENT_ID}";
+      i=0
+      while [ $i -lt $retry ]
+      do
+        travis_wait 50 ansible-playbook tests/integration/main.yml --extra-vars "{\"test\":$filename,\"resource_group\":$resource_group,\"azure_subscription_id\":$AZURE_SUBSCRIPTION_ID,\"azure_tenant\":$AZURE_TENANT,\"azure_client_id\":$AZURE_CLIENT_ID}";
 
-      if [ $? -ne 0 ]; then
-        message+=($test_name);
-        export exit_code=1;
-      fi
+        if [ $? -eq 0 ]; then
+            break
+        else
+          i=$[$i+1]
+          
+          if [ $i -eq $retry ]; then
+            message+=($test_name);
+            export exit_code=1;
+          fi
+        fi
+      done
 
       travis_wait 50 delete_resource_group $resource_group;
     }
