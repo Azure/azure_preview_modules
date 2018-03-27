@@ -81,7 +81,7 @@ before_install:
             export exit_code=1;
           fi
         else
-          echo test $test_name passed;
+          echo test passed;
           break
         fi
       done
