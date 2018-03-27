@@ -80,11 +80,10 @@ EXAMPLES = '''
 '''
 
 RETURN = '''
-xxxxxx:
-    description: A list of dict results where the key is the name of the MySQL Database and the values are the facts for that MySQL Database.
+response:
+    description: Response specific to resource type.
     returned: always
-    type: complex
-    contains:
+    type: dict
 '''
 
 from ansible.module_utils.azure_rm_common import AzureRMModuleBase
@@ -145,8 +144,7 @@ class AzureRMResourceFacts(AzureRMModuleBase):
         )
         # store the results of the module operation
         self.results = dict(
-            changed=False,
-            ansible_facts=dict()
+            response=None
         )
         self.mgmt_client = None
         self.url = None
