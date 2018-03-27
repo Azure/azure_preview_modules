@@ -83,11 +83,8 @@ from ansible.module_utils.azure_rm_common import AzureRMModuleBase
 
 try:
     from msrestazure.azure_exceptions import CloudError
-    from msrestazure.azure_operation import AzureOperationPoller
-    from msrest.serialization import Model
     from msrestazure import AzureConfiguration
     from msrest.service_client import ServiceClient
-    from msrest.pipeline import ClientRawResponse
     import json
 
 except ImportError:
