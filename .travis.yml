@@ -72,14 +72,18 @@ before_install:
         travis_wait 50 ansible-playbook tests/integration/main.yml --extra-vars "{\"test\":$filename,\"resource_group\":$resource_group,\"azure_subscription_id\":$AZURE_SUBSCRIPTION_ID,\"azure_tenant\":$AZURE_TENANT,\"azure_client_id\":$AZURE_CLIENT_ID}";
 
         if [ $? -eq 0 ]; then
-            break
+          echo test passed;
+          break
+
         else
-            i=$[$i+1];
+          i=$[$i+1];
           
-            if [ $i -eq $retry ]; then
-              message+=($test_name);
-              export exit_code=1;
-            fi
+          if [ $i -eq $retry ]; then
+            echo test failed;
+
+            message+=($test_name);
+            export exit_code=1;
+          fi
         fi
       done
 
