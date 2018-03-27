@@ -52,6 +52,14 @@ options:
       - A valid, numeric, HTTP status code that signifies success of the
         request. Can also be comma separated list of status codes.
     default: 200
+  state:
+    description:
+      - Assert the state of the resource. Use C(present) to create or update resource or C(absent) to delete resource.
+    default: present
+    choices:
+        - absent
+        - present
+
 
 extends_documentation_fragment:
   - azure

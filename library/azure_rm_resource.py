@@ -56,12 +56,18 @@ options:
       - The HTTP method of the request or response. It MUST be uppercase.
         choices: [ "GET", "PUT", "POST", "HEAD", "PATCH", "DELETE", "MERGE" ]
         default: "GET"
-
   status_code:
     description:
       - A valid, numeric, HTTP status code that signifies success of the
         request. Can also be comma separated list of status codes.
     default: 200
+  state:
+    description:
+      - Assert the state of the resource. Use C(present) to create or update resource or C(absent) to delete resource.
+    default: present
+    choices:
+        - absent
+        - present
 
 extends_documentation_fragment:
   - azure
@@ -150,6 +156,11 @@ class AzureRMResource(AzureRMModuleBase):
             status_code=dict(
                 type='list',
                 default=[200]
+            ),
+            state=dict(
+                type='str',
+                default='present',
+                choices=['present', 'absent']
             )
         )
         # store the results of the module operation
@@ -168,6 +179,7 @@ class AzureRMResource(AzureRMModuleBase):
         self.subresource_name = None
         self.method = None
         self.status_code = []
+        self.state = None
         super(AzureRMResource, self).__init__(self.module_arg_spec)
 
     def exec_module(self, **kwargs):
@@ -175,6 +187,9 @@ class AzureRMResource(AzureRMModuleBase):
             setattr(self, key, kwargs[key])
         self.mgmt_client = self.get_mgmt_svc_client(GenericRestClient,
                                                     base_url=self._cloud_environment.endpoints.resource_manager)
+
+        if self.state == 'absent':
+            self.method = 'DELETE'
 
         if self.url is not None:
             # check if subscription id is empty
