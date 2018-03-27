@@ -97,76 +97,8 @@ except ImportError:
     # This is handled in azure_rm_common
     pass
 
-class GenericRestClientConfiguration(AzureConfiguration):
-    """Configuration for SqlManagementClient
-    Note that all parameters used to create this instance are saved as instance
-    attributes.
 
-    :param credentials: Credentials needed for the client to connect to Azure.
-    :type credentials: :mod:`A msrestazure Credentials
-     object<msrestazure.azure_active_directory>`
-    :param subscription_id: The subscription ID that identifies an Azure
-     subscription.
-    :type subscription_id: str
-    :param str base_url: Service URL
-    """
-
-    def __init__(
-            self, credentials, subscription_id, base_url=None):
-
-        if credentials is None:
-            raise ValueError("Parameter 'credentials' must not be None.")
-        if subscription_id is None:
-            raise ValueError("Parameter 'subscription_id' must not be None.")
-        if not base_url:
-            base_url = 'https://management.azure.com'
-
-        super(GenericRestClientConfiguration, self).__init__(base_url)
-
-        self.add_user_agent('genericrestclient/1.0')
-        self.add_user_agent('Azure-SDK-For-Python')
-
-        self.credentials = credentials
-        self.subscription_id = subscription_id
-
-
-class GenericRestClient(object):
-    """The Azure SQL Database management API provides a RESTful set of web services that interact with Azure SQL Database services to manage your databases. The API enables you to create, retrieve, update, and delete databases.
-
-    :ivar config: Configuration for client.
-    :vartype config: SqlManagementClientConfiguration
-    :param credentials: Credentials needed for the client to connect to Azure.
-    :type credentials: :mod:`A msrestazure Credentials
-     object<msrestazure.azure_active_directory>`
-    :param subscription_id: The subscription ID that identifies an Azure
-     subscription.
-    :type subscription_id: str
-    :param str base_url: Service URL
-    """
-
-    def __init__(
-            self, credentials, subscription_id, base_url=None):
-
-        self.config = GenericRestClientConfiguration(credentials, subscription_id, base_url)
-        self._client = ServiceClient(self.config.credentials, self.config)
-        self.models = None
-
-    def query(self, url, method, query_parameters, header_parameters, body, expected_status_codes):
-        # Construct and send request
-        operation_config = {}
-
-        request = self._client.get(url, query_parameters)
-        response = self._client.send(request, header_parameters, body, **operation_config)
-
-        if response.status_code not in expected_status_codes:
-            exp = CloudError(response)
-            exp.request_id = response.headers.get('x-ms-request-id')
-            raise exp
-
-        return response
-        
-
-class AzureRMGenericRest(AzureRMModuleBase):
+class AzureRMResourceFacts(AzureRMModuleBase):
     def __init__(self):
         # define user inputs into argument
         self.module_arg_spec = dict(
@@ -224,7 +156,7 @@ class AzureRMGenericRest(AzureRMModuleBase):
         self.subresource_type = None
         self.subresource_name = None
         self.status_code = []
-        super(AzureRMGenericRest, self).__init__(self.module_arg_spec)
+        super(AzureRMResourceFacts, self).__init__(self.module_arg_spec)
 
     def exec_module(self, **kwargs):
         for key in self.module_arg_spec:
@@ -278,7 +210,50 @@ class AzureRMGenericRest(AzureRMModuleBase):
         return json.loads(response.text)
 
 
+class GenericRestClientConfiguration(AzureConfiguration):
+
+    def __init__(
+            self, credentials, subscription_id, base_url=None):
+
+        if credentials is None:
+            raise ValueError("Parameter 'credentials' must not be None.")
+        if subscription_id is None:
+            raise ValueError("Parameter 'subscription_id' must not be None.")
+        if not base_url:
+            base_url = 'https://management.azure.com'
+
+        super(GenericRestClientConfiguration, self).__init__(base_url)
+
+        self.add_user_agent('genericrestclient/1.0')
+        self.add_user_agent('Azure-SDK-For-Python')
+
+        self.credentials = credentials
+        self.subscription_id = subscription_id
+
+
+class GenericRestClient(object):
+
+    def __init__(self, credentials, subscription_id, base_url=None):
+        self.config = GenericRestClientConfiguration(credentials, subscription_id, base_url)
+        self._client = ServiceClient(self.config.credentials, self.config)
+        self.models = None
+
+    def query(self, url, method, query_parameters, header_parameters, body, expected_status_codes):
+        # Construct and send request
+        operation_config = {}
+
+        request = self._client.get(url, query_parameters)
+        response = self._client.send(request, header_parameters, body, **operation_config)
+
+        if response.status_code not in expected_status_codes:
+            exp = CloudError(response)
+            exp.request_id = response.headers.get('x-ms-request-id')
+            raise exp
+
+        return response
+        
+
 def main():
-    AzureRMGenericRest()
+    AzureRMResourceFacts()
 if __name__ == '__main__':
     main()
