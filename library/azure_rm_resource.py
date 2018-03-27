@@ -72,16 +72,14 @@ author:
 '''
 
 EXAMPLES = '''
-  - name: Get instance of MySQL Database
-    azure_rm_mysqldatabase_facts:
-      resource_group: resource_group_name
-      server_name: server_name
-      database_name: database_name
-
-  - name: List instances of MySQL Database
-    azure_rm_mysqldatabase_facts:
-      resource_group: resource_group_name
-      server_name: server_name
+  - name: Update scaleset info using azure_rm_resource
+    azure_rm_resource:
+      resource_group: "{{ resource_group }}"
+      provider: compute
+      resource_type: virtualmachinescalesets
+      resource_name: "{{ scaleset_name }}"
+      api_version: "2017-12-01"
+      body: "{{ body }}"
 '''
 
 RETURN = '''
