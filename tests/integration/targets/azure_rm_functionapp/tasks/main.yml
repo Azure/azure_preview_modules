@@ -1,7 +1,7 @@
 - name: Prepare random number
   set_fact:
     rpfx: "{{ resource_group | hash('md5') | truncate(7, True, '') }}{{ 1000 | random }}"
-    storage_account_name: "stor{{ rpfx }}"
+    storage_account_name: "stor{{ resource_group | hash('md5') | truncate(3, True, '') }}{{ 100 | random }}"
   run_once: yes
 
 - name: create storage account for function apps
