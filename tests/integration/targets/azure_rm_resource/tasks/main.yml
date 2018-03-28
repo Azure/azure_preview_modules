@@ -1,0 +1,31 @@
+- name: Prepare random number
+  set_fact:
+    rpfx: "{{ resource_group | hash('md5') | truncate(7, True, '') }}{{ 1000 | random }}"
+  run_once: yes
+
+- name: Create instance of resource
+  azure_rm_resource:
+    resource_group: "{{ resource_group }}"
+    provider: batch
+    resource_type: batchaccounts
+    resource_name: batch{{ rpfx }}
+    api_version: "2017-09-01"
+    body:
+      location: eastus
+
+- name: Query instance of resource
+  azure_rm_resource_facts:
+    resource_group: "{{ resource_group }}"
+    provider: batch
+    resource_type: batchaccounts
+    resource_name: batch{{ rpfx }}
+    api_version: "2017-09-01"
+
+- name: Delete resource
+  azure_rm_resource:
+    resource_group: "{{ resource_group }}"
+    provider: batch
+    resource_type: batchaccounts
+    resource_name: batch{{ rpfx }}
+    api_version: "2017-09-01"
+    state: absent
