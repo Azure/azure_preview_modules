@@ -15,11 +15,11 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 
 DOCUMENTATION = '''
 ---
-module: azure_rm_mysqldatabase_facts
-version_added: "2.5"
-short_description: Call Azure RM REST API.
+module: azure_rm_resource
+version_added: "2.6"
+short_description: Create any Azure resource.
 description:
-  - Call Azure RM REST API.
+  - Create any Azure resource using Azure REST API.
 
 options:
   url:
