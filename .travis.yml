@@ -67,7 +67,7 @@ before_install:
       m=1;
 
       echo Run test $test_name from $filename;
-      resource_group="ansible-role-test-${test_name##azure_rm_}$(date +%s)";
+      resource_group="asb-roletest-${test_name##azure_rm_}$(date +%s)";
 
       while [ $m -le $max_retry_count ]; do
         echo Run test $m time;
