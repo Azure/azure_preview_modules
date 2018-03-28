@@ -20,12 +20,3 @@
     resource_type: batchaccounts
     resource_name: batch{{ rpfx }}
     api_version: "2017-09-01"
-
-- name: Delete resource
-  azure_rm_resource:
-    resource_group: "{{ resource_group }}"
-    provider: batch
-    resource_type: batchaccounts
-    resource_name: batch{{ rpfx }}
-    api_version: "2017-09-01"
-    state: absent
