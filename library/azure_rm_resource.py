@@ -228,7 +228,11 @@ class AzureRMResource(AzureRMModuleBase):
         header_parameters['Content-Type'] = 'application/json; charset=utf-8'
 
         response = self.mgmt_client.query(self.url, self.method, query_parameters, header_parameters, self.body, self.status_code)
-        return json.loads(response.text)
+
+        try:
+            return json.loads(response.text)
+        except:
+            return response.text
 
 
 class GenericRestClientConfiguration(AzureConfiguration):
