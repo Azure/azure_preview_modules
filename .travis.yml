@@ -11,9 +11,10 @@ env:
     - number_per_job=2
     - message=()
     - ANSIBLE_VERSION=latest
+    - max_retry_count=2
     #- ANSIBLE_VERSION=2.4.2.0
   matrix:
-    - id=1
+  - id=1
     - id=2
     - id=3
     - id=4
@@ -49,6 +50,9 @@ before_install:
   - create_resource_group(){
       name=$1;
       ansible-playbook tests/utils/create_resource_group.yml --extra-vars="name=$name";
+      if [ $? -ne 0 ]; then
+        travis_terminate 1;
+      fi;
     }
   - delete_resource_group(){
       name=$1;
@@ -56,37 +60,36 @@ before_install:
     }
 
   - run_test(){
-      i=0;
-      retry=2;
       file=$1;
       filename=${file##tests/integration/};
       test_name=${file##tests/integration/targets/};
       test_name=${test_name%%/tasks/main.yml};
+      m=1;
 
       echo Run test $test_name from $filename;
       resource_group="ansible-role-test-${test_name##azure_rm_}$(date +%s)";
-      create_resource_group $resource_group;
+
+      while [ $m -le $max_retry_count ]; do
+        echo Run test $m time;
+        create_resource_group $resource_group;
       
-      while [ "$i" -lt "$retry" ]; do
-        echo Run test loop $i;
         travis_wait 50 ansible-playbook tests/integration/main.yml --extra-vars "{\"test\":$filename,\"resource_group\":$resource_group,\"azure_subscription_id\":$AZURE_SUBSCRIPTION_ID,\"azure_tenant\":$AZURE_TENANT,\"azure_client_id\":$AZURE_CLIENT_ID}";
 
         if [ $? -ne 0 ]; then
-          i=$[$i+1];
-          
-          if [ "$i" -eq "$retry" ]; then
-            echo test failed;
-
-            message+=($test_name);
-            export exit_code=1;
-          fi
+          echo test $test_name failed;
+          m=$[$m+1];
+          message+=($test_name);
+          export exit_code=1;
         else
-          echo test passed;
-          break
-        fi
-      done
-
-      travis_wait 50 delete_resource_group $resource_group;
+          echo test $test_name passed;
+          export exit_code=0;
+          travis_wait 50 delete_resource_group $resource_group;
+          break;
+        fi;
+        
+        travis_wait 50 delete_resource_group $resource_group;        
+      done;
+      
     }
 
 
@@ -103,7 +106,7 @@ before_install:
         if [ "$i" -lt "${#list[@]}" ]; then
           run_test ${list[$i]};
         fi
-      done
+      done;
     }
 
 install:
