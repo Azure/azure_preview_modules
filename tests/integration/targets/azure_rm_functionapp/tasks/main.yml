@@ -1,19 +1,20 @@
 - name: Prepare random number
   set_fact:
     rpfx: "{{ resource_group | hash('md5') | truncate(7, True, '') }}{{ 1000 | random }}"
+    storage_account_name: "stor{{ resource_group | hash('md5') | truncate(3, True, '') }}{{ 100 | random }}"
   run_once: yes
 
 - name: create storage account for function apps
   azure_rm_storageaccount:
     resource_group: '{{ resource_group }}'
-    name: azfunccistor4{{ rpfx }}
+    name: '{{ storage_account_name }}'
     account_type: Standard_LRS
 
 - name: create basic function app
   azure_rm_functionapp:
     resource_group: '{{ resource_group }}'
     name: azfuncci{{ rpfx }}
-    storage_account: azfunccistor4{{ rpfx }}
+    storage_account: '{{ storage_account_name }}'
   register: output
 
 - name: assert the function was created
@@ -47,7 +48,7 @@
   azure_rm_functionapp:
     resource_group: '{{ resource_group }}'
     name: azfuncci{{ rpfx }}
-    storage_account: azfunccistor4{{ rpfx }}
+    storage_account: '{{ storage_account_name }}'
     app_settings:
       hello: world
       things: more stuff
@@ -61,7 +62,7 @@
   azure_rm_functionapp:
     resource_group: '{{ resource_group }}'
     name: azfuncci{{ rpfx }}
-    storage_account: azfunccistor4{{ rpfx }}
+    storage_account: '{{ storage_account_name }}'
     app_settings:
       hello: world
       things: more stuff
@@ -86,5 +87,5 @@
 - name: delete storage account
   azure_rm_storageaccount:
     resource_group: '{{ resource_group }}'
-    name: azfunccistor4{{ rpfx }}
+    name: '{{ storage_account_name }}'
     state: absent
