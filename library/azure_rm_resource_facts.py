@@ -37,9 +37,20 @@ options:
   resource_name:
     description:
       - Resource name, should be specified if needed and URL is not specified
-  subresource_type:
+  subresource:
     description:
-      - Sub-resource type, should be specified if needed and not specified via URL
+      - List of subresources
+    type: list
+    suboptions:
+      namespace:
+        description:
+          - Subresource namespace
+      type:
+        description:
+          - Subresource type
+      name:
+        description:
+          - Subresource name
   subresource_name:
     description:
       - Resource name, should be specified if needed and not specified via URL
@@ -125,19 +136,17 @@ class AzureRMResourceFacts(AzureRMModuleBase):
                 type='str',
                 required=False
             ),
-            subresource_type=dict(
-                type='str',
-                required=False
-            ),
-            subresource_name=dict(
-                type='str',
-                required=False
+            subresource=dict(
+                type='list',
+                required=False,
+                default=[]
             ),
             api_version=dict(
                 type='str'
             ),
             status_code=dict(
                 type='list',
+                elements='dict',
                 default=[200]
             )
         )
@@ -152,8 +161,7 @@ class AzureRMResourceFacts(AzureRMModuleBase):
         self.resource_group = None
         self.resource_type = None
         self.resource_name = None
-        self.subresource_type = None
-        self.subresource_name = None
+        self.subresource = []
         self.status_code = []
         super(AzureRMResourceFacts, self).__init__(self.module_arg_spec)
 
@@ -164,13 +172,19 @@ class AzureRMResourceFacts(AzureRMModuleBase):
                                                     base_url=self._cloud_environment.endpoints.resource_manager)
 
         if self.url is None:
-            self.url = resource_id(subscription=self.subscription_id,
-                                   resource_group=self.resource_group,
-                                   namespace="microsoft." + self.provider,
-                                   type=self.resource_type,
-                                   name=self.resource_name,
-                                   child_type_0=self.subresource_type,
-                                   child_name_0=self.subresource_name)
+            rargs = dict()
+            rargs['subscription'] = self.subscription_id
+            rargs['resource_group'] = self.resource_group
+            rargs['namespace'] = "microsoft." + self.provider
+            rargs['type'] = self.resource_type
+            rargs['name'] = self.resource_name
+
+            for i in range(len(self.subresource)):
+                rargs['child_namespace_' + i] = self.subresource[i].get('namespace', None)
+                rargs['child_type_' + i] = self.subresource[i].get('type', None)
+                rargs['child_name_' + i] = self.subresource[i].get('name', None)
+                
+            self.url = resource_id(**rargs)
 
         self.results['response'] = self.query()
 
