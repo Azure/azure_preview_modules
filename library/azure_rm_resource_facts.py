@@ -164,7 +164,7 @@ class AzureRMResourceFacts(AzureRMModuleBase):
                                                     base_url=self._cloud_environment.endpoints.resource_manager)
 
         if self.url is None:
-            self.url = resource_id(subscription_id=self.subscription_id,
+            self.url = resource_id(subscription=self.subscription_id,
                                    resource_group=self.resource_group,
                                    namespace="microsoft." + self.provider,
                                    type=self.resource_type,
