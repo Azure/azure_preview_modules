@@ -45,6 +45,7 @@
         direction: "Outbound"
 
 - name: Query instance of security rule
+  azure_rm_resource_facts:
     resource_group: "{{ resource_group }}"
     provider: network
     resource_type: networksecuritygroups
