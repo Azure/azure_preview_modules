@@ -160,6 +160,7 @@ class AzureRMResourceFacts(AzureRMModuleBase):
                 
             self.url = resource_id(**rargs)
 
+        self.results['url'] = self.url
         self.results['response'] = self.query()
 
         return self.results
