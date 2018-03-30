@@ -204,7 +204,7 @@ class AzureRMResourceFacts(AzureRMModuleBase):
         #if self.config.accept_language is not None:
         #    header_parameters['accept-language'] = self._serialize.header("self.config.accept_language", self.config.accept_language, 'str')
 
-        response = self.mgmt_client.query(self.url, "get", query_parameters, header_parameters, None, self.status_code)
+        response = self.mgmt_client.query(self.url, "GET", query_parameters, header_parameters, None, self.status_code)
         return json.loads(response.text)
 
 
