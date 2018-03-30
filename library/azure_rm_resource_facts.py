@@ -161,7 +161,15 @@ class AzureRMResourceFacts(AzureRMModuleBase):
             self.url = resource_id(**rargs)
 
         self.results['url'] = self.url
-        self.results['response'] = self.query()
+
+        response = self.query()
+
+        if response.get('error', None):
+            self.results['response'] = []
+        elif response is list:
+            self.results['response'] = response
+        else:
+            self.results['response'] = [ response ]
 
         return self.results
 
