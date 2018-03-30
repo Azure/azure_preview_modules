@@ -51,26 +51,6 @@ options:
       name:
         description:
           - Subresource name
-  subresource_name:
-    description:
-      - Resource name, should be specified if needed and not specified via URL
-  body:
-    description:
-      - The body of the http request/response to the web service.
-
-  status_code:
-    description:
-      - A valid, numeric, HTTP status code that signifies success of the
-        request. Can also be comma separated list of status codes.
-    default: 200
-  state:
-    description:
-      - Assert the state of the resource. Use C(present) to create or update resource or C(absent) to delete resource.
-    default: present
-    choices:
-        - absent
-        - present
-
 
 extends_documentation_fragment:
   - azure
@@ -143,11 +123,6 @@ class AzureRMResourceFacts(AzureRMModuleBase):
             ),
             api_version=dict(
                 type='str'
-            ),
-            status_code=dict(
-                type='list',
-                elements='dict',
-                default=[200]
             )
         )
         # store the results of the module operation
@@ -162,7 +137,6 @@ class AzureRMResourceFacts(AzureRMModuleBase):
         self.resource_type = None
         self.resource_name = None
         self.subresource = []
-        self.status_code = []
         super(AzureRMResourceFacts, self).__init__(self.module_arg_spec)
 
     def exec_module(self, **kwargs):
@@ -198,7 +172,7 @@ class AzureRMResourceFacts(AzureRMModuleBase):
         header_parameters = {}
         header_parameters['Content-Type'] = 'application/json; charset=utf-8'
 
-        response = self.mgmt_client.query(self.url, "GET", query_parameters, header_parameters, None, self.status_code)
+        response = self.mgmt_client.query(self.url, "GET", query_parameters, header_parameters, None, [200, 404])
         return json.loads(response.text)
 
 
