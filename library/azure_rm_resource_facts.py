@@ -87,7 +87,7 @@ response:
 '''
 
 from ansible.module_utils.azure_rm_common import AzureRMModuleBase
-from ansible.module_utils.azure_rm_common_rest import GenericRestClient
+from ansible.module_utils.azure_rm_common_rest import GenericRestClient, create_url
 
 try:
     from msrestazure.azure_exceptions import CloudError
@@ -162,30 +162,15 @@ class AzureRMResourceFacts(AzureRMModuleBase):
         self.mgmt_client = self.get_mgmt_svc_client(GenericRestClient,
                                                     base_url=self._cloud_environment.endpoints.resource_manager)
 
-        if self.url is not None:
-            # check if subscription id is empty
-            # check if anything else is empty
-            # check if url is short?
-            self.url = self.url
-        else:
-            # URL is None, so we should construct URL from scratch
-            self.url = '/subscriptions/' + self.subscription_id
+        if self.url is None:
+            self.url = create_url(self.subscription_id,
+                                  self.resource_group,
+                                  self.provider,
+                                  self.resource_type,
+                                  self.resource_name,
+                                  self.subresource_type,
+                                  self.subresource_name)
 
-            if self.resource_group is not None:
-                self.url += '/resourcegroups/' + self.resource_group
-
-            if self.provider is not None:
-                self.url += '/providers/Microsoft.' + self.provider
-
-            if self.resource_type is not None:
-                self.url += '/' + self.resource_type
-                if self.resource_name is not None:
-                    self.url += '/' + self.resource_name
-                    if self.subresource_type is not None:
-                        self.url += '/' + self.subresource_type
-                        if self.subresource_name is not None:
-                            self.url += '/' + self.subresource_name
-            
         self.results['response'] = self.query()
 
         return self.results
@@ -197,12 +182,6 @@ class AzureRMResourceFacts(AzureRMModuleBase):
 
         header_parameters = {}
         header_parameters['Content-Type'] = 'application/json; charset=utf-8'
-        #if self.config.generate_client_request_id:
-        #    header_parameters['x-ms-client-request-id'] = str(uuid.uuid1())
-        #if custom_headers:
-        #    header_parameters.update(custom_headers)
-        #if self.config.accept_language is not None:
-        #    header_parameters['accept-language'] = self._serialize.header("self.config.accept_language", self.config.accept_language, 'str')
 
         response = self.mgmt_client.query(self.url, "GET", query_parameters, header_parameters, None, self.status_code)
         return json.loads(response.text)

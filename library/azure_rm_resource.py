@@ -96,7 +96,7 @@ response:
 '''
 
 from ansible.module_utils.azure_rm_common import AzureRMModuleBase
-from ansible.module_utils.azure_rm_common_rest import GenericRestClient
+from ansible.module_utils.azure_rm_common_rest import GenericRestClient, create_url
 
 try:
     from msrestazure.azure_exceptions import CloudError
@@ -191,29 +191,14 @@ class AzureRMResource(AzureRMModuleBase):
         if self.state == 'absent':
             self.method = 'DELETE'
 
-        if self.url is not None:
-            # check if subscription id is empty
-            # check if anything else is empty
-            # check if url is short?
-            self.url = self.url
-        else:
-            # URL is None, so we should construct URL from scratch
-            self.url = '/subscriptions/' + self.subscription_id
-
-            if self.resource_group is not None:
-                self.url += '/resourcegroups/' + self.resource_group
-
-            if self.provider is not None:
-                self.url += '/providers/Microsoft.' + self.provider
-
-            if self.resource_type is not None:
-                self.url += '/' + self.resource_type
-                if self.resource_name is not None:
-                    self.url += '/' + self.resource_name
-                    if self.subresource_type is not None:
-                        self.url += '/' + self.subresource_type
-                        if self.subresource_name is not None:
-                            self.url += '/' + self.subresource_name
+        if self.url is None:
+            self.url = create_url(self.subscription_id,
+                                  self.resource_group,
+                                  self.provider,
+                                  self.resource_type,
+                                  self.resource_name,
+                                  self.subresource_type,
+                                  self.subresource_name)
             
         self.results['response'] = self.query()
         self.results['changed'] = True
