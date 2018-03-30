@@ -87,7 +87,8 @@ response:
 '''
 
 from ansible.module_utils.azure_rm_common import AzureRMModuleBase
-from ansible.module_utils.azure_rm_common_rest import GenericRestClient, create_url
+from ansible.module_utils.azure_rm_common_rest import GenericRestClient
+from msrestazure.tools import resource_id, is_valid_resource_id
 
 try:
     from msrestazure.azure_exceptions import CloudError
@@ -163,13 +164,13 @@ class AzureRMResourceFacts(AzureRMModuleBase):
                                                     base_url=self._cloud_environment.endpoints.resource_manager)
 
         if self.url is None:
-            self.url = create_url(self.subscription_id,
-                                  self.resource_group,
-                                  self.provider,
-                                  self.resource_type,
-                                  self.resource_name,
-                                  self.subresource_type,
-                                  self.subresource_name)
+            self.url = resource_id(subscription_id=self.subscription_id,
+                                   resource_group=self.resource_group,
+                                   namespace="microsoft." + self.provider,
+                                   type=self.resource_type,
+                                   name=self.resource_name,
+                                   child_type_0=self.subresource_type,
+                                   child_name_0=self.subresource_name)
 
         self.results['response'] = self.query()
 

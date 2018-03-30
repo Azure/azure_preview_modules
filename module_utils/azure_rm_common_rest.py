@@ -65,23 +65,3 @@ class GenericRestClient(object):
             raise exp
 
         return response
-
-def create_url(subscription_id, resource_group, provider, resource_type, resource_name, subresource_type, subresource_name):
-    url = '/subscriptions/' + subscription_id
-
-    if resource_group is not None:
-        url += '/resourcegroups/' + resource_group
-
-    if provider is not None:
-        url += '/providers/Microsoft.' + provider
-
-    if resource_type is not None:
-        url += '/' + resource_type
-        if resource_name is not None:
-            url += '/' + resource_name
-            if subresource_type is not None:
-                url += '/' + subresource_type
-                if subresource_name is not None:
-                    url += '/' + subresource_name
-
-    return url
