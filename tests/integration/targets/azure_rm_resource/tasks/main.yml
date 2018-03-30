@@ -3,25 +3,43 @@
     rpfx: "{{ resource_group | hash('md5') | truncate(7, True, '') }}{{ 1000 | random }}"
   run_once: yes
 
-- name: Create security group -- using module
-  azure_rm_securitygroup:
+- name: Create security group
+  azure_rm_resource:
     resource_group: "{{ resource_group }}"
-    name: sg{{ rpfx }}
-    purge_rules: yes
-    rules:
-      - name: DenySSH
-        protocol: Tcp
-        destination_port_range: 22
-        access: Deny
-        priority: 100
-        direction: Inbound
-      - name: AllowSSH
-        protocol: Tcp
-        source_address_prefix: 174.109.158.0/24
-        destination_port_range: 22
-        access: Allow
-        priority: 101
-        direction: Inbound
+    provider: network
+    resource_type: networksecuritygroups
+    resource_name: sg{{ rpfx }}
+    api_version: "2018-01-01"
+    body:
+      location: eastus
+      properties:
+        securityRules:
+        - name: firstsecurityrule
+          properties:
+            protocol: "*"
+            sourceAddressPrefix: "10.0.0.0/8"
+            destinationAddressPrefix: "11.0.0.0/8"
+            access: "Deny"
+            destinationPortRange: "8080"
+            sourcePortRange: "*"
+            priority: 100
+            direction: "Outbound"
+
+- name: Query instance of security rule
+  azure_rm_resource_facts:
+    resource_group: "{{ resource_group }}"
+    provider: network
+    resource_type: networksecuritygroups
+    resource_name: sg{{ rpfx }}
+    subresource:
+      - type: securityrules
+        name: firstsecurityrule
+    api_version: "2018-01-01"
+  register: output
+
+- name: Dumping instance of security rule
+  debug:
+    msg: "hmmm: {{ output }}"
 
 - name: Create security rule
   azure_rm_resource:
@@ -41,8 +59,8 @@
         access: "Deny"
         destinationPortRange: "8080"
         sourcePortRange: "*"
-        priority: 100
-        direction: "Outbound"
+        priority: 200
+        direction: "Inbound"
 
 - name: Query instance of security rule
   azure_rm_resource_facts:
@@ -54,21 +72,3 @@
       - type: securityrules
         name: mysecurityrule
     api_version: "2018-01-01"
-
-- name: Create instance of resource
-  azure_rm_resource:
-    resource_group: "{{ resource_group }}"
-    provider: batch
-    resource_type: batchaccounts
-    resource_name: batch{{ rpfx }}
-    api_version: "2017-09-01"
-    body:
-      location: eastus
-
-- name: Query instance of resource
-  azure_rm_resource_facts:
-    resource_group: "{{ resource_group }}"
-    provider: batch
-    resource_type: batchaccounts
-    resource_name: batch{{ rpfx }}
-    api_version: "2017-09-01"
