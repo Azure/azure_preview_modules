@@ -11,6 +11,7 @@ env:
     - number_per_job=2
     - message=()
     - ANSIBLE_VERSION=latest
+    - max_retry_count=2
     #- ANSIBLE_VERSION=2.4.2.0
   matrix:
     - id=1
@@ -49,6 +50,9 @@ before_install:
   - create_resource_group(){
       name=$1;
       ansible-playbook tests/utils/create_resource_group.yml --extra-vars="name=$name";
+      if [ $? -ne 0 ]; then
+        travis_terminate 1;
+      fi;
     }
   - delete_resource_group(){
       name=$1;
@@ -60,19 +64,35 @@ before_install:
       filename=${file##tests/integration/};
       test_name=${file##tests/integration/targets/};
       test_name=${test_name%%/tasks/main.yml};
+      m=1;
 
       echo Run test $test_name from $filename;
-      resource_group="ansible-role-test-${test_name##azure_rm_}$(date +%s)";
-      create_resource_group $resource_group;
+      resource_group="asb-roletest-${test_name##azure_rm_}$(date +%s)";
 
-      travis_wait 50 ansible-playbook tests/integration/main.yml --extra-vars "{\"test\":$filename,\"resource_group\":$resource_group,\"azure_subscription_id\":$AZURE_SUBSCRIPTION_ID,\"azure_tenant\":$AZURE_TENANT,\"azure_client_id\":$AZURE_CLIENT_ID}";
+      while [ $m -le $max_retry_count ]; do
+        echo Run test $m time;
+        create_resource_group $resource_group;
+      
+        travis_wait 50 ansible-playbook tests/integration/main.yml --extra-vars "{\"test\":$filename,\"resource_group\":$resource_group,\"azure_subscription_id\":$AZURE_SUBSCRIPTION_ID,\"azure_tenant\":$AZURE_TENANT,\"azure_client_id\":$AZURE_CLIENT_ID}";
 
-      if [ $? -ne 0 ]; then
-        message+=($test_name);
-        export exit_code=1;
-      fi
+        if [ $? -ne 0 ]; then
+          echo test $test_name failed;          
 
-      travis_wait 50 delete_resource_group $resource_group;
+          if [ $m -eq $max_retry_count ]; then
+            message+=($test_name);
+            export exit_code=1;
+          fi;
+          
+          m=$[$m+1];
+        else
+          echo test $test_name passed;          
+          travis_wait 50 delete_resource_group $resource_group;
+          break;
+        fi;
+        
+        travis_wait 50 delete_resource_group $resource_group;        
+      done;
+      
     }
 
 
@@ -89,7 +109,7 @@ before_install:
         if [ "$i" -lt "${#list[@]}" ]; then
           run_test ${list[$i]};
         fi
-      done
+      done;
     }
 
 install:
@@ -104,3 +124,9 @@ script:
 
 notifications:
   webhooks: https://galaxy.ansible.com/api/v1/notifications/
+  email:
+    - yuwzho@microsoft.com
+    - zikalino@microsoft.com
+    - yungez@microsoft.com
+    - yaweiw@microsoft.com
+
