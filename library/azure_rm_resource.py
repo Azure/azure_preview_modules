@@ -151,7 +151,7 @@ class AzureRMResource(AzureRMModuleBase):
             ),
             status_code=dict(
                 type='list',
-                default=[200, 202]
+                default=[200, 201, 202]
             ),
             state=dict(
                 type='str',
