@@ -154,9 +154,9 @@ class AzureRMResourceFacts(AzureRMModuleBase):
             rargs['name'] = self.resource_name
 
             for i in range(len(self.subresource)):
-                rargs['child_namespace_' + i] = self.subresource[i].get('namespace', None)
-                rargs['child_type_' + i] = self.subresource[i].get('type', None)
-                rargs['child_name_' + i] = self.subresource[i].get('name', None)
+                rargs['child_namespace_' + str(i)] = self.subresource[i].get('namespace', None)
+                rargs['child_type_' + str(i)] = self.subresource[i].get('type', None)
+                rargs['child_name_' + str(i)] = self.subresource[i].get('name', None)
                 
             self.url = resource_id(**rargs)
 
