@@ -204,7 +204,12 @@ class AzureRMResource(AzureRMModuleBase):
             self.url = resource_id(**rargs)
             
         response = self.query()
-        self.results['response'] = response 
+
+        try:
+            self.results['response'] = json.loads(response.text)
+        except:
+            self.results['response'] = response.text
+
         self.results['changed'] = True
 
         if self.state == 'absent' and response.status_code == 204:
@@ -220,12 +225,7 @@ class AzureRMResource(AzureRMModuleBase):
         header_parameters = {}
         header_parameters['Content-Type'] = 'application/json; charset=utf-8'
 
-        response = self.mgmt_client.query(self.url, self.method, query_parameters, header_parameters, self.body, self.status_code)
-
-        try:
-            return json.loads(response.text)
-        except:
-            return response.text
+        return self.mgmt_client.query(self.url, self.method, query_parameters, header_parameters, self.body, self.status_code)
 
 
 def main():
