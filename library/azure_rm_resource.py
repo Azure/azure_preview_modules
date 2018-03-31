@@ -186,6 +186,7 @@ class AzureRMResource(AzureRMModuleBase):
 
         if self.state == 'absent':
             self.method = 'DELETE'
+            self.status_code.append(204)
 
         if self.url is None:
             rargs = dict()
@@ -202,8 +203,12 @@ class AzureRMResource(AzureRMModuleBase):
                 
             self.url = resource_id(**rargs)
             
-        self.results['response'] = self.query()
+        response = self.query()
+        self.results['response'] = response 
         self.results['changed'] = True
+
+        if self.state == 'absent' and response['status_code'] == 204:
+            self.results['changed'] = False
 
         return self.results
 
