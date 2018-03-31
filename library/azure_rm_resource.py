@@ -207,7 +207,7 @@ class AzureRMResource(AzureRMModuleBase):
         self.results['response'] = response 
         self.results['changed'] = True
 
-        if self.state == 'absent' and response['status_code'] == 204:
+        if self.state == 'absent' and response.status_code == 204:
             self.results['changed'] = False
 
         return self.results
