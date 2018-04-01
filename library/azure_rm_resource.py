@@ -192,7 +192,10 @@ class AzureRMResource(AzureRMModuleBase):
             rargs = dict()
             rargs['subscription'] = self.subscription_id
             rargs['resource_group'] = self.resource_group
-            rargs['namespace'] = "microsoft." + self.provider
+            if not (self.provider is None or self.provider.lower().startswith('.microsoft')):
+                rargs['namespace'] = "microsoft." + self.provider
+            else:
+                rargs['namespace'] = self.provider
             rargs['type'] = self.resource_type
             rargs['name'] = self.resource_name
 

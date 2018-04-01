@@ -37,10 +37,6 @@
     api_version: "2018-01-01"
   register: output
 
-- name: Dumping instance of security rule
-  debug:
-    msg: "hmmm: {{ output }}"
-
 - name: Create security rule
   azure_rm_resource:
     resource_group: "{{ resource_group }}"
@@ -72,3 +68,31 @@
       - type: securityrules
         name: mysecurityrule
     api_version: "2018-01-01"
+
+- name: Delete security group
+  azure_rm_resource:
+    resource_group: "{{ resource_group }}"
+    provider: network
+    resource_type: networksecuritygroups
+    resource_name: mysecuritygroup
+    api_version: "2018-01-01"
+    state: absent
+  register: output
+
+- assert:
+    that: output.changed
+
+
+- name: Delete unexisting security group
+  azure_rm_resource:
+    resource_group: "{{ resource_group }}"
+    provider: network
+    resource_type: networksecuritygroups
+    resource_name: mysecuritygroupunexisting
+    api_version: "2018-01-01"
+    state: absent
+  register: output
+
+- assert:
+    that: not output.changed
+
