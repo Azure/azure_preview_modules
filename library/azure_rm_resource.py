@@ -206,7 +206,13 @@ class AzureRMResource(AzureRMModuleBase):
                 
             self.url = resource_id(**rargs)
             
-        response = self.query()
+        query_parameters = {}
+        query_parameters['api-version'] = self.api_version
+
+        header_parameters = {}
+        header_parameters['Content-Type'] = 'application/json; charset=utf-8'
+
+        response = self.mgmt_client.query(self.url, self.method, query_parameters, header_parameters, self.body, self.status_code)
 
         try:
             self.results['response'] = json.loads(response.text)
@@ -219,16 +225,6 @@ class AzureRMResource(AzureRMModuleBase):
             self.results['changed'] = False
 
         return self.results
-
-    def query(self):
-
-        query_parameters = {}
-        query_parameters['api-version'] = self.api_version
-
-        header_parameters = {}
-        header_parameters['Content-Type'] = 'application/json; charset=utf-8'
-
-        return self.mgmt_client.query(self.url, self.method, query_parameters, header_parameters, self.body, self.status_code)
 
 
 def main():

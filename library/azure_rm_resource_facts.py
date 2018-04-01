@@ -162,19 +162,6 @@ class AzureRMResourceFacts(AzureRMModuleBase):
 
         self.results['url'] = self.url
 
-        response = self.query()
-
-        if response.get('error', None):
-            self.results['response'] = []
-        elif response is list:
-            self.results['response'] = response
-        else:
-            self.results['response'] = [ response ]
-
-        return self.results
-
-    def query(self):
-
         query_parameters = {}
         query_parameters['api-version'] = self.api_version
 
@@ -182,7 +169,17 @@ class AzureRMResourceFacts(AzureRMModuleBase):
         header_parameters['Content-Type'] = 'application/json; charset=utf-8'
 
         response = self.mgmt_client.query(self.url, "GET", query_parameters, header_parameters, None, [200, 404])
-        return json.loads(response.text)
+
+        if response.get('error', None):
+            self.results['response'] = []
+        else:
+            response = json.loads(response.text)
+            if response is list:
+                self.results['response'] = response
+            else:
+                self.results['response'] = [ response ]
+
+        return self.results
 
 
 def main():
