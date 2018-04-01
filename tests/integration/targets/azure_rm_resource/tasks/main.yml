@@ -74,7 +74,7 @@
     resource_group: "{{ resource_group }}"
     provider: network
     resource_type: networksecuritygroups
-    resource_name: mysecuritygroup
+    resource_name: sg{{ rpfx }}
     api_version: "2018-01-01"
     state: absent
   register: output
@@ -88,11 +88,10 @@
     resource_group: "{{ resource_group }}"
     provider: network
     resource_type: networksecuritygroups
-    resource_name: mysecuritygroupunexisting
+    resource_name: sg{{ rpfx }}
     api_version: "2018-01-01"
     state: absent
   register: output
 
 - assert:
     that: not output.changed
-
