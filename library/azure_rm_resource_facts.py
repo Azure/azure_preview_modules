@@ -20,6 +20,7 @@ version_added: "2.6"
 short_description: Generic facts of Azure resources.
 description:
   - Obtain facts of any resource using Azure REST API.
+  - This module gives access to resources that are not supported via Ansible modules.
   - Refer to https://docs.microsoft.com/en-us/rest/api/ regarding details related to specific resource REST API.
 
 options:
@@ -153,7 +154,7 @@ class AzureRMResourceFacts(AzureRMModuleBase):
             rargs['subscription'] = self.subscription_id
             rargs['resource_group'] = self.resource_group
             if not (self.provider is None or self.provider.lower().startswith('.microsoft')):
-                rargs['namespace'] = "microsoft." + self.provider
+                rargs['namespace'] = "Microsoft." + self.provider
             else:
                 rargs['namespace'] = self.provider
             rargs['type'] = self.resource_type
