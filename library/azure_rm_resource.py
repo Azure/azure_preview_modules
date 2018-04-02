@@ -59,12 +59,12 @@ options:
     description:
       - The HTTP method of the request or response. It MUST be uppercase.
         choices: [ "GET", "PUT", "POST", "HEAD", "PATCH", "DELETE", "MERGE" ]
-        default: "GET"
+        default: "PUT"
   status_code:
     description:
       - A valid, numeric, HTTP status code that signifies success of the
         request. Can also be comma separated list of status codes.
-    default: 200
+    default: [ 200, 201, 202 ]
   state:
     description:
       - Assert the state of the resource. Use C(present) to create or update resource or C(absent) to delete resource.
