@@ -31,13 +31,15 @@ options:
       - Provider type, should be specified in no URL is given
   resource_group:
     description:
-      - Resource group to be used, should be specified if needed and URL is not specified
+      - Resource group to be used.
+      - Required if URL is not specified.
+      
   resource_type:
     description:
-      - Resource type, should be valid for specified provider
+      - Resource type.
   resource_name:
     description:
-      - Resource name, should be specified if needed and URL is not specified
+      - Resource name.
   subresource:
     description:
       - List of subresources
@@ -150,7 +152,10 @@ class AzureRMResourceFacts(AzureRMModuleBase):
             rargs = dict()
             rargs['subscription'] = self.subscription_id
             rargs['resource_group'] = self.resource_group
-            rargs['namespace'] = "microsoft." + self.provider
+            if not (self.provider is None or self.provider.lower().startswith('.microsoft')):
+                rargs['namespace'] = "microsoft." + self.provider
+            else:
+                rargs['namespace'] = self.provider
             rargs['type'] = self.resource_type
             rargs['name'] = self.resource_name
 

@@ -28,16 +28,20 @@ options:
       - Azure RM Resource URL.
   provider:
     description:
-      - Provider type, should be specified in no URL is given
+      - Provider type.
+      - Required if URL is not specified.
   resource_group:
     description:
-      - Resource group to be used, should be specified if needed and URL is not specified
+      - Resource group to be used.
+      - Required if URL is not specified.
   resource_type:
     description:
-      - Resource type, should be valid for specified provider
+      - Resource type.
+      - Required if URL is not specified.
   resource_name:
     description:
-      - Resource name, should be specified if needed and URL is not specified
+      - Resource name.
+      - Required if URL Is not specified.
   subresource:
     description:
       - List of subresources
