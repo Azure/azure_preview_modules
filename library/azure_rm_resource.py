@@ -19,7 +19,8 @@ module: azure_rm_resource
 version_added: "2.6"
 short_description: Create any Azure resource.
 description:
-  - Create any Azure resource using Azure REST API.
+  - Create, update or delete any Azure resource using Azure REST API.
+  - Refer to https://docs.microsoft.com/en-us/rest/api/ regarding details related to specific resource REST API.
 
 options:
   url:

@@ -20,6 +20,7 @@ version_added: "2.6"
 short_description: Generic facts of Azure resources.
 description:
   - Obtain facts of any resource using Azure REST API.
+  - Refer to https://docs.microsoft.com/en-us/rest/api/ regarding details related to specific resource REST API.
 
 options:
   url:
