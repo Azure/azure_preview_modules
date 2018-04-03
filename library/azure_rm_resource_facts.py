@@ -167,6 +167,10 @@ class AzureRMResourceFacts(AzureRMModuleBase):
                 
             self.url = resource_id(**rargs)
 
+            # this is to fix a problem with resource_id implementation, when resource_name is not specified
+            if self.resource_type is not None and self.resource_name is None:
+                self.url += '/' + self.resource_type
+
         self.results['url'] = self.url
 
         query_parameters = {}
