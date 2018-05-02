@@ -32,7 +32,15 @@ options:
         description:
             - The resource group to search for the desired virtual machine scale set
         required: false
-        default: null
+
+    format:
+        description:
+            - What data should be returned?
+        default: 'default'
+        choices:
+            - 'default'
+            - 'full'
+            - 'raw'
 
 extends_documentation_fragment:
     - azure
@@ -159,7 +167,14 @@ class AzureRMVirtualMachineScaleSetFacts(AzureRMModuleBase):
         self.module_args = dict(
             name=dict(type='str'),
             resource_group=dict(type='str'),
+            format=dict(type='str'),
             tags=dict(type='list')
+            format=dict(
+                type='str',
+                choices=['default',
+                         'full',
+                         'raw']
+            ),
         )
 
         self.results = dict(
@@ -171,6 +186,7 @@ class AzureRMVirtualMachineScaleSetFacts(AzureRMModuleBase):
 
         self.name = None
         self.resource_group = None
+        self.format = 'default'
         self.tags = None
 
         super(AzureRMVirtualMachineScaleSetFacts, self).__init__(
@@ -208,6 +224,9 @@ class AzureRMVirtualMachineScaleSetFacts(AzureRMModuleBase):
 
         if item and self.has_tags(item.tags, self.tags):
             results = [self.serialize_obj(item, AZURE_OBJECT_CLASS, enum_modules=AZURE_ENUM_MODULES)]
+
+        if self.format == 'full':
+            results[0]['FULL'] = True
 
         return results
 
