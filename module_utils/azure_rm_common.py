@@ -35,7 +35,7 @@ AZURE_COMMON_ARGS = dict(
     cloud_environment=dict(type='str'),
     cert_validation_mode=dict(type='str', choices=['validate', 'ignore']),
     api_profile=dict(type='str', default='latest'),
-    authority=dict(type='str')
+    adfs_authority_url=dict(type='str')
     # debug=dict(type='bool', default=False),
 )
 
@@ -49,7 +49,7 @@ AZURE_CREDENTIAL_ENV_MAPPING = dict(
     password='AZURE_PASSWORD',
     cloud_environment='AZURE_CLOUD_ENVIRONMENT',
     cert_validation_mode='AZURE_CERT_VALIDATION_MODE',
-    authority='AZURE_AUTHORITY'
+    adfs_authority_url='AZURE_ADFS_AUTHORITY_URL'
 )
 
 # FUTURE: this should come from the SDK or an external location.
@@ -264,7 +264,7 @@ class AzureRMModuleBase(object):
         self._dns_client = None
         self._web_client = None
         self._containerservice_client = None
-        self._authority = None
+        self._adfs_authority_url = None
         self._resource = None
 
         self.check_mode = self.module.check_mode
@@ -317,12 +317,10 @@ class AzureRMModuleBase(object):
         self.subscription_id = self.credentials['subscription_id']
 
         # get authentication authority
-        # for adfs, user could pass in authority or not.
-        # for others, use default authority from cloud environment
-        if self.credentials.get('authority') is None:
-            self._authority = self._cloud_environment.endpoints.active_directory
+        if self.credentials.get('adfs_authority_url') is None:
+            self._adfs_authority_url = self._cloud_environment.endpoints.active_directory
         else:
-            self._authority = self.credentials.get('authority')
+            self._adfs_authority_url = self.credentials.get('adfs_authority_url')
 
         # get resource from cloud environment
         self._resource = self._cloud_environment.endpoints.active_directory_resource_id
@@ -340,27 +338,34 @@ class AzureRMModuleBase(object):
                                                                      verify=self._cert_validation_mode == 'validate')
 
         elif self.credentials.get('ad_user') is not None and \
-             self.credentials.get('password') is not None:
-                tenant = self.credentials.get('tenant')
-                if not tenant:
-                    tenant = 'common'  # SDK default
-
-                client_id = self.credentials.get('client_id')
-                if not client_id:
-                    client_id = '04b07795-8ddb-461a-bbee-02f9e1bf7b46'
+                self.credentials.get('password') is not None and \
+                self.credentials.get('client_id') is not None and \
+                self.credentials.get('tenant') is not None:
 
                 self.azure_credentials = self.acquire_token_with_username_password(
-                                                    self._authority,
-                                                    self._resource,
-                                                    self.credentials['ad_user'],
-                                                    self.credentials['password'],
-                                                    client_id,
-                                                    tenant)
+                    self._adfs_authority_url,
+                    self._resource,
+                    self.credentials['ad_user'],
+                    self.credentials['password'],
+                    self.credentials['client_id'],
+                    self.credentials['tenant'])
 
+        elif self.credentials.get('ad_user') is not None and self.credentials.get('password') is not None:
+            tenant = self.credentials.get('tenant')
+            if not tenant:
+                tenant = 'common'  # SDK default
+
+            self.azure_credentials = UserPassCredentials(self.credentials['ad_user'],
+                                                         self.credentials['password'],
+                                                         tenant=tenant,
+                                                         cloud_environment=self._cloud_environment,
+                                                         verify=self._cert_validation_mode == 'validate')
+        
         else:
             self.fail("Failed to authenticate with provided credentials. Some attributes were missing. "
-                      "Credentials must include client_id, secret and tenant or ad_user and password "
-                      "or be logged in using AzureCLI.")
+                      "Credentials must include client_id, secret and tenant or ad_user and password, or "
+                      "ad_user, password, client_id, tenant and adfs_authority_url(optional) for ADFS authentication, or "
+                      "be logged in using AzureCLI.")
 
         # common parameter validation
         if self.module.params.get('tags'):
