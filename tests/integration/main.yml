@@ -5,5 +5,13 @@
   tasks:
     - debug:
         msg: "{{resource_group}} {{test}}"
-
+        - name: Create a resource group
+    - azure_rm_resourcegroup:
+        name: "{{ name }}"
+        location: eastus
     - include_tasks: "{{test}}"
+    - name: Delete a resource group
+      azure_rm_resourcegroup:
+        name: "{{ name }}"
+        state: absent
+        force: True
