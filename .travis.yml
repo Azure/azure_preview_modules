@@ -47,7 +47,9 @@ env:
 
 before_install:
   - sudo apt-get update -qq
-
+  - mkdir ~/.azure
+  - touch ~/.azure/credentials
+  - printf "[default]\nsubscription_id=${subscriptionId}\nclient_id=${clientId}\nsecret=${secret}\ntenant=${tenant}" >> ~/.azure/credentials
   - run_test(){
       file=$1;
       filename=${file##tests/integration/};
@@ -62,7 +64,7 @@ before_install:
         echo Run test $m time;
       
         echo "run $filename in resource group $resource_group";
-        travis_wait 50 ansible-playbook tests/integration/main.yml --extra-vars "{\"resource_group\":$resource_group,\"azure_subscription_id\":$AZURE_SUBSCRIPTION_ID,\"azure_tenant\":$AZURE_TENANT,\"azure_client_id\":$AZURE_CLIENT_ID,\"test\":$filename}" -vvv;
+        travis_wait 50 ansible-playbook tests/integration/main.yml --extra-vars "{\"resource_group\":$resource_group,\"test\":$filename}" -vvv;
 
         if [ $? -ne 0 ]; then
           echo test $test_name failed;          
