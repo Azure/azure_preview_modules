@@ -63,6 +63,7 @@ before_install:
 
       rm ~/arg.yml
       printf "---\nresource_group: $resource_group\ntest: $filename" >> ~/arg.yml
+      cat ~/arg.yml
 
       while [ $m -le $max_retry_count ]; do
         echo Run test $m time;
