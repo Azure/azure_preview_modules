@@ -10,8 +10,9 @@
         name: "{{ resource_group }}"
         location: eastus
     - include_tasks: "{{test}}"
-    - name: Delete a resource group
-      azure_rm_resourcegroup:
-        name: "{{ resource_group }}"
-        state: absent
-        force: True
+      always:
+       - name: Delete a resource group
+         azure_rm_resourcegroup:
+           name: "{{ resource_group }}"
+           state: absent
+           force: True
