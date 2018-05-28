@@ -63,7 +63,7 @@ before_install:
       while [ $m -le $max_retry_count ]; do
         echo Run test $m time;
       
-        travis_wait 50 ansible-playbook tests/integration/main.yml --extra-vars "{resource_group:$resource_group test:$filename}" -vvv;
+        travis_wait 50 ansible-playbook tests/integration/main.yml --extra-vars "resource_group=$resource_group test=$filename" -vvv;
 
         if [ $? -ne 0 ]; then
           echo test $test_name failed;          
