@@ -2,6 +2,8 @@
 - hosts: localhost
   roles:
   - { role: azure_preview_modules }
+  vars_files:
+  - ~/arg.yml
   tasks:
     - name: Create a resource group
       azure_rm_resourcegroup:
