@@ -49,7 +49,7 @@ before_install:
   - sudo apt-get update -qq
   - mkdir ~/.azure
   - touch ~/.azure/credentials
-  - printf "[default]\nsubscription_id=${subscriptionId}\nclient_id=${clientId}\nsecret=${secret}\ntenant=${tenant}" >> ~/.azure/credentials
+  - printf "[default]\nsubscription_id=${subscriptionId}\nclient_id=${clientId}\nsecret=${secret}\ntenant=${tenant}" > ~/.azure/credentials
   - run_test(){
       file=$1;
       filename=${file##tests/integration/};
@@ -60,7 +60,7 @@ before_install:
       echo Run test $test_name from $filename;
       resource_group="asb-roletest-${test_name##azure_rm_}$(date +%s)";
 
-      printf "{\"resource_group\":\"$resource_group\",\n\"test\":\"$filename\"}" >> ~/arg.json;
+      printf "{\"resource_group\":\"$resource_group\",\n\"test\":\"$filename\"}" > ~/arg.json;
       cat ~/arg.json;
 
       while [ $m -le $max_retry_count ]; do
