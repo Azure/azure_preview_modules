@@ -5,8 +5,8 @@
   tasks:
     - debug:
         msg: "{{resource_group}} {{test}}"
-        - name: Create a resource group
-    - azure_rm_resourcegroup:
+    - name: Create a resource group
+      azure_rm_resourcegroup:
         name: "{{ resource_group }}"
         location: eastus
     - include_tasks: "{{test}}"
