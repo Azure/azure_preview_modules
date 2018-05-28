@@ -48,7 +48,6 @@ env:
 before_install:
   - sudo apt-get update -qq
   - mkdir ~/.azure
-  - rm ~/.azure/credentials
   - touch ~/.azure/credentials
   - printf "[default]\nsubscription_id=${subscriptionId}\nclient_id=${clientId}\nsecret=${secret}\ntenant=${tenant}" >> ~/.azure/credentials
   - run_test(){
@@ -61,14 +60,13 @@ before_install:
       echo Run test $test_name from $filename;
       resource_group="asb-roletest-${test_name##azure_rm_}$(date +%s)";
 
-      rm ~/arg.yml;
       printf "resource_group: $resource_group\ntest: $filename" >> ~/arg.yml;
       cat ~/arg.yml;
 
       while [ $m -le $max_retry_count ]; do
         echo Run test $m time;
       
-        travis_wait 50 ansible-playbook tests/integration/main.yml -vvv;
+        travis_wait 50 ansible-playbook tests/integration/main.yml;
 
         if [ $? -ne 0 ]; then
           echo test $test_name failed;          
