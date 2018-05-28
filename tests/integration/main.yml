@@ -3,8 +3,6 @@
   roles:
   - { role: azure_preview_modules }
   tasks:
-    - debug:
-        msg: "{{resource_group}} {{test}}"
     - name: Create a resource group
       azure_rm_resourcegroup:
         name: "{{ resource_group }}"
