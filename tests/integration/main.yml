@@ -3,7 +3,7 @@
   roles:
   - { role: azure_preview_modules }
   vars_files:
-  - ~/arg.yml
+  - ~/arg.json
   tasks:
     - name: Create a resource group
       azure_rm_resourcegroup:
