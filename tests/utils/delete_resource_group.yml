@@ -1,8 +1,0 @@
----
-- hosts: localhost
-  tasks:
-    - name: Delete a resource group
-      azure_rm_resourcegroup:
-        name: "{{ name }}"
-        state: absent
-        force: True
