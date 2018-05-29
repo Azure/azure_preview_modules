@@ -50,7 +50,7 @@ options:
         choices:
             - public
             - none
-        default: None
+        default: 'none'
     ports:
         description:
             - List of ports exposed within the container group.
@@ -93,7 +93,7 @@ options:
         description:
             - Force update of existing container instance. Any update will result in deletion and recreation of existing containers.
         type: bool
-        default: False
+        default: 'no'
 
 extends_documentation_fragment:
     - azure
