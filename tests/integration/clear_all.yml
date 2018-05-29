@@ -1,5 +1,6 @@
 ---
 - hosts: localhost
+  strategy: free
   tasks:
     - name: query
       azure_rm_resourcegroup_facts:
