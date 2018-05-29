@@ -414,8 +414,7 @@ class AzureRMContainerRegistry(AzureRMModuleBase):
         if not self._containerregistry_mgmt_client:
             self._containerregistry_mgmt_client = self.get_mgmt_svc_client(
                 ContainerRegistryManagementClient,
-                base_url=self._cloud_environment.endpoints.resource_manager,
-                api_version='2017-10-01'
+                base_url=self._cloud_environment.endpoints.resource_manager
             )
 
         return self._containerregistry_mgmt_client
