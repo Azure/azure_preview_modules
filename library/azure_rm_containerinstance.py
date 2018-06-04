@@ -380,14 +380,13 @@ class AzureRMContainerInstance(AzureRMModuleBase):
                                                   os_type=self.os_type,
                                                   volumes=None)
 
-        response = self.client.container_groups.create_or_update(resource_group_name=self.resource_group,
-                                                                 container_group_name=self.name,
-                                                                 container_group=parameters)
-
-        if isinstance(response, AzureOperationPoller):
-            response = self.get_poller_result(response)
-
-        return response.as_dict()
+        try:
+            response = self.client.container_groups.create_or_update(resource_group_name=self.resource_group,
+                                                                     container_group_name=self.name,
+                                                                     container_group=parameters)
+            return self.get_poller_result(response).as_dict()
+        except CloudError as exc:
+            self.fail('Error creating or update container instance: {0}'.format(str(exc)))
 
     def delete_containerinstance(self):
         '''
