@@ -202,6 +202,10 @@ AZURE_PKG_VERSIONS = {
         'package_name': 'containerinstance',
         'expected_version': '0.3.1'
     },
+    'ContainerRegistryManagementClient': {
+        'package_name': 'containerregistry',
+        'expected_version': '2.0.0'
+    },
     'NetworkManagementClient': {
         'package_name': 'network',
         'expected_version': '1.3.0'
