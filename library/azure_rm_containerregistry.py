@@ -255,8 +255,6 @@ class AzureRMContainerRegistry(AzureRMModuleBase):
             supports_check_mode=True,
             supports_tags=True)
 
-        self.api_profile = None
-
     def exec_module(self, **kwargs):
         """Main module execution method"""
         for key in list(self.module_arg_spec.keys()) + ['tags']:

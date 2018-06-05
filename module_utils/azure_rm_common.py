@@ -915,7 +915,7 @@ class AzureRMModuleBase(object):
             return profile_raw
 
         # wrap basic strings in a dict that just defines the default
-        return dict(default_api_version=profile_raw)
+        return None # dict(default_api_version=profile_raw)
 
     def get_mgmt_svc_client(self, client_type, base_url=None, api_version=None):
         self.log('Getting management service client {0}'.format(client_type.__name__))
@@ -942,7 +942,7 @@ class AzureRMModuleBase(object):
         # If the client doesn't accept api_version, it's unversioned.
         # If it does, favor explicitly-specified api_version, fall back to api_profile
         if 'api_version' in client_argspec.args:
-            profile_default_version = api_profile_dict.get('default_api_version', None)
+            profile_default_version = api_profile_dict.get('default_api_version', None) if api_profile_dict else None
             if api_version or profile_default_version:
                 client_kwargs['api_version'] = api_version or profile_default_version
 
