@@ -14,7 +14,7 @@
       family: A
     access_policies:
       - tenant_id: "{{ azure_tenant }}"
-        object_id: 97567bfa-cf13-4217-8fa3-cc56bc1867fe
+        object_id: "{{ azure_object_id }}"
         keys:
           - get
           - list
@@ -25,6 +25,12 @@
           - recover
           - backup
           - restore
+          - encrypt
+          - decrypt
+          - wrapkey
+          - unwrapkey
+          - sign
+          - verify
         secrets:
           - get
           - list
