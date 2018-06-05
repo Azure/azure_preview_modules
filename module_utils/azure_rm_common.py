@@ -915,7 +915,7 @@ class AzureRMModuleBase(object):
             return profile_raw
 
         # wrap basic strings in a dict that just defines the default
-        return None # dict(default_api_version=profile_raw)
+        return dict(default_api_version=profile_raw)
 
     def get_mgmt_svc_client(self, client_type, base_url=None, api_version=None):
         self.log('Getting management service client {0}'.format(client_type.__name__))

@@ -247,6 +247,7 @@ class AzureRMContainerRegistry(AzureRMModuleBase):
         self.sku = None
         self.tags = None
         self._containerregistry_mgmt_client = None
+        self.api_profile = None
 
         self.results = dict(changed=False, state=dict())
 
