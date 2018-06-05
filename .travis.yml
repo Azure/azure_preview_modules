@@ -108,6 +108,7 @@ install:
     install ansible[azure]==$ANSIBLE_VERSION; fi
   - "{ echo '[defaults]'; echo 'roles_path = ../'; } >> ansible.cfg"
   - pip install -I -r ./files/requirements-azure.txt
+  - pip  freeze
 
 script:
   - scan_test
