@@ -1,5 +1,6 @@
 azure-mgmt-containerservice>=2.0.0,<3.0.0
 azure-mgmt-containerregistry>=1.0.1,<2.0.0
+azure-mgmt-containerinstance==0.4.0
 azure-mgmt-rdbms>=0.2.0rc1,<1
 azure-mgmt-authorization>=0.30.0,<1
 azure-keyvault==1.0.0a1
