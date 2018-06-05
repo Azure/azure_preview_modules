@@ -57,7 +57,7 @@ AZURE_CREDENTIAL_ENV_MAPPING = dict(
 # For now, we have to copy from azure-cli
 AZURE_API_PROFILES = {
     'latest': {
-        'ContainerInstanceManagementClient': '2018-02-01-preview',
+        'ContainerInstanceManagementClient': '2017-12-01-preview',
         'ComputeManagementClient': dict(
             default_api_version='2017-12-01',
             resource_skus='2017-09-01',
@@ -199,7 +199,7 @@ AZURE_PKG_VERSIONS = {
     },
     'ContainerInstanceManagementClient': {
         'package_name': 'containerinstance',
-        'expected_version': '0.3.1'
+        'expected_version': '0.4.0'
     },
     'NetworkManagementClient': {
         'package_name': 'network',
