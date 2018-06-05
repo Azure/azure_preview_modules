@@ -537,7 +537,7 @@ class AzureRMModuleBase(object):
         if credentials.get('subscription_id'):
             return credentials
 
-        return dict(default_api_version=profile_raw) if profile_raw else None
+        return None
 
     def _get_msi_credentials(self, subscription_id_param=None):
         credentials = MSIAuthentication()
@@ -915,7 +915,7 @@ class AzureRMModuleBase(object):
             return profile_raw
 
         # wrap basic strings in a dict that just defines the default
-        return None # dict(default_api_version=profile_raw)
+        return dict(default_api_version=profile_raw) if profile_raw else None
 
     def get_mgmt_svc_client(self, client_type, base_url=None, api_version=None):
         self.log('Getting management service client {0}'.format(client_type.__name__))
