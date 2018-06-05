@@ -247,7 +247,6 @@ class AzureRMContainerRegistry(AzureRMModuleBase):
         self.sku = None
         self.tags = None
         self._containerregistry_mgmt_client = None
-        self.api_profile = None
 
         self.results = dict(changed=False, state=dict())
 
@@ -255,6 +254,8 @@ class AzureRMContainerRegistry(AzureRMModuleBase):
             derived_arg_spec=self.module_arg_spec,
             supports_check_mode=True,
             supports_tags=True)
+
+        self.api_profile = None
 
     def exec_module(self, **kwargs):
         """Main module execution method"""
