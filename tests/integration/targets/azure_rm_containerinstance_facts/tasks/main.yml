@@ -9,7 +9,7 @@
     name: aci{{ rpfx }}
     os_type: linux
     ip_address: public
-    location: westus
+    location: eastus
     ports:
       - 80
     containers:
@@ -19,16 +19,13 @@
         ports:
           - 80
           - 81
-      - name: mycontainer2
-        image: httpd
-        memory: 1.5
 - name: Create sample container instance
   azure_rm_containerinstance:
     resource_group: "{{ resource_group }}"
     name: aci{{ rpfx }}second
     os_type: linux
     ip_address: public
-    location: westus
+    location: eastus
     ports:
       - 80
     containers:
@@ -38,9 +35,6 @@
         ports:
           - 80
           - 81
-      - name: mycontainer2
-        image: httpd
-        memory: 1.5
 
 - name: Gather facts Container Group
   azure_rm_containerinstance_facts:
@@ -79,7 +73,7 @@
     name: aci{{ rpfx }}
     os_type: linux
     ip_address: public
-    location: westus
+    location: eastus
     ports:
       - 80
     containers:
@@ -89,9 +83,6 @@
         ports:
           - 80
           - 81
-      - name: mycontainer2
-        image: httpd
-        memory: 1.5
     state: absent
 - name: Delete sample container instance
   azure_rm_containerinstance:
@@ -99,7 +90,7 @@
     name: aci{{ rpfx }}second
     os_type: linux
     ip_address: public
-    location: westus
+    location: eastus
     ports:
       - 80
     containers:
@@ -109,9 +100,6 @@
         ports:
           - 80
           - 81
-      - name: mycontainer2
-        image: httpd
-        memory: 1.5
     state: absent
 
 - name: Gather facts Container Group

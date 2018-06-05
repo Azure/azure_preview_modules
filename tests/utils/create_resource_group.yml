@@ -1,7 +1,0 @@
----
-- hosts: localhost
-  tasks:
-    - name: Create a resource group
-      azure_rm_resourcegroup:
-        name: "{{ name }}"
-        location: eastus

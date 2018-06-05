@@ -1,0 +1,13 @@
+---
+- hosts: localhost
+  strategy: free
+  tasks:
+    - name: query
+      azure_rm_resourcegroup_facts:
+      register: output
+    - name: delete
+      azure_rm_resourcegroup:
+        name: "{{ item }}"
+        state: absent
+        force: yes
+      with_items: "{{ output | json_query('ansible_facts.azure_resourcegroups[*].name') | select('match', 'asb-roletest') | list }}"

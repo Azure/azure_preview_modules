@@ -1,6 +1,7 @@
 - name: Prepare random number
   set_fact:
     rpfx: "{{ resource_group | hash('md5') | truncate(7, True, '') }}{{ 1000 | random }}"
+    azure_tenant: "{{ lookup('env', 'AZURE_TENANT') }}"
   run_once: yes
 
 - name: Create instance of Key Vault
@@ -14,7 +15,7 @@
       family: A
     access_policies:
       - tenant_id: "{{ azure_tenant }}"
-        object_id: 97567bfa-cf13-4217-8fa3-cc56bc1867fe
+        object_id: "{{ azure_object_id }}"
         keys:
           - get
           - list
