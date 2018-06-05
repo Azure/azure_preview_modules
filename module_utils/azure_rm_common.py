@@ -58,7 +58,6 @@ AZURE_CREDENTIAL_ENV_MAPPING = dict(
 AZURE_API_PROFILES = {
     'latest': {
         'ContainerInstanceManagementClient': '2018-02-01-preview',
-        'ContainerRegistryManagementClient': '2017-10-01',
         'ComputeManagementClient': dict(
             default_api_version='2017-12-01',
             resource_skus='2017-09-01',
@@ -142,7 +141,6 @@ try:
     from azure.mgmt.resource.version import VERSION as resource_client_version
     from azure.mgmt.dns.version import VERSION as dns_client_version
     from azure.mgmt.web.version import VERSION as web_client_version
-    from azure.mgmt.containerregistry import VERSION as containerregistry_client_version
     from azure.mgmt.network import NetworkManagementClient
     from azure.mgmt.resource.resources import ResourceManagementClient
     from azure.mgmt.resource.subscriptions import SubscriptionClient
@@ -153,7 +151,6 @@ try:
     from azure.mgmt.containerservice import ContainerServiceClient
     from azure.storage.cloudstorageaccount import CloudStorageAccount
     from adal.authentication_context import AuthenticationContext
-    from azure.mgmt.containerregistry import ContainerRegistryManagementClient
 except ImportError as exc:
     HAS_AZURE_EXC = exc
     HAS_AZURE = False
@@ -203,10 +200,6 @@ AZURE_PKG_VERSIONS = {
     'ContainerInstanceManagementClient': {
         'package_name': 'containerinstance',
         'expected_version': '0.3.1'
-    },
-    'ContainerRegistryManagementClient': {
-        'package_name': 'containerregistry',
-        'expected_version': '2.0.0'
     },
     'NetworkManagementClient': {
         'package_name': 'network',
@@ -932,7 +925,7 @@ class AzureRMModuleBase(object):
 
         client_kwargs = dict(credentials=self.azure_credentials, subscription_id=self.subscription_id, base_url=base_url)
 
-        api_profile_dict = {}
+        api_profile_dict = None
 
         if self.api_profile:
             api_profile_dict = self.get_api_profile(client_type.__name__, self.api_profile)
