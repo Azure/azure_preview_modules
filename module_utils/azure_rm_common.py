@@ -142,6 +142,7 @@ try:
     from azure.mgmt.resource.version import VERSION as resource_client_version
     from azure.mgmt.dns.version import VERSION as dns_client_version
     from azure.mgmt.web.version import VERSION as web_client_version
+    from azure.mgmt.containerregistry import VERSION as containerregistry_client_version
     from azure.mgmt.network import NetworkManagementClient
     from azure.mgmt.resource.resources import ResourceManagementClient
     from azure.mgmt.resource.subscriptions import SubscriptionClient
