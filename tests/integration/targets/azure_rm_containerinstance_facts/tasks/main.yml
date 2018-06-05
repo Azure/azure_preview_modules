@@ -19,9 +19,6 @@
         ports:
           - 80
           - 81
-      - name: mycontainer2
-        image: httpd
-        memory: 1.5
 - name: Create sample container instance
   azure_rm_containerinstance:
     resource_group: "{{ resource_group }}"
@@ -38,9 +35,6 @@
         ports:
           - 80
           - 81
-      - name: mycontainer2
-        image: httpd
-        memory: 1.5
 
 - name: Gather facts Container Group
   azure_rm_containerinstance_facts:
@@ -89,9 +83,6 @@
         ports:
           - 80
           - 81
-      - name: mycontainer2
-        image: httpd
-        memory: 1.5
     state: absent
 - name: Delete sample container instance
   azure_rm_containerinstance:
@@ -109,9 +100,6 @@
         ports:
           - 80
           - 81
-      - name: mycontainer2
-        image: httpd
-        memory: 1.5
     state: absent
 
 - name: Gather facts Container Group
