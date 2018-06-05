@@ -152,6 +152,7 @@ try:
     from azure.mgmt.containerservice import ContainerServiceClient
     from azure.storage.cloudstorageaccount import CloudStorageAccount
     from adal.authentication_context import AuthenticationContext
+    from azure.mgmt.containerregistry import ContainerRegistryManagementClient
 except ImportError as exc:
     HAS_AZURE_EXC = exc
     HAS_AZURE = False
