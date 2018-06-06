@@ -16,7 +16,7 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = '''
 ---
 module: azure_rm_appgw
-version_added: "2.5"
+version_added: "2.6"
 short_description: Manage Application Gateway instance.
 description:
     - Create, update and delete instance of Application Gateway.
@@ -30,9 +30,6 @@ options:
         description:
             - The name of the application gateway.
         required: True
-    id:
-        description:
-            - Resource ID.
     location:
         description:
             - Resource location. If not set, location from the resource group will be used as default.
@@ -64,11 +61,10 @@ options:
         suboptions:
             disabled_ssl_protocols:
                 description:
-                    - Ssl protocols to be disabled on application gateway.
-                type: list
+                    - List of SSL protocols to be disabled on application gateway.
             policy_type:
                 description:
-                    - Type of Ssl Policy.
+                    - Type of SSL Policy.
                 choices:
                     - 'predefined'
                     - 'custom'
@@ -81,73 +77,38 @@ options:
                     - 'app_gw_ssl_policy20170401_s'
             cipher_suites:
                 description:
-                    - Ssl cipher suites to be enabled in the specified order to application gateway.
-                type: list
+                    - List of SSL cipher suites to be enabled in the specified order to application gateway.
             min_protocol_version:
                 description:
                     - Minimum version of Ssl protocol to be supported on application gateway.
                 choices:
-                    - 'tl_sv1_0'
-                    - 'tl_sv1_1'
-                    - 'tl_sv1_2'
+                    - 'tls_v1_0'
+                    - 'tls_v1_1'
+                    - 'tls_v1_2'
     gateway_ip_configurations:
         description:
-            - Subnets of application the gateway resource.
-        type: list
+            - List of subnets used by the application gateway.
         suboptions:
-            id:
-                description:
-                    - Resource ID.
             subnet:
                 description:
                     - Reference of the subnet resource. A subnet from where application gateway gets its private address.
-                suboptions:
-                    id:
-                        description:
-                            - Resource ID.
-            provisioning_state:
-                description:
-                    - "Provisioning state of the application gateway I(subnet) resource. Possible values are: 'Updating', 'Deleting', and 'Failed'."
             name:
                 description:
                     - Name of the resource that is unique within a resource group. This name can be used to access the resource.
-            etag:
-                description:
-                    - A unique read-only string that changes whenever the resource is updated.
-            type:
-                description:
-                    - Type of the resource.
     authentication_certificates:
         description:
             - Authentication certificates of the application gateway resource.
-        type: list
         suboptions:
-            id:
-                description:
-                    - Resource ID.
             data:
                 description:
                     - Certificate public data.
-            provisioning_state:
-                description:
-                    - "Provisioning state of the authentication certificate resource. Possible values are: 'Updating', 'Deleting', and 'Failed'."
             name:
                 description:
                     - Name of the resource that is unique within a resource group. This name can be used to access the resource.
-            etag:
-                description:
-                    - A unique read-only string that changes whenever the resource is updated.
-            type:
-                description:
-                    - Type of the resource.
     ssl_certificates:
         description:
             - SSL certificates of the application gateway resource.
-        type: list
         suboptions:
-            id:
-                description:
-                    - Resource ID.
             data:
                 description:
                     - Base-64 encoded pfx certificate. Only applicable in PUT Request.
@@ -157,26 +118,13 @@ options:
             public_cert_data:
                 description:
                     - Base-64 encoded Public cert I(data) corresponding to pfx specified in I(data). Only applicable in GET request.
-            provisioning_state:
-                description:
-                    - "Provisioning state of the SSL certificate resource Possible values are: 'Updating', 'Deleting', and 'Failed'."
             name:
                 description:
                     - Name of the resource that is unique within a resource group. This name can be used to access the resource.
-            etag:
-                description:
-                    - A unique read-only string that changes whenever the resource is updated.
-            type:
-                description:
-                    - Type of the resource.
     frontend_ip_configurations:
         description:
             - Frontend IP addresses of the application gateway resource.
-        type: list
         suboptions:
-            id:
-                description:
-                    - Resource ID.
             private_ip_address:
                 description:
                     - PrivateIPAddress of the network interface IP Configuration.
@@ -189,496 +137,29 @@ options:
             subnet:
                 description:
                     - Reference of the subnet resource.
-                suboptions:
-                    id:
-                        description:
-                            - Resource ID.
             public_ip_address:
                 description:
                     - Reference of the PublicIP resource.
-                suboptions:
-                    id:
-                        description:
-                            - Resource ID.
-            provisioning_state:
-                description:
-                    - "Provisioning state of the public IP resource. Possible values are: 'Updating', 'Deleting', and 'Failed'."
             name:
                 description:
                     - Name of the resource that is unique within a resource group. This name can be used to access the resource.
-            etag:
-                description:
-                    - A unique read-only string that changes whenever the resource is updated.
-            type:
-                description:
-                    - Type of the resource.
     frontend_ports:
         description:
-            - Frontend ports of the application gateway resource.
-        type: list
+            - List of frontend ports of the application gateway resource.
         suboptions:
-            id:
-                description:
-                    - Resource ID.
             port:
                 description:
                     - Frontend port
-            provisioning_state:
-                description:
-                    - "Provisioning state of the frontend I(port) resource. Possible values are: 'Updating', 'Deleting', and 'Failed'."
             name:
                 description:
                     - Name of the resource that is unique within a resource group. This name can be used to access the resource.
-            etag:
-                description:
-                    - A unique read-only string that changes whenever the resource is updated.
-            type:
-                description:
-                    - Type of the resource.
-    probes:
-        description:
-            - Probes of the application gateway resource.
-        type: list
-        suboptions:
-            id:
-                description:
-                    - Resource ID.
-            protocol:
-                description:
-                    - Protocol.
-                choices:
-                    - 'http'
-                    - 'https'
-            host:
-                description:
-                    - Host name to send the probe to.
-            path:
-                description:
-                    - "Relative path of probe. Valid path starts from '/'. Probe is sent to <I(protocol)>://<I(host)>:<port><path>"
-            interval:
-                description:
-                    - "The probing interval in seconds. This is the time interval between two consecutive probes. Acceptable values are from 1 second to 8640
-                      0 seconds."
-            timeout:
-                description:
-                    - "the probe timeout in seconds. Probe marked as failed if valid response is not received with this timeout period. Acceptable values are
-                       from 1 second to 86400 seconds."
-            unhealthy_threshold:
-                description:
-                    - "The probe retry count. Backend server is marked down after consecutive probe failure count reaches UnhealthyThreshold. Acceptable valu
-                      es are from 1 second to 20."
-            pick_host_name_from_backend_http_settings:
-                description:
-                    - Whether the I(host) header should be picked from the backend C(http) settings. Default value is false.
-            min_servers:
-                description:
-                    - Minimum number of servers that are always marked healthy. Default value is 0.
-            match:
-                description:
-                    - Criterion for classifying a healthy probe response.
-                suboptions:
-                    body:
-                        description:
-                            - Body that must be contained in the health response. Default value is empty.
-                    status_codes:
-                        description:
-                            - Allowed ranges of healthy status codes. Default range of healthy status codes is 200-399.
-                        type: list
-            provisioning_state:
-                description:
-                    - "Provisioning state of the backend C(http) settings resource. Possible values are: 'Updating', 'Deleting', and 'Failed'."
-            name:
-                description:
-                    - Name of the resource that is unique within a resource group. This name can be used to access the resource.
-            etag:
-                description:
-                    - A unique read-only string that changes whenever the resource is updated.
-            type:
-                description:
-                    - Type of the resource.
     backend_address_pools:
         description:
-            - Backend address pool of the application gateway resource.
-        type: list
+            - List of backend address pool of the application gateway resource.
         suboptions:
-            id:
-                description:
-                    - Resource ID.
-            backend_ip_configurations:
-                description:
-                    - Collection of references to IPs defined in network interfaces.
-                type: list
-                suboptions:
-                    id:
-                        description:
-                            - Resource ID.
-                    application_gateway_backend_address_pools:
-                        description:
-                            - The reference of ApplicationGatewayBackendAddressPool resource.
-                        type: list
-                        suboptions:
-                            id:
-                                description:
-                                    - Resource ID.
-                            backend_ip_configurations:
-                                description:
-                                    - Collection of references to IPs defined in network interfaces.
-                                type: list
-                                suboptions:
-                                    id:
-                                        description:
-                                            - Resource ID.
-                                    application_gateway_backend_address_pools:
-                                        description:
-                                            - The reference of ApplicationGatewayBackendAddressPool resource.
-                                        type: list
-                                    load_balancer_backend_address_pools:
-                                        description:
-                                            - The reference of LoadBalancerBackendAddressPool resource.
-                                        type: list
-                                    load_balancer_inbound_nat_rules:
-                                        description:
-                                            - A list of references of LoadBalancerInboundNatRules.
-                                        type: list
-                                    private_ip_address:
-                                        description:
-                                            - Private IP address of the IP configuration.
-                                    private_ip_allocation_method:
-                                        description:
-                                            - "Defines how a private IP address is assigned. Possible values are: 'C(static)' and 'C(dynamic)'."
-                                        choices:
-                                            - 'static'
-                                            - 'dynamic'
-                                    private_ip_address_version:
-                                        description:
-                                            - "Available from Api-Version 2016-03-30 onwards, it represents whether the specific ipconfiguration is C(ipv4) o
-                                              r C(ipv6). Default is taken as C(ipv4).  Possible values are: 'C(ipv4)' and 'C(ipv6)'."
-                                        choices:
-                                            - 'ipv4'
-                                            - 'ipv6'
-                                    subnet:
-                                        description:
-                                            - Subnet bound to the IP configuration.
-                                    primary:
-                                        description:
-                                            - Gets whether this is a primary customer address on the network interface.
-                                    public_ip_address:
-                                        description:
-                                            - Public IP address bound to the IP configuration.
-                                    application_security_groups:
-                                        description:
-                                            - Application security groups in which the IP configuration is included.
-                                        type: list
-                                    provisioning_state:
-                                        description:
-                                            - "The provisioning state of the network interface IP configuration. Possible values are: 'Updating', 'Deleting',
-                                               and 'Failed'."
-                                    name:
-                                        description:
-                                            - The name of the resource that is unique within a resource group. This name can be used to access the resource.
-                                    etag:
-                                        description:
-                                            - A unique read-only string that changes whenever the resource is updated.
-                            backend_addresses:
-                                description:
-                                    - Backend addresses
-                                type: list
-                                suboptions:
-                                    fqdn:
-                                        description:
-                                            - Fully qualified domain name (FQDN).
-                                    ip_address:
-                                        description:
-                                            - IP address
-                            provisioning_state:
-                                description:
-                                    - "Provisioning state of the backend address pool resource. Possible values are: 'Updating', 'Deleting', and 'Failed'."
-                            name:
-                                description:
-                                    - Resource that is unique within a resource group. This name can be used to access the resource.
-                            etag:
-                                description:
-                                    - A unique read-only string that changes whenever the resource is updated.
-                            type:
-                                description:
-                                    - Type of the resource.
-                    load_balancer_backend_address_pools:
-                        description:
-                            - The reference of LoadBalancerBackendAddressPool resource.
-                        type: list
-                        suboptions:
-                            id:
-                                description:
-                                    - Resource ID.
-                            provisioning_state:
-                                description:
-                                    - "Get provisioning state of the public IP resource. Possible values are: 'Updating', 'Deleting', and 'Failed'."
-                            name:
-                                description:
-                                    - Gets name of the resource that is unique within a resource group. This name can be used to access the resource.
-                            etag:
-                                description:
-                                    - A unique read-only string that changes whenever the resource is updated.
-                    load_balancer_inbound_nat_rules:
-                        description:
-                            - A list of references of LoadBalancerInboundNatRules.
-                        type: list
-                        suboptions:
-                            id:
-                                description:
-                                    - Resource ID.
-                            frontend_ip_configuration:
-                                description:
-                                    - A reference to frontend IP addresses.
-                                suboptions:
-                                    id:
-                                        description:
-                                            - Resource ID.
-                            protocol:
-                                description:
-                                    - "Possible values include: 'C(udp)', 'C(tcp)', 'C(all)'"
-                                choices:
-                                    - 'udp'
-                                    - 'tcp'
-                                    - 'all'
-                            frontend_port:
-                                description:
-                                    - "The port for the external endpoint. Port numbers for each rule must be unique within the Load Balancer. Acceptable val
-                                      ues range from 1 to 65534."
-                            backend_port:
-                                description:
-                                    - The port used for the internal endpoint. Acceptable values range from 1 to 65535.
-                            idle_timeout_in_minutes:
-                                description:
-                                    - "The timeout for the C(tcp) idle connection. The value can be set between 4 and 30 minutes. The default value is 4 minu
-                                      tes. This element is only used when the I(protocol) is set to C(tcp)."
-                            enable_floating_ip:
-                                description:
-                                    - "Configures a virtual machine's endpoint for the floating IP capability required to configure a SQL AlwaysOn Availabili
-                                      ty Group. This setting is required when using the SQL AlwaysOn Availability Groups in SQL server. This setting can't b
-                                      e changed after you create the endpoint."
-                            provisioning_state:
-                                description:
-                                    - "Gets the provisioning state of the public IP resource. Possible values are: 'Updating', 'Deleting', and 'Failed'."
-                            name:
-                                description:
-                                    - Gets name of the resource that is unique within a resource group. This name can be used to access the resource.
-                            etag:
-                                description:
-                                    - A unique read-only string that changes whenever the resource is updated.
-                    private_ip_address:
-                        description:
-                            - Private IP address of the IP configuration.
-                    private_ip_allocation_method:
-                        description:
-                            - "Defines how a private IP address is assigned. Possible values are: 'C(static)' and 'C(dynamic)'."
-                        choices:
-                            - 'static'
-                            - 'dynamic'
-                    private_ip_address_version:
-                        description:
-                            - "Available from Api-Version 2016-03-30 onwards, it represents whether the specific ipconfiguration is C(ipv4) or C(ipv6). Defau
-                              lt is taken as C(ipv4).  Possible values are: 'C(ipv4)' and 'C(ipv6)'."
-                        choices:
-                            - 'ipv4'
-                            - 'ipv6'
-                    subnet:
-                        description:
-                            - Subnet bound to the IP configuration.
-                        suboptions:
-                            id:
-                                description:
-                                    - Resource ID.
-                            address_prefix:
-                                description:
-                                    - The address prefix for the subnet.
-                            network_security_group:
-                                description:
-                                    - The reference of the NetworkSecurityGroup resource.
-                                suboptions:
-                                    id:
-                                        description:
-                                            - Resource ID.
-                                    location:
-                                        description:
-                                            - Resource location.
-                                    security_rules:
-                                        description:
-                                            - A collection of security rules of the network security group.
-                                        type: list
-                                    default_security_rules:
-                                        description:
-                                            - The default security rules of network security group.
-                                        type: list
-                                    resource_guid:
-                                        description:
-                                            - The resource GUID property of the network security group resource.
-                                    provisioning_state:
-                                        description:
-                                            - "The provisioning state of the public IP resource. Possible values are: 'Updating', 'Deleting', and 'Failed'."
-                                    etag:
-                                        description:
-                                            - A unique read-only string that changes whenever the resource is updated.
-                            route_table:
-                                description:
-                                    - The reference of the RouteTable resource.
-                                suboptions:
-                                    id:
-                                        description:
-                                            - Resource ID.
-                                    location:
-                                        description:
-                                            - Resource location.
-                                    routes:
-                                        description:
-                                            - Collection of routes contained within a route table.
-                                        type: list
-                                    disable_bgp_route_propagation:
-                                        description:
-                                            - Gets or sets whether to disable the I(routes) learned by BGP on that route table. True means disable.
-                                    provisioning_state:
-                                        description:
-                                            - "The provisioning state of the resource. Possible values are: 'Updating', 'Deleting', and 'Failed'."
-                                    etag:
-                                        description:
-                                            - Gets a unique read-only string that changes whenever the resource is updated.
-                            service_endpoints:
-                                description:
-                                    - An array of service endpoints.
-                                type: list
-                                suboptions:
-                                    service:
-                                        description:
-                                            - The type of the endpoint service.
-                                    locations:
-                                        description:
-                                            - A list of locations.
-                                        type: list
-                                    provisioning_state:
-                                        description:
-                                            - The provisioning state of the resource.
-                            resource_navigation_links:
-                                description:
-                                    - Gets an array of references to the external resources using subnet.
-                                type: list
-                                suboptions:
-                                    id:
-                                        description:
-                                            - Resource ID.
-                                    linked_resource_type:
-                                        description:
-                                            - Resource type of the linked resource.
-                                    link:
-                                        description:
-                                            - Link to the external resource
-                                    name:
-                                        description:
-                                            - Name of the resource that is unique within a resource group. This name can be used to access the resource.
-                            provisioning_state:
-                                description:
-                                    - The provisioning state of the resource.
-                            name:
-                                description:
-                                    - The name of the resource that is unique within a resource group. This name can be used to access the resource.
-                            etag:
-                                description:
-                                    - A unique read-only string that changes whenever the resource is updated.
-                    primary:
-                        description:
-                            - Gets whether this is a primary customer address on the network interface.
-                    public_ip_address:
-                        description:
-                            - Public IP address bound to the IP configuration.
-                        suboptions:
-                            id:
-                                description:
-                                    - Resource ID.
-                            location:
-                                description:
-                                    - Resource location.
-                            sku:
-                                description:
-                                    - The public IP address SKU.
-                                suboptions:
-                                    name:
-                                        description:
-                                            - Name of a public IP address SKU.
-                                        choices:
-                                            - 'basic'
-                                            - 'standard'
-                            public_ip_allocation_method:
-                                description:
-                                    - "The public IP allocation method. Possible values are: 'C(static)' and 'C(dynamic)'."
-                                choices:
-                                    - 'static'
-                                    - 'dynamic'
-                            public_ip_address_version:
-                                description:
-                                    - "The public IP address version. Possible values are: 'C(ipv4)' and 'C(ipv6)'."
-                                choices:
-                                    - 'ipv4'
-                                    - 'ipv6'
-                            dns_settings:
-                                description:
-                                    - The FQDN of the DNS record associated with the public IP address.
-                                suboptions:
-                                    domain_name_label:
-                                        description:
-                                            - "Gets or sets the Domain name label.The concatenation of the domain name label and the regionalized DNS zone ma
-                                              ke up the fully qualified domain name associated with the public IP address. If a domain name label is specifi
-                                              ed, an A DNS record is created for the public IP in the Microsoft Azure DNS system."
-                                    fqdn:
-                                        description:
-                                            - "Gets the FQDN, Fully qualified domain name of the A DNS record associated with the public IP. This is the conc
-                                              atenation of the I(domain_name_label) and the regionalized DNS zone."
-                                    reverse_fqdn:
-                                        description:
-                                            - "Gets or Sets the Reverse I(fqdn). A user-visible, fully qualified domain name that resolves to this public IP
-                                              address. If the reverseFqdn is specified, then a PTR DNS record is created pointing from the IP address in the
-                                               in-addr.arpa domain to the reverse I(fqdn). "
-                            ip_address:
-                                description:
-                                    - The IP address associated with the public IP address resource.
-                            idle_timeout_in_minutes:
-                                description:
-                                    - The idle timeout of the public IP address.
-                            resource_guid:
-                                description:
-                                    - The resource GUID property of the public IP resource.
-                            provisioning_state:
-                                description:
-                                    - "The provisioning state of the PublicIP resource. Possible values are: 'Updating', 'Deleting', and 'Failed'."
-                            etag:
-                                description:
-                                    - A unique read-only string that changes whenever the resource is updated.
-                            zones:
-                                description:
-                                    - A list of availability zones denoting the IP allocated for the resource needs to come from.
-                                type: list
-                    application_security_groups:
-                        description:
-                            - Application security groups in which the IP configuration is included.
-                        type: list
-                        suboptions:
-                            id:
-                                description:
-                                    - Resource ID.
-                            location:
-                                description:
-                                    - Resource location.
-                    provisioning_state:
-                        description:
-                            - "The provisioning state of the network interface IP configuration. Possible values are: 'Updating', 'Deleting', and 'Failed'."
-                    name:
-                        description:
-                            - The name of the resource that is unique within a resource group. This name can be used to access the resource.
-                    etag:
-                        description:
-                            - A unique read-only string that changes whenever the resource is updated.
             backend_addresses:
                 description:
-                    - Backend addresses
-                type: list
+                    - List of backend addresses
                 suboptions:
                     fqdn:
                         description:
@@ -686,26 +167,13 @@ options:
                     ip_address:
                         description:
                             - IP address
-            provisioning_state:
-                description:
-                    - "Provisioning state of the backend address pool resource. Possible values are: 'Updating', 'Deleting', and 'Failed'."
             name:
                 description:
                     - Resource that is unique within a resource group. This name can be used to access the resource.
-            etag:
-                description:
-                    - A unique read-only string that changes whenever the resource is updated.
-            type:
-                description:
-                    - Type of the resource.
     backend_http_settings_collection:
         description:
             - Backend http settings of the application gateway resource.
-        type: list
         suboptions:
-            id:
-                description:
-                    - Resource ID.
             port:
                 description:
                     - Port
@@ -725,33 +193,13 @@ options:
                 description:
                     - "Request timeout in seconds. Application Gateway will fail the request if response is not received within RequestTimeout. Acceptable va
                       lues are from 1 second to 86400 seconds."
-            probe:
-                description:
-                    - Probe resource of an application gateway.
-                suboptions:
-                    id:
-                        description:
-                            - Resource ID.
             authentication_certificates:
                 description:
-                    - Array of references to application gateway authentication certificates.
-                type: list
+                    - List of references to application gateway authentication certificates.
                 suboptions:
                     id:
                         description:
                             - Resource ID.
-            connection_draining:
-                description:
-                    - Connection draining of the backend C(http) settings resource.
-                suboptions:
-                    enabled:
-                        description:
-                            - Whether connection draining is enabled or not.
-                        required: True
-                    drain_timeout_in_sec:
-                        description:
-                            - The number of seconds connection draining is active. Acceptable values are from 1 second to 3600 seconds.
-                        required: True
             host_name:
                 description:
                     - Host header to be sent to the backend servers.
@@ -761,46 +209,22 @@ options:
             affinity_cookie_name:
                 description:
                     - Cookie name to use for the affinity cookie.
-            probe_enabled:
-                description:
-                    - Whether the I(probe) is C(enabled). Default value is false.
             path:
                 description:
                     - Path which should be used as a prefix for all C(http) requests. Null means no path will be prefixed. Default value is null.
-            provisioning_state:
-                description:
-                    - "Provisioning state of the backend C(http) settings resource. Possible values are: 'Updating', 'Deleting', and 'Failed'."
             name:
                 description:
                     - Name of the resource that is unique within a resource group. This name can be used to access the resource.
-            etag:
-                description:
-                    - A unique read-only string that changes whenever the resource is updated.
-            type:
-                description:
-                    - Type of the resource.
     http_listeners:
         description:
-            - Http listeners of the application gateway resource.
-        type: list
+            - List of HTTP listeners of the application gateway resource.
         suboptions:
-            id:
-                description:
-                    - Resource ID.
             frontend_ip_configuration:
                 description:
                     - Frontend IP configuration resource of an application gateway.
-                suboptions:
-                    id:
-                        description:
-                            - Resource ID.
             frontend_port:
                 description:
                     - Frontend port resource of an application gateway.
-                suboptions:
-                    id:
-                        description:
-                            - Resource ID.
             protocol:
                 description:
                     - Protocol.
@@ -813,119 +237,16 @@ options:
             ssl_certificate:
                 description:
                     - SSL certificate resource of an application gateway.
-                suboptions:
-                    id:
-                        description:
-                            - Resource ID.
             require_server_name_indication:
                 description:
                     - Applicable only if I(protocol) is C(https). Enables SNI for multi-hosting.
-            provisioning_state:
-                description:
-                    - "Provisioning state of the C(http) listener resource. Possible values are: 'Updating', 'Deleting', and 'Failed'."
             name:
                 description:
                     - Name of the resource that is unique within a resource group. This name can be used to access the resource.
-            etag:
-                description:
-                    - A unique read-only string that changes whenever the resource is updated.
-            type:
-                description:
-                    - Type of the resource.
-    url_path_maps:
-        description:
-            - URL path map of the application gateway resource.
-        type: list
-        suboptions:
-            id:
-                description:
-                    - Resource ID.
-            default_backend_address_pool:
-                description:
-                    - Default backend address pool resource of URL path map.
-                suboptions:
-                    id:
-                        description:
-                            - Resource ID.
-            default_backend_http_settings:
-                description:
-                    - Default backend http settings resource of URL path map.
-                suboptions:
-                    id:
-                        description:
-                            - Resource ID.
-            default_redirect_configuration:
-                description:
-                    - Default redirect configuration resource of URL path map.
-                suboptions:
-                    id:
-                        description:
-                            - Resource ID.
-            path_rules:
-                description:
-                    - Path rule of URL path map resource.
-                type: list
-                suboptions:
-                    id:
-                        description:
-                            - Resource ID.
-                    paths:
-                        description:
-                            - Path rules of URL path map.
-                        type: list
-                    backend_address_pool:
-                        description:
-                            - Backend address pool resource of URL path map path rule.
-                        suboptions:
-                            id:
-                                description:
-                                    - Resource ID.
-                    backend_http_settings:
-                        description:
-                            - Backend http settings resource of URL path map path rule.
-                        suboptions:
-                            id:
-                                description:
-                                    - Resource ID.
-                    redirect_configuration:
-                        description:
-                            - Redirect configuration resource of URL path map path rule.
-                        suboptions:
-                            id:
-                                description:
-                                    - Resource ID.
-                    provisioning_state:
-                        description:
-                            - "Path rule of URL path map resource. Possible values are: 'Updating', 'Deleting', and 'Failed'."
-                    name:
-                        description:
-                            - Name of the resource that is unique within a resource group. This name can be used to access the resource.
-                    etag:
-                        description:
-                            - A unique read-only string that changes whenever the resource is updated.
-                    type:
-                        description:
-                            - Type of the resource.
-            provisioning_state:
-                description:
-                    - "Provisioning state of the backend http settings resource. Possible values are: 'Updating', 'Deleting', and 'Failed'."
-            name:
-                description:
-                    - Name of the resource that is unique within a resource group. This name can be used to access the resource.
-            etag:
-                description:
-                    - A unique read-only string that changes whenever the resource is updated.
-            type:
-                description:
-                    - Type of the resource.
     request_routing_rules:
         description:
-            - Request routing rules of the application gateway resource.
-        type: list
+            - List of request routing rules of the application gateway resource.
         suboptions:
-            id:
-                description:
-                    - Resource ID.
             rule_type:
                 description:
                     - Rule I(type).
@@ -935,166 +256,28 @@ options:
             backend_address_pool:
                 description:
                     - Backend address pool resource of the application gateway.
-                suboptions:
-                    id:
-                        description:
-                            - Resource ID.
             backend_http_settings:
                 description:
                     - Frontend port resource of the application gateway.
-                suboptions:
-                    id:
-                        description:
-                            - Resource ID.
             http_listener:
                 description:
                     - Http listener resource of the application gateway.
-                suboptions:
-                    id:
-                        description:
-                            - Resource ID.
-            url_path_map:
-                description:
-                    - URL path map resource of the application gateway.
-                suboptions:
-                    id:
-                        description:
-                            - Resource ID.
-            redirect_configuration:
-                description:
-                    - Redirect configuration resource of the application gateway.
-                suboptions:
-                    id:
-                        description:
-                            - Resource ID.
-            provisioning_state:
-                description:
-                    - "Provisioning state of the request routing rule resource. Possible values are: 'Updating', 'Deleting', and 'Failed'."
             name:
                 description:
                     - Name of the resource that is unique within a resource group. This name can be used to access the resource.
-            etag:
-                description:
-                    - A unique read-only string that changes whenever the resource is updated.
-            type:
-                description:
-                    - Type of the resource.
-    redirect_configurations:
+    state:
         description:
-            - Redirect configurations of the application gateway resource.
-        type: list
-        suboptions:
-            id:
-                description:
-                    - Resource ID.
-            redirect_type:
-                description:
-                    - Supported http redirection types - C(permanent), C(temporary), C(found), C(see_other).
-                choices:
-                    - 'permanent'
-                    - 'found'
-                    - 'see_other'
-                    - 'temporary'
-            target_listener:
-                description:
-                    - Reference to a listener to redirect the request to.
-                suboptions:
-                    id:
-                        description:
-                            - Resource ID.
-            target_url:
-                description:
-                    - Url to redirect the request to.
-            include_path:
-                description:
-                    - Include path in the redirected url.
-            include_query_string:
-                description:
-                    - Include query string in the redirected url.
-            request_routing_rules:
-                description:
-                    - Request routing specifying redirect configuration.
-                type: list
-                suboptions:
-                    id:
-                        description:
-                            - Resource ID.
-            url_path_maps:
-                description:
-                    - Url path maps specifying default redirect configuration.
-                type: list
-                suboptions:
-                    id:
-                        description:
-                            - Resource ID.
-            path_rules:
-                description:
-                    - Path rules specifying redirect configuration.
-                type: list
-                suboptions:
-                    id:
-                        description:
-                            - Resource ID.
-            name:
-                description:
-                    - Name of the resource that is unique within a resource group. This name can be used to access the resource.
-            etag:
-                description:
-                    - A unique read-only string that changes whenever the resource is updated.
-            type:
-                description:
-                    - Type of the resource.
-    web_application_firewall_configuration:
-        description:
-            - Web application firewall configuration.
-        suboptions:
-            enabled:
-                description:
-                    - Whether the web application firewall is enabled or not.
-                required: True
-            firewall_mode:
-                description:
-                    - Web application firewall mode.
-                required: True
-                choices:
-                    - 'detection'
-                    - 'prevention'
-            rule_set_type:
-                description:
-                    - "The type of the web application firewall rule set. Possible values are: 'OWASP'."
-                required: True
-            rule_set_version:
-                description:
-                    - The version of the rule set type.
-                required: True
-            disabled_rule_groups:
-                description:
-                    - The disabled rule groups.
-                type: list
-                suboptions:
-                    rule_group_name:
-                        description:
-                            - The name of the rule group that will be disabled.
-                        required: True
-                    rules:
-                        description:
-                            - The list of rules that will be disabled. If null, all rules of the rule group will be disabled.
-                        type: list
-    enable_http2:
-        description:
-            - Whether HTTP2 is enabled on the application gateway resource.
-    resource_guid:
-        description:
-            - Resource GUID property of the application gateway resource.
-    provisioning_state:
-        description:
-            - "Provisioning state of the application gateway resource. Possible values are: 'Updating', 'Deleting', and 'Failed'."
-    etag:
-        description:
-            - A unique read-only string that changes whenever the resource is updated.
+            - Assert the state of the Public IP. Use 'present' to create or update a and
+              'absent' to delete.
+        default: present
+        choices:
+            - absent
+            - present
+        required: false
 
 extends_documentation_fragment:
     - azure
+    - azure_tags
 
 author:
     - "Zim Kalinowski (@zikalino)"
@@ -1102,11 +285,44 @@ author:
 '''
 
 EXAMPLES = '''
-  - name: Create (or update) Application Gateway
-    azure_rm_appgw:
-      resource_group: NOT FOUND
-      name: NOT FOUND
-      location: eastus
+- name: Create instance of Application Gateway
+  azure_rm_appgw:
+    resource_group: myresourcegroup
+    name: myappgateway
+    sku:
+      name: standard_small
+      tier: standard
+      capacity: 2
+    gateway_ip_configurations:
+      - subnet:
+          id: "{{ subnet_id }}"
+        name: app_gateway_ip_config
+    frontend_ip_configurations:
+      - subnet:
+          id: "{{ subnet_id }}"
+        name: sample_gateway_frontend_ip_config
+    frontend_ports:
+      - port: 90
+        name: ag_frontend_port
+    backend_address_pools:
+      - backend_addresses:
+          - ip_address: 10.0.0.4
+        name: test_backend_address_pool
+    backend_http_settings_collection:
+      - port: 80
+        protocol: http
+        cookie_based_affinity: enabled
+        name: sample_appgateway_http_settings
+    http_listeners:
+      - frontend_ip_configuration: sample_gateway_frontend_ip_config
+        frontend_port: ag_frontend_port
+        name: sample_http_listener
+    request_routing_rules:
+      - rule_type: Basic
+        backend_address_pool: test_backend_address_pool
+        backend_http_settings: sample_appgateway_http_settings
+        http_listener: sample_http_listener
+        name: rule1
 '''
 
 RETURN = '''
@@ -1120,6 +336,11 @@ id:
 
 import time
 from ansible.module_utils.azure_rm_common import AzureRMModuleBase
+from copy import deepcopy
+from ansible.module_utils.common.dict_transformations import (
+    camel_dict_to_snake_dict, snake_dict_to_camel_dict,
+    _camel_to_snake, _snake_to_camel,
+)
 
 try:
     from msrestazure.azure_exceptions import CloudError
@@ -1148,9 +369,6 @@ class AzureRMApplicationGateways(AzureRMModuleBase):
                 type='str',
                 required=True
             ),
-            id=dict(
-                type='str'
-            ),
             location=dict(
                 type='str'
             ),
@@ -1175,9 +393,6 @@ class AzureRMApplicationGateways(AzureRMModuleBase):
             frontend_ports=dict(
                 type='list'
             ),
-            probes=dict(
-                type='list'
-            ),
             backend_address_pools=dict(
                 type='list'
             ),
@@ -1187,29 +402,8 @@ class AzureRMApplicationGateways(AzureRMModuleBase):
             http_listeners=dict(
                 type='list'
             ),
-            url_path_maps=dict(
-                type='list'
-            ),
             request_routing_rules=dict(
                 type='list'
-            ),
-            redirect_configurations=dict(
-                type='list'
-            ),
-            web_application_firewall_configuration=dict(
-                type='dict'
-            ),
-            enable_http2=dict(
-                type='str'
-            ),
-            resource_guid=dict(
-                type='str'
-            ),
-            provisioning_state=dict(
-                type='str'
-            ),
-            etag=dict(
-                type='str'
             ),
             state=dict(
                 type='str',
@@ -1229,12 +423,12 @@ class AzureRMApplicationGateways(AzureRMModuleBase):
 
         super(AzureRMApplicationGateways, self).__init__(derived_arg_spec=self.module_arg_spec,
                                                          supports_check_mode=True,
-                                                         supports_tags=False)
+                                                         supports_tags=True)
 
     def exec_module(self, **kwargs):
         """Main module execution method"""
 
-        for key in list(self.module_arg_spec.keys()):
+        for key in list(self.module_arg_spec.keys()) + ['tags']:
             if hasattr(self, key):
                 setattr(self, key, kwargs[key])
             elif kwargs[key] is not None:
@@ -1264,23 +458,15 @@ class AzureRMApplicationGateways(AzureRMModuleBase):
                 elif key == "ssl_policy":
                     ev = kwargs[key]
                     if 'policy_type' in ev:
-                        if ev['policy_type'] == 'predefined':
-                            ev['policy_type'] = 'Predefined'
-                        elif ev['policy_type'] == 'custom':
-                            ev['policy_type'] = 'Custom'
+                        ev['policy_type'] = _snake_to_camel(ev['policy_type'], True)
                     if 'policy_name' in ev:
-                        if ev['policy_name'] == 'app_gw_ssl_policy20150501':
-                            ev['policy_name'] = 'AppGwSslPolicy20150501'
-                        elif ev['policy_name'] == 'app_gw_ssl_policy20170401':
-                            ev['policy_name'] = 'AppGwSslPolicy20170401'
-                        elif ev['policy_name'] == 'app_gw_ssl_policy20170401_s':
-                            ev['policy_name'] = 'AppGwSslPolicy20170401S'
+                        ev['policy_name'] = _snake_to_camel(ev['policy_name'], True)
                     if 'min_protocol_version' in ev:
-                        if ev['min_protocol_version'] == 'tl_sv1_0':
+                        if ev['min_protocol_version'] == 'tls_v1_0':
                             ev['min_protocol_version'] = 'TLSv1_0'
-                        elif ev['min_protocol_version'] == 'tl_sv1_1':
+                        elif ev['min_protocol_version'] == 'tls_v1_1':
                             ev['min_protocol_version'] = 'TLSv1_1'
-                        elif ev['min_protocol_version'] == 'tl_sv1_2':
+                        elif ev['min_protocol_version'] == 'tls_v1_2':
                             ev['min_protocol_version'] = 'TLSv1_2'
                     self.parameters["ssl_policy"] = ev
                 elif key == "gateway_ip_configurations":
@@ -1291,81 +477,73 @@ class AzureRMApplicationGateways(AzureRMModuleBase):
                     self.parameters["ssl_certificates"] = kwargs[key]
                 elif key == "frontend_ip_configurations":
                     ev = kwargs[key]
-                    if 'private_ip_allocation_method' in ev:
-                        if ev['private_ip_allocation_method'] == 'static':
-                            ev['private_ip_allocation_method'] = 'Static'
-                        elif ev['private_ip_allocation_method'] == 'dynamic':
-                            ev['private_ip_allocation_method'] = 'Dynamic'
+                    for i in range(len(ev)):
+                        item = ev[i]
+                        if 'private_ip_allocation_method' in item:
+                            item['private_ip_allocation_method'] = _snake_to_camel(item['private_ip_allocation_method'], True)
                     self.parameters["frontend_ip_configurations"] = ev
                 elif key == "frontend_ports":
                     self.parameters["frontend_ports"] = kwargs[key]
-                elif key == "probes":
-                    ev = kwargs[key]
-                    if 'protocol' in ev:
-                        if ev['protocol'] == 'http':
-                            ev['protocol'] = 'Http'
-                        elif ev['protocol'] == 'https':
-                            ev['protocol'] = 'Https'
-                    self.parameters["probes"] = ev
                 elif key == "backend_address_pools":
                     self.parameters["backend_address_pools"] = kwargs[key]
                 elif key == "backend_http_settings_collection":
                     ev = kwargs[key]
-                    if 'protocol' in ev:
-                        if ev['protocol'] == 'http':
-                            ev['protocol'] = 'Http'
-                        elif ev['protocol'] == 'https':
-                            ev['protocol'] = 'Https'
-                    if 'cookie_based_affinity' in ev:
-                        if ev['cookie_based_affinity'] == 'enabled':
-                            ev['cookie_based_affinity'] = 'Enabled'
-                        elif ev['cookie_based_affinity'] == 'disabled':
-                            ev['cookie_based_affinity'] = 'Disabled'
+                    for i in range(len(ev)):
+                        item = ev[i]
+                        if 'protocol' in item:
+                            item['protocol'] = _snake_to_camel(item['protocol'], True)
+                        if 'cookie_based_affinity' in item:
+                            item['cookie_based_affinity'] = _snake_to_camel(item['cookie_based_affinity'], True)
                     self.parameters["backend_http_settings_collection"] = ev
                 elif key == "http_listeners":
                     ev = kwargs[key]
-                    if 'protocol' in ev:
-                        if ev['protocol'] == 'http':
-                            ev['protocol'] = 'Http'
-                        elif ev['protocol'] == 'https':
-                            ev['protocol'] = 'Https'
+                    for i in range(len(ev)):
+                        item = ev[i]
+                        if 'frontend_ip_configuration' in item:
+                            id = frontend_ip_configuration_id(self.subscription_id,
+                                                              kwargs['resource_group'],
+                                                              kwargs['name'],
+                                                              item['frontend_ip_configuration'])
+                            item['frontend_ip_configuration'] = {'id': id}
+
+                        if 'frontend_port' in item:
+                            id = frontend_port_id(self.subscription_id,
+                                                  kwargs['resource_group'],
+                                                  kwargs['name'],
+                                                  item['frontend_port'])
+                            item['frontend_port'] = {'id': id}
+                        if 'protocol' in item:
+                            item['protocol'] = _snake_to_camel(item['protocol'], True)
+                        ev[i] = item
                     self.parameters["http_listeners"] = ev
-                elif key == "url_path_maps":
-                    self.parameters["url_path_maps"] = kwargs[key]
                 elif key == "request_routing_rules":
                     ev = kwargs[key]
-                    if 'rule_type' in ev:
-                        if ev['rule_type'] == 'basic':
-                            ev['rule_type'] = 'Basic'
-                        elif ev['rule_type'] == 'path_based_routing':
-                            ev['rule_type'] = 'PathBasedRouting'
+                    for i in range(len(ev)):
+                        item = ev[i]
+                        if 'backend_address_pool' in item:
+                            id = backend_address_pool_id(self.subscription_id,
+                                                         kwargs['resource_group'],
+                                                         kwargs['name'],
+                                                         item['backend_address_pool'])
+                            item['backend_address_pool'] = {'id': id}
+                        if 'backend_http_settings' in item:
+                            id = backend_http_settings_id(self.subscription_id,
+                                                          kwargs['resource_group'],
+                                                          kwargs['name'],
+                                                          item['backend_http_settings'])
+                            item['backend_http_settings'] = {'id': id}
+                        if 'http_listener' in item:
+                            id = http_listener_id(self.subscription_id,
+                                                  kwargs['resource_group'],
+                                                  kwargs['name'],
+                                                  item['http_listener'])
+                            item['http_listener'] = {'id': id}
+                        if 'protocol' in item:
+                            item['protocol'] = _snake_to_camel(item['protocol'], True)
+                        if 'rule_type' in ev:
+                            item['rule_type'] = _snake_to_camel(item['rule_type'], True)
+                        ev[i] = item
                     self.parameters["request_routing_rules"] = ev
-                elif key == "redirect_configurations":
-                    ev = kwargs[key]
-                    if 'redirect_type' in ev:
-                        if ev['redirect_type'] == 'permanent':
-                            ev['redirect_type'] = 'Permanent'
-                        elif ev['redirect_type'] == 'found':
-                            ev['redirect_type'] = 'Found'
-                        elif ev['redirect_type'] == 'see_other':
-                            ev['redirect_type'] = 'SeeOther'
-                        elif ev['redirect_type'] == 'temporary':
-                            ev['redirect_type'] = 'Temporary'
-                    self.parameters["redirect_configurations"] = ev
-                elif key == "web_application_firewall_configuration":
-                    ev = kwargs[key]
-                    if 'firewall_mode' in ev:
-                        if ev['firewall_mode'] == 'detection':
-                            ev['firewall_mode'] = 'Detection'
-                        elif ev['firewall_mode'] == 'prevention':
-                            ev['firewall_mode'] = 'Prevention'
-                    self.parameters["web_application_firewall_configuration"] = ev
-                elif key == "enable_http2":
-                    self.parameters["enable_http2"] = kwargs[key]
-                elif key == "resource_guid":
-                    self.parameters["resource_guid"] = kwargs[key]
-                elif key == "provisioning_state":
-                    self.parameters["provisioning_state"] = kwargs[key]
                 elif key == "etag":
                     self.parameters["etag"] = kwargs[key]
 
@@ -1396,11 +574,31 @@ class AzureRMApplicationGateways(AzureRMModuleBase):
                 self.log("Need to check if Application Gateway instance has to be deleted or may be updated")
                 self.to_do = Actions.Update
 
+        if (self.to_do == Actions.Update):
+            if (self.parameters['location'] != old_response['location'] or
+                    self.parameters['sku']['name'] != old_response['sku']['name'] or
+                    self.parameters['sku']['tier'] != old_response['sku']['tier'] or
+                    self.parameters['sku']['capacity'] != old_response['sku']['capacity'] or
+                    not compare_arrays(old_response, self.parameters, 'authentication_certificates') or
+                    not compare_arrays(old_response, self.parameters, 'gateway_ip_configurations') or
+                    not compare_arrays(old_response, self.parameters, 'ssl_certificates') or
+                    not compare_arrays(old_response, self.parameters, 'frontend_ip_configurations') or
+                    not compare_arrays(old_response, self.parameters, 'frontend_ports') or
+                    not compare_arrays(old_response, self.parameters, 'backend_address_pools') or
+                    not compare_arrays(old_response, self.parameters, 'backend_http_settings_collection') or
+                    not compare_arrays(old_response, self.parameters, 'request_routing_rules') or
+                    not compare_arrays(old_response, self.parameters, 'http_listeners')):
+
+                self.to_do = Actions.Update
+            else:
+                self.to_do = Actions.NoAction
+
         if (self.to_do == Actions.Create) or (self.to_do == Actions.Update):
             self.log("Need to Create / Update the Application Gateway instance")
 
             if self.check_mode:
                 self.results['changed'] = True
+                self.results["parameters"] = self.parameters
                 return self.results
 
             response = self.create_update_applicationgateway()
@@ -1488,6 +686,88 @@ class AzureRMApplicationGateways(AzureRMModuleBase):
             return response.as_dict()
 
         return False
+
+
+def frontend_ip_configuration_id(subscription_id, resource_group_name, appgw_name, name):
+    """Generate the id for a frontend ip configuration"""
+    return '/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.Network/applicationGateways/{2}/frontendIPConfigurations/{3}'.format(
+        subscription_id,
+        resource_group_name,
+        appgw_name,
+        name
+    )
+
+
+def frontend_port_id(subscription_id, resource_group_name, appgw_name, name):
+    """Generate the id for a frontend port"""
+    return '/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.Network/applicationGateways/{2}/frontendPorts/{3}'.format(
+        subscription_id,
+        resource_group_name,
+        appgw_name,
+        name
+    )
+
+
+def backend_address_pool_id(subscription_id, resource_group_name, appgw_name, name):
+    """Generate the id for an address pool"""
+    return '/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.Network/applicationGateways/{2}/backendAddressPools/{3}'.format(
+        subscription_id,
+        resource_group_name,
+        appgw_name,
+        name
+    )
+
+
+def backend_http_settings_id(subscription_id, resource_group_name, appgw_name, name):
+    """Generate the id for a http settings"""
+    return '/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.Network/applicationGateways/{2}/backendHttpSettingsCollection/{3}'.format(
+        subscription_id,
+        resource_group_name,
+        appgw_name,
+        name
+    )
+
+
+def http_listener_id(subscription_id, resource_group_name, appgw_name, name):
+    """Generate the id for a http listener"""
+    return '/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.Network/applicationGateways/{2}/httpListeners/{3}'.format(
+        subscription_id,
+        resource_group_name,
+        appgw_name,
+        name
+    )
+
+
+def compare_arrays(old_params, new_params, param_name):
+    old = old_params.get(param_name) or []
+    new = new_params.get(param_name) or []
+
+    oldd = {}
+    for item in old:
+        name = item['name']
+        oldd[name] = item
+    newd = {}
+    for item in new:
+        name = item['name']
+        newd[name] = item
+
+    newd = dict_merge(oldd, newd)
+    return newd == oldd
+
+
+def dict_merge(a, b):
+    '''recursively merges dict's. not just simple a['key'] = b['key'], if
+    both a and bhave a key who's value is a dict then dict_merge is called
+    on both values and the result stored in the returned dictionary.'''
+    if not isinstance(b, dict):
+        return b
+    result = deepcopy(a)
+    for k, v in b.items():
+        if k in result and isinstance(result[k], dict):
+                result[k] = dict_merge(result[k], v)
+        else:
+            result[k] = deepcopy(v)
+    return result
 
 
 def main():
