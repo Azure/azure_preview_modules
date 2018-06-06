@@ -1,22 +1,8 @@
 #!/usr/bin/python
 #
-# Copyright (c) 2016 Thomas Stringer, <tomstr@microsoft.com>
+# Copyright (c) 2018 Yuwei Zhou, <yuwzho@microsoft.com>
 #
-# This file is part of Ansible
-#
-# Ansible is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# Ansible is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with Ansible.  If not, see <http://www.gnu.org/licenses/>.
-#
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -28,14 +14,14 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 
 DOCUMENTATION = '''
 ---
-module: azure_rm_loadbalancer_facts
+module: azure_rm_aks_facts
 
-version_added: "2.4"
+version_added: "2.6"
 
-short_description: Get load balancer facts.
+short_description: Get Azure Kubernetes Service facts.
 
 description:
-    - Get facts for a specific load balancer or all load balancers.
+    - Get facts for a specific Azure Kubernetes Service or all Azure Kubernetes Services.
 
 options:
     name:
@@ -43,7 +29,7 @@ options:
             - Limit results to a specific resource group.
     resource_group:
         description:
-            - The resource group to search for the desired load balancer
+            - The resource group to search for the desired Azure Kubernetes Service
     tags:
         description:
             - Limit results by providing a list of tags. Format tags as 'key' or 'key:value'.
@@ -52,27 +38,27 @@ extends_documentation_fragment:
     - azure
 
 author:
-    - "Thomas Stringer (@tstringer)"
+    - "Yuwei Zhou (@yuwzho)"
 '''
 
 EXAMPLES = '''
-    - name: Get facts for one load balancer
-      azure_rm_loadbalancer_facts:
+    - name: Get facts for one Azure Kubernetes Service
+      azure_rm_aks_facts:
         name: Testing
         resource_group: TestRG
 
-    - name: Get facts for all load balancers
-      azure_rm_loadbalancer_facts:
+    - name: Get facts for all Azure Kubernetes Services
+      azure_rm_aks_facts:
 
     - name: Get facts by tags
-      azure_rm_loadbalancer_facts:
+      azure_rm_aks_facts:
         tags:
           - testing
 '''
 
 RETURN = '''
-azure_loadbalancers:
-    description: List of load balancer dicts.
+azure_aks:
+    description: List of Azure Kubernetes Service dicts.
     returned: always
     type: list
 '''
@@ -86,11 +72,11 @@ except:
     # handled in azure_rm_common
     pass
 
-AZURE_OBJECT_CLASS = 'LoadBalancer'
+AZURE_OBJECT_CLASS = 'managedClusters'
 
 
-class AzureRMLoadBalancerFacts(AzureRMModuleBase):
-    """Utility class to get load balancer facts"""
+class AzureRMManagedClusterFacts(AzureRMModuleBase):
+    """Utility class to get Azure Kubernetes Service facts"""
 
     def __init__(self):
 
@@ -102,16 +88,14 @@ class AzureRMLoadBalancerFacts(AzureRMModuleBase):
 
         self.results = dict(
             changed=False,
-            ansible_facts=dict(
-                azure_loadbalancers=[]
-            )
+            aks=[]
         )
 
         self.name = None
         self.resource_group = None
         self.tags = None
 
-        super(AzureRMLoadBalancerFacts, self).__init__(
+        super(AzureRMManagedClusterFacts, self).__init__(
             derived_arg_spec=self.module_args,
             supports_tags=False,
             facts_module=True
@@ -122,7 +106,7 @@ class AzureRMLoadBalancerFacts(AzureRMModuleBase):
         for key in self.module_args:
             setattr(self, key, kwargs[key])
 
-        self.results['ansible_facts']['azure_loadbalancers'] = (
+        self.results['aks'] = (
             self.get_item() if self.name
             else self.list_items()
         )
@@ -130,15 +114,16 @@ class AzureRMLoadBalancerFacts(AzureRMModuleBase):
         return self.results
 
     def get_item(self):
-        """Get a single load balancer"""
+        """Get a single Azure Kubernetes Service"""
 
-        self.log('Get properties for {}'.format(self.name))
+        self.log('Get properties for {0}'.format(self.name))
 
         item = None
         result = []
 
         try:
-            item = self.network_client.load_balancers.get(self.resource_group, self.name)
+            item = self.containerservice_client.managed_clusters.get(
+                self.resource_group, self.name)
         except CloudError:
             pass
 
@@ -148,14 +133,15 @@ class AzureRMLoadBalancerFacts(AzureRMModuleBase):
         return result
 
     def list_items(self):
-        """Get all load balancers"""
+        """Get all Azure Kubernetes Services"""
 
-        self.log('List all load balancers')
+        self.log('List all Azure Kubernetes Services')
 
         try:
-            response = self.network_client.load_balancers.list()
+            response = self.containerservice_client.managed_clusters.list(
+                self.resource_group)
         except AzureHttpError as exc:
-            self.fail('Failed to list all items - {}'.format(str(exc)))
+            self.fail('Failed to list all items - {0}'.format(str(exc)))
 
         results = []
         for item in response:
@@ -168,7 +154,8 @@ class AzureRMLoadBalancerFacts(AzureRMModuleBase):
 def main():
     """Main module execution code path"""
 
-    AzureRMLoadBalancerFacts()
+    AzureRMManagedClusterFacts()
+
 
 if __name__ == '__main__':
     main()

@@ -60,7 +60,7 @@ before_install:
       echo Run test $test_name from $filename;
       resource_group="asb-roletest-${test_name##azure_rm_}$(date +%s)";
 
-      printf "{\"resource_group\":\"$resource_group\",\n\"test\":\"$filename\",\n\"azure_object_id\":\"$AZURE_OBJECT_ID\"}" > ~/arg.json;
+      printf "{\"resource_group\":\"$resource_group\",\n\"test\":\"$filename\",\n\"resource_group_secondary\":\"$resource_group\",\n\"azure_object_id\":\"$AZURE_OBJECT_ID\"}" > ~/arg.json;
       cat ~/arg.json;
 
       while [ $m -le $max_retry_count ]; do
