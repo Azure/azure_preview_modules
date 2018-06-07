@@ -15,3 +15,5 @@
         name: "{{ resource_group }}"
         state: absent
         force: True
+      async: 5000
+      poll: 0
