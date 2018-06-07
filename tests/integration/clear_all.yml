@@ -18,4 +18,4 @@
       register: job
       until: job.finished
       retries: 300
-      with_items: jobs.results
+      with_items: "{{ jobs.results }}"
