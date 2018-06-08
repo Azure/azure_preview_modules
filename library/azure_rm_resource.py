@@ -27,6 +27,10 @@ options:
   url:
     description:
       - Azure RM Resource URL.
+  api_version:
+    description:
+      - Specific API version to be used.
+    required: yes
   provider:
     description:
       - Provider type.
@@ -46,7 +50,6 @@ options:
   subresource:
     description:
       - List of subresources
-    type: list
     suboptions:
       namespace:
         description:
@@ -63,13 +66,18 @@ options:
   method:
     description:
       - The HTTP method of the request or response. It MUST be uppercase.
-        choices: [ "GET", "PUT", "POST", "HEAD", "PATCH", "DELETE", "MERGE" ]
-        default: "PUT"
+    choices: [ "GET", "PUT", "POST", "HEAD", "PATCH", "DELETE", "MERGE" ]
+    default: "PUT"
   status_code:
     description:
       - A valid, numeric, HTTP status code that signifies success of the
         request. Can also be comma separated list of status codes.
     default: [ 200, 201, 202 ]
+  idempotency:
+    description:
+      - If enabled, idempotency check will be done by using GET method first and then comparing with I(body)
+    default: no
+    type: bool
   state:
     description:
       - Assert the state of the resource. Use C(present) to create or update resource or C(absent) to delete resource.
@@ -106,12 +114,12 @@ response:
 
 from ansible.module_utils.azure_rm_common import AzureRMModuleBase
 from ansible.module_utils.azure_rm_common_rest import GenericRestClient
-from msrestazure.tools import resource_id, is_valid_resource_id
+from copy import deepcopy
 
 try:
     from msrestazure.azure_exceptions import CloudError
-    from msrestazure import AzureConfiguration
     from msrest.service_client import ServiceClient
+    from msrestazure.tools import resource_id, is_valid_resource_id
     import json
 
 except ImportError:
@@ -150,7 +158,7 @@ class AzureRMResource(AzureRMModuleBase):
             method=dict(
                 type='str',
                 default='PUT',
-                choices=[ "GET", "PUT", "POST", "HEAD", "PATCH", "DELETE", "MERGE" ]
+                choices=["GET", "PUT", "POST", "HEAD", "PATCH", "DELETE", "MERGE"]
             ),
             body=dict(
                 type='raw'
@@ -158,6 +166,10 @@ class AzureRMResource(AzureRMModuleBase):
             status_code=dict(
                 type='list',
                 default=[200, 201, 202]
+            ),
+            idempotency=dict(
+                type='bool',
+                default=False
             ),
             state=dict(
                 type='str',
@@ -179,10 +191,13 @@ class AzureRMResource(AzureRMModuleBase):
         self.resource_name = None
         self.subresource_type = None
         self.subresource_name = None
+        self.subresource = []
         self.method = None
         self.status_code = []
+        self.idempotency = False
         self.state = None
-        super(AzureRMResource, self).__init__(self.module_arg_spec)
+        self.body = None
+        super(AzureRMResource, self).__init__(self.module_arg_spec, supports_tags=False)
 
     def exec_module(self, **kwargs):
         for key in self.module_arg_spec:
@@ -209,31 +224,65 @@ class AzureRMResource(AzureRMModuleBase):
                 rargs['child_namespace_' + str(i + 1)] = self.subresource[i].get('namespace', None)
                 rargs['child_type_' + str(i + 1)] = self.subresource[i].get('type', None)
                 rargs['child_name_' + str(i + 1)] = self.subresource[i].get('name', None)
-                
+
             self.url = resource_id(**rargs)
-            
+
         query_parameters = {}
         query_parameters['api-version'] = self.api_version
 
         header_parameters = {}
         header_parameters['Content-Type'] = 'application/json; charset=utf-8'
 
-        response = self.mgmt_client.query(self.url, self.method, query_parameters, header_parameters, self.body, self.status_code)
+        needs_update = True
+        response = None
 
-        try:
-            self.results['response'] = json.loads(response.text)
-        except:
-            self.results['response'] = response.text
+        if self.idempotency:
+            original = self.mgmt_client.query(self.url, "GET", query_parameters, None, None, [200, 404])
 
-        self.results['changed'] = True
+            if original.status_code == 404:
+                if self.state == 'absent':
+                    needs_update = False
+            else:
+                try:
+                    response = json.loads(original.text)
+                    needs_update = (dict_merge(response, self.body) != response)
+                except:
+                    pass
 
-        if self.state == 'absent' and response.status_code == 204:
-            self.results['changed'] = False
+        if needs_update:
+            response = self.mgmt_client.query(self.url, self.method, query_parameters, header_parameters, self.body, self.status_code)
+            if self.state == 'present':
+                try:
+                    response = json.loads(response.text)
+                except:
+                    response = response.text
+            else:
+                response = None
+
+        self.results['response'] = response
+        self.results['changed'] = needs_update
 
         return self.results
 
 
+def dict_merge(a, b):
+    '''recursively merges dict's. not just simple a['key'] = b['key'], if
+    both a and bhave a key who's value is a dict then dict_merge is called
+    on both values and the result stored in the returned dictionary.'''
+    if not isinstance(b, dict):
+        return b
+    result = deepcopy(a)
+    for k, v in b.items():
+        if k in result and isinstance(result[k], dict):
+                result[k] = dict_merge(result[k], v)
+        else:
+            result[k] = deepcopy(v)
+    return result
+
+
 def main():
     AzureRMResource()
+
+
 if __name__ == '__main__':
     main()

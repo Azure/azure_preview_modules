@@ -27,6 +27,10 @@ options:
   url:
     description:
       - Azure RM Resource URL.
+  api_version:
+    description:
+      - Specific API version to be used.
+    required: yes
   provider:
     description:
       - Provider type, should be specified in no URL is given
@@ -34,7 +38,6 @@ options:
     description:
       - Resource group to be used.
       - Required if URL is not specified.
-      
   resource_type:
     description:
       - Resource type.
@@ -44,7 +47,6 @@ options:
   subresource:
     description:
       - List of subresources
-    type: list
     suboptions:
       namespace:
         description:
@@ -83,12 +85,11 @@ response:
 
 from ansible.module_utils.azure_rm_common import AzureRMModuleBase
 from ansible.module_utils.azure_rm_common_rest import GenericRestClient
-from msrestazure.tools import resource_id, is_valid_resource_id
 
 try:
     from msrestazure.azure_exceptions import CloudError
-    from msrestazure import AzureConfiguration
     from msrest.service_client import ServiceClient
+    from msrestazure.tools import resource_id, is_valid_resource_id
     import json
 
 except ImportError:
@@ -126,7 +127,8 @@ class AzureRMResourceFacts(AzureRMModuleBase):
                 default=[]
             ),
             api_version=dict(
-                type='str'
+                type='str',
+                required=True
             )
         )
         # store the results of the module operation
@@ -141,7 +143,7 @@ class AzureRMResourceFacts(AzureRMModuleBase):
         self.resource_type = None
         self.resource_name = None
         self.subresource = []
-        super(AzureRMResourceFacts, self).__init__(self.module_arg_spec)
+        super(AzureRMResourceFacts, self).__init__(self.module_arg_spec, supports_tags=False)
 
     def exec_module(self, **kwargs):
         for key in self.module_arg_spec:
@@ -164,7 +166,7 @@ class AzureRMResourceFacts(AzureRMModuleBase):
                 rargs['child_namespace_' + str(i + 1)] = self.subresource[i].get('namespace', None)
                 rargs['child_type_' + str(i + 1)] = self.subresource[i].get('type', None)
                 rargs['child_name_' + str(i + 1)] = self.subresource[i].get('name', None)
-                
+
             self.url = resource_id(**rargs)
 
             # this is to fix a problem with resource_id implementation, when resource_name is not specified
@@ -186,7 +188,7 @@ class AzureRMResourceFacts(AzureRMModuleBase):
             if response is list:
                 self.results['response'] = response
             else:
-                self.results['response'] = [ response ]
+                self.results['response'] = [response]
         except:
             self.results['response'] = []
 
@@ -195,5 +197,7 @@ class AzureRMResourceFacts(AzureRMModuleBase):
 
 def main():
     AzureRMResourceFacts()
+
+
 if __name__ == '__main__':
     main()

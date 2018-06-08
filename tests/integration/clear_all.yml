@@ -1,6 +1,5 @@
 ---
 - hosts: localhost
-  strategy: free
   tasks:
     - name: query
       azure_rm_resourcegroup_facts:
@@ -11,3 +10,12 @@
         state: absent
         force: yes
       with_items: "{{ output | json_query('ansible_facts.azure_resourcegroups[*].name') | select('match', 'asb-roletest') | list }}"
+      async: 10000
+      poll: 0
+      register: jobs
+    - name: Wait for complete
+      async_status: jid={{ item.ansible_job_id }}
+      register: job
+      until: job.finished
+      retries: 300
+      with_items: "{{ jobs.results }}"

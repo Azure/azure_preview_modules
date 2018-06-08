@@ -9,9 +9,14 @@
       azure_rm_resourcegroup:
         name: "{{ resource_group }}"
         location: eastus
-    - include_tasks: "{{test}}"
-    - name: Delete a resource group
-      azure_rm_resourcegroup:
-        name: "{{ resource_group }}"
-        state: absent
-        force: True
+    - name: run integration test
+      block:
+        - include_tasks: "{{test}}"
+      always:
+        - name: Delete a resource group
+          azure_rm_resourcegroup:
+            name: "{{ resource_group }}"
+            state: absent
+            force: True
+          async: 5000
+          poll: 0
