@@ -700,7 +700,7 @@ class AzureRMApplicationGateways(AzureRMModuleBase):
 
 def public_ip_id(subscription_id, resource_group_name, name):
     """Generate the id for a frontend ip configuration"""
-    return '/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.Network/publicPAddresses/{2}/{3}'.format(
+    return '/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.Network/publicPAddresses/{2}'.format(
         subscription_id,
         resource_group_name,
         name
