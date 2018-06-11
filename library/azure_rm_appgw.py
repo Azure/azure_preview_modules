@@ -477,11 +477,6 @@ class AzureRMApplicationGateways(AzureRMModuleBase):
                     self.parameters["ssl_certificates"] = kwargs[key]
                 elif key == "frontend_ip_configurations":
                     ev = kwargs[key]
-                    if 'private_ip_allocation_method' in ev:
-                        if ev['private_ip_allocation_method'] == 'static':
-                            ev['private_ip_allocation_method'] = 'Static'
-                        elif ev['private_ip_allocation_method'] == 'dynamic':
-                            ev['private_ip_allocation_method'] = 'Dynamic'
                     for i in range(len(ev)):
                         item = ev[i]
                         if 'private_ip_allocation_method' in item:
