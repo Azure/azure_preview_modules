@@ -17,7 +17,7 @@ module: azure_rm_containerregistry
 version_added: "2.5"
 short_description: Manage an Azure Container Registry.
 description:
-    - Create, update and delete an Azure Container Registry.
+    - Create, update and  delete an Azure Container Registry.
 
 options:
     resource_group:
