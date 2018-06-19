@@ -39,10 +39,8 @@ options:
                     - The name of the sku, typically, a letter + Number code, e.g. P3.
             tier:
                 description:
-                    - The tier of the particular SKU, e.g. C(basic).
-                choices:
-                    - 'basic'
-                    - 'standard'
+                    - The tier of the particular SKU, e.g. Basic.
+                choices: ['basic', 'standard']
             capacity:
                 description:
                     - "The scale up/out capacity, representing server's compute units."
@@ -58,9 +56,7 @@ options:
     version:
         description:
             - Server version.
-        choices:
-            - '5.6'
-            - '5.7'
+        choices: ['5.6', '5.7']
     enforce_ssl:
         description:
             - Enable SSL enforcement.
@@ -72,6 +68,17 @@ options:
     admin_password:
         description:
             - The password of the administrator login.
+    create_mode:
+        description:
+            - Create mode of SQL Server
+        default: Default
+    state:
+        description:
+            - Assert the state of the MySQL Server. Use 'present' to create or update a server and 'absent' to delete it.
+        default: present
+        choices:
+            - absent
+            - present
 
 extends_documentation_fragment:
     - azure
@@ -106,13 +113,13 @@ id:
     sample: /subscriptions/12345678-1234-1234-1234-123412341234/testrg/providers/Microsoft.DBforMySQL/servers/mysqlsrv1b6dd89593
 version:
     description:
-        - "Server version. Possible values include: '5.6', '5.7'"
+        - 'Server version. Possible values include: C(5.6), C(5.7)'
     returned: always
     type: str
     sample: 5.6
 state:
     description:
-        - "A state of a server that is visible to user. Possible values include: 'Ready', 'Dropping', 'Disabled'"
+        - 'A state of a server that is visible to user. Possible values include: C(Ready), C(Dropping), C(Disabled)'
     returned: always
     type: str
     sample: Ready
@@ -128,9 +135,9 @@ import time
 from ansible.module_utils.azure_rm_common import AzureRMModuleBase
 
 try:
-    from msrestazure.azure_exceptions import CloudError
-    from msrestazure.azure_operation import AzureOperationPoller
     from azure.mgmt.rdbms.mysql import MySQLManagementClient
+    from msrestazure.azure_exceptions import CloudError
+    from msrest.polling import LROPoller
     from msrest.serialization import Model
 except ImportError:
     # This is handled in azure_rm_common
@@ -165,8 +172,7 @@ class AzureRMServers(AzureRMModuleBase):
             ),
             version=dict(
                 type='str',
-                choices=['5.6',
-                         '5.7']
+                choices=['5.6', '5.7']
             ),
             enforce_ssl=dict(
                 type='bool',
@@ -308,7 +314,7 @@ class AzureRMServers(AzureRMModuleBase):
         self.log("Creating / Updating the MySQL Server instance {0}".format(self.name))
 
         try:
-            if self.to_do == Actions.Create:
+            if (self.to_do == Actions.Create):
                 response = self.mgmt_client.servers.create(resource_group_name=self.resource_group,
                                                            server_name=self.name,
                                                            parameters=self.parameters)
@@ -316,7 +322,7 @@ class AzureRMServers(AzureRMModuleBase):
                 response = self.mgmt_client.servers.update(resource_group_name=self.resource_group,
                                                            server_name=self.name,
                                                            parameters=self.parameters)
-            if isinstance(response, AzureOperationPoller):
+            if isinstance(response, LROPoller):
                 response = self.get_poller_result(response)
 
         except CloudError as exc:
