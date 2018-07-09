@@ -1,0 +1,13 @@
+{
+  "ansible_repo_path": "/tmp/ansible_repo",
+  "azure_repo_path": "/tmp/azure_repo",
+  "sha_file_path": "/tmp/azure_repo/files/sha.json",
+  "repo_mapping_file_path": "./repo_mapping.json",
+  "author": "Microsoft Visual Studio China Ansible on Azure robot",
+  "mail": "ansibleazurebot@microsoft.com",
+  "alias": "@yungezz @yuwzho @zikalino @yaweiw",
+  "ansible_default_branch": "devel",
+  "azure_default_branch": "master",
+  "special_src_folder_path": "test/integration/targets",
+  "test_case_folder_prefix": "azure_rm_"
+}
