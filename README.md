@@ -1,3 +1,6 @@
+[![Travis CI](https://travis-ci.org/Azure/azure_preview_modules.svg?branch=master)](https://travis-ci.org/Azure/azure_preview_modules)
+
+
 Azure.azure_preview_modules
 =========
 
