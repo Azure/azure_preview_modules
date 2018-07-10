@@ -100,6 +100,8 @@ def copy_folder(path):
     print "Copy folder " + path
     if config["special_src_folder_path"] in path:
         copy_folder_specially(path)
+    elif config["not_overwrite_copy"] in path:
+        copy_folder_non_overwrite(path)
     else:
         copy_folder_normally(path)
 
@@ -109,6 +111,14 @@ def copy_folder_normally(path):
     shutil.rmtree(dest)
     shutil.copytree(src, dest)
 
+
+def copy_folder_non_overwrite(path):
+    src, dest = get_joined_path(path)
+    for name in os.listdir(src):
+        src_file_name = os.path.join(src, file_name)
+        dest_file_name = os.path.join(dest, file_name)
+        if os.path.isfile(dest_file_path):
+            shutil.copy(src_file_name, dest_file_name)
 
 def copy_folder_specially(path):
     src, dest = get_joined_path(path)
