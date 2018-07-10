@@ -122,7 +122,6 @@ def copy_folder_non_overwrite(path):
 
 def copy_folder_specially(path):
     src, dest = get_joined_path(path)
-    shutil.rmtree(dest)
     for dir_name in os.listdir(src):
         src_dir_path = os.path.join(src, dir_name)
         dest_dir_path = os.path.join(dest, dir_name)
