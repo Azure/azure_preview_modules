@@ -126,8 +126,9 @@ def copy_folder_specially(path):
         src_dir_path = os.path.join(src, dir_name)
         dest_dir_path = os.path.join(dest, dir_name)
         if os.path.isdir(src_dir_path) and config["test_case_folder_prefix"] in dir_name:
-            shutil.rmtree(dest_dir_path)
-            shutil.copytree(src_dir_path, dest_dir_path)
+            if os.path.isdir(dest_dir_path):
+                shutil.rmtree(dest_dir_path)
+                shutil.copytree(src_dir_path, dest_dir_path)
 
 
 def check_out_new_branch():
