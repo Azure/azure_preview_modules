@@ -22,3 +22,4 @@ azure-storage==0.35.1
 msrest==0.4.29
 msrestazure==0.4.31
 azure-keyvault==1.0.0a1
+azure-mgmt-authorization>=0.30.0,<1
