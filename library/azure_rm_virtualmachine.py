@@ -337,6 +337,25 @@ EXAMPLES = '''
       sku: '7.1'
       version: latest
 
+- name: Create a VM with existing NIC in other resource group
+  azure_rm_virtualmachine:
+    resource_group: Testing
+    name: testvm002
+    vm_size: Standard_D4
+    storage_account: testaccount001
+    admin_username: adminUser
+    ssh_public_keys:
+      - path: /home/adminUser/.ssh/authorized_keys
+        key_data: < insert yor ssh public key here... >
+    network_interfaces:
+      - name: testvm001
+        resource_group: Testing1
+    image:
+      offer: CentOS
+      publisher: OpenLogic
+      sku: '7.1'
+      version: latest
+
 - name: Create a VM with OS and multiple data managed disks
   azure_rm_virtualmachine:
     resource_group: Testing
