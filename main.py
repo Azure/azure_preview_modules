@@ -115,8 +115,8 @@ def copy_folder_normally(path):
 def copy_folder_non_overwrite(path):
     src, dest = get_joined_path(path)
     for name in os.listdir(src):
-        src_file_name = os.path.join(src, file_name)
-        dest_file_name = os.path.join(dest, file_name)
+        src_file_name = os.path.join(src, name)
+        dest_file_name = os.path.join(dest, name)
         if os.path.isfile(dest_file_path):
             shutil.copy(src_file_name, dest_file_name)
 
