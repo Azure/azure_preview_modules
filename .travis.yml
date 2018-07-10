@@ -104,9 +104,10 @@ before_install:
     }
 
 install:
-  - if [ "$ANSIBLE_VERSION" = "latest" ]; then pip install ansible[azure]; else pip
+  - if [ "$ANSIBLE_VERSION" == "latest" ]; then pip install ansible[azure]; else pip
     install ansible[azure]==$ANSIBLE_VERSION; fi
   - "{ echo '[defaults]'; echo 'roles_path = ../'; } >> ansible.cfg"
+  - ansible --version
   - pip install -I -r ./files/requirements-azure.txt
   - pip  freeze
 
