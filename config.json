@@ -1,7 +1,7 @@
 {
   "ansible_repo_path": "/tmp/ansible_repo",
   "azure_repo_path": "/tmp/azure_repo",
-  "sha_file_path": "/tmp/azure_repo/files/sha.json",
+  "sha_file_path": "/tmp/azure_repo/.github/sha.json",
   "repo_mapping_file_path": "./repo_mapping.json",
   "author": "Microsoft Visual Studio China Ansible on Azure robot",
   "mail": "ansibleazurebot@microsoft.com",
