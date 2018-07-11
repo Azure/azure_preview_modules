@@ -245,8 +245,8 @@ class AzureRMWebhooks(AzureRMModuleBase):
             response = old_response
 
         if response:
-            self.results["id"] = response["id"]
-            self.results["status"] = response["status"]
+            self.results["id"] = response.id
+            self.results["status"] = response.status
 
         return self.results
 
