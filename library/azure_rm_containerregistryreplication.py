@@ -90,6 +90,20 @@ except ImportError:
     pass
 
 
+def create_replication_dict(replication):
+    if replication is None:
+        return None
+    results = dict(
+        id=replication.id,
+        name=replication.name,
+        location=replication.location,
+        provisioning_state=replication.provisioning_state,
+        tags=replication.tags,
+        status=replication.status.display_status
+    )
+    return results
+
+
 class Actions:
     NoAction, Create, Update, Delete = range(4)
 
@@ -207,8 +221,8 @@ class AzureRMReplications(AzureRMModuleBase):
             response = old_response
 
         if response:
-            self.results["id"] = response.id
-            self.results["status"] = response.status
+            self.results["id"] = response["id"]
+            self.results["status"] = response["status"]
 
         return self.results
 
@@ -237,7 +251,7 @@ class AzureRMReplications(AzureRMModuleBase):
         except CloudError as exc:
             self.log('Error attempting to create the Replication instance.')
             self.fail("Error creating the Replication instance: {0}".format(str(exc)))
-        return response
+        return create_replication_dict(response)
 
     def delete_replication(self):
         '''

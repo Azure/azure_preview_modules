@@ -105,6 +105,20 @@ except ImportError:
     pass
 
 
+def create_webhook_dict(webhook):
+    if webhook is None:
+        return None
+    results = dict(
+        id=webhook.id,
+        name=webhook.name,
+        location=webhook.location,
+        provisioning_state=webhook.provisioning_state,
+        tags=webhook.tags,
+        status=webhook.status
+    )
+    return results
+
+
 class Actions:
     NoAction, Create, Update, Delete = range(4)
 
@@ -198,6 +212,9 @@ class AzureRMWebhooks(AzureRMModuleBase):
 
         resource_group = self.get_resource_group(self.resource_group)
 
+        if 'location' not in self.parameters:
+            self.parameters['location'] = resource_group.location
+
         old_response = self.get_webhook()
 
         if not old_response:
@@ -246,8 +263,8 @@ class AzureRMWebhooks(AzureRMModuleBase):
             response = old_response
 
         if response:
-            self.results["id"] = response.id
-            self.results["status"] = response.status
+            self.results["id"] = response["id"]
+            self.results["status"] = response["status"]
 
         return self.results
 
@@ -264,19 +281,21 @@ class AzureRMWebhooks(AzureRMModuleBase):
                 response = self.mgmt_client.webhooks.create(resource_group_name=self.resource_group,
                                                             registry_name=self.registry_name,
                                                             webhook_name=self.webhook_name,
-                                                            webhook_create_parameters=self.parameters)
+                                                            webhook_create_parameters=self.parameters,
+                                                            location=self.location)
             else:
                 response = self.mgmt_client.webhooks.update(resource_group_name=self.resource_group,
                                                             registry_name=self.registry_name,
                                                             webhook_name=self.webhook_name,
-                                                            webhook_update_parameters=self.parameters)
+                                                            webhook_update_parameters=self.parameters,
+                                                            location=self.location)
             if isinstance(response, LROPoller):
                 response = self.get_poller_result(response)
 
         except CloudError as exc:
             self.log('Error attempting to create the Webhook instance.')
             self.fail("Error creating the Webhook instance: {0}".format(str(exc)))
-        return response
+        return create_webhook_dict(response)
 
     def delete_webhook(self):
         '''
