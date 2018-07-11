@@ -236,7 +236,7 @@ class AzureRMReplications(AzureRMModuleBase):
         except CloudError as exc:
             self.log('Error attempting to create the Replication instance.')
             self.fail("Error creating the Replication instance: {0}".format(str(exc)))
-        return response.as_dict()
+        return response
 
     def delete_replication(self):
         '''

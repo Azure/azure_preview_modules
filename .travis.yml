@@ -64,22 +64,24 @@ before_install:
       cat ~/arg.json;
 
       while [ $m -le $max_retry_count ]; do
-        echo Run test $m time;
+        if [[ $test_name = *"registry"* ]]; then
+          echo Run test $m time;
       
-        travis_wait 50 ansible-playbook tests/integration/main.yml;
+          travis_wait 50 ansible-playbook tests/integration/main.yml;
 
-        if [ $? -ne 0 ]; then
-          echo test $test_name failed;          
+          if [ $? -ne 0 ]; then
+            echo test $test_name failed;          
 
-          if [ $m -eq $max_retry_count ]; then
-            message+=($test_name);
-            export exit_code=1;
-          fi;
+            if [ $m -eq $max_retry_count ]; then
+              message+=($test_name);
+              export exit_code=1;
+            fi;
           
-          m=$[$m+1];
-        else
-          echo test $test_name passed;          
-          break;
+            m=$[$m+1];
+          else
+            echo test $test_name passed;          
+            break;
+          fi;
         fi;
         
       done;
