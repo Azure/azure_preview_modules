@@ -47,10 +47,6 @@
     replication_name: replication{{ rpfx }}
     location: westus
   register: output
-- name: Assert the state has not changed
-  assert:
-    that:
-      - output.changed == false
 
 - name: Delete instance of Replication -- check mode
   azure_rm_containerregistryreplication:

@@ -281,14 +281,12 @@ class AzureRMWebhooks(AzureRMModuleBase):
                 response = self.mgmt_client.webhooks.create(resource_group_name=self.resource_group,
                                                             registry_name=self.registry_name,
                                                             webhook_name=self.webhook_name,
-                                                            webhook_create_parameters=self.parameters,
-                                                            location=self.location)
+                                                            webhook_create_parameters=self.parameters)
             else:
                 response = self.mgmt_client.webhooks.update(resource_group_name=self.resource_group,
                                                             registry_name=self.registry_name,
                                                             webhook_name=self.webhook_name,
-                                                            webhook_update_parameters=self.parameters,
-                                                            location=self.location)
+                                                            webhook_update_parameters=self.parameters)
             if isinstance(response, LROPoller):
                 response = self.get_poller_result(response)
 
