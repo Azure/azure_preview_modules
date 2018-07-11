@@ -99,6 +99,7 @@ try:
     from msrestazure.azure_operation import AzureOperationPoller
     from azure.mgmt.containerregistry import ContainerRegistryManagementClient
     from msrest.serialization import Model
+    from msrest.polling import LROPoller
 except ImportError:
     # This is handled in azure_rm_common
     pass
@@ -269,7 +270,7 @@ class AzureRMWebhooks(AzureRMModuleBase):
                                                             registry_name=self.registry_name,
                                                             webhook_name=self.webhook_name,
                                                             webhook_update_parameters=self.parameters)
-            if isinstance(response, AzureOperationPoller):
+            if isinstance(response, LROPoller):
                 response = self.get_poller_result(response)
 
         except CloudError as exc:
