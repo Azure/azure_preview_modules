@@ -12,7 +12,7 @@ env:
     - message=()
     - ANSIBLE_VERSION=latest
     - max_retry_count=2
-    #- ANSIBLE_VERSION=2.4.2.0
+    - ANSIBLE_VERSION=2.5.5
   matrix:
     - id=1
     - id=2
