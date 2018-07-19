@@ -108,7 +108,7 @@ install:
   - "{ echo '[defaults]'; echo 'roles_path = ../'; } >> ansible.cfg"
   - ansible --version
   - ansible-galaxy install --force git+https://github.com/Azure/azure_preview_modules.git,integration-2018-07-10-03-38-56
-  - cp /home/travis/build/Azure/azure_preview_modules/  /home/travis/.ansible/roles/Azure.azure_preview_modules/
+  - cp -fr /home/travis/build/Azure/azure_preview_modules/  /home/travis/.ansible/roles/Azure.azure_preview_modules/
   - pip install -I -r /home/travis/.ansible/role/Azure.azure_preview_modules/files/requirements-azure.txt
   - pip freeze
 
