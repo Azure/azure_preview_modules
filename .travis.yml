@@ -111,6 +111,8 @@ install:
   - mkdir -p /home/travis/.ansible
   - mkdir -p /home/travis/.ansible/roles
   - cp -fr /home/travis/build/Azure/azure_preview_modules/  /home/travis/.ansible/roles/Azure.azure_preview_modules/
+  - ls /home/travis/.ansible/roles/Azure.azure_preview_modules/
+  - ls /home/travis/.ansible/roles/Azure.azure_preview_modules/files
   - pip install -I -r /home/travis/.ansible/roles/Azure.azure_preview_modules/files/requirements-azure.txt
   - pip freeze
 
