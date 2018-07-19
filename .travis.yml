@@ -110,13 +110,13 @@ install:
   - ansible-galaxy install --force git+https://github.com/Azure/azure_preview_modules.git,integration-2018-07-10-03-38-56
   - mkdir -p /home/travis/.ansible
   - mkdir -p /home/travis/.ansible/roles
-  - cp -fr /home/travis/build/Azure/azure_preview_modules/  /home/travis/.ansible/roles/Azure.azure_preview_modules/
-  - ls /home/travis/.ansible/roles/Azure.azure_preview_modules/
-  - ls /home/travis/.ansible/roles/Azure.azure_preview_modules/files
+  - cp -fr /home/travis/build/Azure/azure_preview_modules/  /home/travis/.ansible/roles/azure_preview_modules/
+  - ls /home/travis/.ansible/roles/azure_preview_modules/
+  - ls /home/travis/.ansible/roles/azure_preview_modules/files
   - cd
-  - pip install -I -r /home/travis/.ansible/roles/Azure.azure_preview_modules/files/requirements-azure.txt
+  - pip install -I -r /home/travis/.ansible/roles/azure_preview_modules/files/requirements-azure.txt
   - pip freeze
-  - cd /home/travis/.ansible/roles/Azure.azure_preview_modules
+  - cd /home/travis/.ansible/roles/azure_preview_modules
 
 script:
   - scan_test
