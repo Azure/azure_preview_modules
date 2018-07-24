@@ -6,14 +6,15 @@
 - name: Create SQL Server
   azure_rm_sqlserver:
     resource_group: "{{ resource_group }}"
-    name: sqlsrv{{ rpfx }}
+    name: "sqlsrv{{ rpfx }}"
     location: eastus
     admin_username: mylogin
     admin_password: Testpasswordxyz12!
-- name: Create SQL Server
+
+- name: Create SQL Server - 2
   azure_rm_sqlserver:
     resource_group: "{{ resource_group }}"
-    name: sqlsrv{{ rpfx }}second
+    name: "sqlsrv{{ rpfx }}x"
     location: eastus
     admin_username: mylogin
     admin_password: Testpasswordxyz12!
@@ -21,14 +22,14 @@
 - name: Gather facts SQL Server
   azure_rm_sqlserver_facts:
     resource_group: "{{ resource_group }}"
-    server_name: sqlsrv{{ rpfx }}
+    server_name: "sqlsrv{{ rpfx }}"
   register: output
 - name: Assert that facts are returned
   assert:
     that:
       - output.changed == False
       - output.servers.sqlsrv{{ rpfx }}.id != None
-      - output.servers.sqlsrv{{ rpfx }}.name != None
+      - output.servers.sqlsrv{{ rpfx }}.name == "sqlsrv{{ rpfx }}"
       - output.servers.sqlsrv{{ rpfx }}.type != None
       - output.servers.sqlsrv{{ rpfx }}.location != None
       - output.servers.sqlsrv{{ rpfx }}.kind != None
@@ -36,7 +37,36 @@
       - output.servers.sqlsrv{{ rpfx }}.state != None
       - output.servers.sqlsrv{{ rpfx }}.fully_qualified_domain_name != None
 
-- name: Gather facts SQL Server
+- name: Gather facts SQL Server - second
+  azure_rm_sqlserver_facts:
+    resource_group: "{{ resource_group }}"
+    server_name: "sqlsrv{{ rpfx }}x"
+  register: output
+- name: Assert that facts are returned
+  assert:
+    that:
+      - output.changed == False
+      - output.servers.sqlsrv{{ rpfx }}x.id != None
+      - output.servers.sqlsrv{{ rpfx }}x.name == "sqlsrv{{ rpfx }}x"
+      - output.servers.sqlsrv{{ rpfx }}x.type != None
+      - output.servers.sqlsrv{{ rpfx }}x.location != None
+      - output.servers.sqlsrv{{ rpfx }}x.kind != None
+      - output.servers.sqlsrv{{ rpfx }}x.version != None
+      - output.servers.sqlsrv{{ rpfx }}x.state != None
+      - output.servers.sqlsrv{{ rpfx }}x.fully_qualified_domain_name != None
+
+- name: Gather facts SQL Server - unexisting
+  azure_rm_sqlserver_facts:
+    resource_group: "{{ resource_group }}"
+    server_name: "unexisting"
+  register: output
+- name: Assert that facts are returned
+  assert:
+    that:
+      - output.changed == False
+      - output.servers == {}
+
+- name: Gather facts SQL Server - list
   azure_rm_sqlserver_facts:
     resource_group: "{{ resource_group }}"
   register: output
@@ -45,53 +75,30 @@
     that:
       - output.changed == False
       - output.servers.sqlsrv{{ rpfx }}.id != None
-      - output.servers.sqlsrv{{ rpfx }}.name != None
+      - output.servers.sqlsrv{{ rpfx }}.name == "sqlsrv{{ rpfx }}"
       - output.servers.sqlsrv{{ rpfx }}.type != None
       - output.servers.sqlsrv{{ rpfx }}.location != None
       - output.servers.sqlsrv{{ rpfx }}.kind != None
       - output.servers.sqlsrv{{ rpfx }}.version != None
       - output.servers.sqlsrv{{ rpfx }}.state != None
       - output.servers.sqlsrv{{ rpfx }}.fully_qualified_domain_name != None
-      - output.servers.sqlsrv{{ rpfx }}second.id != None
-      - output.servers.sqlsrv{{ rpfx }}second.name != None
-      - output.servers.sqlsrv{{ rpfx }}second.type != None
-      - output.servers.sqlsrv{{ rpfx }}second.location != None
-      - output.servers.sqlsrv{{ rpfx }}second.kind != None
-      - output.servers.sqlsrv{{ rpfx }}second.version != None
-      - output.servers.sqlsrv{{ rpfx }}second.state != None
-      - output.servers.sqlsrv{{ rpfx }}second.fully_qualified_domain_name != None
+      - output.servers.sqlsrv{{ rpfx }}x.id != None
+      - output.servers.sqlsrv{{ rpfx }}x.name == "sqlsrv{{ rpfx }}x"
+      - output.servers.sqlsrv{{ rpfx }}x.type != None
+      - output.servers.sqlsrv{{ rpfx }}x.location != None
+      - output.servers.sqlsrv{{ rpfx }}x.kind != None
+      - output.servers.sqlsrv{{ rpfx }}x.version != None
+      - output.servers.sqlsrv{{ rpfx }}x.state != None
+      - output.servers.sqlsrv{{ rpfx }}x.fully_qualified_domain_name != None
 
 - name: Delete instance of SQL Server
   azure_rm_sqlserver:
     resource_group: "{{ resource_group }}"
-    name: sqlsrv{{ rpfx }}
+    name: "sqlsrv{{ rpfx }}"
     state: absent
+
 - name: Delete instance of SQL Server
   azure_rm_sqlserver:
     resource_group: "{{ resource_group }}"
-    name: sqlsrv{{ rpfx }}second
+    name: "sqlsrv{{ rpfx }}x"
     state: absent
-
-- name: Gather facts SQL Server
-  azure_rm_sqlserver_facts:
-    resource_group: "{{ resource_group }}"
-    server_name: sqlsrv{{ rpfx }}
-  register: output
-- name: Assert that empty dictionary was returned
-  assert:
-    that:
-      - output.changed == False
-      - "'sqlsrv{{ rpfx }}' not in output.servers"
-      - "'sqlsrv{{ rpfx }}second' not in output.servers"
-
-- name: Gather facts SQL Server
-  azure_rm_sqlserver_facts:
-    resource_group: "{{ resource_group }}"
-  register: output
-- name: Assert that empty dictionary was returned
-  assert:
-    that:
-      - output.changed == False
-      - "'sqlsrv{{ rpfx }}' not in output.servers"
-      - "'sqlsrv{{ rpfx }}second' not in output.servers"
-
