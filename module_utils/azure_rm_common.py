@@ -23,8 +23,7 @@ except ImportError:
 AZURE_COMMON_ARGS = dict(
     auth_source=dict(
         type='str',
-        choices=['auto', 'cli', 'env', 'credential_file', 'msi'],
-        default='auto'
+        choices=['auto', 'cli', 'env', 'credential_file', 'msi']
     ),
     profile=dict(type='str'),
     subscription_id=dict(type='str', no_log=True),
@@ -57,7 +56,7 @@ AZURE_CREDENTIAL_ENV_MAPPING = dict(
 # For now, we have to copy from azure-cli
 AZURE_API_PROFILES = {
     'latest': {
-        'ContainerInstanceManagementClient': '2017-12-01-preview',
+        'ContainerInstanceManagementClient': '2018-02-01-preview',
         'ComputeManagementClient': dict(
             default_api_version='2017-12-01',
             resource_skus='2017-09-01',
@@ -195,7 +194,7 @@ AZURE_PKG_VERSIONS = {
     },
     'ComputeManagementClient': {
         'package_name': 'compute',
-        'expected_version': '2.0.0'
+        'expected_version': '2.1.0'
     },
     'ContainerInstanceManagementClient': {
         'package_name': 'containerinstance',
@@ -203,15 +202,15 @@ AZURE_PKG_VERSIONS = {
     },
     'NetworkManagementClient': {
         'package_name': 'network',
-        'expected_version': '1.3.0'
+        'expected_version': '1.7.1'
     },
     'ResourceManagementClient': {
         'package_name': 'resource',
-        'expected_version': '1.1.0'
+        'expected_version': '1.2.2'
     },
     'DnsManagementClient': {
         'package_name': 'dns',
-        'expected_version': '1.0.1'
+        'expected_version': '1.2.0'
     },
     'WebSiteManagementClient': {
         'package_name': 'web',
@@ -408,8 +407,11 @@ class AzureRMModuleBase(object):
                 return
             expected_version = package_version.get('expected_version')
             if Version(client_version) < Version(expected_version):
-                self.fail("Installed azure-mgmt-{0} client version is {1}. The supported version is {2}. Try "
+                self.fail("Installed azure-mgmt-{0} client version is {1}. The minimum supported version is {2}. Try "
                           "`pip install ansible[azure]`".format(client_name, client_version, expected_version))
+            if Version(client_version) != Version(expected_version):
+                self.module.warn("Installed azure-mgmt-{0} client version is {1}. The expected version is {2}. Try "
+                                 "`pip install ansible[azure]`".format(client_name, client_version, expected_version))
 
     def exec_module(self, **kwargs):
         self.fail("Error: {0} failed to implement exec_module method.".format(self.__class__.__name__))
@@ -915,7 +917,7 @@ class AzureRMModuleBase(object):
             return profile_raw
 
         # wrap basic strings in a dict that just defines the default
-        return dict(default_api_version=profile_raw) if profile_raw else None
+        return dict(default_api_version=profile_raw)
 
     def get_mgmt_svc_client(self, client_type, base_url=None, api_version=None):
         self.log('Getting management service client {0}'.format(client_type.__name__))
@@ -923,16 +925,16 @@ class AzureRMModuleBase(object):
 
         client_argspec = inspect.getargspec(client_type.__init__)
 
-        client_kwargs = dict(credentials=self.azure_credentials, subscription_id=self.subscription_id, base_url=base_url)
-
-        api_profile_dict = None
-
-        if self.api_profile:
-            api_profile_dict = self.get_api_profile(client_type.__name__, self.api_profile)
-
         if not base_url:
             # most things are resource_manager, don't make everyone specify
             base_url = self._cloud_environment.endpoints.resource_manager
+
+        client_kwargs = dict(credentials=self.azure_credentials, subscription_id=self.subscription_id, base_url=base_url)
+
+        api_profile_dict = {}
+
+        if self.api_profile:
+            api_profile_dict = self.get_api_profile(client_type.__name__, self.api_profile)
 
         # unversioned clients won't accept profile; only send it if necessary
         # clients without a version specified in the profile will use the default
@@ -942,9 +944,12 @@ class AzureRMModuleBase(object):
         # If the client doesn't accept api_version, it's unversioned.
         # If it does, favor explicitly-specified api_version, fall back to api_profile
         if 'api_version' in client_argspec.args:
-            profile_default_version = api_profile_dict.get('default_api_version', None) if api_profile_dict else None
+            profile_default_version = api_profile_dict.get('default_api_version', None)
             if api_version or profile_default_version:
                 client_kwargs['api_version'] = api_version or profile_default_version
+                if 'profile' in client_kwargs:
+                    # remove profile; only pass API version if specified
+                    client_kwargs.pop('profile')
 
         client = client_type(**client_kwargs)
 
