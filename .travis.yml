@@ -12,7 +12,7 @@ env:
     - message=()
     - ANSIBLE_VERSION=latest
     - max_retry_count=2
-    #- ANSIBLE_VERSION=2.4.2.0
+    #- ANSIBLE_VERSION=2.5.5
   matrix:
     - id=1
     - id=2
@@ -65,20 +65,20 @@ before_install:
 
       while [ $m -le $max_retry_count ]; do
         echo Run test $m time;
-      
+
         travis_wait 50 ansible-playbook tests/integration/main.yml;
 
         if [ $? -ne 0 ]; then
-          echo test $test_name failed;          
+          echo test $test_name failed;
 
           if [ $m -eq $max_retry_count ]; then
             message+=($test_name);
             export exit_code=1;
           fi;
-          
+
           m=$[$m+1];
         else
-          echo test $test_name passed;          
+          echo test $test_name passed;
           break;
         fi;
         
@@ -104,9 +104,10 @@ before_install:
     }
 
 install:
-  - if [ "$ANSIBLE_VERSION" = "latest" ]; then pip install ansible[azure]; else pip
+  - if [ "$ANSIBLE_VERSION" == "latest" ]; then pip install ansible[azure]; else pip
     install ansible[azure]==$ANSIBLE_VERSION; fi
   - "{ echo '[defaults]'; echo 'roles_path = ../'; } >> ansible.cfg"
+  - ansible --version
   - pip install -I -r ./files/requirements-azure.txt
   - pip  freeze
 

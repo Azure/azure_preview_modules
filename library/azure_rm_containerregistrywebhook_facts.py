@@ -114,6 +114,7 @@ try:
     from msrestazure.azure_operation import AzureOperationPoller
     from azure.mgmt.containerregistry import ContainerRegistryManagementClient
     from msrest.serialization import Model
+    from msrest.polling import LROPoller
 except ImportError:
     # This is handled in azure_rm_common
     pass
@@ -150,8 +151,11 @@ class AzureRMWebhooksFacts(AzureRMModuleBase):
     def exec_module(self, **kwargs):
         for key in self.module_arg_spec:
             setattr(self, key, kwargs[key])
-        self.mgmt_client = self.get_mgmt_svc_client(ContainerRegistryManagementClient,
-                                                    base_url=self._cloud_environment.endpoints.resource_manager)
+        self.mgmt_client = self.get_mgmt_svc_client(
+                ContainerRegistryManagementClient,
+                base_url=self._cloud_environment.endpoints.resource_manager,
+                api_version='2017-10-01'
+            )
 
         if (self.resource_group is not None and
                 self.registry_name is not None and
