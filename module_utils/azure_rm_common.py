@@ -150,6 +150,7 @@ try:
     from azure.mgmt.web import WebSiteManagementClient
     from azure.mgmt.containerservice import ContainerServiceClient
     from azure.mgmt.cdn import CdnManagementClient
+    from azure.mgmt.trafficmanager import TrafficManagerManagementClient
     from azure.storage.cloudstorageaccount import CloudStorageAccount
     from adal.authentication_context import AuthenticationContext
 except ImportError as exc:
@@ -222,6 +223,10 @@ AZURE_PKG_VERSIONS = {
         'package_name': 'cdn',
         'expected_version': '3.0.0'
     },
+    'TrafficManagerManagementClient': {
+        'package_name': 'trafficmanager',
+        'expected_version': '0.50.0'
+    }
 } if HAS_AZURE else {}
 
 
@@ -278,6 +283,7 @@ class AzureRMModuleBase(object):
         self._web_client = None
         self._containerservice_client = None
         self._cdn_management_client = None
+        self._traffic_manager_management_client = None
         self._adfs_authority_url = None
         self._resource = None
 
@@ -1072,3 +1078,11 @@ class AzureRMModuleBase(object):
             self._cdn_management_client = self.get_mgmt_svc_client(CdnManagementClient,
                                                                    base_url=self._cloud_environment.endpoints.resource_manager)
         return self._cdn_management_client
+
+    @property
+    def traffic_manager_management_client(self):
+        self.log('Getting traffic manager client')
+        if not self._traffic_manager_management_client:
+            self._traffic_manager_management_client = self.get_mgmt_svc_client(TrafficManagerManagementClient,
+                                                                               base_url=self._cloud_environment.endpoints.resource_manager)
+        return self._traffic_manager_management_client
