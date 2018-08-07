@@ -64,7 +64,7 @@ options:
             ttl:
                 description:
                     - The DNS Time-To-Live (TTL), in seconds.
-        default: 
+        default:
             relative_name: Name of the Traffic Manager profile
             ttl: 60
     monitor_config:
@@ -92,8 +92,7 @@ options:
                     - The monitor timeout for endpoints in this profile.
             tolerated_number_of_failures:
                 description:
-                    - The number of consecutive failed health check that Traffic Manager tolerates
-                    before declaring an endpoint in this profile Degraded after the next failed health check.
+                    - The number of consecutive failed health check before declaring an endpoint in this profile Degraded after the next failed health check.
         default:
             protocol: HTTP
             port: 80
@@ -146,7 +145,7 @@ options:
             geo_mapping:
                 description:
                     - The list of countries/regions mapped to this endpoint when using the 'Geographic' traffic routing method.
-            
+
 extends_documentation_fragment:
     - azure
     - azure_tags
@@ -195,44 +194,44 @@ state:
     type: dict
     example:
         "dns_config": {
-        "fqdn": "tmtest.trafficmanager.net",
-        "relative_name": "tmtest",
-        "ttl": 60
-    },
-    "endpoints": [
-        {
-            "endpoint_location": "West US 2",
-            "endpoint_monitor_status": "Degraded",
-            "endpoint_status": "Enabled",
-            "geo_mapping": null,
-            "id": "/subscriptions/XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX/resourceGroups/tmt/providers/Microsoft.Network/trafficManagerProfiles/tmtest/externalEndpoints/e1",
-            "min_child_endpoints": null,
-            "name": "e1",
-            "priority": 2,
-            "target": "1.2.3.4",
-            "target_resource_id": null,
-            "type": "Microsoft.Network/trafficManagerProfiles/externalEndpoints",
-            "weight": 1
+            "fqdn": "tmtest.trafficmanager.net",
+            "relative_name": "tmtest",
+            "ttl": 60
         }
-    ],
-    "id": "/subscriptions/XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX/resourceGroups/tmt/providers/Microsoft.Network/trafficManagerProfiles/tmtest",
-    "location": "global",
-    "monitor_config": {
-        "interval_in_seconds": 30,
-        "path": "/",
-        "port": 80,
-        "profile_monitor_status": "Degraded",
-        "protocol": "HTTPS",
-        "timeout_in_seconds": 10,
-        "tolerated_number_of_failures": 3
-    },
-    "name": "tmtest",
-    "profile_status": "Enabled",
-    "tags": {
-        "Environment": "Test"
-    },
-    "traffic_routing_method": "Priority",
-    "type": "Microsoft.Network/trafficManagerProfiles"
+        "endpoints": [
+            {
+                "endpoint_location": "West US 2",
+                "endpoint_monitor_status": "Degraded",
+                "endpoint_status": "Enabled",
+                "geo_mapping": null,
+                "id":   "/subscriptions/XXXXXX...XXXXXXXXX/resourceGroups/tmt/providers/Microsoft.Network/trafficManagerProfiles/tmtest/externalEndpoints/e1",
+                "min_child_endpoints": null,
+                "name": "e1",
+                "priority": 2,
+                "target": "1.2.3.4",
+                "target_resource_id": null,
+                "type": "Microsoft.Network/trafficManagerProfiles/externalEndpoints",
+                "weight": 1
+            }
+        ]
+        "id": "/subscriptions/XXXXXX...XXXXXXXXX/resourceGroups/tmt/providers/Microsoft.Network/trafficManagerProfiles/tmtest"
+        "location": "global"
+        "monitor_config": {
+            "interval_in_seconds": 30,
+            "path": "/",
+            "port": 80,
+            "profile_monitor_status": "Degraded",
+            "protocol": "HTTPS",
+            "timeout_in_seconds": 10,
+            "tolerated_number_of_failures": 3
+        }
+        "name": "tmtest"
+        "profile_status": "Enabled"
+        "tags": {
+            "Environment": "Test"
+        }
+        "traffic_routing_method": "Priority"
+        "type": "Microsoft.Network/trafficManagerProfiles"
 '''
 from ansible.module_utils.azure_rm_common import AzureRMModuleBase
 
@@ -244,6 +243,7 @@ try:
 except ImportError:
     # This is handled in azure_rm_common
     pass
+
 
 def traffic_manager_profile_to_dict(tmp):
     result = dict(
@@ -288,6 +288,7 @@ def traffic_manager_profile_to_dict(tmp):
             ))
     return result
 
+
 def create_dns_config_instance(dns_config):
 
     return DnsConfig(
@@ -295,17 +296,19 @@ def create_dns_config_instance(dns_config):
         ttl=dns_config['ttl']
     )
 
+
 def create_monitor_config_instance(monitor_config):
 
     return MonitorConfig(
         profile_monitor_status=monitor_config['profile_monitor_status'],
         protocol=monitor_config['protocol'],
         port=monitor_config['port'],
-        path = monitor_config['path'],
-        interval_in_seconds = monitor_config['interval_in_seconds'],
-        timeout_in_seconds = monitor_config['timeout_in_seconds'],
-        tolerated_number_of_failures = monitor_config['tolerated_number_of_failures']
+        path=monitor_config['path'],
+        interval_in_seconds=monitor_config['interval_in_seconds'],
+        timeout_in_seconds=monitor_config['timeout_in_seconds'],
+        tolerated_number_of_failures=monitor_config['tolerated_number_of_failures']
     )
+
 
 def create_endpoint_instance(endpoint):
     return Endpoint(
@@ -321,6 +324,7 @@ def create_endpoint_instance(endpoint):
         min_child_endpoints=endpoint['min_child_endpoints'],
         geo_mapping=endpoint['geo_mapping']
     )
+
 
 def create_endpoints(endpoints):
     return [create_endpoint_instance(endpoint) for endpoint in endpoints]
@@ -352,8 +356,9 @@ endpoint_spec = dict(
     endpoint_location=dict(type='str'),
     endpoint_monitor_status=dict(type='str'),
     min_child_endpoints=dict(type='int'),
-    geo_mapping=dict(type='list',elements='str'),    
+    geo_mapping=dict(type='list', elements='str')
 )
+
 
 class AzureRMTrafficManager(AzureRMModuleBase):
 
@@ -416,7 +421,7 @@ class AzureRMTrafficManager(AzureRMModuleBase):
         self.dns_config = None
         self.monitor_config = None
         self.endpoints = None
-        
+
         required_if = [
             ('state', 'present', [])
         ]
@@ -426,13 +431,13 @@ class AzureRMTrafficManager(AzureRMModuleBase):
             state=dict()
         )
 
-        super(AzureRMTrafficManager,self).__init__(derived_arg_spec=self.module_arg_spec,supports_check_mode=True,required_if=required_if)
+        super(AzureRMTrafficManager, self).__init__(derived_arg_spec=self.module_arg_spec, supports_check_mode=True, required_if=required_if)
 
     def exec_module(self, **kwargs):
 
         for key in list(self.module_arg_spec.keys()) + ['tags']:
             setattr(self, key, kwargs[key])
-    
+
         resource_group = None
         to_be_updated = False
 
@@ -458,7 +463,7 @@ class AzureRMTrafficManager(AzureRMModuleBase):
 
                 if update_tags:
                     to_be_updated = True
-                
+
                 to_be_updated = self.check_update(response)
 
             if to_be_updated:
@@ -477,13 +482,12 @@ class AzureRMTrafficManager(AzureRMModuleBase):
 
             if self.check_mode:
                 return self.results
-            
+
             self.delete_traffic_manager_profile()
 
             self.log("Traffic Manager profile deleted")
 
         return self.results
-
 
     def get_traffic_manager_profile(self):
         '''
@@ -515,7 +519,7 @@ class AzureRMTrafficManager(AzureRMModuleBase):
             self.log('Error attempting to delete the Traffic Manager profile.')
             self.fail("Error deleting the Traffic Manager profile: {0}".format(e.message))
             return False
-    
+
     def ceate_update_traffic_manager_profile(self):
         '''
         Creates or updates a Traffic Manager profile.
@@ -539,26 +543,24 @@ class AzureRMTrafficManager(AzureRMModuleBase):
         except CloudError as exc:
             self.log('Error attempting to create the Traffic Manager.')
             self.fail("Error creating the Traffic Manager: {0}".format(exc.message))
-    
+
     def check_update(self, response):
         if response['location'] != self.location:
             self.log("Location Diff - Origin {0} / Update {1}".format(response['location'], self.location))
             return True
-        
+
         if response['profile_status'] != self.profile_status:
             self.log("Profile Status Diff - Origin {0} / Update {1}".format(response['profile_status'], self.profile_status))
             return True
-        
+
         if response['traffic_routing_method'] != self.traffic_routing_method:
             self.log("Traffic Routing Method Diff - Origin {0} / Update {1}".format(response['traffic_routing_method'], self.traffic_routing_method))
             return True
-        
-        if (response['dns_config']['relative_name'] != self.dns_config['relative_name'] or 
-        response['dns_config']['ttl'] != self.dns_config['ttl']
-        ):
+
+        if (response['dns_config']['relative_name'] != self.dns_config['relative_name'] or response['dns_config']['ttl'] != self.dns_config['ttl']):
             self.log("DNS Config Diff - Origin {0} / Update {1}".format(response['dns_config'], self.dns_config))
             return True
-                        
+
         for k, v in self.monitor_config.items():
             if v:
                 if str(v).lower() != str(response['monitor_config'][k]).lower():

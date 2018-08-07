@@ -134,8 +134,7 @@ tms:
                     sample: 30
                 tolerated_number_of_failures:
                     description:
-                        - The number of consecutive failed health check that Traffic Manager tolerates
-                        before declaring an endpoint in this profile Degraded after the next failed health check.
+                        - The number of consecutive failed health check before declaring an endpoint Degraded after the next failed health check.
                     type: int
                     sample: 3
         endpoints:
@@ -148,7 +147,7 @@ tms:
                     description:
                         - Fully qualified resource Id for the resource.
                     type: str
-                    sample: /subscriptions/XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX/resourceGroups/tmt/providers/Microsoft.Network/trafficManagerProfiles/tmtest/externalEndpoints/e1
+                    sample: /subscriptions/XXXXXX...XXXXXXXXX/resourceGroups/tmt/providers/Microsoft.Network/trafficManagerProfiles/tmtest/externalEndpoints/e1
                 name:
                     description:
                         - The name of the endpoint.
@@ -163,7 +162,7 @@ tms:
                     description:
                         - The Azure Resource URI of the of the endpoint.
                     type: str
-                    sample: /subscriptions/XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX/resourceGroups/vscjavaci/providers/Microsoft.ClassicCompute/domainNames/vscjavaci
+                    sample: /subscriptions/XXXXXX...XXXXXXXXX/resourceGroups/vscjavaci/providers/Microsoft.ClassicCompute/domainNames/vscjavaci
                 target:
                     description:
                         - The fully-qualified DNS name of the endpoint.
@@ -191,7 +190,7 @@ tms:
                     sample: East US
                 min_child_endpoints:
                     description:
-                        - The minimum number of endpoints that must be available in the child profile in order for the parent profile to be considered available.
+                        - The minimum number of endpoints that must be available in the child profile to make the parent profile available.
                     type: int
                     sample: 3
                 geo_mapping:
@@ -217,6 +216,7 @@ import re
 
 AZURE_OBJECT_CLASS = 'trafficManagerProfiles'
 
+
 def serialize_endpoint(endpoint):
     return dict(
         id=endpoint.id,
@@ -231,6 +231,7 @@ def serialize_endpoint(endpoint):
         min_child_endpoints=endpoint.min_child_endpoints,
         geo_mapping=endpoint.geo_mapping,
     )
+
 
 class AzureRMTrafficManagerFacts(AzureRMModuleBase):
     """Utility class to get Azure Traffic Manager facts"""
@@ -325,7 +326,7 @@ class AzureRMTrafficManagerFacts(AzureRMModuleBase):
             if self.has_tags(item.tags, self.tags):
                 results.append(self.serialize_tm(item))
         return results
-    
+
     def serialize_tm(self, tm):
         '''
         Convert a Traffic Manager profile object to dict.
@@ -359,6 +360,7 @@ class AzureRMTrafficManagerFacts(AzureRMModuleBase):
         new_result['endpoints'] = [serialize_endpoint(endpoint) for endpoint in tm.endpoints]
         new_result['tags'] = tm.tags
         return new_result
+
 
 def main():
     """Main module execution code path"""
