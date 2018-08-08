@@ -177,6 +177,26 @@
       - output.endpoints | length == 1
       - output.traffic_routing_method == 'Priority'
 
+- name: Delete the Traffic Manager profile(check mode)
+  azure_rm_trafficmanager:
+    resource_group: "{{ resource_group }}"
+    name: "{{ tmname }}"
+    state: absent
+  check_mode: yes
+
+- name: Gather Traffic Manager profile facts
+  azure_rm_trafficmanager_facts:
+      resource_group: "{{ resource_group }}"
+      name: "{{ tmname }}"
+  register: fact
+
+- name: Assert the traffic manager is still there
+  assert:
+      that:
+        - "fact.tms | length == 1"
+        - fact.tms[0].id == output.id
+        - fact.tms[0].endpoints | length == 1
+
 - name: Delete the Traffic Manager profile
   azure_rm_trafficmanager:
     resource_group: "{{ resource_group }}"

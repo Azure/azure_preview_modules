@@ -61,12 +61,11 @@ options:
             relative_name:
                 description:
                     - The relative DNS name provided by this Traffic Manager profile.
+                    - If no provided, name of the Traffic Manager will be used
             ttl:
                 description:
                     - The DNS Time-To-Live (TTL), in seconds.
-        default:
-            relative_name: Name of the Traffic Manager profile
-            ttl: 60
+                default: 60
     monitor_config:
         description:
             - The endpoint monitoring settings of the Traffic Manager profile.
@@ -237,9 +236,6 @@ from ansible.module_utils.azure_rm_common import AzureRMModuleBase
 
 try:
     from msrestazure.azure_exceptions import CloudError
-    from azure.mgmt.trafficmanager.models import (
-        Profile, DnsConfig, MonitorConfig, Endpoint
-    )
 except ImportError:
     # This is handled in azure_rm_common
     pass
@@ -289,17 +285,15 @@ def traffic_manager_profile_to_dict(tmp):
     return result
 
 
-def create_dns_config_instance(dns_config):
-
-    return DnsConfig(
+def create_dns_config_instance(self, dns_config):
+    return self.traffic_manager_models.DnsConfig(
         relative_name=dns_config['relative_name'],
         ttl=dns_config['ttl']
     )
 
 
-def create_monitor_config_instance(monitor_config):
-
-    return MonitorConfig(
+def create_monitor_config_instance(self, monitor_config):
+    return self.traffic_manager_models.MonitorConfig(
         profile_monitor_status=monitor_config['profile_monitor_status'],
         protocol=monitor_config['protocol'],
         port=monitor_config['port'],
@@ -310,8 +304,8 @@ def create_monitor_config_instance(monitor_config):
     )
 
 
-def create_endpoint_instance(endpoint):
-    return Endpoint(
+def create_endpoint_instance(self, endpoint):
+    return self.traffic_manager_models.Endpoint(
         id=endpoint['id'],
         name=endpoint['name'],
         type=endpoint['type'],
@@ -326,8 +320,8 @@ def create_endpoint_instance(endpoint):
     )
 
 
-def create_endpoints(endpoints):
-    return [create_endpoint_instance(endpoint) for endpoint in endpoints]
+def create_endpoints(self, endpoints):
+    return [create_endpoint_instance(self, endpoint) for endpoint in endpoints]
 
 dns_config_spec = dict(
     relative_name=dict(type='str'),
@@ -422,23 +416,17 @@ class AzureRMTrafficManager(AzureRMModuleBase):
         self.monitor_config = None
         self.endpoints = None
 
-        required_if = [
-            ('state', 'present', [])
-        ]
-
         self.results = dict(
-            changed=False,
-            state=dict()
+            changed=False
         )
 
-        super(AzureRMTrafficManager, self).__init__(derived_arg_spec=self.module_arg_spec, supports_check_mode=True, required_if=required_if)
+        super(AzureRMTrafficManager, self).__init__(derived_arg_spec=self.module_arg_spec, supports_check_mode=True)
 
     def exec_module(self, **kwargs):
 
         for key in list(self.module_arg_spec.keys()) + ['tags']:
             setattr(self, key, kwargs[key])
 
-        resource_group = None
         to_be_updated = False
 
         if not self.dns_config:
@@ -447,7 +435,6 @@ class AzureRMTrafficManager(AzureRMModuleBase):
                 ttl=60
             )
 
-        resource_group = self.get_resource_group(self.resource_group)
         if not self.location:
             self.location = 'global'
 
@@ -464,7 +451,7 @@ class AzureRMTrafficManager(AzureRMModuleBase):
                 if update_tags:
                     to_be_updated = True
 
-                to_be_updated = self.check_update(response)
+                to_be_updated = to_be_updated or self.check_update(response)
 
             if to_be_updated:
                 self.log("Need to Create / Update the Traffic Manager profile")
@@ -528,14 +515,14 @@ class AzureRMTrafficManager(AzureRMModuleBase):
         '''
         self.log("Creating / Updating the Traffic Manager profile {0}".format(self.name))
 
-        parameters = Profile(
+        parameters = self.traffic_manager_models.Profile(
             tags=self.tags,
             location=self.location,
             profile_status=self.profile_status,
             traffic_routing_method=self.traffic_routing_method,
-            dns_config=create_dns_config_instance(self.dns_config) if self.dns_config else None,
-            monitor_config=create_monitor_config_instance(self.monitor_config) if self.monitor_config else None,
-            endpoints=create_endpoints(self.endpoints)
+            dns_config=create_dns_config_instance(self, self.dns_config) if self.dns_config else None,
+            monitor_config=create_monitor_config_instance(self, self.monitor_config) if self.monitor_config else None,
+            endpoints=create_endpoints(self, self.endpoints)
         )
         try:
             response = self.traffic_manager_management_client.profiles.create_or_update(self.resource_group, self.name, parameters)

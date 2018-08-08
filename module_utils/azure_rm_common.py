@@ -1086,3 +1086,9 @@ class AzureRMModuleBase(object):
             self._traffic_manager_management_client = self.get_mgmt_svc_client(TrafficManagerManagementClient,
                                                                                base_url=self._cloud_environment.endpoints.resource_manager)
         return self._traffic_manager_management_client
+
+    @property
+    def traffic_manager_models(self):
+        self.log("Getting traffic manager models")
+        from azure.mgmt.trafficmanager import models
+        return models
