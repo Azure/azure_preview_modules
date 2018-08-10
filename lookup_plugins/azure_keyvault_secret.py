@@ -10,35 +10,36 @@ DOCUMENTATION = """
         - requests
         - azure
         - msrest
-    short_description: read secret from Azure Key Vault.
+    short_description: Read secret from Azure Key Vault.
     description:
-      - This lookup returns the content of a secret kept in Azure Key Vault.
+      - This lookup returns the content of secret saved in Azure Key Vault.
+      - When ansible host is MSI enabled Azure VM, user don't need provide any credential to access to Azure Key Vault.
     options:
         _terms:
-            description: secret name of the secret to retrieve, version can be included like secret_name/secret_version.
+            description: Secret name, version can be included like secret_name/secret_version.
             required: True
         vault_url:
-            description: url of Azure Key Vault to be retrieved from
+            description: Url of Azure Key Vault.
             required: True
         client_id:
-            description: client_id of service principal that has access to the provided Azure Key Vault
+            description: Client id of service principal that has access to the Azure Key Vault
         secret:
-            description: secret of service principal provided above
+            description: Secret of the service principal.
         tenant_id:
-            description: tenant_id of service principal provided above
+            description: Tenant id of service principal.
     notes:
-        - If version is not provided, Key Vault will give the latest version.
-        - If ansible is running on Azure Virtual Machine with MSI enabled, client_id, secret and tenant isn't necessary.
-        - For how to enable MSI on Azure VM, please refer to this doc https://docs.microsoft.com/en-us/azure/active-directory/managed-service-identity/
-        - After enableing MSI on Azure VM, remember to grant this VM access to the Key Vault by adding a new Acess Policy in Azure Portal.
-        - If MSI is not available on the machine, then you have to provide a valid service principal that has access to the key vault.
+        - If version is not provided, this plugin will return the latest version of the secret.
+        - If ansible is running on Azure Virtual Machine with MSI enabled, client_id, secret and tenant isn't required.
+        - For enabling MSI on Azure VM, please refer to this doc https://docs.microsoft.com/en-us/azure/active-directory/managed-service-identity/
+        - After enabling MSI on Azure VM, remember to grant access of the Key Vault to the VM by adding a new Acess Policy in Azure Portal.
+        - If MSI is not enabled on ansible host, it's required to provide a valid service principal which has access to the key vault.
 """
 
 EXAMPLE = """
-- name: Lookup secret via MSI endpoint
+- name: Look up secret when ansible host is MSI enabled Azure VM
   debug: msg="the value of this secret is {{lookup('azure_keyvault_secret','testSecret/version',vault_url='https://yourvault.vault.azure.net')}}"
 
-- name: Lookup secret via KeyVault Client
+- name: Look up secret when ansible host is general VM
   vars:
     url: 'https://yourvault.vault.azure.net'
     secretname: 'testSecret/version'
@@ -47,7 +48,7 @@ EXAMPLE = """
     tenant: 'uvwxyz'
   debug: msg="the value of this secret is {{lookup('azure_keyvault_secret',secretname,vault_url=url, cliend_id=client_id, secret=secret, tenant_id=tenant)}}"
 
-# Example below creates an Azure Virtual Machine with ssh public key from key vault using 'azure_keyvault_secret' lookup plugin.
+# Example below creates an Azure Virtual Machine with SSH public key from key vault using 'azure_keyvault_secret' lookup plugin.
 - name: Create Azure VM
   hosts: localhost
   connection: local
@@ -77,7 +78,7 @@ EXAMPLE = """
 
 RETURN = """
   _raw:
-    description: secret content
+    description: secret content string
 """
 
 from ansible.errors import AnsibleError, AnsibleParserError
@@ -103,7 +104,7 @@ except requests.exceptions.RequestException:
     TOKEN_ACQUIRED = False
 
 
-def lookup_sercret_non_msi(terms, vault_url, kwargs):
+def lookup_secret_non_msi(terms, vault_url, kwargs):
     import logging
     logging.getLogger('msrestazure.azure_active_directory').addHandler(logging.NullHandler())
     logging.getLogger('msrest.service_client').addHandler(logging.NullHandler())
@@ -163,4 +164,4 @@ class LookupModule(LookupBase):
                     raise AnsibleError('Failed to fetch secret ' + term + '.')
             return ret
         else:
-            return lookup_sercret_non_msi(terms, vault_url, kwargs)
+            return lookup_secret_non_msi(terms, vault_url, kwargs)
