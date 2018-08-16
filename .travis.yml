@@ -107,11 +107,10 @@ before_install:
 install:
   - if [ "$ANSIBLE_VERSION" == "latest" ]; then pip install ansible[azure]; else pip
     install ansible[azure]==$ANSIBLE_VERSION; fi
-  - "{ echo '[defaults]'; echo 'roles_path = ../'; } >> ansible.cfg"
+  - "{ echo '[defaults]'; echo 'roles_path = ../'; echo 'lookup_plugins = ./tests/integration/targets/azure_rm_keyvaultkey/lookup_plugins'; } >> ansible.cfg"
   - ansible --version
   - pip install -I -r ./files/requirements-azure.txt
   - pip freeze
-  - cp ./tests/integration/targets/azure_rm_keyvaultkey/lookup_plugins/azure_service_principal_attribute.py $HOME/.ansible/plugins/lookup
 
 script:
   - scan_test
