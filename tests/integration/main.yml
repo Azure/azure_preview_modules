@@ -5,9 +5,13 @@
   vars_files:
   - ~/arg.json
   tasks:
-    - name: Create a resource group
+    - name: Create first resource group
       azure_rm_resourcegroup:
         name: "{{ resource_group }}"
+        location: eastus
+    - name: Create second resource group
+      azure_rm_resourcegroup:
+        name: "{{ resource_group_secondary }}"
         location: eastus
     - name: run integration test
       block:
