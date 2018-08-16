@@ -41,6 +41,7 @@ options:
     sku:
         description:
             - The pricing tier (defines a CDN provider, feature list and rate) of the CDN profile.
+            - Detailed pricing can be find at https://azure.microsoft.com/en-us/pricing/details/cdn/
         choices:
             - Standard_Verizon
             - Premium_Verizon
@@ -77,7 +78,7 @@ state:
     returned: always
     type: dict
     example:
-            id: /subscriptions/685ba005-af8d-4b04-8f16-a7bf38b2eb5a/resourcegroups/cdntest/providers/Microsoft.Cdn/profiles/cdntest
+            id: /subscriptions/XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX/resourcegroups/cdntest/providers/Microsoft.Cdn/profiles/cdntest
             location: WestUs
             name: cdntest
             provisioning_state: Succeeded

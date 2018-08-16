@@ -88,7 +88,7 @@ cdnprofiles:
             description
                 - ID of the CDN profile.
             type: str
-            sample: Microsoft.Cdn/profiles
+            sample: /subscriptions/XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX/resourcegroups/cdntest/providers/Microsoft.Cdn/profiles/cdntest
         provisioning_state:
             description:
                 - Provisioning status of the profile.
