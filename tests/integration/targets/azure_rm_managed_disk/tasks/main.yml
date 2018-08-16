@@ -201,7 +201,7 @@
        name: "{{ parameter.name }}"
        storage_account_type: "{{ parameter.storage_account_type }}"
        disk_size_gb: "{{ parameter.disk_size_gb }}"
-       create_option: "{{ parameter.create_option }}"
+       create_option: empty
        tags: "{{ parameter.tags }}"
    register: output
 
