@@ -77,7 +77,7 @@
 
 - name: Create network security group in another resource group
   azure_rm_securitygroup:
-    name: secgroupfoo1
+    name: secgroupfoo
     resource_group: "{{ resource_group_secondary }}"
   register: nsg
 
@@ -88,7 +88,7 @@
     resource_group: "{{ resource_group }}"
     address_prefix_cidr: "10.1.0.0/16"
     security_group:
-      name: secgroupfoo1
+      name: secgroupfoo
       resource_group: "{{ resource_group_secondary }}"
     tags:
        testing: testing
