@@ -368,23 +368,25 @@ class AzureRMCdnendpoint(AzureRMModuleBase):
 
         if self.state == 'present':
 
-            if not response and self.started is None:
-            # If endpoint dosen't exist and no start/stop operation specified, create endpoint.
-                if self.origin == None:
-                    self.fail("Origin is not provided when trying to create endpoint")
-                self.log("Need to create the Azure CDN endpoint")
+            if not response:
 
-                if not self.check_mode:
-                    self.results = self.create_cdnendpoint()
-                    self.log("Creation done")
+                if self.started is None:
+                # If endpoint dosen't exist and no start/stop operation specified, create endpoint.
+                    if self.origin == None:
+                        self.fail("Origin is not provided when trying to create endpoint")
+                    self.log("Need to create the Azure CDN endpoint")
 
-                self.results['changed'] = True
-                return self.results
+                    if not self.check_mode:
+                        self.results = self.create_cdnendpoint()
+                        self.log("Creation done")
 
-            elif not response and self.started is not None:
-            # Fail the module when user try to start/stop a non-existed endpoint
-                self.log("Can't stop/stop a non-existed endpoint")
-                self.fail("This endpoint is not found, stop/start is forbidden")
+                    self.results['changed'] = True
+                    return self.results
+
+                else:
+                # Fail the module when user try to start/stop a non-existed endpoint
+                    self.log("Can't stop/stop a non-existed endpoint")
+                    self.fail("This endpoint is not found, stop/start is forbidden")
 
             else:
                 self.log('Results : {0}'.format(response))
