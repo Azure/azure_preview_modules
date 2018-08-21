@@ -15,22 +15,22 @@ DOCUMENTATION = '''
 ---
 module: azure_rm_cdnendpoint
 version_added: "2.7"
-short_description: Manage a CDN endpoint.
+short_description: Manage a Azure CDN endpoint.
 description:
-    - Create, update, start, stop and delete a CDN endpoint.
+    - Create, update, start, stop and delete a Azure CDN endpoint.
 
 options:
     resource_group:
         description:
-            - Name of a resource group where the CDN endpoint exists or will be created.
+            - Name of a resource group where the Azure CDN endpoint exists or will be created.
         required: true
     name:
         description:
-            - Name of the CDN endpoint.
+            - Name of the Azure CDN endpoint.
         required: true
     state:
         description:
-            - Assert the state of the CDN endpoint. Use C(present) to create or update a CDN endpoint and C(absent) to delete it.
+            - Assert the state of the Azure CDN endpoint. Use C(present) to create or update a Azure CDN endpoint and C(absent) to delete it.
         default: present
         choices:
             - absent
@@ -40,7 +40,7 @@ options:
             - Valid azure location. Defaults to location of the resource group.
     started:
         description:
-            - Use with state 'present' to start the machine. Set to false to have the endpoint be 'stopped'. Set to true to start the endpoint.
+            - Use with state 'present' to start the endpoint. Set to false to have the endpoint be 'stopped'. Set to true to start the endpoint.
         type: bool
     purge:
         description:
@@ -124,7 +124,7 @@ author:
 '''
 
 EXAMPLES = '''
-    - name: Create a CDN endpoint
+    - name: Create a Azure CDN endpoint
       azure_rm_cdnendpoint:
           resource_group: TestRg
           name: TestEndpoint
@@ -136,7 +136,7 @@ EXAMPLES = '''
               testing: testing
               delete: on-exit
               foo: bar
-    - name: Delete a CDN endpoint
+    - name: Delete a Azure CDN endpoint
       azure_rm_cdnendpoint:
           resource_group: TestRg
           name: TestEndpoint
@@ -145,11 +145,40 @@ EXAMPLES = '''
 '''
 RETURN = '''
 state:
-    description: Current state of the CDN endpoint
+    description: Current state of the Azure CDN endpoint
     returned: always
     type: dict
     example:
-
+        "content_types_to_compress": []
+        "geo_filters": null
+        "host_name": "end2ea455690.azureedge.net"
+        "id":   "/subscriptions/685ba005-af8d-4b04-8f16-a7bf38b2eb5a/resourcegroups/cdnprofiletest0815/providers/Microsoft.Cdn/profiles/cdnprofile2ea4556635t/endpoints/end2ea455690"
+        "is_compression_enabled": false
+        "is_http_allowed": true
+        "is_https_allowed": true
+        "location": "WestUs"
+        "name": "end2ea455690"
+        "optimization_type": null
+        "origin_host_header": null
+        "origin_path": null
+        "origins": [
+            {
+                "host_name": "www.google.com",
+                "http_port": null,
+                "https_port": null,
+                "name": "orgend2ea455690"
+            }
+        ]
+        "probe_path": null
+        "provisioning_state": "Succeeded"
+        "query_string_caching_behavior": "IgnoreQueryString"
+        "resource_state": "Running"
+        "tags": {
+            "delete": "on-exit",
+            "foo": "bar",
+            "testing": "testing"
+        }
+        "type": "Microsoft.Cdn/profiles/endpoints"
 '''
 from ansible.module_utils.azure_rm_common import AzureRMModuleBase
 
@@ -343,7 +372,7 @@ class AzureRMCdnendpoint(AzureRMModuleBase):
             # If endpoint dosen't exist and no start/stop operation specified, create endpoint.
                 if self.origin == None:
                     self.fail("Origin is not provided when trying to create endpoint")
-                self.log("Need to create the CDN endpoint")
+                self.log("Need to create the Azure CDN endpoint")
 
                 if not self.check_mode:
                     self.results = self.create_cdnendpoint()
@@ -364,7 +393,7 @@ class AzureRMCdnendpoint(AzureRMModuleBase):
                 if response['provisioning_state'] == "Succeeded":
 
                     if self.started == False and response['resource_state'] == 'Running':
-                        self.log("Need to stop the CDN endpoint")
+                        self.log("Need to stop the Azure CDN endpoint")
 
                         if not self.check_mode:
                             self.results = self.stop_cdnendpoint()
@@ -374,7 +403,7 @@ class AzureRMCdnendpoint(AzureRMModuleBase):
                         return self.results
 
                     elif self.started and response['resource_state'] == 'Stopped':
-                        self.log("Need to start the CDN endpoint")
+                        self.log("Need to start the Azure CDN endpoint")
 
                         if not self.check_mode:
                             self.results = self.start_cdnendpoint()
@@ -405,7 +434,7 @@ class AzureRMCdnendpoint(AzureRMModuleBase):
                     to_be_updated = to_be_updated or self.check_update(response)
 
                     if to_be_updated:
-                        self.log("Need to update the CDN endpoint")
+                        self.log("Need to update the Azure CDN endpoint")
 
                         if not self.check_mode:
                             self.results = self.update_cdnendpoint()
@@ -415,12 +444,12 @@ class AzureRMCdnendpoint(AzureRMModuleBase):
                         return self.results
 
         elif self.state == 'absent' and response:
-            self.log("Need to delete the CDN endpoint")
+            self.log("Need to delete the Azure CDN endpoint")
             self.results['changed'] = True
 
             if not self.check_mode:
                 self.delete_cdnendpoint()
-                self.log("CDN endpoint deleted")
+                self.log("Azure CDN endpoint deleted")
 
             return self.results
 
@@ -439,8 +468,8 @@ class AzureRMCdnendpoint(AzureRMModuleBase):
                 DeepCreatedOrigin(
                     name=self.origin['name'],
                     host_name=self.origin['host_name'],
-                    http_port=self.origin['http_port'],
-                    https_port=self.origin['https_port'],
+                    http_port=self.origin['http_port'] if 'http_port' in self.origin else None,
+                    https_port=self.origin['https_port'] if 'https_port' in self.origin else None,
                 )
             ],
             location=self.location,
@@ -495,85 +524,85 @@ class AzureRMCdnendpoint(AzureRMModuleBase):
 
         :return: True
         '''
-        self.log("Deleting the CDN endpoint {0}".format(self.name))
+        self.log("Deleting the Azure CDN endpoint {0}".format(self.name))
         try:
             poller = self.cdn_management_client.endpoints.delete(
                 self.resource_group, self.profile_name, self.name)
             self.get_poller_result(poller)
             return True
         except ErrorResponseException as e:
-            self.log('Error attempting to delete the CDN endpoint.')
-            self.fail("Error deleting the CDN endpoint: {0}".format(e.message))
+            self.log('Error attempting to delete the Azure CDN endpoint.')
+            self.fail("Error deleting the Azure CDN endpoint: {0}".format(e.message))
             return False
 
     def get_cdnendpoint(self):
         '''
-        Gets the properties of the specified CDN endpoint.
+        Gets the properties of the specified Azure CDN endpoint.
 
-        :return: deserialized CDN endpoint state dictionary
+        :return: deserialized Azure CDN endpoint state dictionary
         '''
         self.log(
-            "Checking if the CDN endpoint {0} is present".format(self.name))
+            "Checking if the Azure CDN endpoint {0} is present".format(self.name))
         try:
             response = self.cdn_management_client.endpoints.get(self.resource_group, self.profile_name, self.name)
             self.log("Response : {0}".format(response))
-            self.log("CDN endpoint : {0} found".format(response.name))
+            self.log("Azure CDN endpoint : {0} found".format(response.name))
             return cdnendpoint_to_dict(response)
         except ErrorResponseException:
-            self.log('Did not find the CDN endpoint.')
+            self.log('Did not find the Azure CDN endpoint.')
             return False
 
     def start_cdnendpoint(self):
         '''
-        Starts an existing CDN endpoint that is on a stopped state.
+        Starts an existing Azure CDN endpoint that is on a stopped state.
 
-        :return: deserialized CDN endpoint state dictionary
+        :return: deserialized Azure CDN endpoint state dictionary
         '''
         self.log(
-            "Starting the CDN endpoint {0}".format(self.name))
+            "Starting the Azure CDN endpoint {0}".format(self.name))
         try:
             poller = self.cdn_management_client.endpoints.start(self.resource_group, self.profile_name, self.name)
             response = self.get_poller_result(poller)
             self.log("Response : {0}".format(response))
-            self.log("CDN endpoint : {0} started".format(response.name))
+            self.log("Azure CDN endpoint : {0} started".format(response.name))
             return self.get_cdnendpoint()
         except ErrorResponseException:
-            self.log('Fail to start the CDN endpoint.')
+            self.log('Fail to start the Azure CDN endpoint.')
             return False
 
     def purge_cdnendpoint(self):
         '''
-        Purges an existing CDN endpoint.
+        Purges an existing Azure CDN endpoint.
 
-        :return: deserialized CDN endpoint state dictionary
+        :return: deserialized Azure CDN endpoint state dictionary
         '''
         self.log(
-            "Purging the CDN endpoint {0}".format(self.name))
+            "Purging the Azure CDN endpoint {0}".format(self.name))
         try:
             poller = self.cdn_management_client.endpoints.purge_content(self.resource_group, self.profile_name, self.name, content_paths=self.purge_content_paths)
             response = self.get_poller_result(poller)
             self.log("Response : {0}".format(response))
             return self.get_cdnendpoint()
         except ErrorResponseException as e:
-            self.log('Fail to purge the CDN endpoint.')
+            self.log('Fail to purge the Azure CDN endpoint.')
             return False
 
     def stop_cdnendpoint(self):
         '''
-        Stops an existing CDN endpoint that is on a running state.
+        Stops an existing Azure CDN endpoint that is on a running state.
 
-        :return: deserialized CDN endpoint state dictionary
+        :return: deserialized Azure CDN endpoint state dictionary
         '''
         self.log(
-            "Stopping the CDN endpoint {0}".format(self.name))
+            "Stopping the Azure CDN endpoint {0}".format(self.name))
         try:
             poller = self.cdn_management_client.endpoints.stop(self.resource_group, self.profile_name, self.name)
             response = self.get_poller_result(poller)
             self.log("Response : {0}".format(response))
-            self.log("CDN endpoint : {0} stopped".format(response.name))
+            self.log("Azure CDN endpoint : {0} stopped".format(response.name))
             return self.get_cdnendpoint()
         except ErrorResponseException:
-            self.log('Fail to stop the CDN endpoint.')
+            self.log('Fail to stop the Azure CDN endpoint.')
             return False
 
     def check_update(self, response):
