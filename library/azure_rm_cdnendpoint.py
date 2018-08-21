@@ -152,7 +152,7 @@ state:
         "content_types_to_compress": []
         "geo_filters": null
         "host_name": "end2ea455690.azureedge.net"
-        "id":   "/subscriptions/685ba005-af8d-4b04-8f16-a7bf38b2eb5a/resourcegroups/cdnprofiletest0815/providers/Microsoft.Cdn/profiles/cdnprofile2ea4556635t/endpoints/end2ea455690"
+        "id": "/subscriptions/XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX/resourcegroups/testgroup/providers/Microsoft.Cdn/profiles/cdnprofile2ea/endpoints/end25690"
         "is_compression_enabled": false
         "is_http_allowed": true
         "is_https_allowed": true
