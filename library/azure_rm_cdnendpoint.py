@@ -212,6 +212,7 @@ def cdnendpoint_to_dict(cdnendpoint):
         provisioning_state=cdnendpoint.provisioning_state
     )
 
+
 def deep_created_origin_to_dict(origin):
     return dict(
         name=origin.name,
@@ -220,12 +221,14 @@ def deep_created_origin_to_dict(origin):
         https_port=origin.https_port,
     )
 
+
 def geo_filter_to_dict(geo_filter):
     return dict(
         relative_path=geo_filter.relative_path,
         action=geo_filter.action,
         country_codes=geo_filter.country_codes,
     )
+
 
 def default_content_types():
     return ["text/plain",
@@ -237,7 +240,8 @@ def default_content_types():
             "application/json",
             "application/xml"]
 
-origin_spec=dict(
+
+origin_spec = dict(
     name=dict(
         type='str',
         required=True
@@ -328,29 +332,29 @@ class AzureRMCdnendpoint(AzureRMModuleBase):
             ),
         )
 
-        self.resource_group=None
-        self.name=None
-        self.state=None
-        self.started=None
-        self.purge=None
-        self.purge_content_paths=None
-        self.location=None
-        self.profile_name=None
-        self.origin=None
-        self.tags=None
-        self.origin_host_header=None
-        self.origin_path=None
-        self.content_types_to_compress=None
-        self.is_compression_enabled=None
-        self.is_http_allowed=None
-        self.is_https_allowed=None
-        self.query_string_caching_behavior=None
+        self.resource_group = None
+        self.name = None
+        self.state = None
+        self.started = None
+        self.purge = None
+        self.purge_content_paths = None
+        self.location = None
+        self.profile_name = None
+        self.origin = None
+        self.tags = None
+        self.origin_host_header = None
+        self.origin_path = None
+        self.content_types_to_compress = None
+        self.is_compression_enabled = None
+        self.is_http_allowed = None
+        self.is_https_allowed = None
+        self.query_string_caching_behavior = None
 
         self.results = dict(changed=False)
 
         super(AzureRMCdnendpoint, self).__init__(derived_arg_spec=self.module_arg_spec,
-                                                supports_check_mode=True,
-                                                supports_tags=True)
+                                                 supports_check_mode=True,
+                                                 supports_tags=True)
 
     def exec_module(self, **kwargs):
         """Main module execution method"""
@@ -371,8 +375,8 @@ class AzureRMCdnendpoint(AzureRMModuleBase):
             if not response:
 
                 if self.started is None:
-                # If endpoint dosen't exist and no start/stop operation specified, create endpoint.
-                    if self.origin == None:
+                    # If endpoint dosen't exist and no start/stop operation specified, create endpoint.
+                    if self.origin is None:
                         self.fail("Origin is not provided when trying to create endpoint")
                     self.log("Need to create the Azure CDN endpoint")
 
@@ -384,7 +388,7 @@ class AzureRMCdnendpoint(AzureRMModuleBase):
                     return self.results
 
                 else:
-                # Fail the module when user try to start/stop a non-existed endpoint
+                    # Fail the module when user try to start/stop a non-existed endpoint
                     self.log("Can't stop/stop a non-existed endpoint")
                     self.fail("This endpoint is not found, stop/start is forbidden")
 
@@ -394,7 +398,7 @@ class AzureRMCdnendpoint(AzureRMModuleBase):
 
                 if response['provisioning_state'] == "Succeeded":
 
-                    if self.started == False and response['resource_state'] == 'Running':
+                    if self.started is False and response['resource_state'] == 'Running':
                         self.log("Need to stop the Azure CDN endpoint")
 
                         if not self.check_mode:
@@ -416,7 +420,7 @@ class AzureRMCdnendpoint(AzureRMModuleBase):
 
                     elif self.started is not None:
                         self.log("Start/Stop not performed due to current resource state")
-                        self.results=response
+                        self.results = response
                         self.results['changed'] = False
                         return self.results
 
@@ -478,12 +482,13 @@ class AzureRMCdnendpoint(AzureRMModuleBase):
             tags=self.tags,
             origin_host_header=self.origin_host_header,
             origin_path=self.origin_path,
-            content_types_to_compress=default_content_types() if self.is_compression_enabled and not self.content_types_to_compress\
+            content_types_to_compress=default_content_types() if self.is_compression_enabled and not self.content_types_to_compress
             else self.content_types_to_compress,
             is_compression_enabled=self.is_compression_enabled if self.is_compression_enabled is not None else False,
             is_http_allowed=self.is_http_allowed if self.is_http_allowed is not None else True,
             is_https_allowed=self.is_https_allowed if self.is_https_allowed is not None else True,
-            query_string_caching_behavior=self.query_string_caching_behavior if self.query_string_caching_behavior else QueryStringCachingBehavior.ignore_query_string
+            query_string_caching_behavior=self.query_string_caching_behavior if self.query_string_caching_behavior
+            else QueryStringCachingBehavior.ignore_query_string
         )
 
         try:
@@ -506,7 +511,7 @@ class AzureRMCdnendpoint(AzureRMModuleBase):
             tags=self.tags,
             origin_host_header=self.origin_host_header,
             origin_path=self.origin_path,
-            content_types_to_compress=default_content_types() if self.is_compression_enabled and not self.content_types_to_compress\
+            content_types_to_compress=default_content_types() if self.is_compression_enabled and not self.content_types_to_compress
             else self.content_types_to_compress,
             is_compression_enabled=self.is_compression_enabled,
             is_http_allowed=self.is_http_allowed,
@@ -583,7 +588,8 @@ class AzureRMCdnendpoint(AzureRMModuleBase):
         self.log(
             "Purging the Azure CDN endpoint {0}".format(self.name))
         try:
-            poller = self.cdn_management_client.endpoints.purge_content(self.resource_group, self.profile_name, self.name, content_paths=self.purge_content_paths)
+            poller = self.cdn_management_client.endpoints.purge_content(self.resource_group, self.profile_name, self.name,
+                                                                        content_paths=self.purge_content_paths)
             response = self.get_poller_result(poller)
             self.log("Response : {0}".format(response))
             return self.get_cdnendpoint()
@@ -610,19 +616,19 @@ class AzureRMCdnendpoint(AzureRMModuleBase):
             return False
 
     def check_update(self, response):
-            
+
         if response['tags'] != self.tags:
             self.log("Tags Diff - Origin {0} / Update {1}".format(response['tags'], self.tags))
             return True
-            
+
         if self.origin_host_header and response['origin_host_header'] != self.origin_host_header:
             self.log("Origin host header Diff - Origin {0} / Update {1}".format(response['origin_host_header'], self.origin_host_header))
             return True
-            
+
         if self.origin_path and response['origin_path'] != self.origin_path:
             self.log("Origin path Diff - Origin {0} / Update {1}".format(response['origin_path'], self.origin_path))
             return True
-            
+
         if self.content_types_to_compress and response['content_types_to_compress'] != self.content_types_to_compress:
             self.log("Content types to compress Diff - Origin {0} / Update {1}".format(response['content_types_to_compress'], self.content_types_to_compress))
             return True
@@ -630,7 +636,7 @@ class AzureRMCdnendpoint(AzureRMModuleBase):
         if self.is_compression_enabled is not None and response['is_compression_enabled'] != self.is_compression_enabled:
             self.log("is_compression_enabled Diff - Origin {0} / Update {1}".format(response['is_compression_enabled'], self.is_compression_enabled))
             return True
-            
+
         if self.is_http_allowed is not None and response['is_http_allowed'] != self.is_http_allowed:
             self.log("is_http_allowed Diff - Origin {0} / Update {1}".format(response['is_http_allowed'], self.is_http_allowed))
             return True
@@ -638,13 +644,13 @@ class AzureRMCdnendpoint(AzureRMModuleBase):
         if self.is_https_allowed is not None and response['is_https_allowed'] != self.is_https_allowed:
             self.log("is_https_allowed Diff - Origin {0} / Update {1}".format(response['is_https_allowed'], self.is_https_allowed))
             return True
-            
+
         if self.query_string_caching_behavior and response['query_string_caching_behavior'] != self.query_string_caching_behavior:
-            self.log("query_string_caching_behavior Diff - Origin {0} / Update {1}".format(response['query_string_caching_behavior'], self.query_string_caching_behavior))
+            self.log("query_string_caching_behavior Diff - Origin {0} / Update {1}".format(response['query_string_caching_behavior'],
+                                                                                           self.query_string_caching_behavior))
             return True
 
         return False
-
 
 
 def main():
