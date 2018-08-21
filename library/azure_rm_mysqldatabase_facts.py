@@ -16,8 +16,8 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = '''
 ---
 module: azure_rm_mysqldatabase_facts
-version_added: "2.5"
-short_description: Get MySQL Database facts.
+version_added: "2.7"
+short_description: Get Azure MySQL Database facts.
 description:
     - Get facts of MySQL Database.
 
@@ -30,7 +30,7 @@ options:
         description:
             - The name of the server.
         required: True
-    database_name:
+    name:
         description:
             - The name of the database.
 
@@ -47,7 +47,7 @@ EXAMPLES = '''
     azure_rm_mysqldatabase_facts:
       resource_group: resource_group_name
       server_name: server_name
-      database_name: database_name
+      name: database_name
 
   - name: List instances of MySQL Database
     azure_rm_mysqldatabase_facts:
@@ -57,45 +57,47 @@ EXAMPLES = '''
 
 RETURN = '''
 databases:
-    description: A list of dict results where the key is the name of the MySQL Database and the values are the facts for that MySQL Database.
+    description: A list of dictionaries containing facts for MySQL Databases.
     returned: always
     type: complex
     contains:
-        mysqldatabase_name:
-            description: The key is the name of the server that the values relate to.
-            type: complex
-            contains:
-                id:
-                    description:
-                        - Resource ID
-                    returned: always
-                    type: str
-                    sample: "/subscriptions/ffffffff-ffff-ffff-ffff-ffffffffffff/resourceGroups/TestGroup/providers/Microsoft.DBforMySQL/servers/testserver/d
-                            atabases/db1"
-                name:
-                    description:
-                        - Resource name.
-                    returned: always
-                    type: str
-                    sample: db1
-                type:
-                    description:
-                        - Resource type.
-                    returned: always
-                    type: str
-                    sample: Microsoft.DBforMySQL/servers/databases
-                charset:
-                    description:
-                        - The charset of the database.
-                    returned: always
-                    type: str
-                    sample: utf8
-                collation:
-                    description:
-                        - The collation of the database.
-                    returned: always
-                    type: str
-                    sample: utf8_general_ci
+        id:
+            description:
+                - Resource ID
+            returned: always
+            type: str
+            sample: "/subscriptions/ffffffff-ffff-ffff-ffff-ffffffffffff/resourceGroups/TestGroup/providers/Microsoft.DBforMySQL/servers/testser
+                    ver/databases/db1"
+        resource_group:
+            description:
+                - Resource group name.
+            returned: always
+            type: str
+            sample: testrg
+        server_name:
+            description:
+                - Server name.
+            returned: always
+            type: str
+            sample: testserver
+        name:
+            description:
+                - Resource name.
+            returned: always
+            type: str
+            sample: db1
+        charset:
+            description:
+                - The charset of the database.
+            returned: always
+            type: str
+            sample: UTF8
+        collation:
+            description:
+                - The collation of the database.
+            returned: always
+            type: str
+            sample: English_United States.1252
 '''
 
 from ansible.module_utils.azure_rm_common import AzureRMModuleBase
@@ -122,30 +124,26 @@ class AzureRMDatabasesFacts(AzureRMModuleBase):
                 type='str',
                 required=True
             ),
-            database_name=dict(
+            name=dict(
                 type='str'
             )
         )
         # store the results of the module operation
         self.results = dict(
-            changed=False,
-            ansible_facts=dict()
+            changed=False
         )
-        self.mgmt_client = None
         self.resource_group = None
         self.server_name = None
-        self.database_name = None
-        super(AzureRMDatabasesFacts, self).__init__(self.module_arg_spec)
+        self.name = None
+        super(AzureRMDatabasesFacts, self).__init__(self.module_arg_spec, supports_tags=False)
 
     def exec_module(self, **kwargs):
         for key in self.module_arg_spec:
             setattr(self, key, kwargs[key])
-        self.mgmt_client = self.get_mgmt_svc_client(MySQLManagementClient,
-                                                    base_url=self._cloud_environment.endpoints.resource_manager)
 
         if (self.resource_group is not None and
                 self.server_name is not None and
-                self.database_name is not None):
+                self.name is not None):
             self.results['databases'] = self.get()
         elif (self.resource_group is not None and
               self.server_name is not None):
@@ -153,49 +151,52 @@ class AzureRMDatabasesFacts(AzureRMModuleBase):
         return self.results
 
     def get(self):
-        '''
-        Gets facts of the specified MySQL Database.
-
-        :return: deserialized MySQL Databaseinstance state dictionary
-        '''
         response = None
-        results = {}
+        results = []
         try:
-            response = self.mgmt_client.databases.get(resource_group_name=self.resource_group,
-                                                      server_name=self.server_name,
-                                                      database_name=self.database_name)
+            response = self.mysql_client.databases.get(resource_group_name=self.resource_group,
+                                                       server_name=self.server_name,
+                                                       database_name=self.name)
             self.log("Response : {0}".format(response))
         except CloudError as e:
             self.log('Could not get facts for Databases.')
 
         if response is not None:
-            results[response.name] = response.as_dict()
+            results.append(self.format_item(response))
 
         return results
 
     def list_by_server(self):
-        '''
-        Gets facts of the specified MySQL Database.
-
-        :return: deserialized MySQL Databaseinstance state dictionary
-        '''
         response = None
-        results = {}
+        results = []
         try:
-            response = self.mgmt_client.databases.list_by_server(resource_group_name=self.resource_group,
-                                                                 server_name=self.server_name)
+            response = self.mysql_client.databases.list_by_server(resource_group_name=self.resource_group,
+                                                                  server_name=self.server_name)
             self.log("Response : {0}".format(response))
         except CloudError as e:
-            self.log('Could not get facts for Databases.')
+            self.fail("Error listing for server {0} - {1}".format(self.server_name, str(e)))
 
         if response is not None:
             for item in response:
-                results[item.name] = item.as_dict()
+                results.append(self.format_item(item))
 
         return results
+
+    def format_item(self, item):
+        d = item.as_dict()
+        d = {
+            'resource_group': self.resource_group,
+            'server_name': self.server_name,
+            'name': d['name'],
+            'charset': d['charset'],
+            'collation': d['collation']
+        }
+        return d
 
 
 def main():
     AzureRMDatabasesFacts()
+
+
 if __name__ == '__main__':
     main()
