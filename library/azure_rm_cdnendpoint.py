@@ -478,7 +478,8 @@ class AzureRMCdnendpoint(AzureRMModuleBase):
             tags=self.tags,
             origin_host_header=self.origin_host_header,
             origin_path=self.origin_path,
-            content_types_to_compress=default_content_types() if self.is_compression_enabled and not self.content_types_to_compress else self.content_types_to_compress,
+            content_types_to_compress=default_content_types() if self.is_compression_enabled and not self.content_types_to_compress\
+            else self.content_types_to_compress,
             is_compression_enabled=self.is_compression_enabled if self.is_compression_enabled is not None else False,
             is_http_allowed=self.is_http_allowed if self.is_http_allowed is not None else True,
             is_https_allowed=self.is_https_allowed if self.is_https_allowed is not None else True,
@@ -505,7 +506,8 @@ class AzureRMCdnendpoint(AzureRMModuleBase):
             tags=self.tags,
             origin_host_header=self.origin_host_header,
             origin_path=self.origin_path,
-            content_types_to_compress=default_content_types() if self.is_compression_enabled and not self.content_types_to_compress else self.content_types_to_compress,
+            content_types_to_compress=default_content_types() if self.is_compression_enabled and not self.content_types_to_compress\
+            else self.content_types_to_compress,
             is_compression_enabled=self.is_compression_enabled,
             is_http_allowed=self.is_http_allowed,
             is_https_allowed=self.is_https_allowed,
