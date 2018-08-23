@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# Copyright (c) 2018 Hai Cao, <t-haicao@microsoft.com>
+# Copyright (c) 2018 Hai Cao, <t-haicao@microsoft.com>, Yunge Zhu <yungez@microsoft.com>
 #
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
@@ -14,14 +14,14 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 
 DOCUMENTATION = '''
 ---
-module: azure_rm_trafficmanager_facts
+module: azure_rm_trafficmanagerendpoint_facts
 
 version_added: "2.7"
 
-short_description: Get Traffic Manager profile facts
+short_description: Get Azure Traffic Manager endpoint facts
 
 description:
-    - Get facts for a specific Traffic Manager profile or all Traffic Manager profiles.
+    - Get facts for a specific Traffic Manager endpoints or all endpoints  in a Traffic Manager profile
 
 options:
     name:
@@ -30,15 +30,25 @@ options:
     resource_group:
         description:
             - The resource group to search for the desired Traffic Manager profile
-    tags:
+        required: True
+    profile_name:
         description:
-            - Limit results by providing a list of tags. Format tags as 'key' or 'key:value'.
+            - Name of Traffic Manager Profile
+        required: True
+    type:
+        description:
+            - Type of endpoint.
+        choices:
+            - azureEndpoints
+            - externalEndpoints
+            - nestedEndpoints
 
 extends_documentation_fragment:
     - azure
 
 author:
     - "Hai Cao <t-haicao@microsoft.com>"
+    - "Yunge Zhu <yungez@microsoft.com>"
 '''
 
 EXAMPLES = '''
@@ -214,7 +224,7 @@ except:
 
 import re
 
-AZURE_OBJECT_CLASS = 'trafficManagerProfiles'
+AZURE_OBJECT_CLASS = 'TrafficManagerEndpoints'
 
 
 def serialize_endpoint(endpoint):
@@ -233,27 +243,39 @@ def serialize_endpoint(endpoint):
     )
 
 
-class AzureRMTrafficManagerFacts(AzureRMModuleBase):
-    """Utility class to get Azure Traffic Manager facts"""
+class AzureRMTrafficManagerEndpointFacts(AzureRMModuleBase):
+    """Utility class to get Azure Traffic Manager Endpoint facts"""
 
     def __init__(self):
 
         self.module_args = dict(
+            profile_name=dict(
+                type='str',
+                required=True),
+            resource_group=dict(
+                type='str',
+                required=True),
             name=dict(type='str'),
-            resource_group=dict(type='str'),
-            tags=dict(type='list')
+            type=dict(
+                type='str',
+                choices=[
+                    'azureEndpoints',
+                    'externalEndpoints',
+                    'nestedEndpoints'
+                ])
         )
 
         self.results = dict(
             changed=False,
-            tms=[]
+            endpoints=[]
         )
 
+        self.profile_name = None
         self.name = None
         self.resource_group = None
-        self.tags = None
+        self.type = None
 
-        super(AzureRMTrafficManagerFacts, self).__init__(
+        super(AzureRMTrafficManagerEndpointFacts, self).__init__(
             derived_arg_spec=self.module_args,
             supports_tags=False,
             facts_module=True
@@ -285,8 +307,8 @@ class AzureRMTrafficManagerFacts(AzureRMModuleBase):
         result = []
 
         try:
-            item = self.traffic_manager_management_client.profiles.get(
-                self.resource_group, self.name)
+            item = self.traffic_manager_management_client.endpoints.get(
+                self.resource_group, self.profile_name, self.type, self.name)
         except CloudError:
             pass
 
@@ -295,77 +317,45 @@ class AzureRMTrafficManagerFacts(AzureRMModuleBase):
 
         return result
 
-    def list_resource_group(self):
-        """Get all Azure Traffic Managers within a resource group"""
+    def list_by_profile(self):
+        """Get all Azure Traffic Manager endpoints of a profile"""
 
-        self.log('List all Azure Traffic Managers within a resource group')
+        self.log('List all endpoints belongs to a Traffic Manager profile')
 
         try:
-            response = self.traffic_manager_management_client.profiles.list_by_resource_group(
-                self.resource_group)
+            response = self.traffic_manager_management_client.profiles.get(self.resource_group, self.profile_name)
         except AzureHttpError as exc:
             self.fail('Failed to list all items - {0}'.format(str(exc)))
 
         results = []
         for item in response:
-            if self.has_tags(item.tags, self.tags):
-                results.append(self.serialize_tm(item))
+            if item.endpoints:
+                for endpoint in item.endpoints:
+                    results.append(serialize_endpoint(endpoint))
 
         return results
 
-    def list_all(self):
-        """Get all Azure Traffic Managers within a subscription"""
-        self.log('List all Traffic Manager profiles within a subscription')
+    def list_by_type(self):
+        """Get all Azure Traffic Managers endpoints of a profile by type"""
+        self.log('List all Traffic Manager endpoints of a profile by type')
         try:
-            response = self.traffic_manager_management_client.profiles.list_by_subscription()
-        except Exception as exc:
-            self.fail("Error listing all items - {0}".format(str(exc)))
+            response = self.traffic_manager_management_client.profiles.get(self.resource_group, self.profile_name)
+        except AzureHttpError as exc:
+            self.fail('Failed to list all items - {0}'.format(str(exc)))
 
         results = []
         for item in response:
-            if self.has_tags(item.tags, self.tags):
-                results.append(self.serialize_tm(item))
+            if item.endpoints:
+                for endpoint in item.endpoints:
+                    if endpoint.type == self.type:
+                        results.append(serialize_endpoint(endpoint))
         return results
-
-    def serialize_tm(self, tm):
-        '''
-        Convert a Traffic Manager profile object to dict.
-        :param tm: Traffic Manager profile object
-        :return: dict
-        '''
-        result = self.serialize_obj(tm, AZURE_OBJECT_CLASS)
-
-        new_result = {}
-        new_result['id'] = tm.id
-        new_result['resource_group'] = re.sub('\\/.*', '', re.sub('.*resourceGroups\\/', '', result['id']))
-        new_result['name'] = tm.name
-        new_result['state'] = 'present'
-        new_result['location'] = tm.location
-        new_result['profile_status'] = tm.profile_status
-        new_result['traffic_routing_method'] = tm.traffic_routing_method
-        new_result['dns_config'] = dict(
-            relative_name=tm.dns_config.relative_name,
-            fqdn=tm.dns_config.fqdn,
-            ttl=tm.dns_config.ttl
-        )
-        new_result['monitor_config'] = dict(
-            profile_monitor_status=tm.monitor_config.profile_monitor_status,
-            protocol=tm.monitor_config.protocol,
-            port=tm.monitor_config.port,
-            path=tm.monitor_config.path,
-            interval_in_seconds=tm.monitor_config.interval_in_seconds,
-            timeout_in_seconds=tm.monitor_config.timeout_in_seconds,
-            tolerated_number_of_failures=tm.monitor_config.tolerated_number_of_failures
-        )
-        new_result['endpoints'] = [serialize_endpoint(endpoint) for endpoint in tm.endpoints]
-        new_result['tags'] = tm.tags
-        return new_result
 
 
 def main():
     """Main module execution code path"""
 
-    AzureRMTrafficManagerFacts()
+    AzureRMTrafficManagerEndpointFacts()
 
 
 if __name__ == '__main__':

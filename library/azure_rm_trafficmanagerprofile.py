@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# Copyright (c) 2018 Hai Cao, <t-haicao@microsoft.com>
+# Copyright (c) 2018 Hai Cao, <t-haicao@microsoft.com>, Yunge Zhu <yungez@microsoft.com>
 #
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
@@ -13,9 +13,9 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 
 DOCUMENTATION = '''
 ---
-module: azure_rm_trafficmanager
+module: azure_rm_trafficmanagerprofile
 version_added: "2.7"
-short_description: Manage a Traffic Manager profile.
+short_description: Manage Azure Traffic Manager profile.
 description:
     - Create, update and delete a Traffic Manager profile.
 
@@ -96,54 +96,6 @@ options:
             protocol: HTTP
             port: 80
             path: /
-    endpoints:
-        description:
-            - The list of endpoints in the Traffic Manager profile.
-        suboptions:
-            id:
-                description:
-                    - Fully qualified resource Id for the resource.
-            name:
-                description:
-                    - The name of the endpoint.
-                required: true
-            type:
-                description:
-                    - The type of the endpoint. Ex- Microsoft.network/TrafficManagerProfiles/ExternalEndpoints.
-                required: true
-            target_resource_id:
-                description:
-                    - The Azure Resource URI of the of the endpoint.
-                    - Not applicable to endpoints of type 'ExternalEndpoints'.
-            target:
-                description:
-                    - The fully-qualified DNS name of the endpoint.
-            endpoint_status:
-                description:
-                    - The status of the endpoint.
-                choices:
-                    - Enabled
-                    - Disabled
-            weight:
-                description:
-                    - The weight of this endpoint when using the 'Weighted' traffic routing method.
-                    - Possible values are from 1 to 1000.
-            priority:
-                description:
-                    - The priority of this endpoint when using the 'Priority' traffic routing method.
-                    - Possible values are from 1 to 1000, lower values represent higher priority.
-                    - This is an optional parameter. If specified, it must be specified on all endpoints.
-                    - No two endpoints can share the same priority value.
-            endpoint_location:
-                description:
-                    - Specifies the location of the external or nested endpoints when using the 'Performance' traffic routing method.
-            min_child_endpoints:
-                description:
-                    - The minimum number of endpoints that must be available in the child profile in order for the parent profile to be considered available.
-                    - Only applicable to endpoint of type 'NestedEndpoints'.
-            geo_mapping:
-                description:
-                    - The list of countries/regions mapped to this endpoint when using the 'Geographic' traffic routing method.
 
 extends_documentation_fragment:
     - azure
@@ -151,7 +103,7 @@ extends_documentation_fragment:
 
 author:
     - "Hai Cao <t-haicao@microsoft.com>"
-
+    - "Yunge Zhu <yungez@microsoft.com>"
 '''
 
 EXAMPLES = '''
@@ -269,22 +221,6 @@ def traffic_manager_profile_to_dict(tmp):
         result['monitor_config']['interval_in_seconds'] = tmp.monitor_config.interval_in_seconds
         result['monitor_config']['timeout_in_seconds'] = tmp.monitor_config.timeout_in_seconds
         result['monitor_config']['tolerated_number_of_failures'] = tmp.monitor_config.tolerated_number_of_failures
-    if tmp.endpoints:
-        for endpoint in tmp.endpoints:
-            result['endpoints'].append(dict(
-                id=endpoint.id,
-                name=endpoint.name,
-                type=endpoint.type,
-                target_resource_id=endpoint.target_resource_id,
-                target=endpoint.target,
-                endpoint_status=endpoint.endpoint_status,
-                weight=endpoint.weight,
-                priority=endpoint.priority,
-                endpoint_location=endpoint.endpoint_location,
-                endpoint_monitor_status=endpoint.endpoint_monitor_status,
-                min_child_endpoints=endpoint.min_child_endpoints,
-                geo_mapping=endpoint.geo_mapping
-            ))
     return result
 
 
@@ -306,23 +242,6 @@ def create_monitor_config_instance(monitor_config):
         tolerated_number_of_failures=monitor_config['tolerated_number_of_failures']
     )
 
-
-def create_endpoint_instance(endpoint):
-    return Endpoint(
-        id=endpoint['id'],
-        name=endpoint['name'],
-        type=endpoint['type'],
-        target_resource_id=endpoint['target_resource_id'],
-        target=endpoint['target'],
-        endpoint_status=endpoint['endpoint_status'],
-        weight=endpoint['weight'],
-        priority=endpoint['priority'],
-        endpoint_location=endpoint['endpoint_location'],
-        min_child_endpoints=endpoint['min_child_endpoints'],
-        geo_mapping=endpoint['geo_mapping']
-    )
-
-
 def create_endpoints(endpoints):
     return [create_endpoint_instance(endpoint) for endpoint in endpoints]
 
@@ -342,23 +261,8 @@ monitor_config_spec = dict(
     tolerated_number_of_failures=dict(type='int')
 )
 
-endpoint_spec = dict(
-    id=dict(type='str'),
-    name=dict(type='str'),
-    type=dict(type='str'),
-    target_resource_id=dict(type='str'),
-    target=dict(type='str'),
-    endpoint_status=dict(type='str'),
-    weight=dict(type='int'),
-    priority=dict(type='int'),
-    endpoint_location=dict(type='str'),
-    endpoint_monitor_status=dict(type='str'),
-    min_child_endpoints=dict(type='int'),
-    geo_mapping=dict(type='list', elements='str')
-)
 
-
-class AzureRMTrafficManager(AzureRMModuleBase):
+class AzureRMTrafficManagerProfiles(AzureRMModuleBase):
 
     def __init__(self):
         self.module_arg_spec = dict(
@@ -400,12 +304,6 @@ class AzureRMTrafficManager(AzureRMModuleBase):
                     path='/'
                 ),
                 options=monitor_config_spec
-            ),
-            endpoints=dict(
-                type='list',
-                elements='dict',
-                options=endpoint_spec,
-                default=[]
             )
         )
 
@@ -418,13 +316,14 @@ class AzureRMTrafficManager(AzureRMModuleBase):
         self.traffic_routing_method = None
         self.dns_config = None
         self.monitor_config = None
-        self.endpoints = None
 
         self.results = dict(
             changed=False
         )
 
-        super(AzureRMTrafficManager, self).__init__(derived_arg_spec=self.module_arg_spec, supports_check_mode=True)
+        super(AzureRMTrafficManagerProfiles, self).__init__(derived_arg_spec=self.module_arg_spec,
+                                                    supports_check_mode=True,
+                                                    support_tags=True)
 
     def exec_module(self, **kwargs):
 
@@ -525,8 +424,7 @@ class AzureRMTrafficManager(AzureRMModuleBase):
             profile_status=self.profile_status,
             traffic_routing_method=self.traffic_routing_method,
             dns_config=create_dns_config_instance(self.dns_config) if self.dns_config else None,
-            monitor_config=create_monitor_config_instance(self.monitor_config) if self.monitor_config else None,
-            endpoints=create_endpoints(self.endpoints)
+            monitor_config=create_monitor_config_instance(self.monitor_config) if self.monitor_config else None
         )
         try:
             response = self.traffic_manager_management_client.profiles.create_or_update(self.resource_group, self.name, parameters)
@@ -558,22 +456,12 @@ class AzureRMTrafficManager(AzureRMModuleBase):
                     self.log("Monitor Config Diff - Origin {0} / Update {1}".format(response['monitor_config'], self.monitor_config))
                     return True
 
-        if len(response['endpoints']) != len(self.endpoints):
-            self.log("Endpoints Diff - Origin {0} / Update {1}".format(response['endpoints'], self.endpoints))
-            return True
-        else:
-            for e1, e2 in zip(sorted(self.endpoints, key=lambda k: k['name']), sorted(response['endpoints'], key=lambda k: k['name'])):
-                for k, v in e1.items():
-                    if v:
-                        if str(v).lower() != str(e2[k]).lower():
-                            self.log("Endpoints Diff - Origin {0} / Update {1}".format(response['endpoints'], self.endpoints))
-                            return True
         return False
 
 
 def main():
     """Main execution"""
-    AzureRMTrafficManager()
+    AzureRMTrafficManagerProfiles()
 
 
 if __name__ == '__main__':
