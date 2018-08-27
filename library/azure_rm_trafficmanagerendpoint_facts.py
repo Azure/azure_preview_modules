@@ -60,15 +60,11 @@ EXAMPLES = '''
     - name: Get facts for all Traffic Manager profiles
       azure_rm_trafficmanager_facts:
 
-    - name: Get facts by tags
-      azure_rm_trafficmanager_facts:
-        tags:
-          - Environment:Test
 '''
 
 RETURN = '''
 tms:
-    description: List of Traffic Manager profiles.
+    description: List of Traffic Manager endpoints.
     returned: always
     type: complex
     contains:
@@ -292,10 +288,10 @@ class AzureRMTrafficManagerEndpointFacts(AzureRMModuleBase):
 
         if self.name:
             self.results['endpoints'] = self.get_item()
-        elif self.resource_group:
-            self.results['endpoints'] = self.list_resource_group()
+        elif self.type:
+            self.results['endpoints'] = self.list_by_type()
         else:
-            self.results['endpoints'] = self.list_all()
+            self.results['endpoints'] = self.list_by_profile()
 
         return self.results
 
@@ -313,8 +309,9 @@ class AzureRMTrafficManagerEndpointFacts(AzureRMModuleBase):
         except CloudError:
             pass
 
-        if item and self.has_tags(item.tags, self.tags):
-            result = [self.serialize_tm(item)]
+        if self.type:
+            if endpoint.type == self.type:
+                result = [self.serialize_tm(item)]
 
         return result
 

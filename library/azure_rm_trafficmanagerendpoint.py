@@ -154,7 +154,7 @@ class AzureRMTrafficManagerEndpoint(AzureRMModuleBase):
                 choices=['azureEndpoints', 'externalEndpoints', 'nestedEndpoints'],
                 required=True
             ),
-            target=dict(type='str')
+            target=dict(type='str'),
             target_resource_id=dict(type='str'),
             enable=dict(type='bool', default=True),
             weight=dict(type='int'),
@@ -214,7 +214,7 @@ class AzureRMTrafficManagerEndpoint(AzureRMModuleBase):
             self.log('Results : {0}'.format(response))
             if self.state == 'present':
                 # check update
-                to_be_update = selff.check_update(response)
+                to_be_update = self.check_update(response)
                 if to_be_update:
                     self.action = Actions.CreateOrUpdate
 
@@ -234,7 +234,7 @@ class AzureRMTrafficManagerEndpoint(AzureRMModuleBase):
                 return self.results
 
             response = self.ceate_update_traffic_manager_endpoint()
-            self.results['id'] = response.id
+            self.results['id'] = response['id']
         
         if self.action == Actions.Delete:
             self.results['changed'] = True
