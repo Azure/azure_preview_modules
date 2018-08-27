@@ -102,7 +102,7 @@ EXAMPLES = '''
 '''
 RETURN = '''
 '''
-from ansible.module_utils.azure_rm_common import AzureRMModuleBase
+from ansible.module_utils.azure_rm_common import AzureRMModuleBase, normalize_location_name
 
 try:
     from msrestazure.azure_exceptions import CloudError
@@ -295,19 +295,19 @@ class AzureRMTrafficManagerEndpoint(AzureRMModuleBase):
             response = self.traffic_manager_management_client.endpoints.create_or_update(self.resource_group, self.profile_name, self.type, self.name, parameters)
             return traffic_manager_endpoint_to_dict(response)
         except CloudError as exc:
-            request_id = e.request_id if exc.request_id else ''
+            request_id = exc.request_id if exc.request_id else ''
             self.fail("Error creating the Traffic Manager endpoint {0}, request id {1} - {2}".format(self.name, request_id, str(exc)))
 
     def check_update(self, response):
-        if self.location and response['location'] != self.location:
+        if self.location and normalize_location_name(response['location']) != normalize_location_name(self.location):
             self.log("Location Diff - Origin {0} / Update {1}".format(response['location'], self.location))
             return True
 
-        if self.endpoint_status is not None and response['status'] != self.endpoint_status:
+        if self.endpoint_status is not None and response['status'].lower() != self.endpoint_status.lower():
             self.log("Status Diff - Origin {0} / Update {1}".format(response['status'], self.endpoint_status))
             return True
 
-        if self.type and response['type'] != self.type:
+        if self.type and response['type'].lower() != "Microsoft.network/TrafficManagerProfiles/{0}".format(self.type).lower():
             self.log("Type Diff - Origin {0} / Update {1}".format(response['type'], self.type))
             return True
 
@@ -319,15 +319,15 @@ class AzureRMTrafficManagerEndpoint(AzureRMModuleBase):
             self.log("target Diff - Origin {0} / Update {1}".format(response['target'], self.target))
             return True
 
-        if self.weight and response['weight'] != self.weight:
+        if self.weight and int(response['weight']) != self.weight:
             self.log("weight Diff - Origin {0} / Update {1}".format(response['weight'], self.weight))
             return True
 
-        if self.priority and response['priority'] != self.priority:
+        if self.priority and int(response['priority']) != self.priority:
             self.log("priority Diff - Origin {0} / Update {1}".format(response['priority'], self.priority))
             return True
 
-        if self.min_child_endpoints and response['min_child_endpoints'] != self.min_child_endpoints:
+        if self.min_child_endpoints and int(response['min_child_endpoints']) != self.min_child_endpoints:
             self.log("min_child_endpoints Diff - Origin {0} / Update {1}".format(response['min_child_endpoints'], self.min_child_endpoints))
             return True
 

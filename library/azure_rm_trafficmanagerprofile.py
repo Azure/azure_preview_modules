@@ -148,7 +148,7 @@ endpoints:
         "/subscriptions/XXXXXX...XXXXXXXXX/resourceGroups/tmt/providers/Microsoft.Network/trafficManagerProfiles/tm049b1ae293/externalEndpoints/e1"
     ]
 '''
-from ansible.module_utils.azure_rm_common import AzureRMModuleBase
+from ansible.module_utils.azure_rm_common import AzureRMModuleBase, normalize_location_name
 
 try:
     from msrestazure.azure_exceptions import CloudError
@@ -421,7 +421,7 @@ class AzureRMTrafficManagerProfile(AzureRMModuleBase):
             self.fail("Error creating the Traffic Manager: {0}".format(exc.message))
 
     def check_update(self, response):
-        if self.location and response['location'] != self.location:
+        if self.location and normalize_location_name(response['location']) != normalize_location_name(self.location):
             self.log("Location Diff - Origin {0} / Update {1}".format(response['location'], self.location))
             return True
 
