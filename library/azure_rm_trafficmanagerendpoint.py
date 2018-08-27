@@ -299,10 +299,6 @@ class AzureRMTrafficManagerEndpoint(AzureRMModuleBase):
             self.fail("Error creating the Traffic Manager endpoint {0}, request id {1} - {2}".format(self.name, request_id, str(exc)))
 
     def check_update(self, response):
-        if self.location and normalize_location_name(response['location']) != normalize_location_name(self.location):
-            self.log("Location Diff - Origin {0} / Update {1}".format(response['location'], self.location))
-            return True
-
         if self.endpoint_status is not None and response['status'].lower() != self.endpoint_status.lower():
             self.log("Status Diff - Origin {0} / Update {1}".format(response['status'], self.endpoint_status))
             return True
