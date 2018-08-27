@@ -128,11 +128,6 @@ def traffic_manager_endpoint_to_dict(endpoint):
         min_child_endpoints=endpoint.min_child_endpoints,
         geo_mapping=endpoint.geo_mapping
     )
-    # if endpoint.geo_mapping:
-
-    #     for geo in endpoint.geo_mapping:
-    #         result['geo_mapping'].append(geo)
-    )
 
 
 class Actions:
@@ -164,7 +159,6 @@ class AzureRMTrafficManagerEndpoint(AzureRMModuleBase):
             weight=dict(type='int'),
             priority=dict(type='int'),
             location=dict(type='str'),
-            minitor_status=dict(type='str'),
             min_child_endpoints=dict(type='int'),
             geo_mapping=dict(type='list', elements='str'),
             state=dict(
@@ -185,7 +179,6 @@ class AzureRMTrafficManagerEndpoint(AzureRMModuleBase):
         self.weight = None
         self.priority = None
         self.location = None
-        self.minitor_status = None
         self.min_child_endpoints = None
         self.geo_mapping = None
         self.endpoint_status = 'Enabled'
@@ -197,7 +190,6 @@ class AzureRMTrafficManagerEndpoint(AzureRMModuleBase):
         )
 
         super(AzureRMTrafficManagerEndpoint, self).__init__(derived_arg_spec=self.module_arg_spec,
-                                             mutually_exclusive=mutually_exclusive,
                                              supports_check_mode=True,
                                              supports_tags=False)
 
@@ -208,8 +200,9 @@ class AzureRMTrafficManagerEndpoint(AzureRMModuleBase):
 
         to_be_updated = False
 
+        resource_group = self.get_resource_group(self.resource_group)
         if not self.location:
-            self.location = 'global'
+            self.location = resource_group.location
 
         if self.enable is not None and self.enable == False:
             self.endpoint_status = 'Disabled'
@@ -294,10 +287,9 @@ class AzureRMTrafficManagerEndpoint(AzureRMModuleBase):
                               weight=self.weight,
                               priority=self.priority,
                               endpoint_location=self.location,
-                              endpoint_monitor_status=self.monitor_status,
                               min_child_endpoints=self.min_child_endpoints,
                               geo_mapping=self.geo_mapping)
-        )
+
         try:
             response = self.traffic_manager_management_client.endpoints.create_or_update(self.resource_group, self.profile_name, self.type, self.name, parameters)
             return traffic_manager_endpoint_to_dict(response)
@@ -318,31 +310,27 @@ class AzureRMTrafficManagerEndpoint(AzureRMModuleBase):
             self.log("Type Diff - Origin {0} / Update {1}".format(response['type'], self.type))
             return True
 
-        if (response['target_resource_id'] != self.target_resource_id:
+        if response['target_resource_id'] != self.target_resource_id:
             self.log("target_resource_id Diff - Origin {0} / Update {1}".format(response['target_resource_id'], self.target_resource_id))
             return True
 
-        if (response['target'] != self.target:
+        if response['target'] != self.target:
             self.log("target Diff - Origin {0} / Update {1}".format(response['target'], self.target))
             return True
 
-        if (response['weight'] != self.weight:
+        if response['weight'] != self.weight:
             self.log("weight Diff - Origin {0} / Update {1}".format(response['weight'], self.weight))
             return True
 
-        if (response['priority'] != self.priority:
+        if response['priority'] != self.priority:
             self.log("priority Diff - Origin {0} / Update {1}".format(response['priority'], self.priority))
             return True
 
-        if (response['monitor_status'] != self.monitor_status:
-            self.log("monitor_status Diff - Origin {0} / Update {1}".format(response['monitor_status'], self.monitor_status))
-            return True
-
-        if (response['min_child_endpoints'] != self.min_child_endpoints:
+        if response['min_child_endpoints'] != self.min_child_endpoints:
             self.log("min_child_endpoints Diff - Origin {0} / Update {1}".format(response['min_child_endpoints'], self.min_child_endpoints))
             return True
 
-        if (response['geo_mapping'] != self.geo_mapping:
+        if response['geo_mapping'] != self.geo_mapping:
             self.log("geo_mapping Diff - Origin {0} / Update {1}".format(response['geo_mapping'], self.geo_mapping))
             return True
 

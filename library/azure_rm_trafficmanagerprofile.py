@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# Copyright (c) 2018 Hai Cao, <t-haicao@microsoft.com>, Yunge Zhu <yungez@microsoft.com>
+# Copyright (c) 2018 Hai Cao, <t-haicao@microsoft.com> Yunge Zhu <yungez@microsoft.com>
 #
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
@@ -37,23 +37,25 @@ options:
             - present
     location:
         description:
-            - Valid azure location. Defaults to 'global'.
+            - Valid azure location. Defaults to 'global' because in default public Azure cloud, Traffic Manager profile can only be deployed globally.
+            - Reference https://docs.microsoft.com/en-us/azure/traffic-manager/quickstart-create-traffic-manager-profile#create-a-traffic-manager-profile
+        default: global
     profile_status:
         description:
             - The status of the Traffic Manager profile.
-        default: Enabled
+        default: enabled
         choices:
-            - Enabled
-            - Disabled
-    traffic_routing_method:
+            - enabled
+            - disabled
+    routing_method:
         description:
             - The traffic routing method of the Traffic Manager profile.
-        default: Performance
+        default: performance
         choices:
-            - Performance
-            - Priority
-            - Weighted
-            - Geographic
+            - performance
+            - priority
+            - weighted
+            - geographic
     dns_config:
         description:
             - The DNS settings of the Traffic Manager profile.
@@ -61,7 +63,7 @@ options:
             relative_name:
                 description:
                     - The relative DNS name provided by this Traffic Manager profile.
-                    - If no provided, name of the Traffic Manager will be used
+                    - If not provided, name of the Traffic Manager will be used
             ttl:
                 description:
                     - The DNS Time-To-Live (TTL), in seconds.
@@ -83,13 +85,13 @@ options:
             path:
                 description:
                     - The path relative to the endpoint domain name used to probe for endpoint health.
-            interval_in_seconds:
+            interval:
                 description:
-                    - The monitor interval for endpoints in this profile.
-            timeout_in_seconds:
+                    - The monitor interval for endpoints in this profile in seconds.
+            timeout:
                 description:
-                    - The monitor timeout for endpoints in this profile.
-            tolerated_number_of_failures:
+                    - The monitor timeout for endpoints in this profile in seconds.
+            tolerated_failures:
                 description:
                     - The number of consecutive failed health check before declaring an endpoint in this profile Degraded after the next failed health check.
         default:
@@ -104,6 +106,7 @@ extends_documentation_fragment:
 author:
     - "Hai Cao <t-haicao@microsoft.com>"
     - "Yunge Zhu <yungez@microsoft.com>"
+
 '''
 
 EXAMPLES = '''
@@ -112,8 +115,8 @@ EXAMPLES = '''
         name: tmtest
         resource_group: tmt
         location: global
-        profile_status: Enabled
-        traffic_routing_method: Priority
+        profile_status: enabled
+        routing_method: priority
         dns_config:
           relative_name: tmtest
           ttl: 60
@@ -121,14 +124,6 @@ EXAMPLES = '''
           protocol: HTTPS
           port: 80
           path: '/'
-        endpoints:
-          - name: e1
-            type: Microsoft.network/TrafficManagerProfiles/ExternalEndpoints
-            endpoint_location: West US 2
-            endpoint_status: Enabled
-            priority: 2
-            target: 1.2.3.4
-            weight: 1
         tags:
           Environment: Test
 
@@ -139,50 +134,19 @@ EXAMPLES = '''
         resource_group: tmt
 '''
 RETURN = '''
-state:
-    description: Current state of the Traffic Manager Profile
+id:
+    description: The ID of the traffic manager profile
     returned: always
-    type: dict
-    example:
-        "dns_config": {
-            "fqdn": "tmtest.trafficmanager.net",
-            "relative_name": "tmtest",
-            "ttl": 60
-        }
-        "endpoints": [
-            {
-                "endpoint_location": "West US 2",
-                "endpoint_monitor_status": "Degraded",
-                "endpoint_status": "Enabled",
-                "geo_mapping": null,
-                "id":   "/subscriptions/XXXXXX...XXXXXXXXX/resourceGroups/tmt/providers/Microsoft.Network/trafficManagerProfiles/tmtest/externalEndpoints/e1",
-                "min_child_endpoints": null,
-                "name": "e1",
-                "priority": 2,
-                "target": "1.2.3.4",
-                "target_resource_id": null,
-                "type": "Microsoft.Network/trafficManagerProfiles/externalEndpoints",
-                "weight": 1
-            }
-        ]
-        "id": "/subscriptions/XXXXXX...XXXXXXXXX/resourceGroups/tmt/providers/Microsoft.Network/trafficManagerProfiles/tmtest"
-        "location": "global"
-        "monitor_config": {
-            "interval_in_seconds": 30,
-            "path": "/",
-            "port": 80,
-            "profile_monitor_status": "Degraded",
-            "protocol": "HTTPS",
-            "timeout_in_seconds": 10,
-            "tolerated_number_of_failures": 3
-        }
-        "name": "tmtest"
-        "profile_status": "Enabled"
-        "tags": {
-            "Environment": "Test"
-        }
-        "traffic_routing_method": "Priority"
-        "type": "Microsoft.Network/trafficManagerProfiles"
+    type: str
+    example: "/subscriptions/XXXXXX...XXXXXXXXX/resourceGroups/tmt/providers/Microsoft.Network/trafficManagerProfiles/tmtest"
+endpoints:
+  description: List of endpoint IDs attached to the profile
+  returned: always
+  type: list
+  sample: [
+        "/subscriptions/XXXXXX...XXXXXXXXX/resourceGroups/tmt/providers/Microsoft.Network/trafficManagerProfiles/tm049b1ae293/externalEndpoints/e2",
+        "/subscriptions/XXXXXX...XXXXXXXXX/resourceGroups/tmt/providers/Microsoft.Network/trafficManagerProfiles/tm049b1ae293/externalEndpoints/e1"
+    ]
 '''
 from ansible.module_utils.azure_rm_common import AzureRMModuleBase
 
@@ -196,6 +160,13 @@ except ImportError:
     pass
 
 
+def shorten_traffic_manager_dict(tmd):
+    return dict(
+        id=tmd['id'],
+        endpoints=[endpoint['id'] for endpoint in tmd['endpoints']] if tmd['endpoints'] else []
+    )
+
+
 def traffic_manager_profile_to_dict(tmp):
     result = dict(
         id=tmp.id,
@@ -204,7 +175,7 @@ def traffic_manager_profile_to_dict(tmp):
         tags=tmp.tags,
         location=tmp.location,
         profile_status=tmp.profile_status,
-        traffic_routing_method=tmp.traffic_routing_method,
+        routing_method=tmp.traffic_routing_method,
         dns_config=dict(),
         monitor_config=dict(),
         endpoints=[]
@@ -218,9 +189,25 @@ def traffic_manager_profile_to_dict(tmp):
         result['monitor_config']['protocol'] = tmp.monitor_config.protocol
         result['monitor_config']['port'] = tmp.monitor_config.port
         result['monitor_config']['path'] = tmp.monitor_config.path
-        result['monitor_config']['interval_in_seconds'] = tmp.monitor_config.interval_in_seconds
-        result['monitor_config']['timeout_in_seconds'] = tmp.monitor_config.timeout_in_seconds
-        result['monitor_config']['tolerated_number_of_failures'] = tmp.monitor_config.tolerated_number_of_failures
+        result['monitor_config']['interval'] = tmp.monitor_config.interval_in_seconds
+        result['monitor_config']['timeout'] = tmp.monitor_config.timeout_in_seconds
+        result['monitor_config']['tolerated_failures'] = tmp.monitor_config.tolerated_number_of_failures
+    if tmp.endpoints:
+        for endpoint in tmp.endpoints:
+            result['endpoints'].append(dict(
+                id=endpoint.id,
+                name=endpoint.name,
+                type=endpoint.type,
+                target_resource_id=endpoint.target_resource_id,
+                target=endpoint.target,
+                endpoint_status=endpoint.endpoint_status,
+                weight=endpoint.weight,
+                priority=endpoint.priority,
+                endpoint_location=endpoint.endpoint_location,
+                endpoint_monitor_status=endpoint.endpoint_monitor_status,
+                min_child_endpoints=endpoint.min_child_endpoints,
+                geo_mapping=endpoint.geo_mapping
+            ))
     return result
 
 
@@ -237,13 +224,10 @@ def create_monitor_config_instance(monitor_config):
         protocol=monitor_config['protocol'],
         port=monitor_config['port'],
         path=monitor_config['path'],
-        interval_in_seconds=monitor_config['interval_in_seconds'],
-        timeout_in_seconds=monitor_config['timeout_in_seconds'],
-        tolerated_number_of_failures=monitor_config['tolerated_number_of_failures']
+        interval_in_seconds=monitor_config['interval'],
+        timeout_in_seconds=monitor_config['timeout'],
+        tolerated_number_of_failures=monitor_config['tolerated_failures']
     )
-
-def create_endpoints(endpoints):
-    return [create_endpoint_instance(endpoint) for endpoint in endpoints]
 
 
 dns_config_spec = dict(
@@ -256,13 +240,13 @@ monitor_config_spec = dict(
     protocol=dict(type='str'),
     port=dict(type='int'),
     path=dict(type='str'),
-    interval_in_seconds=dict(type='int'),
-    timeout_in_seconds=dict(type='int'),
-    tolerated_number_of_failures=dict(type='int')
+    interval=dict(type='int'),
+    timeout=dict(type='int'),
+    tolerated_failures=dict(type='int')
 )
 
 
-class AzureRMTrafficManagerProfiles(AzureRMModuleBase):
+class AzureRMTrafficManagerProfile(AzureRMModuleBase):
 
     def __init__(self):
         self.module_arg_spec = dict(
@@ -284,13 +268,13 @@ class AzureRMTrafficManagerProfiles(AzureRMModuleBase):
             ),
             profile_status=dict(
                 type='str',
-                default='Enabled',
-                choices=['Enabled', 'Disabled']
+                default='enabled',
+                choices=['enabled', 'disabled']
             ),
-            traffic_routing_method=dict(
+            routing_method=dict(
                 type='str',
-                default='Performance',
-                choices=['Performance', 'Priority', 'Weighted', 'Geographic']
+                default='performance',
+                choices=['performance', 'priority', 'weighted', 'geographic']
             ),
             dns_config=dict(
                 type='dict',
@@ -304,7 +288,7 @@ class AzureRMTrafficManagerProfiles(AzureRMModuleBase):
                     path='/'
                 ),
                 options=monitor_config_spec
-            )
+            ),
         )
 
         self.resource_group = None
@@ -313,17 +297,18 @@ class AzureRMTrafficManagerProfiles(AzureRMModuleBase):
         self.tags = None
         self.location = None
         self.profile_status = None
-        self.traffic_routing_method = None
+        self.routing_method = None
         self.dns_config = None
         self.monitor_config = None
+        self.endpoints_copy = None
 
         self.results = dict(
             changed=False
         )
 
-        super(AzureRMTrafficManagerProfiles, self).__init__(derived_arg_spec=self.module_arg_spec,
-                                                    supports_check_mode=True,
-                                                    support_tags=True)
+        super(AzureRMTrafficManagerProfile, self).__init__(derived_arg_spec=self.module_arg_spec,
+                                                           supports_check_mode=True,
+                                                           supports_tags=True)
 
     def exec_module(self, **kwargs):
 
@@ -360,7 +345,7 @@ class AzureRMTrafficManagerProfiles(AzureRMModuleBase):
                 self.log("Need to Create / Update the Traffic Manager profile")
 
                 if not self.check_mode:
-                    self.results = self.ceate_update_traffic_manager_profile()
+                    self.results = shorten_traffic_manager_dict(self.ceate_update_traffic_manager_profile())
                     self.log("Creation / Update done.")
 
                 self.results['changed'] = True
@@ -390,6 +375,7 @@ class AzureRMTrafficManagerProfiles(AzureRMModuleBase):
             response = self.traffic_manager_management_client.profiles.get(self.resource_group, self.name)
             self.log("Response : {0}".format(response))
             self.log("Traffic Manager profile : {0} found".format(response.name))
+            self.endpoints_copy = response.endpoints if response and response.endpoints else None
             return traffic_manager_profile_to_dict(response)
         except CloudError:
             self.log('Did not find the Traffic Manager profile.')
@@ -422,9 +408,10 @@ class AzureRMTrafficManagerProfiles(AzureRMModuleBase):
             tags=self.tags,
             location=self.location,
             profile_status=self.profile_status,
-            traffic_routing_method=self.traffic_routing_method,
+            traffic_routing_method=self.routing_method,
             dns_config=create_dns_config_instance(self.dns_config) if self.dns_config else None,
-            monitor_config=create_monitor_config_instance(self.monitor_config) if self.monitor_config else None
+            monitor_config=create_monitor_config_instance(self.monitor_config) if self.monitor_config else None,
+            endpoints=self.endpoints_copy
         )
         try:
             response = self.traffic_manager_management_client.profiles.create_or_update(self.resource_group, self.name, parameters)
@@ -438,12 +425,12 @@ class AzureRMTrafficManagerProfiles(AzureRMModuleBase):
             self.log("Location Diff - Origin {0} / Update {1}".format(response['location'], self.location))
             return True
 
-        if response['profile_status'] != self.profile_status:
+        if response['profile_status'].lower() != self.profile_status.lower():
             self.log("Profile Status Diff - Origin {0} / Update {1}".format(response['profile_status'], self.profile_status))
             return True
 
-        if response['traffic_routing_method'] != self.traffic_routing_method:
-            self.log("Traffic Routing Method Diff - Origin {0} / Update {1}".format(response['traffic_routing_method'], self.traffic_routing_method))
+        if response['routing_method'].lower() != self.routing_method.lower():
+            self.log("Traffic Routing Method Diff - Origin {0} / Update {1}".format(response['routing_method'], self.routing_method))
             return True
 
         if (response['dns_config']['relative_name'] != self.dns_config['relative_name'] or response['dns_config']['ttl'] != self.dns_config['ttl']):
@@ -455,13 +442,12 @@ class AzureRMTrafficManagerProfiles(AzureRMModuleBase):
                 if str(v).lower() != str(response['monitor_config'][k]).lower():
                     self.log("Monitor Config Diff - Origin {0} / Update {1}".format(response['monitor_config'], self.monitor_config))
                     return True
-
         return False
 
 
 def main():
     """Main execution"""
-    AzureRMTrafficManagerProfiles()
+    AzureRMTrafficManagerProfile()
 
 
 if __name__ == '__main__':

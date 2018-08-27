@@ -190,7 +190,7 @@
     name: "{{ endpointname2 }}"
     type: externalEndpoints
     location: westus
-    priority: `
+    priority: 1
     weight: 3
     target: test.com
 
@@ -248,14 +248,14 @@
       - facts.endpoints.length == 1
 
 - name: Delete the Traffic Manager profile(check mode)
-  azure_rm_trafficmanager:
+  azure_rm_trafficmanagerprofile:
     resource_group: "{{ resource_group }}"
     name: "{{ tmname }}"
     state: absent
   check_mode: yes
 
 - name: Gather Traffic Manager profile facts
-  azure_rm_trafficmanager_facts:
+  azure_rm_trafficmanagerprofile_facts:
       resource_group: "{{ resource_group }}"
       name: "{{ tmname }}"
   register: fact
@@ -268,7 +268,7 @@
         - fact.tms[0].endpoints | length == 1
 
 - name: Delete the Traffic Manager profile
-  azure_rm_trafficmanager:
+  azure_rm_trafficmanagerprofile:
     resource_group: "{{ resource_group }}"
     name: "{{ tmname }}"
     state: absent
@@ -280,7 +280,7 @@
       - output.changed
 
 - name: Delete the Traffic Manager profile (idempotent)
-  azure_rm_trafficmanager:
+  azure_rm_trafficmanagerprofile:
     resource_group: "{{ resource_group }}"
     name: "{{ tmname }}"
     state: absent
@@ -292,7 +292,7 @@
       - not output.changed
 
 - name: Get Traffic Manager profile fact
-  azure_rm_trafficmanager_facts:
+  azure_rm_trafficmanagerprofile_facts:
       resource_group: "{{ resource_group }}"
       name: "{{ tmname }}"
   register: fact

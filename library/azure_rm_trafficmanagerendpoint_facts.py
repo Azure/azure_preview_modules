@@ -26,7 +26,7 @@ description:
 options:
     name:
         description:
-            - Limit results to a specific Traffic Manager profile.
+            - Limit results to a specific Traffic Manager endpoint.
     resource_group:
         description:
             - The resource group to search for the desired Traffic Manager profile
@@ -240,6 +240,7 @@ def serialize_endpoint(endpoint):
         endpoint_location=endpoint.endpoint_location,
         min_child_endpoints=endpoint.min_child_endpoints,
         geo_mapping=endpoint.geo_mapping,
+        monitor_status=endpoint.endpoint_monitor_status
     )
 
 
@@ -290,16 +291,16 @@ class AzureRMTrafficManagerEndpointFacts(AzureRMModuleBase):
             self.fail("Parameter error: resource group required when filtering by name.")
 
         if self.name:
-            self.results['tms'] = self.get_item()
+            self.results['endpoints'] = self.get_item()
         elif self.resource_group:
-            self.results['tms'] = self.list_resource_group()
+            self.results['endpoints'] = self.list_resource_group()
         else:
-            self.results['tms'] = self.list_all()
+            self.results['endpoints'] = self.list_all()
 
         return self.results
 
     def get_item(self):
-        """Get a single Azure Traffic Manager"""
+        """Get a single Azure Traffic Manager endpoint"""
 
         self.log('Get properties for {0}'.format(self.name))
 
