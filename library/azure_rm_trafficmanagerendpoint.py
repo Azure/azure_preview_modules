@@ -299,39 +299,39 @@ class AzureRMTrafficManagerEndpoint(AzureRMModuleBase):
             self.fail("Error creating the Traffic Manager endpoint {0}, request id {1} - {2}".format(self.name, request_id, str(exc)))
 
     def check_update(self, response):
-        if response['location'] != self.location:
+        if self.location and response['location'] != self.location:
             self.log("Location Diff - Origin {0} / Update {1}".format(response['location'], self.location))
             return True
 
-        if response['status'] != self.endpoint_status:
+        if self.endpoint_status is not None and response['status'] != self.endpoint_status:
             self.log("Status Diff - Origin {0} / Update {1}".format(response['status'], self.endpoint_status))
             return True
 
-        if response['type'] != self.type:
+        if self.type and response['type'] != self.type:
             self.log("Type Diff - Origin {0} / Update {1}".format(response['type'], self.type))
             return True
 
-        if response['target_resource_id'] != self.target_resource_id:
+        if self.target_resource_id and response['target_resource_id'] != self.target_resource_id:
             self.log("target_resource_id Diff - Origin {0} / Update {1}".format(response['target_resource_id'], self.target_resource_id))
             return True
 
-        if response['target'] != self.target:
+        if self.target and response['target'] != self.target:
             self.log("target Diff - Origin {0} / Update {1}".format(response['target'], self.target))
             return True
 
-        if response['weight'] != self.weight:
+        if self.weight and response['weight'] != self.weight:
             self.log("weight Diff - Origin {0} / Update {1}".format(response['weight'], self.weight))
             return True
 
-        if response['priority'] != self.priority:
+        if self.priority and response['priority'] != self.priority:
             self.log("priority Diff - Origin {0} / Update {1}".format(response['priority'], self.priority))
             return True
 
-        if response['min_child_endpoints'] != self.min_child_endpoints:
+        if self.min_child_endpoints and response['min_child_endpoints'] != self.min_child_endpoints:
             self.log("min_child_endpoints Diff - Origin {0} / Update {1}".format(response['min_child_endpoints'], self.min_child_endpoints))
             return True
 
-        if response['geo_mapping'] != self.geo_mapping:
+        if self.geo_mapping and response['geo_mapping'] != self.geo_mapping:
             self.log("geo_mapping Diff - Origin {0} / Update {1}".format(response['geo_mapping'], self.geo_mapping))
             return True
 

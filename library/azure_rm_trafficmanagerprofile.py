@@ -421,19 +421,20 @@ class AzureRMTrafficManagerProfile(AzureRMModuleBase):
             self.fail("Error creating the Traffic Manager: {0}".format(exc.message))
 
     def check_update(self, response):
-        if response['location'] != self.location:
+        if self.location and response['location'] != self.location:
             self.log("Location Diff - Origin {0} / Update {1}".format(response['location'], self.location))
             return True
 
-        if response['profile_status'].lower() != self.profile_status.lower():
+        if self.profile_status and response['profile_status'].lower() != self.profile_status.lower():
             self.log("Profile Status Diff - Origin {0} / Update {1}".format(response['profile_status'], self.profile_status))
             return True
 
-        if response['routing_method'].lower() != self.routing_method.lower():
+        if self.routing_method and response['routing_method'].lower() != self.routing_method.lower():
             self.log("Traffic Routing Method Diff - Origin {0} / Update {1}".format(response['routing_method'], self.routing_method))
             return True
 
-        if (response['dns_config']['relative_name'] != self.dns_config['relative_name'] or response['dns_config']['ttl'] != self.dns_config['ttl']):
+        if self.dns_config and \
+           (response['dns_config']['relative_name'] != self.dns_config['relative_name'] or response['dns_config']['ttl'] != self.dns_config['ttl']):
             self.log("DNS Config Diff - Origin {0} / Update {1}".format(response['dns_config'], self.dns_config))
             return True
 
