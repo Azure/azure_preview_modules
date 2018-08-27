@@ -67,7 +67,7 @@ options:
             - This is an optional parameter. If specified, it must be specified on all endpoints.
             - No two endpoints can share the same priority value.
         type: int
-    endpoint_location:
+    location:
         description:
             - Specifies the location of the external or nested endpoints when using the 'Performance' traffic routing method.
         type: str
@@ -154,6 +154,7 @@ class AzureRMTrafficManagerEndpoint(AzureRMModuleBase):
                 choices=['azureEndpoints', 'externalEndpoints', 'nestedEndpoints'],
                 required=True
             ),
+            target=dict(type='str')
             target_resource_id=dict(type='str'),
             enable=dict(type='bool', default=True),
             weight=dict(type='int'),

@@ -15,8 +15,8 @@
           delete: on-exit
           foo: bar
       location: global
-      profile_status: Enabled
-      traffic_routing_method: Performance
+      profile_status: enabled
+      routing_method: performance
       dns_config: 
         relative_name: "{{ tmname }}"
         ttl: 60
@@ -44,8 +44,8 @@
           delete: on-exit
           foo: bar
       location: global
-      profile_status: Enabled
-      traffic_routing_method: Performance
+      profile_status: enabled
+      routing_method: performance
       dns_config: 
         relative_name: "{{ tmname }}"
         ttl: 60
@@ -83,8 +83,8 @@
           delete: on-exit
           foo: bar
       location: global
-      profile_status: Enabled
-      traffic_routing_method: Performance
+      profile_status: enabled
+      routing_method: performance
       dns_config: 
         relative_name: "{{ tmname }}"
         ttl: 60
@@ -108,8 +108,8 @@
           delete: on-exit
           foo: bar
       location: global
-      profile_status: Disabled
-      traffic_routing_method: Priority
+      profile_status: disabled
+      routing_method: priority
       dns_config: 
         relative_name: "{{ tmname }}"
         ttl: 60
