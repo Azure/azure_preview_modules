@@ -147,8 +147,9 @@ import re
 AZURE_OBJECT_CLASS = 'TrafficManagerEndpoints'
 
 
-def serialize_endpoint(endpoint):
+def serialize_endpoint(endpoint, resource_grorup):
     return dict(
+        resource_gropu=resource_group,
         id=endpoint.id,
         name=endpoint.name,
         type=endpoint.type,
@@ -252,7 +253,7 @@ class AzureRMTrafficManagerEndpointFacts(AzureRMModuleBase):
         results = []
         if response and response.endpoints:
             for endpoint in response.endpoints:
-                results.append(serialize_endpoint(endpoint))
+                results.append(serialize_endpoint(endpoint, self.resource_grorup))
 
         return results
 
@@ -269,7 +270,7 @@ class AzureRMTrafficManagerEndpointFacts(AzureRMModuleBase):
             if item.endpoints:
                 for endpoint in item.endpoints:
                     if endpoint.type == self.type:
-                        results.append(serialize_endpoint(endpoint))
+                        results.append(serialize_endpoint(endpoint, self.resource_grorup))
         return results
 
 
