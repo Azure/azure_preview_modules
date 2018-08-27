@@ -218,13 +218,13 @@ class AzureRMTrafficManagerEndpoint(AzureRMModuleBase):
                 if to_be_update:
                     self.action = Actions.CreateOrUpdate
 
-            elif state == 'absent':
+            elif self.state == 'absent':
                 # delete
                 self.action = Actions.Delete
         else:
             if self.state == 'present':
                 self.action = Actions.CreateOrUpdate
-            elif state == 'absent':
+            elif self.state == 'absent':
                 # delete when no exists
                 self.fail("Traffic Manager endpoint {0} not exists.".format(self.name))
 

@@ -169,7 +169,7 @@ tms:
                         - The fully-qualified DNS name of the endpoint.
                     type: str
                     sample: 8.8.8.8
-                endpoint_status:
+                status:
                     description:
                         - The status of the endpoint.
                     type: str
@@ -184,7 +184,7 @@ tms:
                         - The priority of this endpoint when using the 'Priority' traffic routing method.
                     type: str
                     sample: 3
-                endpoint_location:
+                location:
                     description:
                         - The location of the external or nested endpoints when using the 'Performance' traffic routing method.
                     type: str
@@ -225,10 +225,10 @@ def serialize_endpoint(endpoint):
         type=endpoint.type,
         target_resource_id=endpoint.target_resource_id,
         target=endpoint.target,
-        endpoint_status=endpoint.endpoint_status,
+        status=endpoint.endpoint_status,
         weight=endpoint.weight,
         priority=endpoint.priority,
-        endpoint_location=endpoint.endpoint_location,
+        location=endpoint.endpoint_location,
         min_child_endpoints=endpoint.min_child_endpoints,
         geo_mapping=endpoint.geo_mapping,
     )

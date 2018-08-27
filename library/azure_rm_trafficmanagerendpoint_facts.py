@@ -52,161 +52,85 @@ author:
 '''
 
 EXAMPLES = '''
-    - name: Get facts for one Traffic Manager profile
-      azure_rm_trafficmanager_facts:
-        name: Testing
+    - name: Get endpoints fact of a Traffic Manager profile
+      azure_rm_trafficmanagerendpoint_facts:
         resource_group: TestRG
+        profile_name: Testing
 
-    - name: Get facts for all Traffic Manager profiles
+    - name: Get specific endpoint of a Traffic Manager profiel
       azure_rm_trafficmanager_facts:
+        resource_group: TestRG
+        profile_name: Testing
+        name: test_external_endpoint
 
 '''
 
 RETURN = '''
-tms:
+endpoints:
     description: List of Traffic Manager endpoints.
     returned: always
     type: complex
     contains:
         resource_group:
             description:
-                - Name of a resource group where the Traffic Manager profile exists.
+                - Name of a resource group.
             returned: always
             type: str
             sample: testGroup
         name:
             description:
-                - Name of the Traffic Manager profile.
+                - Name of the Traffic Manager endpoint.
             returned: always
             type: str
-            sample: testTm
-        state:
+            sample: testendpoint
+        type:
             description:
-                - The state of the Traffic Manager profile.
+                - The type of the endpoint. Ex- Microsoft.network/TrafficManagerProfiles/ExternalEndpoints.
             type: str
-            sample: present
-        location:
+            sample: Microsoft.Network/trafficManagerProfiles/externalEndpoints
+        target_resource_id:
             description:
-                - Location of the Traffic Manager profile.
+                - The Azure Resource URI of the of the endpoint.
             type: str
-            sample: global
-        profile_status:
+            sample: /subscriptions/XXXXXX...XXXXXXXXX/resourceGroups/vscjavaci/providers/Microsoft.ClassicCompute/domainNames/vscjavaci
+        target:
             description:
-                - The status of the Traffic Manager profile.
+                - The fully-qualified DNS name of the endpoint.
+            type: str
+            sample: 8.8.8.8
+        enable:
+            description:
+                - The status of the endpoint.
             type: str
             sample: Enabled
-        traffic_routing_method:
+        weight:
             description:
-                - The traffic routing method of the Traffic Manager profile.
+                - The weight of this endpoint when using the 'Weighted' traffic routing method.
+            type: int
+            sample: 10
+        priority:
+            description:
+                - The priority of this endpoint when using the 'Priority' traffic routing method.
             type: str
-            sample: Performance
-        dns_config:
+            sample: 3
+        location:
             description:
-                - The DNS settings of the Traffic Manager profile.
-            type: complex
-            sample:
-                relative_name: testTm
-                fqdn: testTm.trafficmanager.net
-                ttl: 60
-        monitor_config:
+                - The location of the external or nested endpoints when using the 'Performance' traffic routing method.
+            type: str
+            sample: East US
+        min_child_endpoints:
             description:
-                - The endpoint monitoring settings of the Traffic Manager profile.
-            type: complex
-            contains:
-                protocol:
-                    description:
-                        - The protocol (HTTP, HTTPS or TCP) used to probe for endpoint health.
-                    type: str
-                    sample: HTTP
-                port:
-                    description:
-                        - The TCP port used to probe for endpoint health.
-                    type: int
-                    sample: 80
-                path:
-                    description:
-                        - The path relative to the endpoint domain name used to probe for endpoint health.
-                    type: str
-                    sample: /
-                interval_in_seconds:
-                    description:
-                        - The monitor interval for endpoints in this profile.
-                    type: int
-                    sample: 10
-                timeout_in_seconds:
-                    description:
-                        - The monitor timeout for endpoints in this profile.
-                    type: int
-                    sample: 30
-                tolerated_number_of_failures:
-                    description:
-                        - The number of consecutive failed health check before declaring an endpoint Degraded after the next failed health check.
-                    type: int
-                    sample: 3
-        endpoints:
+                - The minimum number of endpoints that must be available in the child profile to make the parent profile available.
+            type: int
+            sample: 3
+        geo_mapping:
             description:
-                - The list of endpoints in the Traffic Manager profile.
+                - The list of countries/regions mapped to this endpoint when using the 'Geographic' traffic routing method.
             type: list
-            element: complex
-            contains:
-                id:
-                    description:
-                        - Fully qualified resource Id for the resource.
-                    type: str
-                    sample: /subscriptions/XXXXXX...XXXXXXXXX/resourceGroups/tmt/providers/Microsoft.Network/trafficManagerProfiles/tmtest/externalEndpoints/e1
-                name:
-                    description:
-                        - The name of the endpoint.
-                    type: str
-                    sample: e1
-                type:
-                    description:
-                        - The type of the endpoint. Ex- Microsoft.network/TrafficManagerProfiles/ExternalEndpoints.
-                    type: str
-                    sample: Microsoft.Network/trafficManagerProfiles/externalEndpoints
-                target_resource_id:
-                    description:
-                        - The Azure Resource URI of the of the endpoint.
-                    type: str
-                    sample: /subscriptions/XXXXXX...XXXXXXXXX/resourceGroups/vscjavaci/providers/Microsoft.ClassicCompute/domainNames/vscjavaci
-                target:
-                    description:
-                        - The fully-qualified DNS name of the endpoint.
-                    type: str
-                    sample: 8.8.8.8
-                endpoint_status:
-                    description:
-                        - The status of the endpoint.
-                    type: str
-                    sample: Enabled
-                weight:
-                    description:
-                        - The weight of this endpoint when using the 'Weighted' traffic routing method.
-                    type: int
-                    sample: 10
-                priority:
-                    description:
-                        - The priority of this endpoint when using the 'Priority' traffic routing method.
-                    type: str
-                    sample: 3
-                endpoint_location:
-                    description:
-                        - The location of the external or nested endpoints when using the 'Performance' traffic routing method.
-                    type: str
-                    sample: East US
-                min_child_endpoints:
-                    description:
-                        - The minimum number of endpoints that must be available in the child profile to make the parent profile available.
-                    type: int
-                    sample: 3
-                geo_mapping:
-                    description:
-                        - The list of countries/regions mapped to this endpoint when using the 'Geographic' traffic routing method.
-                    type: list
-                    sample: [
-                        "GEO-NA",
-                        "GEO-AS"
-                    ]
+            sample: [
+                "GEO-NA",
+                "GEO-AS"
+                ]
 '''
 
 from ansible.module_utils.azure_rm_common import AzureRMModuleBase
@@ -230,10 +154,10 @@ def serialize_endpoint(endpoint):
         type=endpoint.type,
         target_resource_id=endpoint.target_resource_id,
         target=endpoint.target,
-        endpoint_status=endpoint.endpoint_status,
+        status=endpoint.endpoint_status,
         weight=endpoint.weight,
         priority=endpoint.priority,
-        endpoint_location=endpoint.endpoint_location,
+        location=endpoint.endpoint_location,
         min_child_endpoints=endpoint.min_child_endpoints,
         geo_mapping=endpoint.geo_mapping,
         monitor_status=endpoint.endpoint_monitor_status
@@ -326,10 +250,9 @@ class AzureRMTrafficManagerEndpointFacts(AzureRMModuleBase):
             self.fail('Failed to list all items - {0}'.format(str(exc)))
 
         results = []
-        for item in response:
-            if item.endpoints:
-                for endpoint in item.endpoints:
-                    results.append(serialize_endpoint(endpoint))
+        if response and response.endpoints:
+            for endpoint in response.endpoints:
+                results.append(serialize_endpoint(endpoint))
 
         return results
 
