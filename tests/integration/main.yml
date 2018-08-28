@@ -24,3 +24,10 @@
             force: True
           async: 5000
           poll: 0
+        - name: Delete second resource group
+          azure_rm_resourcegroup:
+            name: "{{ resource_group_secondary }}"
+            state: absent
+            force: True
+          async: 5000
+          poll: 0

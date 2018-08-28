@@ -151,7 +151,7 @@ try:
     from azure.mgmt.containerservice import ContainerServiceClient
     from azure.storage.cloudstorageaccount import CloudStorageAccount
     from adal.authentication_context import AuthenticationContext
-    from azure.mgmt.cdn import CdnManagementClient	
+    from azure.mgmt.cdn import CdnManagementClient
     from azure.mgmt.trafficmanager import TrafficManagerManagementClient
     from azure.mgmt.rdbms.postgresql import PostgreSQLManagementClient
     from azure.mgmt.rdbms.mysql import MySQLManagementClient
@@ -220,7 +220,7 @@ AZURE_PKG_VERSIONS = {
     'TrafficManagerManagementClient': {	
         'package_name': 'trafficmanager',	
         'expected_version': '0.50.0'	
-    }
+    },
     'DnsManagementClient': {
         'package_name': 'dns',
         'expected_version': '1.2.0'
