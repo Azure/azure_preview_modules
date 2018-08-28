@@ -151,6 +151,8 @@ try:
     from azure.mgmt.containerservice import ContainerServiceClient
     from azure.storage.cloudstorageaccount import CloudStorageAccount
     from adal.authentication_context import AuthenticationContext
+    from azure.mgmt.cdn import CdnManagementClient	
+    from azure.mgmt.trafficmanager import TrafficManagerManagementClient
     from azure.mgmt.rdbms.postgresql import PostgreSQLManagementClient
     from azure.mgmt.rdbms.mysql import MySQLManagementClient
 except ImportError as exc:
@@ -211,6 +213,14 @@ AZURE_PKG_VERSIONS = {
         'package_name': 'resource',
         'expected_version': '1.2.2'
     },
+    'CdnManagementClient': {	
+        'package_name': 'cdn',	
+        'expected_version': '3.0.0'	
+    },	
+    'TrafficManagerManagementClient': {	
+        'package_name': 'trafficmanager',	
+        'expected_version': '0.50.0'	
+    }
     'DnsManagementClient': {
         'package_name': 'dns',
         'expected_version': '1.2.0'
@@ -274,6 +284,8 @@ class AzureRMModuleBase(object):
         self._dns_client = None
         self._web_client = None
         self._containerservice_client = None
+        self._cdn_management_client = None
+        self._traffic_manager_management_client = None
         self._mysql_client = None
         self._postgresql_client = None
         self._adfs_authority_url = None
@@ -1059,6 +1071,22 @@ class AzureRMModuleBase(object):
             self._containerservice_client = self.get_mgmt_svc_client(ContainerServiceClient,
                                                                      base_url=self._cloud_environment.endpoints.resource_manager)
         return self._containerservice_client
+
+    @property
+    def cdn_management_client(self):
+        self.log('Getting cdn management client')
+        if not self._cdn_management_client:
+            self._cdn_management_client = self.get_mgmt_svc_client(CdnManagementClient,
+                                                                   base_url=self._cloud_environment.endpoints.resource_manager)
+        return self._cdn_management_client
+
+    @property
+    def traffic_manager_management_client(self):
+        self.log('Getting traffic manager client')
+        if not self._traffic_manager_management_client:
+            self._traffic_manager_management_client = self.get_mgmt_svc_client(TrafficManagerManagementClient,
+                                                                               base_url=self._cloud_environment.endpoints.resource_manager)
+        return self._traffic_manager_management_client
 
     @property
     def postgresql_client(self):
