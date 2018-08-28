@@ -545,7 +545,7 @@ class AzureRMWebApps(AzureRMModuleBase):
                             self.fail("Linux web app only supports tomcat container.")
 
                         if self.frameworks[0]['settings'] and self.frameworks[0]['settings']['java_container'].lower() == 'tomcat':
-                            self.site_config['linux_fx_version'] = 'TOMCAT|' + self.frameworks[0]['settings']['java_container_version']  + '-jre8'
+                            self.site_config['linux_fx_version'] = 'TOMCAT|' + self.frameworks[0]['settings']['java_container_version'] + '-jre8'
                         else:
                             self.site_config['linux_fx_version'] = 'JAVA|8-jre8'
                 else:
@@ -555,10 +555,11 @@ class AzureRMWebApps(AzureRMModuleBase):
                         else:
                             self.site_config[fx.get('name') + '_version'] = fx.get('version')
 
-                for fx in self.frameworks:
-                    if 'settings' in fx and fx['settings'] is not None:
-                        for key, value in fx['settings'].items():
-                            self.site_config[key] = value
+                if not is_linux:
+                    for fx in self.frameworks:
+                        if 'settings' in fx and fx['settings'] is not None:
+                            for key, value in fx['settings'].items():
+                                self.site_config[key] = value
 
             if not self.app_settings:
                 self.app_settings = dict()
