@@ -9,6 +9,7 @@ import types
 import copy
 import inspect
 import traceback
+import json
 
 from os.path import expanduser
 
@@ -36,7 +37,6 @@ AZURE_COMMON_ARGS = dict(
     cert_validation_mode=dict(type='str', choices=['validate', 'ignore']),
     api_profile=dict(type='str', default='latest'),
     adfs_authority_url=dict(type='str', default=None)
-    # debug=dict(type='bool', default=False),
 )
 
 AZURE_CREDENTIAL_ENV_MAPPING = dict(
@@ -149,10 +149,12 @@ try:
     from azure.mgmt.dns import DnsManagementClient
     from azure.mgmt.web import WebSiteManagementClient
     from azure.mgmt.containerservice import ContainerServiceClient
-    from azure.mgmt.cdn import CdnManagementClient
-    from azure.mgmt.trafficmanager import TrafficManagerManagementClient
     from azure.storage.cloudstorageaccount import CloudStorageAccount
     from adal.authentication_context import AuthenticationContext
+    from azure.mgmt.cdn import CdnManagementClient
+    from azure.mgmt.trafficmanager import TrafficManagerManagementClient
+    from azure.mgmt.rdbms.postgresql import PostgreSQLManagementClient
+    from azure.mgmt.rdbms.mysql import MySQLManagementClient
 except ImportError as exc:
     HAS_AZURE_EXC = exc
     HAS_AZURE = False
@@ -211,6 +213,14 @@ AZURE_PKG_VERSIONS = {
         'package_name': 'resource',
         'expected_version': '1.2.2'
     },
+    'CdnManagementClient': {	
+        'package_name': 'cdn',	
+        'expected_version': '3.0.0'	
+    },	
+    'TrafficManagerManagementClient': {	
+        'package_name': 'trafficmanager',	
+        'expected_version': '0.50.0'	
+    },
     'DnsManagementClient': {
         'package_name': 'dns',
         'expected_version': '1.2.0'
@@ -219,14 +229,6 @@ AZURE_PKG_VERSIONS = {
         'package_name': 'web',
         'expected_version': '0.32.0'
     },
-    'CdnManagementClient': {
-        'package_name': 'cdn',
-        'expected_version': '3.0.0'
-    },
-    'TrafficManagerManagementClient': {
-        'package_name': 'trafficmanager',
-        'expected_version': '0.50.0'
-    }
 } if HAS_AZURE else {}
 
 
@@ -284,13 +286,14 @@ class AzureRMModuleBase(object):
         self._containerservice_client = None
         self._cdn_management_client = None
         self._traffic_manager_management_client = None
+        self._mysql_client = None
+        self._postgresql_client = None
         self._adfs_authority_url = None
         self._resource = None
 
         self.check_mode = self.module.check_mode
         self.api_profile = self.module.params.get('api_profile')
         self.facts_module = facts_module
-        # self.debug = self.module.params.get('debug')
 
         # authenticate
         self.credentials = self._get_credentials(self.module.params)
@@ -443,14 +446,10 @@ class AzureRMModuleBase(object):
         self.module.deprecate(msg, version)
 
     def log(self, msg, pretty_print=False):
-        pass
-        # Use only during module development
-        # if self.debug:
-        #     log_file = open('azure_rm.log', 'a')
-        #     if pretty_print:
-        #         log_file.write(json.dumps(msg, indent=4, sort_keys=True))
-        #     else:
-        #         log_file.write(msg + u'\n')
+        if pretty_print:
+            self.module.debug(json.dumps(msg, indent=4, sort_keys=True))
+        else:
+            self.module.debug(msg)
 
     def validate_tags(self, tags):
         '''
@@ -476,17 +475,20 @@ class AzureRMModuleBase(object):
         :return: bool, dict
         '''
         new_tags = copy.copy(tags) if isinstance(tags, dict) else dict()
+        param_tags = self.module.params.get('tags') if isinstance(self.module.params.get('tags'), dict) else dict()
+        append_tags = self.module.params.get('append_tags') if self.module.params.get('append_tags') is not None else True
         changed = False
-        if isinstance(self.module.params.get('tags'), dict):
-            for key, value in self.module.params['tags'].items():
-                if not new_tags.get(key) or new_tags[key] != value:
+        # check add or update
+        for key, value in param_tags.items():
+            if not new_tags.get(key) or new_tags[key] != value:
+                changed = True
+                new_tags[key] = value
+        # check remove
+        if not append_tags:
+            for key, value in tags.items():
+                if not param_tags.get(key):
+                    new_tags.pop(key)
                     changed = True
-                    new_tags[key] = value
-            if isinstance(tags, dict):
-                for key, value in tags.items():
-                    if not self.module.params['tags'].get(key):
-                        new_tags.pop(key)
-                        changed = True
         return changed, new_tags
 
     def has_tags(self, obj_tags, tag_list):
@@ -1001,7 +1003,6 @@ class AzureRMModuleBase(object):
 
     @property
     def storage_models(self):
-        self.log('Getting storage models...')
         return StorageManagementClient.models("2017-10-01")
 
     @property
@@ -1086,3 +1087,19 @@ class AzureRMModuleBase(object):
             self._traffic_manager_management_client = self.get_mgmt_svc_client(TrafficManagerManagementClient,
                                                                                base_url=self._cloud_environment.endpoints.resource_manager)
         return self._traffic_manager_management_client
+
+    @property
+    def postgresql_client(self):
+        self.log('Getting PostgreSQL client')
+        if not self._postgresql_client:
+            self._postgresql_client = self.get_mgmt_svc_client(PostgreSQLManagementClient,
+                                                               base_url=self._cloud_environment.endpoints.resource_manager)
+        return self._postgresql_client
+
+    @property
+    def mysql_client(self):
+        self.log('Getting MySQL client')
+        if not self._mysql_client:
+            self._mysql_client = self.get_mgmt_svc_client(MySQLManagementClient,
+                                                          base_url=self._cloud_environment.endpoints.resource_manager)
+        return self._mysql_client
