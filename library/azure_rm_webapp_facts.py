@@ -254,17 +254,40 @@ class AzureRMWebAppFacts(AzureRMModuleBase):
 
         return response.as_dict()
 
+    def get_webapp_publish_url(self, resource_group, name):
+        import xmltodict
+
+        self.log('Get web app {0} app publish profile'.format(name))
+
+        url = ''
+        try:
+            content = self.web_client.web_apps.list_publishing_profile_xml_with_secrets(resource_group_name=resource_group, name=name)
+            full_xml = ''
+            for f in content:
+                full_xml += f.decode()
+            profiles = xmltodict.parse(full_xml, xml_attribs=True)['publishData']['publishProfile']
+
+            for profile in profiles:
+                if profile['@publishMethod'] == 'FTP':
+                    url = profile['@publishUrl']
+
+        except CloudError as ex:
+            self.fail('Error getting web app {0} app settings'.format(name))
+
+        return url
+
     def get_curated_webapp(self, resource_group, name, webapp):
         pip = self.serialize_obj(webapp, AZURE_OBJECT_CLASS)
 
         try:
             site_config = self.list_webapp_configuration(resource_group, name)
             app_settings = self.list_webapp_appsettings(resource_group, name)
+            publish_url = self.get_webapp_publish_url(resource_group, name)
         except CloudError as ex:
             pass
-        return self.construct_curated_webapp(pip, site_config, app_settings)
+        return self.construct_curated_webapp(pip, site_config, app_settings, publish_url)
 
-    def construct_curated_webapp(self, webapp, configuration=None, app_settings=None, deployment_slot=None):
+    def construct_curated_webapp(self, webapp, configuration=None, app_settings=None, publish_url=None, deployment_slot=None):
         curated_output = dict()
         curated_output['id'] = webapp['id']
         curated_output['name'] = webapp['name']
@@ -314,6 +337,8 @@ class AzureRMWebAppFacts(AzureRMModuleBase):
             curated_output['deployment_slot'] = deployment_slot
         return curated_output
 
+        if publish_url:
+            curated_output['publish_url'] = publish_url
 
 def main():
     AzureRMWebAppFacts()
