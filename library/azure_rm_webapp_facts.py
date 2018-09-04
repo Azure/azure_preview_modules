@@ -259,7 +259,7 @@ class AzureRMWebAppFacts(AzureRMModuleBase):
 
         self.log('Get web app {0} app publish profile'.format(name))
 
-        url = ''
+        url = None
         try:
             content = self.web_client.web_apps.list_publishing_profile_xml_with_secrets(resource_group_name=resource_group, name=name)
             full_xml = ''
