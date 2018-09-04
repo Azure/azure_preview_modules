@@ -16,7 +16,7 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = '''
 ---
 module: azure_rm_sqlfirewallrule
-version_added: "2.5"
+version_added: "2.7"
 short_description: Manage Firewall Rule instance.
 description:
     - Create, update and delete instance of Firewall Rule.
@@ -36,11 +36,18 @@ options:
         required: True
     start_ip_address:
         description:
-            - "The start IP address of the firewall rule. Must be IPv4 format. Use value '0.0.0.0' to represent all Azure-internal IP addresses."
+            - The start IP address of the firewall rule. Must be IPv4 format. Use value C(0.0.0.0) to represent all Azure-internal IP addresses.
     end_ip_address:
         description:
-            - "The end IP address of the firewall rule. Must be IPv4 format. Must be greater than or equal to I(start_ip_address). Use value '0.0.0.0' to rep
-              resent all Azure-internal IP addresses."
+            - "The end IP address of the firewall rule. Must be IPv4 format. Must be greater than or equal to startIpAddress. Use value C(0.0.0.0) to represe
+               nt all Azure-internal IP addresses."
+    state:
+      description:
+        - Assert the state of the SQL Database. Use 'present' to create or update an SQL Database and 'absent' to delete it.
+      default: present
+      choices:
+        - absent
+        - present
 
 extends_documentation_fragment:
     - azure
@@ -56,8 +63,8 @@ EXAMPLES = '''
       resource_group: firewallrulecrudtest-12
       server_name: firewallrulecrudtest-6285
       name: firewallrulecrudtest-5370
-      start_ip_address: NOT FOUND
-      end_ip_address: NOT FOUND
+      start_ip_address: 172.28.10.136
+      end_ip_address: 172.28.10.138
 '''
 
 RETURN = '''
@@ -66,8 +73,8 @@ id:
         - Resource ID.
     returned: always
     type: str
-    sample: "/subscriptions/00000000-1111-2222-3333-444444444444/resourceGroups/firewallrulecrudtest-12/providers/Microsoft.Sql/servers/firewallrulecrudtest-
-            6285/firewallRules/firewallrulecrudtest-5370"
+    sample: "/subscriptions/00000000-1111-2222-3333-444444444444/resourceGroups/firewallrulecrudtest-12/providers/Microsoft.Sql/servers/firewallrulecrudtest-628
+             5/firewallRules/firewallrulecrudtest-5370"
 '''
 
 import time
@@ -124,7 +131,6 @@ class AzureRMFirewallRules(AzureRMModuleBase):
         self.end_ip_address = None
 
         self.results = dict(changed=False)
-        self.mgmt_client = None
         self.state = None
         self.to_do = Actions.NoAction
 
@@ -139,15 +145,8 @@ class AzureRMFirewallRules(AzureRMModuleBase):
             if hasattr(self, key):
                 setattr(self, key, kwargs[key])
 
-        old_response = None
-        response = None
-
-        self.mgmt_client = self.get_mgmt_svc_client(SqlManagementClient,
-                                                    base_url=self._cloud_environment.endpoints.resource_manager)
-
-        resource_group = self.get_resource_group(self.resource_group)
-
         old_response = self.get_firewallrule()
+        response = None
 
         if not old_response:
             self.log("Firewall Rule instance doesn't exist")
@@ -211,11 +210,11 @@ class AzureRMFirewallRules(AzureRMModuleBase):
         self.log("Creating / Updating the Firewall Rule instance {0}".format(self.name))
 
         try:
-            response = self.mgmt_client.firewall_rules.create_or_update(resource_group_name=self.resource_group,
-                                                                        server_name=self.server_name,
-                                                                        firewall_rule_name=self.name,
-                                                                        start_ip_address=self.start_ip_address,
-                                                                        end_ip_address=self.end_ip_address)
+            response = self.sql_client.firewall_rules.create_or_update(resource_group_name=self.resource_group,
+                                                                       server_name=self.server_name,
+                                                                       firewall_rule_name=self.name,
+                                                                       start_ip_address=self.start_ip_address,
+                                                                       end_ip_address=self.end_ip_address)
             if isinstance(response, AzureOperationPoller):
                 response = self.get_poller_result(response)
 
@@ -232,9 +231,9 @@ class AzureRMFirewallRules(AzureRMModuleBase):
         '''
         self.log("Deleting the Firewall Rule instance {0}".format(self.name))
         try:
-            response = self.mgmt_client.firewall_rules.delete(resource_group_name=self.resource_group,
-                                                              server_name=self.server_name,
-                                                              firewall_rule_name=self.name)
+            response = self.sql_client.firewall_rules.delete(resource_group_name=self.resource_group,
+                                                             server_name=self.server_name,
+                                                             firewall_rule_name=self.name)
         except CloudError as e:
             self.log('Error attempting to delete the Firewall Rule instance.')
             self.fail("Error deleting the Firewall Rule instance: {0}".format(str(e)))
@@ -250,9 +249,9 @@ class AzureRMFirewallRules(AzureRMModuleBase):
         self.log("Checking if the Firewall Rule instance {0} is present".format(self.name))
         found = False
         try:
-            response = self.mgmt_client.firewall_rules.get(resource_group_name=self.resource_group,
-                                                           server_name=self.server_name,
-                                                           firewall_rule_name=self.name)
+            response = self.sql_client.firewall_rules.get(resource_group_name=self.resource_group,
+                                                          server_name=self.server_name,
+                                                          firewall_rule_name=self.name)
             found = True
             self.log("Response : {0}".format(response))
             self.log("Firewall Rule instance : {0} found".format(response.name))
@@ -267,6 +266,7 @@ class AzureRMFirewallRules(AzureRMModuleBase):
 def main():
     """Main execution"""
     AzureRMFirewallRules()
+
 
 if __name__ == '__main__':
     main()
