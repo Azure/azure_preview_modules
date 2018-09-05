@@ -31,6 +31,11 @@ options:
     resource_group:
         description:
             - Limit results by resource group.
+    return_publish_profile:
+        description:
+            - Indicate wheather to return publishing profile of the web app.
+        default: False
+        type: bool
     tags:
         description:
             - Limit results by providing a list of tags. Format tags as 'key' or 'key:value'.
@@ -100,42 +105,46 @@ webapps:
             description:
                 - Frameworks of the application. Only returned when web app has frameworks.
             type: complex
-        properties:
-            description:
-                - Other useful properties of the web app, which is not curated to module input.
-            return: always
-            type: complex
-            contains:
-                availabilityState:
-                    description: Availability of this web app.
-                    type: str
-                defaultHostName:
-                    description: Host name of the web app.
-                    type: str
-                enabled:
-                    description: Indicate the web app enabled or not.
-                    type: bool
-                enabledHostNames:
-                    description: Enabled host names of the web app.
-                    type: list
-                hostNameSslStates:
-                    description: SSL state per host names of the web app.
-                    type: list
-                hostNames:
-                    description: host names of the web app.
-                    type: list
-                lastModifiedTimeUtc:
-                    description: Last modified date  of the web app.
-                    type: str
-                outboundIpAddresses:
-                    description: outbound ip address of the web app.
-                    type: str
-                state:
-                    description: state of the web app.  eg. running.
-                    type: str
+        availability_state:
+            description: Availability of this web app.
+            type: str
+        default_host_name:
+            description: Host name of the web app.
+            type: str
+        enabled:
+            description: Indicates the web app enabled or not.
+            type: bool
+        enabled_host_names:
+            description: Enabled host names of the web app.
+            type: list
+        host_name_ssl_states:
+            description: SSL state per host names of the web app.
+            type: list
+        host_names:
+            description: Host names of the web app.
+            type: list
+        outbound_ip_addresses:
+            description: Outbound ip address of the web app.
+            type: str
+        ftp_publish_url:
+            description: Publishing url of the web app when depeloyment type is FTP.
+            type: str
+            sample: ftp://xxxx.ftp.azurewebsites.windows.net
+        state:
+            description: State of the web app.  eg. running.
+            type: str
+        publishing_username:
+            description: Publishing profle user name.
+            returned: only when I(return_publish_profile) is True.
+            type: str
+        publishing_password:
+            description: Publishing profile password.
+            returned: only when I(return_publish_profile) is True.
+            type: str
 '''
 try:
     from msrestazure.azure_exceptions import CloudError
+    from msrestazure.azure_operation import AzureOperationPoller
     from azure.common import AzureMissingResourceHttpError, AzureHttpError
 except:
     # This is handled in azure_rm_common
@@ -153,7 +162,8 @@ class AzureRMWebAppFacts(AzureRMModuleBase):
         self.module_arg_spec = dict(
             name=dict(type='str'),
             resource_group=dict(type='str'),
-            tags=dict(type='list')
+            tags=dict(type='list'),
+            return_publish_profile=dict(type=bool, default=False)
         )
 
         self.results = dict(
@@ -164,7 +174,7 @@ class AzureRMWebAppFacts(AzureRMModuleBase):
         self.name = None
         self.resource_group = None
         self.tags = None
-        self.info_level = None
+        self.return_publish_profile = False
 
         self.framework_names = ['net_framework', 'java', 'php', 'node', 'python', 'dotnetcore', 'ruby']
 
@@ -207,7 +217,8 @@ class AzureRMWebAppFacts(AzureRMModuleBase):
         try:
             response = list(self.web_client.web_apps.list_by_resource_group(self.resource_group))
         except CloudError as exc:
-            self.fail("Error listing web apps in resource groups {0} - {1}".format(self.resource_group, str(exc)))
+            request_id = exc.request_id if exc.request_id else ''
+            self.fail("Error listing web apps in resource groups {0}, request id: {1} - {2}".format(self.resource_group, request_id, str(exc)))
 
         results = []
         for item in response:
@@ -221,7 +232,8 @@ class AzureRMWebAppFacts(AzureRMModuleBase):
         try:
             response = list(self.web_client.web_apps.list())
         except CloudError as exc:
-            self.fail("Error listing web apps: {1}".format(str(exc)))
+            request_id = exc.request_id if exc.request_id else ''
+            self.fail("Error listing web apps, request id {0} - {1}".format(request_id, str(exc)))
 
         results = []
         for item in response:
@@ -238,7 +250,8 @@ class AzureRMWebAppFacts(AzureRMModuleBase):
         try:
             response = self.web_client.web_apps.get_configuration(resource_group_name=resource_group, name=name)
         except CloudError as ex:
-            self.fail('Error getting web app {0} configuration'.format(name))
+            request_id = ex.request_id if ex.request_id else ''
+            self.fail('Error getting web app {0} configuration, request id {1} - {2}'.format(name, request_id, str(ex)))
 
         return response.as_dict()
 
@@ -250,9 +263,49 @@ class AzureRMWebAppFacts(AzureRMModuleBase):
         try:
             response = self.web_client.web_apps.list_application_settings(resource_group_name=resource_group, name=name)
         except CloudError as ex:
-            self.fail('Error getting web app {0} app settings'.format(name))
+            request_id = ex.request_id if ex.request_id else ''
+            self.fail('Error getting web app {0} app settings, request id {1} - {2}'.format(name, request_id, str(ex)))
 
         return response.as_dict()
+
+    def get_publish_credentials(self, resource_group, name):
+        self.log('Get web app {0} publish credentials'.format(name))
+        try:
+            poller = self.web_client.web_apps.list_publishing_credentials(resource_group, name)
+            if isinstance(poller, AzureOperationPoller):
+                response = self.get_poller_result(poller)
+        except CloudError as ex:
+            request_id = ex.request_id if ex.request_id else ''
+            self.fail('Error getting web app {0} publishing credentials - {1}'.format(request_id, str(ex)))
+        return response
+
+    def get_webapp_ftp_publish_url(self, resource_group, name):
+        import xmltodict
+
+        self.log('Get web app {0} app publish profile'.format(name))
+
+        url = None
+        try:
+            content = self.web_client.web_apps.list_publishing_profile_xml_with_secrets(resource_group_name=resource_group, name=name)
+            if not content:
+                return url
+
+            full_xml = ''
+            for f in content:
+                full_xml += f.decode()
+            profiles = xmltodict.parse(full_xml, xml_attribs=True)['publishData']['publishProfile']
+
+            if not profiles:
+                return url
+
+            for profile in profiles:
+                if profile['@publishMethod'] == 'FTP':
+                    url = profile['@publishUrl']
+
+        except CloudError as ex:
+            self.fail('Error getting web app {0} app settings'.format(name))
+
+        return url
 
     def get_curated_webapp(self, resource_group, name, webapp):
         pip = self.serialize_obj(webapp, AZURE_OBJECT_CLASS)
@@ -260,11 +313,24 @@ class AzureRMWebAppFacts(AzureRMModuleBase):
         try:
             site_config = self.list_webapp_configuration(resource_group, name)
             app_settings = self.list_webapp_appsettings(resource_group, name)
+            publish_cred = self.get_publish_credentials(resource_group, name)
+            ftp_publish_url = self.get_webapp_ftp_publish_url(resource_group, name)
         except CloudError as ex:
             pass
-        return self.construct_curated_webapp(pip, site_config, app_settings)
+        return self.construct_curated_webapp(webapp=pip,
+                                             configuration=site_config,
+                                             app_settings=app_settings,
+                                             deployment_slot=None,
+                                             ftp_publish_url=ftp_publish_url,
+                                             publish_credentials=publish_cred)
 
-    def construct_curated_webapp(self, webapp, configuration=None, app_settings=None, deployment_slot=None):
+    def construct_curated_webapp(self,
+                                 webapp,
+                                 configuration=None,
+                                 app_settings=None,
+                                 deployment_slot=None,
+                                 ftp_publish_url=None,
+                                 publish_credentials=None):
         curated_output = dict()
         curated_output['id'] = webapp['id']
         curated_output['name'] = webapp['name']
@@ -273,8 +339,15 @@ class AzureRMWebAppFacts(AzureRMModuleBase):
         curated_output['plan'] = webapp['properties']['serverFarmId']
         curated_output['tags'] = webapp.get('tags', None)
 
-        # add properties
-        curated_output['properties'] = webapp['properties']
+        # important properties from output. not match input arguments.
+        curated_output['app_state'] = webapp['properties']['state']
+        curated_output['availability_state'] = webapp['properties']['availabilityState']
+        curated_output['default_host_name'] = webapp['properties']['defaultHostName']
+        curated_output['host_names'] = webapp['properties']['hostNames']
+        curated_output['enabled'] = webapp['properties']['enabled']
+        curated_output['enabled_host_names'] = webapp['properties']['enabledHostNames']
+        curated_output['host_name_ssl_states'] = webapp['properties']['hostNameSslStates']
+        curated_output['outbound_ip_addresses'] = webapp['properties']['outboundIpAddresses']
 
         # curated site_config
         if configuration:
@@ -312,6 +385,15 @@ class AzureRMWebAppFacts(AzureRMModuleBase):
         # curated deploymenet_slot
         if deployment_slot:
             curated_output['deployment_slot'] = deployment_slot
+
+        # ftp_publish_url
+        if ftp_publish_url:
+            curated_output['ftp_publish_url'] = ftp_publish_url
+
+        # curated publish credentials
+        if publish_credentials and self.return_publish_profile:
+            curated_output['publishing_username'] = publish_credentials.publishing_user_name
+            curated_output['publishing_password'] = publish_credentials.publishing_password
         return curated_output
 
 
