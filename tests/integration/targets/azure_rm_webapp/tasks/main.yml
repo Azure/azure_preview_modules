@@ -249,6 +249,10 @@
           java_container_version: "8.5"
   register: output
 
+- name: Assert the web app was created
+  assert:
+    that: output.changed
+
 - name: Get facts with publish profile
   azure_rm_webapp_facts:
     resource_group: "{{ resource_group }}"
@@ -259,8 +263,4 @@
 - name: Assert publish profile returned
   assert:
     that:
-      - facts.publish_url != ''
-
-- name: Assert the web app was created
-  assert:
-    that: output.changed
+      - facts.webapps[0].ftp_publish_url != ''
