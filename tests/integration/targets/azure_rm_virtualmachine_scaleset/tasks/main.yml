@@ -345,6 +345,7 @@
     name: testVnet
     state: absent
     address_prefixes: "10.0.0.0/16"
+  ignore_errors: yes
 
 # TODO: Until we have a module to create/delete images this is the best tests
 # I can do
