@@ -226,7 +226,7 @@ class AzureRMCdnprofile(AzureRMModuleBase):
         )
 
         try:
-            poller = self.cdn_management_client.profiles.create(self.resource_group, self.name, parameters)
+            poller = self.cdn_client.profiles.create(self.resource_group, self.name, parameters)
             response = self.get_poller_result(poller)
             return cdnprofile_to_dict(response)
         except ErrorResponseException as exc:
@@ -242,7 +242,7 @@ class AzureRMCdnprofile(AzureRMModuleBase):
         self.log("Updating the Azure CDN profile instance {0}".format(self.name))
 
         try:
-            poller = self.cdn_management_client.profiles.update(self.resource_group, self.name, self.tags)
+            poller = self.cdn_client.profiles.update(self.resource_group, self.name, self.tags)
             response = self.get_poller_result(poller)
             return cdnprofile_to_dict(response)
         except ErrorResponseException as exc:
@@ -257,7 +257,7 @@ class AzureRMCdnprofile(AzureRMModuleBase):
         '''
         self.log("Deleting the CDN profile {0}".format(self.name))
         try:
-            poller = self.cdn_management_client.profiles.delete(
+            poller = self.cdn_client.profiles.delete(
                 self.resource_group, self.name)
             self.get_poller_result(poller)
             return True
@@ -275,7 +275,7 @@ class AzureRMCdnprofile(AzureRMModuleBase):
         self.log(
             "Checking if the CDN profile {0} is present".format(self.name))
         try:
-            response = self.cdn_management_client.profiles.get(self.resource_group, self.name)
+            response = self.cdn_client.profiles.get(self.resource_group, self.name)
             self.log("Response : {0}".format(response))
             self.log("CDN profile : {0} found".format(response.name))
             return cdnprofile_to_dict(response)

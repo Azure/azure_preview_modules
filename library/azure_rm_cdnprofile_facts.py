@@ -184,7 +184,7 @@ class AzureRMCdnprofileFacts(AzureRMModuleBase):
         result = []
 
         try:
-            item = self.cdn_management_client.profiles.get(
+            item = self.cdn_client.profiles.get(
                 self.resource_group, self.name)
         except ErrorResponseException:
             pass
@@ -200,7 +200,7 @@ class AzureRMCdnprofileFacts(AzureRMModuleBase):
         self.log('List all Azure CDNs within a resource group')
 
         try:
-            response = self.cdn_management_client.profiles.list_by_resource_group(
+            response = self.cdn_client.profiles.list_by_resource_group(
                 self.resource_group)
         except AzureHttpError as exc:
             self.fail('Failed to list all items - {0}'.format(str(exc)))
@@ -216,7 +216,7 @@ class AzureRMCdnprofileFacts(AzureRMModuleBase):
         """Get all Azure CDN profiles within a subscription"""
         self.log('List all CDN profiles within a subscription')
         try:
-            response = self.cdn_management_client.profiles.list()
+            response = self.cdn_client.profiles.list()
         except Exception as exc:
             self.fail("Error listing all items - {0}".format(str(exc)))
 
