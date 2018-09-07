@@ -10,7 +10,7 @@
 
 - name: Create virtual network
   azure_rm_virtualnetwork:
-    name: "{{ vnetname }}"
+    name: "{{ vnetname }}2"
     address_prefixes_cidr:
       - 10.1.0.0/16
       - 172.100.0.0/16
@@ -54,6 +54,7 @@
 - name: Gather facts by resource group, tags
   azure_rm_virtualnetwork_facts:
     resource_group: "{{ resource_group }}"
+    name: "{{ vnetname }}"
     tags:
       - testing
 
