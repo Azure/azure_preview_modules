@@ -65,6 +65,7 @@
       security_group: "{{ vm_name1 }}"
 
 - name: Create virtual machine with a single NIC
+  register: output
   azure_rm_virtualmachine:
       resource_group: "{{ resource_group }}"
       name: "{{ vm_name1 }}"
@@ -86,7 +87,6 @@
       custom_data: |
         #!/bin/sh
         echo "custom_data was executed" > /tmp/custom_data.txt
-  register: output
 
 - assert:
       that:
@@ -244,6 +244,7 @@
       that: azure_publicipaddresses | length == 0
 
 - name: Create virtual machine without public ip address
+  register: output
   azure_rm_virtualmachine:
       resource_group: "{{ resource_group }}"
       name: testvmnoip
@@ -259,7 +260,6 @@
         publisher: Canonical
         sku: 16.04-LTS
         version: latest
-  register: output
 
 - assert:
       that:
@@ -310,6 +310,7 @@
   loop: "{{ niclist }}"
 
 - name: Create virtual machine with two NICs
+  register: output
   azure_rm_virtualmachine:
       resource_group: "{{ resource_group }}"
       name: "{{ vm_name2 }}"
@@ -329,7 +330,6 @@
         publisher: Canonical
         sku: 16.04-LTS
         version: latest
-  register: output
 
 - assert:
       that:
@@ -345,15 +345,15 @@
   debug:
     var: results
 
-# - name: Assert that facts module returned the second vm
-#   assert:
-#     that: 
-#       - results.vms | length == 1
-#       - results.vms[0].name == "{{ vm_name2 }}"
-#       - results.vms[0].location == 'eastus'
-#       - results.vms[0].admin_username == 'adminuser'
-#       - results.vms[0].resource_group == "{{ resource_group }}"
-#       - results.vms[0].power_state != None
+- name: Assert that facts module returned the second vm
+  assert:
+    that: 
+      - results.vms | length == 1
+      - results.vms[0].name == "{{ vm_name2 }}"
+      - results.vms[0].location == 'eastus'
+      - results.vms[0].admin_username == 'adminuser'
+      - results.vms[0].resource_group == "{{ resource_group }}"
+      - results.vms[0].power_state != None
 
 - name: Should be idempotent with a dual NICs
   azure_rm_virtualmachine:
