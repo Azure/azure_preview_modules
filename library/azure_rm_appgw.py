@@ -105,6 +105,30 @@ options:
             name:
                 description:
                     - Name of the resource that is unique within a resource group. This name can be used to access the resource.
+    redirect_configurations:
+        description:
+            - Redirect configurations of the application gateway resource
+        suboptions:
+            redirect_type:
+                description:
+                    - Redirection type
+                choices:
+                    - 'permanent'
+                    - 'found'
+                    - 'see_other'
+                    - 'temporary'
+            target_listener:
+                description:
+                    - Reference to a listener to redirect the request to
+            include_path:
+                description:
+                    - Include path in the redirected url
+            include_query_string:
+                description:
+                    - Include query string in the redirected url
+            name:
+                description:
+                    - Name of the resource that is unique within a resource group
     ssl_certificates:
         description:
             - SSL certificates of the application gateway resource.
@@ -170,10 +194,41 @@ options:
             name:
                 description:
                     - Resource that is unique within a resource group. This name can be used to access the resource.
+    probes:
+        description:
+            - Probes available to the application gateway resource.
+        suboptions:
+            name:
+                description:
+                    - Name
+            protocol:
+                description:
+                    - Protocol
+                choices:
+                    - 'http'
+                    - 'https'
+            host:
+                description:
+                    - Host
+            path:
+                description:
+                    - Path
+            timeout:
+                description:
+                    - Timeout
+            interval:
+                description:
+                    - Interval
+            unhealthy_threshold:
+                description:
+                    - Unhealthy Threshold
     backend_http_settings_collection:
         description:
             - Backend http settings of the application gateway resource.
         suboptions:
+            probe:
+                description:
+                    - Probe
             port:
                 description:
                     - Port
@@ -265,6 +320,9 @@ options:
             name:
                 description:
                     - Name of the resource that is unique within a resource group. This name can be used to access the resource.
+            redirect_configuration:
+                description:
+                    - Redirect configuration resource of the application gateway
     state:
         description:
             - Assert the state of the Public IP. Use 'present' to create or update a and
@@ -387,6 +445,9 @@ class AzureRMApplicationGateways(AzureRMModuleBase):
             ssl_certificates=dict(
                 type='list'
             ),
+            redirect_configurations=dict(
+                type='list'
+            ),
             frontend_ip_configurations=dict(
                 type='list'
             ),
@@ -397,6 +458,9 @@ class AzureRMApplicationGateways(AzureRMModuleBase):
                 type='list'
             ),
             backend_http_settings_collection=dict(
+                type='list'
+            ),
+            probes=dict(
                 type='list'
             ),
             http_listeners=dict(
@@ -475,6 +539,19 @@ class AzureRMApplicationGateways(AzureRMModuleBase):
                     self.parameters["authentication_certificates"] = kwargs[key]
                 elif key == "ssl_certificates":
                     self.parameters["ssl_certificates"] = kwargs[key]
+                elif key == "redirect_configurations":
+                    ev = kwargs[key]
+                    for i in range(len(ev)):
+                        item = ev[i]
+                        if 'redirect_type' in item:
+                            item['redirect_type'] = _snake_to_camel(item['redirect_type'], True)
+                        if 'target_listener' in item:
+                            id = http_listener_id(self.subscription_id,
+                                                  kwargs['resource_group'],
+                                                  kwargs['name'],
+                                                  item['target_listener'])
+                            item['target_listener'] = {'id': id}
+                    self.parameters["redirect_configurations"] = ev
                 elif key == "frontend_ip_configurations":
                     ev = kwargs[key]
                     for i in range(len(ev)):
@@ -491,6 +568,13 @@ class AzureRMApplicationGateways(AzureRMModuleBase):
                     self.parameters["frontend_ports"] = kwargs[key]
                 elif key == "backend_address_pools":
                     self.parameters["backend_address_pools"] = kwargs[key]
+                elif key == "probes":
+                    ev = kwargs[key]
+                    for i in range(len(ev)):
+                        item = ev[i]
+                        if 'protocol' in item:
+                            item['protocol'] = _snake_to_camel(item['protocol'], True)
+                    self.parameters["probes"] = ev
                 elif key == "backend_http_settings_collection":
                     ev = kwargs[key]
                     for i in range(len(ev)):
@@ -499,6 +583,12 @@ class AzureRMApplicationGateways(AzureRMModuleBase):
                             item['protocol'] = _snake_to_camel(item['protocol'], True)
                         if 'cookie_based_affinity' in item:
                             item['cookie_based_affinity'] = _snake_to_camel(item['cookie_based_affinity'], True)
+                        if 'probe' in item:
+                            id = probe_id(self.subscription_id,
+                                          kwargs['resource_group'],
+                                          kwargs['name'],
+                                          item['probe'])
+                            item['probe'] = {'id': id}
                     self.parameters["backend_http_settings_collection"] = ev
                 elif key == "http_listeners":
                     ev = kwargs[key]
@@ -517,6 +607,12 @@ class AzureRMApplicationGateways(AzureRMModuleBase):
                                                   kwargs['name'],
                                                   item['frontend_port'])
                             item['frontend_port'] = {'id': id}
+                        if 'ssl_certificate' in item:
+                            id = ssl_certificate_id(self.subscription_id,
+                                                              kwargs['resource_group'],
+                                                              kwargs['name'],
+                                                              item['ssl_certificate'])
+                            item['ssl_certificate'] = {'id': id}
                         if 'protocol' in item:
                             item['protocol'] = _snake_to_camel(item['protocol'], True)
                         ev[i] = item
@@ -547,6 +643,12 @@ class AzureRMApplicationGateways(AzureRMModuleBase):
                             item['protocol'] = _snake_to_camel(item['protocol'], True)
                         if 'rule_type' in ev:
                             item['rule_type'] = _snake_to_camel(item['rule_type'], True)
+                        if 'redirect_configuration' in item:
+                            id = redirect_configuration_id(self.subscription_id,
+                                                  kwargs['resource_group'],
+                                                  kwargs['name'],
+                                                  item['redirect_configuration'])
+                            item['redirect_configuration'] = {'id': id}
                         ev[i] = item
                     self.parameters["request_routing_rules"] = ev
                 elif key == "etag":
@@ -587,9 +689,11 @@ class AzureRMApplicationGateways(AzureRMModuleBase):
                     not compare_arrays(old_response, self.parameters, 'authentication_certificates') or
                     not compare_arrays(old_response, self.parameters, 'gateway_ip_configurations') or
                     not compare_arrays(old_response, self.parameters, 'ssl_certificates') or
+                    not compare_arrays(old_response, self.parameters, 'redirect_configurations') or
                     not compare_arrays(old_response, self.parameters, 'frontend_ip_configurations') or
                     not compare_arrays(old_response, self.parameters, 'frontend_ports') or
                     not compare_arrays(old_response, self.parameters, 'backend_address_pools') or
+                    not compare_arrays(old_response, self.parameters, 'probes') or
                     not compare_arrays(old_response, self.parameters, 'backend_http_settings_collection') or
                     not compare_arrays(old_response, self.parameters, 'request_routing_rules') or
                     not compare_arrays(old_response, self.parameters, 'http_listeners')):
@@ -711,6 +815,24 @@ def frontend_ip_configuration_id(subscription_id, resource_group_name, appgw_nam
         name
     )
 
+def ssl_certificate_id(subscription_id, resource_group_name, appgw_name, name):
+    """Generate the id for a SSL certificate"""
+    return '/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.Network/applicationGateways/{2}/sslCertificates/{3}'.format(
+        subscription_id,
+        resource_group_name,
+        appgw_name,
+        name
+    )
+
+def redirect_configuration_id(subscription_id, resource_group_name, appgw_name, name):
+    """Generate the id for a redirect configuration"""
+    return '/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.Network/applicationGateways/{2}/redirectConfigurations/{3}'.format(
+        subscription_id,
+        resource_group_name,
+        appgw_name,
+        name
+    )
+
 
 def frontend_port_id(subscription_id, resource_group_name, appgw_name, name):
     """Generate the id for a frontend port"""
@@ -731,6 +853,14 @@ def backend_address_pool_id(subscription_id, resource_group_name, appgw_name, na
         name
     )
 
+def probe_id(subscription_id, resource_group_name, appgw_name, name):
+    """Generate the id for a probe"""
+    return '/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.Network/applicationGateways/{2}/probes/{3}'.format(
+        subscription_id,
+        resource_group_name,
+        appgw_name,
+        name
+    )
 
 def backend_http_settings_id(subscription_id, resource_group_name, appgw_name, name):
     """Generate the id for a http settings"""
@@ -765,13 +895,20 @@ def compare_arrays(old_params, new_params, param_name):
         name = item['name']
         newd[name] = item
 
+    # Ignore data and password elements for ssl_certificate comparision since
+    # it is not returned by the API for security reasons
+    if param_name == 'ssl_certificates':
+        for ssl_certificate in newd.values():
+            ssl_certificate.pop('data')
+            ssl_certificate.pop('password')
+
     newd = dict_merge(oldd, newd)
     return newd == oldd
 
 
 def dict_merge(a, b):
     '''recursively merges dict's. not just simple a['key'] = b['key'], if
-    both a and bhave a key who's value is a dict then dict_merge is called
+    both a and b have a key who's value is a dict then dict_merge is called
     on both values and the result stored in the returned dictionary.'''
     if not isinstance(b, dict):
         return b
