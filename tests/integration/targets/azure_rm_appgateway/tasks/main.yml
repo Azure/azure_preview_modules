@@ -22,13 +22,27 @@
   register: subnet_output
 
 - name: Create instance of Application Gateway -- check mode
-  azure_rm_appgw:
+  azure_rm_appgateway:
     resource_group: "{{ resource_group }}"
     name: "appgateway{{ rpfx }}"
     sku:
       name: standard_small
       tier: standard
       capacity: 2
+    ssl_policy:
+      policy_type: predefined
+      policy_name: ssl_policy20150501
+      disabled_ssl_protocols:
+        - tls_v1_0
+      cipher_suites:
+        - tls_ecdhe_ecdsa_with_aes_256_gcm_sha384
+    authentication_certificates:
+      - name: cert1
+        data: "{{ lookup('file', 'cert1.txt') }}"
+    ssl_certificates:
+      - name: cert2
+        password: your-password
+        data: "{{ lookup('file', 'cert2.txt') }}"
     gateway_ip_configurations:
       - subnet:
           id: "{{ subnet_output.state.id }}"
@@ -52,6 +66,8 @@
     http_listeners:
       - frontend_ip_configuration: sample_gateway_frontend_ip_config
         frontend_port: ag_frontend_port
+        protocol: https
+        ssl_certificate: cert2
         name: sample_http_listener
     request_routing_rules:
       - rule_type: basic
@@ -71,13 +87,27 @@
     var: output
 
 - name: Create instance of Application Gateway
-  azure_rm_appgw:
+  azure_rm_appgateway:
     resource_group: "{{ resource_group }}"
     name: "appgateway{{ rpfx }}"
     sku:
       name: standard_small
       tier: standard
       capacity: 2
+    ssl_policy:
+      policy_type: predefined
+      policy_name: ssl_policy20150501
+      disabled_ssl_protocols:
+        - tls_v1_0
+      cipher_suites:
+        - tls_ecdhe_ecdsa_with_aes_256_gcm_sha384
+    authentication_certificates:
+      - name: cert1
+        data: "{{ lookup('file', 'cert1.txt') }}"
+    ssl_certificates:
+      - name: cert2
+        password: your-password
+        data: "{{ lookup('file', 'cert2.txt') }}"
     gateway_ip_configurations:
       - subnet:
           id: "{{ subnet_output.state.id }}"
@@ -101,6 +131,8 @@
     http_listeners:
       - frontend_ip_configuration: sample_gateway_frontend_ip_config
         frontend_port: ag_frontend_port
+        protocol: https
+        ssl_certificate: cert2
         name: sample_http_listener
     request_routing_rules:
       - rule_type: Basic
@@ -115,13 +147,27 @@
       - output.changed
 
 - name: Try to update instance of Application Gateway - no change
-  azure_rm_appgw:
+  azure_rm_appgateway:
     resource_group: "{{ resource_group }}"
     name: "appgateway{{ rpfx }}"
     sku:
       name: standard_small
       tier: standard
       capacity: 2
+    ssl_policy:
+      policy_type: predefined
+      policy_name: ssl_policy20150501
+      disabled_ssl_protocols:
+        - tls_v1_0
+      cipher_suites:
+        - tls_ecdhe_ecdsa_with_aes_256_gcm_sha384
+    authentication_certificates:
+      - name: cert1
+        data: "{{ lookup('file', 'cert1.txt') }}"
+    ssl_certificates:
+      - name: cert2
+        password: your-password
+        data: "{{ lookup('file', 'cert2.txt') }}"
     gateway_ip_configurations:
       - subnet:
           id: "{{ subnet_output.state.id }}"
@@ -145,6 +191,8 @@
     http_listeners:
       - frontend_ip_configuration: sample_gateway_frontend_ip_config
         frontend_port: ag_frontend_port
+        protocol: https
+        ssl_certificate: cert2
         name: sample_http_listener
     request_routing_rules:
       - rule_type: Basic
@@ -159,13 +207,27 @@
       - not output.changed
 
 - name: Try to update instance of Application Gateway - single change
-  azure_rm_appgw:
+  azure_rm_appgateway:
     resource_group: "{{ resource_group }}"
     name: "appgateway{{ rpfx }}"
     sku:
       name: standard_small
       tier: standard
       capacity: 2
+    ssl_policy:
+      policy_type: predefined
+      policy_name: ssl_policy20150501
+      disabled_ssl_protocols:
+        - tls_v1_0
+      cipher_suites:
+        - tls_ecdhe_ecdsa_with_aes_256_gcm_sha384
+    authentication_certificates:
+      - name: cert1
+        data: "{{ lookup('file', 'cert1.txt') }}"
+    ssl_certificates:
+      - name: cert2
+        password: your-password
+        data: "{{ lookup('file', 'cert2.txt') }}"
     gateway_ip_configurations:
       - subnet:
           id: "{{ subnet_output.state.id }}"
@@ -189,6 +251,8 @@
     http_listeners:
       - frontend_ip_configuration: sample_gateway_frontend_ip_config
         frontend_port: ag_frontend_port
+        protocol: https
+        ssl_certificate: cert2
         name: sample_http_listener
     request_routing_rules:
       - rule_type: Basic
@@ -203,7 +267,7 @@
       - output.changed
 
 - name: Delete instance of Application Gateway -- check mode
-  azure_rm_appgw:
+  azure_rm_appgateway:
     resource_group: "{{ resource_group }}"
     name: "appgateway{{ rpfx }}"
     state: absent
@@ -215,7 +279,7 @@
       - output.changed
 
 - name: Delete instance of Application Gateway
-  azure_rm_appgw:
+  azure_rm_appgateway:
     resource_group: "{{ resource_group }}"
     name: "appgateway{{ rpfx }}"
     state: absent
@@ -226,7 +290,7 @@
       - output.changed
 
 - name: Delete unexisting instance of Application Gateway
-  azure_rm_appgw:
+  azure_rm_appgateway:
     resource_group: "{{ resource_group }}"
     name: "appgateway{{ rpfx }}"
     state: absent
