@@ -15,7 +15,7 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 
 DOCUMENTATION = '''
 ---
-module: azure_rm_appgw
+module: azure_rm_appgateway
 version_added: "2.7"
 short_description: Manage Application Gateway instance.
 description:
@@ -62,6 +62,10 @@ options:
             disabled_ssl_protocols:
                 description:
                     - List of SSL protocols to be disabled on application gateway.
+                choices:
+                    - 'tls_v1_0'
+                    - 'tls_v1_1'
+                    - 'tls_v1_2'
             policy_type:
                 description:
                     - Type of SSL Policy.
@@ -72,12 +76,41 @@ options:
                 description:
                     - Name of Ssl C(predefined) policy.
                 choices:
-                    - 'app_gw_ssl_policy20150501'
-                    - 'app_gw_ssl_policy20170401'
-                    - 'app_gw_ssl_policy20170401_s'
+                    - 'ssl_policy20150501'
+                    - 'ssl_policy20170401'
+                    - 'ssl_policy20170401_s'
             cipher_suites:
                 description:
                     - List of SSL cipher suites to be enabled in the specified order to application gateway.
+                choices:
+                    - tls_ecdhe_rsa_with_aes_256_gcm_sha384
+                    - tls_ecdhe_rsa_with_aes_128_gcm_sha256
+                    - tls_ecdhe_rsa_with_aes_256_cbc_sha384
+                    - tls_ecdhe_rsa_with_aes_128_cbc_sha256
+                    - tls_ecdhe_rsa_with_aes_256_cbc_sha
+                    - tls_ecdhe_rsa_with_aes_128_cbc_sha
+                    - tls_dhe_rsa_with_aes_256_gcm_sha384
+                    - tls_dhe_rsa_with_aes_128_gcm_sha256
+                    - tls_dhe_rsa_with_aes_256_cbc_sha
+                    - tls_dhe_rsa_with_aes_128_cbc_sha
+                    - tls_rsa_with_aes_256_gcm_sha384
+                    - tls_rsa_with_aes_128_gcm_sha256
+                    - tls_rsa_with_aes_256_cbc_sha256
+                    - tls_rsa_with_aes_128_cbc_sha256
+                    - tls_rsa_with_aes_256_cbc_sha
+                    - tls_rsa_with_aes_128_cbc_sha
+                    - tls_ecdhe_ecdsa_with_aes_256_gcm_sha384
+                    - tls_ecdhe_ecdsa_with_aes_128_gcm_sha256
+                    - tls_ecdhe_ecdsa_with_aes_256_cbc_sha384
+                    - tls_ecdhe_ecdsa_with_aes_128_cbc_sha256
+                    - tls_ecdhe_ecdsa_with_aes_256_cbc_sha
+                    - tls_ecdhe_ecdsa_with_aes_128_cbc_sha
+                    - tls_dhe_dss_with_aes_256_cbc_sha256
+                    - tls_dhe_dss_with_aes_128_cbc_sha256
+                    - tls_dhe_dss_with_aes_256_cbc_sha
+                    - tls_dhe_dss_with_aes_128_cbc_sha
+                    - tls_rsa_with_3des_ede_cbc_sha
+                    - tls_dhe_dss_with_3des_ede_cbc_sha
             min_protocol_version:
                 description:
                     - Minimum version of Ssl protocol to be supported on application gateway.
@@ -101,7 +134,7 @@ options:
         suboptions:
             data:
                 description:
-                    - Certificate public data.
+                    - Certificate public data - base64 encoded pfx
             name:
                 description:
                     - Name of the resource that is unique within a resource group. This name can be used to access the resource.
@@ -111,13 +144,10 @@ options:
         suboptions:
             data:
                 description:
-                    - Base-64 encoded pfx certificate. Only applicable in PUT Request.
+                    - Base-64 encoded pfx certificate.
             password:
                 description:
-                    - Password for the pfx file specified in I(data). Only applicable in PUT request.
-            public_cert_data:
-                description:
-                    - Base-64 encoded Public cert I(data) corresponding to pfx specified in I(data). Only applicable in GET request.
+                    - Password for the pfx file specified in I(data).
             name:
                 description:
                     - Name of the resource that is unique within a resource group. This name can be used to access the resource.
@@ -286,7 +316,7 @@ author:
 
 EXAMPLES = '''
 - name: Create instance of Application Gateway
-  azure_rm_appgw:
+  azure_rm_appgateway:
     resource_group: myresourcegroup
     name: myappgateway
     sku:
@@ -337,6 +367,7 @@ id:
 import time
 from ansible.module_utils.azure_rm_common import AzureRMModuleBase
 from copy import deepcopy
+from ansible.module_utils.network.common.utils import dict_merge
 from ansible.module_utils.common.dict_transformations import (
     camel_dict_to_snake_dict, snake_dict_to_camel_dict,
     _camel_to_snake, _snake_to_camel,
@@ -354,6 +385,15 @@ except ImportError:
 
 class Actions:
     NoAction, Create, Update, Delete = range(4)
+
+
+ssl_policy_spec = dict(
+    disabled_ssl_protocols=dict(type='list'),
+    policy_type=dict(type='str', choices=['predefined', 'custom']),
+    policy_name=dict(type='str', choices=['ssl_policy20150501', 'ssl_policy20170401', 'ssl_policy20170401_s']),
+    cipher_suites=dict(type='list'),
+    min_protocol_version=dict(type='str', choices=['tls_v1_0', 'tls_v1_1', 'tls_v1_2'])
+)
 
 
 class AzureRMApplicationGateways(AzureRMModuleBase):
@@ -376,7 +416,8 @@ class AzureRMApplicationGateways(AzureRMModuleBase):
                 type='dict'
             ),
             ssl_policy=dict(
-                type='dict'
+                type='dict',
+                options=ssl_policy_spec
             ),
             gateway_ip_configurations=dict(
                 type='list'
@@ -460,7 +501,12 @@ class AzureRMApplicationGateways(AzureRMModuleBase):
                     if 'policy_type' in ev:
                         ev['policy_type'] = _snake_to_camel(ev['policy_type'], True)
                     if 'policy_name' in ev:
-                        ev['policy_name'] = _snake_to_camel(ev['policy_name'], True)
+                        if ev['policy_name'] == 'ssl_policy20150501':
+                            ev['policy_name'] = 'AppGwSslPolicy20150501'
+                        elif ev['policy_name'] == 'ssl_policy20170401':
+                            ev['policy_name'] = 'AppGwSslPolicy20170401'
+                        elif ev['policy_name'] == 'ssl_policy20170401_s':
+                            ev['policy_name'] = 'AppGwSslPolicy20170401S'
                     if 'min_protocol_version' in ev:
                         if ev['min_protocol_version'] == 'tls_v1_0':
                             ev['min_protocol_version'] = 'TLSv1_0'
@@ -468,7 +514,21 @@ class AzureRMApplicationGateways(AzureRMModuleBase):
                             ev['min_protocol_version'] = 'TLSv1_1'
                         elif ev['min_protocol_version'] == 'tls_v1_2':
                             ev['min_protocol_version'] = 'TLSv1_2'
-                    self.parameters["ssl_policy"] = ev
+                    if 'disabled_ssl_protocols' in ev:
+                        protocols = ev['disabled_ssl_protocols']
+                        if protocols is not None:
+                            for i in range(len(protocols)):
+                                if protocols[i] == 'tls_v1_0':
+                                    protocols[i] = 'TLSv1_0'
+                                elif protocols[i] == 'tls_v1_1':
+                                    protocols[i] = 'TLSv1_1'
+                                elif protocols[i] == 'tls_v1_2':
+                                    protocols[i] = 'TLSv1_2'
+                    if 'cipher_suites' in ev:
+                        suites = ev['cipher_suites']
+                        if suites is not None:
+                            for i in range(len(suites)):
+                                suites[i] = suites[i].upper()
                 elif key == "gateway_ip_configurations":
                     self.parameters["gateway_ip_configurations"] = kwargs[key]
                 elif key == "authentication_certificates":
@@ -517,6 +577,12 @@ class AzureRMApplicationGateways(AzureRMModuleBase):
                                                   kwargs['name'],
                                                   item['frontend_port'])
                             item['frontend_port'] = {'id': id}
+                        if 'ssl_certificate' in item:
+                            id = ssl_certificate_id(self.subscription_id,
+                                                    kwargs['resource_group'],
+                                                    kwargs['name'],
+                                                    item['ssl_certificate'])
+                            item['ssl_certificate'] = {'id': id}
                         if 'protocol' in item:
                             item['protocol'] = _snake_to_camel(item['protocol'], True)
                         ev[i] = item
@@ -586,7 +652,6 @@ class AzureRMApplicationGateways(AzureRMModuleBase):
                     self.parameters['sku']['capacity'] != old_response['sku']['capacity'] or
                     not compare_arrays(old_response, self.parameters, 'authentication_certificates') or
                     not compare_arrays(old_response, self.parameters, 'gateway_ip_configurations') or
-                    not compare_arrays(old_response, self.parameters, 'ssl_certificates') or
                     not compare_arrays(old_response, self.parameters, 'frontend_ip_configurations') or
                     not compare_arrays(old_response, self.parameters, 'frontend_ports') or
                     not compare_arrays(old_response, self.parameters, 'backend_address_pools') or
@@ -702,52 +767,62 @@ def public_ip_id(subscription_id, resource_group_name, name):
     )
 
 
-def frontend_ip_configuration_id(subscription_id, resource_group_name, appgw_name, name):
+def frontend_ip_configuration_id(subscription_id, resource_group_name, appgateway_name, name):
     """Generate the id for a frontend ip configuration"""
     return '/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.Network/applicationGateways/{2}/frontendIPConfigurations/{3}'.format(
         subscription_id,
         resource_group_name,
-        appgw_name,
+        appgateway_name,
         name
     )
 
 
-def frontend_port_id(subscription_id, resource_group_name, appgw_name, name):
+def frontend_port_id(subscription_id, resource_group_name, appgateway_name, name):
     """Generate the id for a frontend port"""
     return '/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.Network/applicationGateways/{2}/frontendPorts/{3}'.format(
         subscription_id,
         resource_group_name,
-        appgw_name,
+        appgateway_name,
         name
     )
 
 
-def backend_address_pool_id(subscription_id, resource_group_name, appgw_name, name):
+def ssl_certificate_id(subscription_id, resource_group_name, ssl_certificate_name, name):
+    """Generate the id for a frontend port"""
+    return '/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.Network/applicationGateways/{2}/sslCertificates/{3}'.format(
+        subscription_id,
+        resource_group_name,
+        ssl_certificate_name,
+        name
+    )
+
+
+def backend_address_pool_id(subscription_id, resource_group_name, appgateway_name, name):
     """Generate the id for an address pool"""
     return '/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.Network/applicationGateways/{2}/backendAddressPools/{3}'.format(
         subscription_id,
         resource_group_name,
-        appgw_name,
+        appgateway_name,
         name
     )
 
 
-def backend_http_settings_id(subscription_id, resource_group_name, appgw_name, name):
+def backend_http_settings_id(subscription_id, resource_group_name, appgateway_name, name):
     """Generate the id for a http settings"""
     return '/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.Network/applicationGateways/{2}/backendHttpSettingsCollection/{3}'.format(
         subscription_id,
         resource_group_name,
-        appgw_name,
+        appgateway_name,
         name
     )
 
 
-def http_listener_id(subscription_id, resource_group_name, appgw_name, name):
+def http_listener_id(subscription_id, resource_group_name, appgateway_name, name):
     """Generate the id for a http listener"""
     return '/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.Network/applicationGateways/{2}/httpListeners/{3}'.format(
         subscription_id,
         resource_group_name,
-        appgw_name,
+        appgateway_name,
         name
     )
 
@@ -769,24 +844,10 @@ def compare_arrays(old_params, new_params, param_name):
     return newd == oldd
 
 
-def dict_merge(a, b):
-    '''recursively merges dict's. not just simple a['key'] = b['key'], if
-    both a and bhave a key who's value is a dict then dict_merge is called
-    on both values and the result stored in the returned dictionary.'''
-    if not isinstance(b, dict):
-        return b
-    result = deepcopy(a)
-    for k, v in b.items():
-        if k in result and isinstance(result[k], dict):
-                result[k] = dict_merge(result[k], v)
-        else:
-            result[k] = deepcopy(v)
-    return result
-
-
 def main():
     """Main execution"""
     AzureRMApplicationGateways()
+
 
 if __name__ == '__main__':
     main()
