@@ -8,7 +8,7 @@
   azure_rm_cdnprofile:
       resource_group: "{{ resource_group }}"
       name: "{{ cdnprofilename }}"
-      sku: Standard_Akamai
+      sku: standard_akamai
       tags:
           testing: testing
           delete: on-exit
@@ -28,7 +28,7 @@
   azure_rm_cdnprofile:
       resource_group: "{{ resource_group }}"
       name: "{{ cdnprofilename }}"
-      sku: Standard_Akamai
+      sku: standard_akamai
       tags:
           testing: testing
           delete: on-exit
@@ -39,7 +39,7 @@
   assert:
     that:
       - output.changed
-      - output.name == "{{ cdnprofilename }}"
+      - output.id != ''
 
 - name: Gather CDN profile facts
   azure_rm_cdnprofile_facts:
@@ -58,7 +58,7 @@
   azure_rm_cdnprofile:
       resource_group: "{{ resource_group }}"
       name: "{{ cdnprofilename }}"
-      sku: Standard_Akamai
+      sku: standard_akamai
       tags:
           testing: testing
           delete: on-exit
@@ -74,7 +74,7 @@
   azure_rm_cdnprofile:
       resource_group: "{{ resource_group }}"
       name: "{{ cdnprofilename }}"
-      sku: Standard_Akamai
+      sku: standard_akamai
       tags:
           testing: testing
           delete: on-exit
@@ -82,11 +82,10 @@
           baz: qux
   register: output
 
-- name: Assert the CDN profile is upgraded
+- name: Assert the CDN profile is updated
   assert:
     that:
       - output.changed
-      - output.tags.baz == 'qux'
 
 - name: Delete the CDN profile(check mode)
   azure_rm_cdnprofile:
@@ -120,18 +119,6 @@
   assert:
     that:
       - output.changed
-
-- name: Delete the CDN profile (idempotent)
-  azure_rm_cdnprofile:
-    resource_group: "{{ resource_group }}"
-    name: "{{ cdnprofilename }}"
-    state: absent
-  register: output
-
-- name: Assert idempotent
-  assert:
-    that:
-      - not output.changed
 
 - name: Get CDN profile fact
   azure_rm_cdnprofile_facts:
