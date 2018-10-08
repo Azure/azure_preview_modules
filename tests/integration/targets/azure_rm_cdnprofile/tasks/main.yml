@@ -1,7 +1,7 @@
 - name: Prepare random number
   set_fact:
     cdnprofilename: "cdnprofile{{ resource_group | hash('md5') | truncate(7, True, '') }}{{ 1000 | random }}"
-    endpoint_name: "endpoint{{ resource_group | hash('md5') | truncate(7, True, '') }}{{ 1000 | random }}"
+    endpointname: "endpoint{{ resource_group | hash('md5') | truncate(7, True, '') }}{{ 1000 | random }}"
   run_once: yes
 
 
