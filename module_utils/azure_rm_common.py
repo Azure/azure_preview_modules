@@ -939,15 +939,6 @@ class AzureRMModuleBase(object):
                                                             base_url=self._cloud_environment.endpoints.resource_manager)
         return self._monitor_client
 
-    @property
-    def cdn_client(self):
-        self.log('Getting cdn management client')
-        if not self._cdn_client:
-            self._cdn_client = self.get_mgmt_svc_client(CdnManagementClient,
-                                                        base_url=self._cloud_environment.endpoints.resource_manager,
-                                                        api_version='2017-04-02')
-        return self._cdn_client
-
 
 class AzureRMAuthException(Exception):
     pass
