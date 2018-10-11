@@ -652,7 +652,7 @@ class AzureRMCdnendpoint(AzureRMModuleBase):
             self.log("is_https_allowed Diff - Origin {0} / Update {1}".format(response['is_https_allowed'], self.is_https_allowed))
             return True
 
-        if self.query_string_caching_behavior and response['query_string_caching_behavior'] != self.query_string_caching_behavior:
+        if self.query_string_caching_behavior and _snake_to_camel(response['query_string_caching_behavior']).lower() != _snake_to_camel(self.query_string_caching_behavior).lower():
             self.log("query_string_caching_behavior Diff - Origin {0} / Update {1}".format(response['query_string_caching_behavior'], self.query_string_caching_behavior))
             return True
 
