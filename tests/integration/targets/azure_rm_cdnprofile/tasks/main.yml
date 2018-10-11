@@ -141,7 +141,7 @@
   assert:
     that:
       - output.changed
-      - output.ids
+      - output.id
 
 - name: Create a Azure CDN endpoint(idempotent)
   azure_rm_cdnendpoint:
