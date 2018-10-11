@@ -474,7 +474,7 @@ class AzureRMCdnendpoint(AzureRMModuleBase):
 
         origins = []
         for item in self.origins:
-            origins.push(
+            origins.append(
                 DeepCreatedOrigin(name=item['name'],
                                   host_name=item['host_name'],
                                   http_port=item['http_port'] if 'http_port' in item else None,
