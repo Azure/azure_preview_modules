@@ -9,7 +9,6 @@
     name: "{{ vnetname1 }}"
     address_prefixes_cidr:
       - 10.1.0.0/16
-      - 172.100.0.0/16
     tags:
       testing: testing
       delete: on-exit
@@ -21,10 +20,6 @@
     name: "{{ vnetname2 }}"
     address_prefixes_cidr:
       - 10.2.0.0/24
-      - 172.17.0.0/16
-    tags:
-      testing: testing
-      delete: on-exit
     resource_group: "{{ resource_group_secondary }}"
   register: vnet2
 

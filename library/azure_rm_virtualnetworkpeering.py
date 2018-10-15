@@ -73,7 +73,7 @@ author:
 '''
 
 EXAMPLES = '''
-    - name: Create a CDN profile
+    - name: Create virtual network peering
       azure_rm_cdnprofile:
           resource_group: Testing
           name: cdntest
@@ -81,7 +81,7 @@ EXAMPLES = '''
           tags:
               testing: testing
 
-    - name: Delete the CDN profile
+    - name: Delete the virtual network peering
       azure_rm_cdnprofile:
         resource_group: Testing
         name: cdntest
@@ -247,12 +247,13 @@ class AzureRMVirtualNetworkPeering(AzureRMModuleBase):
             if response:
                 self.log('Delete Azure Virtual Network Peering')
                 self.results['changed'] = True
+                self.results['id'] = response['id']
 
                 if self.check_mode:
                     return self.results
 
                 response = self.delete_vnet_peering()
-                self.results['id'] = response['id']
+                
             else:
                 self.fail("Azure Virtual Network Peering {0} not exists in resource group {1}".format(self.name, self.resource_group))
 
