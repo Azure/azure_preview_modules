@@ -99,7 +99,6 @@ id:
 try:
     from msrestazure.azure_exceptions import CloudError
     from msrestazure.azure_operation import AzureOperationPoller
-    from msrest.polling import LROPoller
 except ImportError:
     # This is handled in azure_rm_common
     pass
@@ -213,8 +212,6 @@ class AzureRMVirtualNetworkPeering(AzureRMModuleBase):
 
         if self.state == 'present':
             if response:
-                # vnet peering exists
-
                 # check vnet id not changed
                 existing_vnet = self.parse_resource_to_dict(response['id'])
                 if existing_vnet['resource_group'] != self.virtual_network['resource_group'] or \
@@ -239,14 +236,12 @@ class AzureRMVirtualNetworkPeering(AzureRMModuleBase):
                 if not virtual_network:
                     self.fail("Virtual network {0} in resource group {1} not exits!".format(self.virtual_network['name'], 
                                                                                             self.virtual_network['resource_group']))
-                self.virtual_network['id'] = virtual_network['id']
 
                 # check if remote vnet exists
                 remote_virtual_network = self.get_vnet(self.remote_virtual_network['resource_group'], self.remote_virtual_network['name'])
-                if not virtual_network:
+                if not remote_virtual_network:
                     self.fail("Virtual network {0} in resource group {1} not exits!".format(
                         self.remote_virtual_network['name'], self.remote_virtual_network['resource_group']))
-                self.remote_virtual_network['id'] = remote_virtual_network['id']
 
         elif self.state == 'absent':
             if response:
