@@ -93,7 +93,7 @@ before_install:
       end=$((id * number_per_job));
       start=$((end - number_per_job));
 
-      liststr=tests/integration/targets/azure_rm_*/tasks/main.yml;
+      liststr=tests/integration/targets/azure_rm_virtualnetworkpeering/tasks/main.yml;
       list=($liststr);
 
       echo start = $start, end = $end, list_lenth = ${#list[@]};
