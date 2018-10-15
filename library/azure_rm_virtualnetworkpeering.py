@@ -98,12 +98,14 @@ id:
 
 try:
     from msrestazure.azure_exceptions import CloudError
+    from msrestazure.azure_operation import AzureOperationPoller
+    from msrest.polling import LROPoller
 except ImportError:
     # This is handled in azure_rm_common
     pass
 
-from ansible.module_utils.azure_rm_common import AzureRMModuleBase
-from ansible.modules.azure_rm_virtualnetwork import virtual_network_to_dict
+from ansible.module_utils.azure_rm_common import AzureRMModuleBase, format_resource_id
+from ansible.modules.cloud.azure.azure_rm_virtualnetwork import virtual_network_to_dict
 
 
 def vnetpeering_to_dict(vnetpeering):
@@ -114,14 +116,16 @@ def vnetpeering_to_dict(vnetpeering):
         id=vnetpeering.id,
         name=vnetpeering.name,
         remote_virtual_network=vnetpeering.remote_virtual_network.id,
-        remote_address_space=vnetpeering.remote_address_space,
+        remote_address_space=dict(
+            address_prefixes=vnetpeering.remote_address_space.address_prefixes
+        ),
         peering_state=vnetpeering.peering_state,
         provisioning_state=vnetpeering.provisioning_state,
         use_remote_gateways=vnetpeering.use_remote_gateways,
         allow_gateway_transit=vnetpeering.allow_gateway_transit,
         allow_forwarded_traffic=vnetpeering.allow_forwarded_traffic,
-        allow_virtual_network_access=vnetpeering.allow_virtual_network_access
-        etag=vnet.etag
+        allow_virtual_network_access=vnetpeering.allow_virtual_network_access,
+        etag=vnetpeering.etag
     )
     return results
 
@@ -139,10 +143,10 @@ class AzureRMVirtualNetworkPeering(AzureRMModuleBase):
                 required=True
             ),
             virtual_network=dict(
-                type='str'
+                type='raw'
             ),
             remote_virtual_network=dict(
-                type='str'
+                type='raw'
             ),
             allow_virtual_network_access=dict(
                 type='bool',
@@ -261,7 +265,7 @@ class AzureRMVirtualNetworkPeering(AzureRMModuleBase):
             self.results['changed'] = True
 
             if self.check_mode:
-                result self.results
+                return self.results
 
             response = self.create_or_update_vnet_peering()
             self.results['id'] = response['id']
@@ -269,13 +273,13 @@ class AzureRMVirtualNetworkPeering(AzureRMModuleBase):
         return self.results
 
     def check_update(self, exisiting_vnet_peering):
-        if self.allow_forwarded_traffic != exisiting_vnet_peering.allow_forwarded_traffic:
+        if self.allow_forwarded_traffic != exisiting_vnet_peering['allow_forwarded_traffic']:
             return True
-        if self.allow_gateway_transit != exisiting_vnet_peering.allow_gateway_transit:
+        if self.allow_gateway_transit != exisiting_vnet_peering['allow_gateway_transit']:
             return True
-        if self.allow_virtual_network_access != exisiting_vnet_peering.allow_virtual_network_access:
+        if self.allow_virtual_network_access != exisiting_vnet_peering['allow_virtual_network_access']:
             return True
-        if self.use_remote_gateways != exisiting_vnet_peering.use_remote_gateways:
+        if self.use_remote_gateways != exisiting_vnet_peering['use_remote_gateways']:
             return True
         return False
 
@@ -285,14 +289,14 @@ class AzureRMVirtualNetworkPeering(AzureRMModuleBase):
         :return: deserialized Azure Virtual Network
         '''
         self.log("Get the Azure Virtual Network {0}".format(vnet_name))
-        vnet = self.network_client.virtual_networks.get(resource_group, name)
+        vnet = self.network_client.virtual_networks.get(resource_group, vnet_name)
 
         if vnet:
             results = virtual_network_to_dict(vnet)
             return results
         return False
 
-    def create_or_update_vnet_peering(self, vnet_id, remote_vnet_id):
+    def create_or_update_vnet_peering(self):
         '''
         Creates or Update Azure Virtual Network Peering.
 
@@ -300,21 +304,34 @@ class AzureRMVirtualNetworkPeering(AzureRMModuleBase):
         '''
         self.log("Creating or Updating the Azure Virtual Network Peering {0}".format(self.name))
 
-        SubResource, VirtualNetworkPeering = self.network_models.get_models('SubResource', 'VirtualNetworkPeering')
-        peering = VirtualNetworkPeering(id=vnet_id,
-                                        name=self.name,
-                                        remote_virtual_network=remote_vnet_id,
-                                        allow_virtual_network_access=self.allow_virtual_network_access,
-                                        allow_gateway_transit=self.allow_gateway_transit,
-                                        allow_forwarded_traffic=self.allow_forwarded_traffic,
-                                        use_remote_gateways=self.use_remote_gateways)
+        vnet_id=format_resource_id(self.virtual_network['name'],
+                                   self.subscription_id,
+                                   'Microsoft.Network',
+                                   'virtualNetworks',
+                                   self.virtual_network['resource_group'])
+        remote_vnet_id=format_resource_id(self.remote_virtual_network['name'],
+                                          self.subscription_id,
+                                          'Microsoft.Network',
+                                          'virtualNetworks',
+                                          self.remote_virtual_network['resource_group'])
+        peering = self.network_models.VirtualNetworkPeering(
+            id=vnet_id,
+            name=self.name,
+            remote_virtual_network=self.network_models.SubResource(id=remote_vnet_id),
+            allow_virtual_network_access=self.allow_virtual_network_access,
+            allow_gateway_transit=self.allow_gateway_transit,
+            allow_forwarded_traffic=self.allow_forwarded_traffic,
+            use_remote_gateways=self.use_remote_gateways)
+
         try:
-            poller = self.network_client.virtual_network_peerings.create_or_update(self.resource_group,
+            response = self.network_client.virtual_network_peerings.create_or_update(self.resource_group,
                                                                                    self.virtual_network['name'],
                                                                                    self.name,
                                                                                    peering)
+            if isinstance(response, AzureOperationPoller):
+                response = self.get_poller_result(response)
             return vnetpeering_to_dict(response)
-        except ErrorResponseException as exc:
+        except CloudError as exc:
             self.fail("Error creating Azure Virtual Network Peering: {0}.".format(exc.message))
 
     def delete_vnet_peering(self):
@@ -329,7 +346,7 @@ class AzureRMVirtualNetworkPeering(AzureRMModuleBase):
                 self.resource_group, self.virtual_network['name'], self.name)
             self.get_poller_result(poller)
             return True
-        except ErrorResponseException as e:
+        except CloudError as e:
             self.fail("Error deleting the Azure Virtual Network Peering: {0}".format(e.message))
             return False
 
@@ -347,14 +364,14 @@ class AzureRMVirtualNetworkPeering(AzureRMModuleBase):
                                                                        self.name)
             self.log("Response : {0}".format(response))
             return vnetpeering_to_dict(response)
-        except ErrorResponseException:
+        except CloudError:
             self.log('Did not find the Virtual Network Peering.')
             return False
 
 
 def main():
     """Main execution"""
-    AzureRMCdnprofile()
+    AzureRMVirtualNetworkPeering()
 
 
 if __name__ == '__main__':
