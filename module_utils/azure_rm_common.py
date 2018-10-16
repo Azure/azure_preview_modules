@@ -14,12 +14,9 @@ import json
 from os.path import expanduser
 
 from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.ansible_release import __version__ as ANSIBLE_VERSION
 from ansible.module_utils.six.moves import configparser
 import ansible.module_utils.six.moves.urllib.parse as urlparse
-try:
-    from ansible.release import __version__ as ANSIBLE_VERSION
-except ImportError:
-    ANSIBLE_VERSION = 'unknown'
 
 AZURE_COMMON_ARGS = dict(
     auth_source=dict(
@@ -163,8 +160,6 @@ try:
     from azure.mgmt.rdbms.mysql import MySQLManagementClient
     from azure.mgmt.containerregistry import ContainerRegistryManagementClient
     from azure.mgmt.containerinstance import ContainerInstanceManagementClient
-    from azure.mgmt.cdn import CdnManagementClient
-
 except ImportError as exc:
     HAS_AZURE_EXC = exc
     HAS_AZURE = False
@@ -297,7 +292,6 @@ class AzureRMModuleBase(object):
         self._containerservice_client = None
         self._traffic_manager_management_client = None
         self._monitor_client = None
-        self._cdn_client = None
         self._resource = None
 
         self.check_mode = self.module.check_mode
@@ -938,15 +932,6 @@ class AzureRMModuleBase(object):
             self._monitor_client = self.get_mgmt_svc_client(MonitorManagementClient,
                                                             base_url=self._cloud_environment.endpoints.resource_manager)
         return self._monitor_client
-
-    @property
-    def cdn_client(self):
-        self.log('Getting cdn management client')
-        if not self._cdn_client:
-            self._cdn_client = self.get_mgmt_svc_client(CdnManagementClient,
-                                                        base_url=self._cloud_environment.endpoints.resource_manager,
-                                                        api_version='2017-04-02')
-        return self._cdn_client
 
 
 class AzureRMAuthException(Exception):
