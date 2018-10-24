@@ -381,7 +381,9 @@ def webapp_to_dict(webapp):
         host_names_disabled=webapp.host_names_disabled,
         https_only=webapp.https_only if hasattr(webapp, 'https_only') else None,
         skip_custom_domain_verification=webapp.skip_custom_domain_verification if hasattr(webapp, 'skip_custom_domain_verification') else None,
-        ttl_in_seconds=webapp.ttl_in_seconds if hasattr(webapp, 'ttl_in_seconds') else None
+        ttl_in_seconds=webapp.ttl_in_seconds if hasattr(webapp, 'ttl_in_seconds') else None,
+        state=webapp.state,
+        tags=webapp.tags
     )
 
 
