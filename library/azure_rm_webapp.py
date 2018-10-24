@@ -376,7 +376,7 @@ def webapp_to_dict(webapp):
         client_cert_enabled=webapp.client_cert_enabled,
         enabled=webapp.enabled,
         reserved=webapp.reserved,
-        client_affinity_enabled=client_affinity_enabled,
+        client_affinity_enabled=webapp.client_affinity_enabled,
         server_farm_id=webapp.server_farm_id,
         host_names_disabled=webapp.host_names_disabled,
         https_only=webapp.https_only if hasattr(webapp, 'https_only') else None,
