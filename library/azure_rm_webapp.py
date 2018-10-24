@@ -663,8 +663,8 @@ class AzureRMWebApps(AzureRMModuleBase):
                 self.site.server_farm_id = old_plan['id']
 
                 # if linux, setup startup_file
-                if old_plan.get('is_linux'):
-                    if self.startup_file:
+                if old_plan['is_linux']:
+                    if hasattr(self, 'startup_file'):
                         self.site_config['app_command_line'] = self.startup_file
 
                 # set app setting
