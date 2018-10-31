@@ -1,6 +1,7 @@
 - name: Fix resource prefix
   set_fact:
-    redis_name: "{{ (resource_prefix | replace('-','x'))[-8:] }}{{ 1000 | random}}redis"
+    redis_name: "{{ (resource_group | replace('-','x'))[-8:] }}{{ 1000 | random }}redis"
+  run_once: yes
 
 - name: Create a redis cache (Check Mode)
   azure_rm_rediscache:
