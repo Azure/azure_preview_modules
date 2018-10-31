@@ -1,0 +1,117 @@
+- name: Fix resource prefix
+  set_fact:
+    redis_name: "{{ (resource_prefix | replace('-','x'))[-8:] }}{{ 1000 | random}}redis"
+
+- name: Create a redis cache (Check Mode)
+  azure_rm_rediscache:
+    resource_group: "{{ resource_group }}"
+    name: "{{ redis_name }}"
+    sku:
+      name: basic
+      size: C1
+    configuration:
+      config1: value1
+      config2: value2
+  check_mode: yes
+  register: output
+
+- name: Assert creating redis cache check mode
+  assert:
+    that:
+      - output.changed
+
+- name: Create a redis cache
+  azure_rm_rediscache:
+    resource_group: "{{ resource_group }}"
+    name: "{{ redis_name }}"
+    sku:
+      name: basic
+      size: C1
+    configuration:
+      config1: value1
+      config2: value2
+  register: output
+
+- name: Assert creating redis cache check mode
+  assert:
+    that:
+      - output.changed
+      - output.id
+
+- name: Update the redis cache (idempotent)
+  azure_rm_rediscache:
+    resource_group: "{{ resource_group }}"
+    name: "{{ redis_name }}"
+    sku:
+      name: basic
+      size: C1
+    configuration:
+      config1: value1
+      config2: value2
+  register: output
+
+- name: assert output not changed
+  assert:
+    that:
+      - not output.changed
+
+- name: Update redis cache
+  azure_rm_rediscache:
+    resource_group: "{{ resource_group }}"
+    name: "{{ redis_name }}"
+    sku:
+      name: basic
+      size: C1
+    configuration:
+      config1: value1
+      config2: value2
+    enable_non_ssl_port: true
+    tags:
+      testing: foo
+  register: output
+
+- name: assert output changed
+  assert:
+    that:
+      - output.changed
+
+- name: Scale up the redis cache
+  azure_rm_rediscache:
+    resource_group: "{{ resource_group }}"
+    name: "{{ redis_name }}"
+    sku:
+      name: premium
+      size: P1
+    configuration:
+      config1: value1
+      config2: value2
+    tags:
+      testing: foo
+  register: output
+
+- assert:
+    that:
+      - output.changed
+
+- name: Delete the redis cache (Check Mode)
+  azure_rm_rediscache:
+    resource_group: "{{ resource_group }}"
+    name: "{{ redis_name }}"
+    state: absent
+  check_mode: yes
+  register: output
+
+- name: assert deleting redis cache check mode
+  assert:
+    that: output.changed
+
+- name: Delete the redis cache
+  azure_rm_rediscache:
+    resource_group: "{{ resource_group }}"
+    name: "{{ redis_name }}"
+    state: absent
+  register: output
+
+- assert:
+    that:
+      - output.changed
