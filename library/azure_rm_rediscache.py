@@ -67,13 +67,33 @@ options:
         description:
             - When true, the non-ssl redis server port 6379 will be enabled.
         default: false
-    configuration:
+    maxfragmentationmemory_reserved:
+        description: 
+            - Configures the amount of memory in MB that is reserved to accommodate for memory fragmentation.
+            - Please see U(https://docs.microsoft.com/en-us/azure/redis-cache/cache-configure#advanced-settings) for more detail.
+    maxmemory_reserved:
         description:
-            - Dict of redis cache configuration.
+            - Configures the amount of memory in MB that is reserved for non-cache operations.
+            - Please see U(https://docs.microsoft.com/en-us/azure/redis-cache/cache-configure#advanced-settings) for more detail.
+    maxmemory_policy:
+        description:
+            - Configures the eviction policy of the cache.
+            - Please see U(https://docs.microsoft.com/en-us/azure/redis-cache/cache-configure#advanced-settings) for more detail.
+        choices:
+            - volatile_lru
+            - allkeys_lru
+            - volatile_random
+            - allkeys_random
+            - volatile_ttl
+            - noeviction
+    notify_keyspace_events:
+        description:
+            - Allows clients to receive notifications when certain events occur.
+            - Please see U(https://docs.microsoft.com/en-us/azure/redis-cache/cache-configure#advanced-settings) for more detail.
     shard_count:
         description:
             - The number of shards to be created when I(sku) is C(premium).
-        type: integer
+        type: int
     static_ip:
         description:
             - Static IP address. Required when deploying a redis cache inside an existing Azure virtual network.
@@ -161,20 +181,34 @@ def rediscache_to_dict(redis):
         sku=dict(
             name=redis.sku.name.lower(),
             size=redis.sku.family + str(redis.sku.capacity)
-        )
+        ),
         enable_non_ssl_port=redis.enable_non_ssl_port,
         host_name=redis.host_name,
         shard_count=redis.shard_count,
         subnet=redis.subnet_id,
         static_ip=redis.static_ip,
         provisioning_state=redis.provisioning_state,
-        configuration=redis.redis_configuration,
         tenant_settings=redis.tenant_settings,
         tags=redis.tags if redis.tags else None
     )
+    for key in redis.redis_configuration:
+        result[hyphen_to_underline(key)] = hyphen_to_underline(redis.redis_configuration.get(key, None))
+    return result
 
 
-SUBNET_ID_PATTERN = r'^/subscriptions/[^/]*/resourceGroups/[^/]*/providers/Microsoft.(ClassicNetwork|Network)/virtualNetworks/[^/]*/subnets/[^/]*$'}
+def hyphen_to_underline(input):
+    if input and isinstance(input, str):
+        return input.replace("-", "_")
+    return input
+
+
+def underline_to_hyphen(input):
+    if input and isinstance(input, str):
+        return input.replace("_", "-")
+    return input
+
+
+SUBNET_ID_PATTERN = r'^/subscriptions/[^/]*/resourceGroups/[^/]*/providers/Microsoft.(ClassicNetwork|Network)/virtualNetworks/[^/]*/subnets/[^/]*$'
 
 class Actions:
     NoAction, Create, Update, Delete = range(4)
@@ -197,18 +231,35 @@ class AzureRMRedisCaches(AzureRMModuleBase):
                 type='str'
             ),
             sku=dict(
-                type='dct',
+                type='dict',
                 options=sku_spec
             ),
             enable_non_ssl_port=dict(
                 type='bool',
                 default=False
             ),
-            configuration=dict(
-                type='dict'
+            maxfragmentationmemory_reserved=dict(
+                type='int'
+            ),
+            maxmemory_reserved=dict(
+                type='int'
+            ),
+            maxmemory_policy=dict(
+                type='str',
+                choices=[
+                    "volatile_lru",
+                    "allkeys_lru",
+                    "volatile_random",
+                    "allkeys_random",
+                    "volatile_ttl",
+                    "noeviction"
+                ]
+            ),
+            notify_keyspace_events=dict(
+                type='int'
             ),
             shard_count=dict(
-                type='integer'
+                type='ints'
             ),
             static_ip=dict(
                 type='str'
@@ -252,7 +303,7 @@ class AzureRMRedisCaches(AzureRMModuleBase):
 
         self.frameworks = None
 
-        super(AzureRMWebApps, self).__init__(derived_arg_spec=self.module_arg_spec,
+        super(AzureRMRedisCaches, self).__init__(derived_arg_spec=self.module_arg_spec,
                                              supports_check_mode=True,
                                              supports_tags=True)
 
@@ -266,10 +317,16 @@ class AzureRMRedisCaches(AzureRMModuleBase):
         response = None
         to_be_updated = False
 
+        # define redis_configuration properties
+        self.redis_configuration_properties = ["maxfragmentationmemory_reserved",
+                                               "maxmemory_reserved",
+                                               "maxmemory_policy",
+                                               "notify_keyspace_events"]
+
         # get management client
         self._client = self.get_mgmt_svc_client(RedisManagementClient,
                                                 base_url=self._cloud_environment.endpoints.resource_manager,
-                                                api_version='2016-04-01')
+                                                api_version='2018-03-01')
 
         # set location
         resource_group = self.get_resource_group(self.resource_group)
@@ -307,14 +364,14 @@ class AzureRMRedisCaches(AzureRMModuleBase):
                 # redis exists already, do update
                 self.log("Redis cache instance already exists")
 
-                update_tags, self.site.tags = self.update_tags(old_response.get('tags', None))
+                update_tags, self.tags = self.update_tags(old_response.get('tags', None))
 
                 if update_tags:
                     to_be_updated = True
                     self.to_do = Actions.Update
 
                 # check if update
-                if self.check_update(response):
+                if self.check_update(old_response):
                     to_be_updated = True
                     self.to_do = Actions.Update
 
@@ -326,7 +383,7 @@ class AzureRMRedisCaches(AzureRMModuleBase):
                 if self.check_mode:
                     return self.results
 
-                self.delete_webapp()
+                self.delete_rediscache()
 
                 self.log('Redis cache instance deleted')
 
@@ -353,27 +410,32 @@ class AzureRMRedisCaches(AzureRMModuleBase):
         return self.results
 
     def check_update(self, existing):
-        if existing['enable_non_ssl_port'] != self.enable_non_ssl_port:
+        if self.enable_non_ssl_port is not None and existing['enable_non_ssl_port'] != self.enable_non_ssl_port:
             self.log("enable_non_ssl_port diff: origin {0} / update {1}".format(existing['enable_non_ssl_port'], self.enable_non_ssl_port))
             return True
-        if existing['sku'] != self.sku:
-            self.log("sku diff: origin {0} / update {1}".format(existing['sku'], self.sku))
-            return True
-        if existing['configuration'] != self.configuration:
-            self.log("configuration diff: origin {0} / update {1}".format(existing['configuration'], self.configuration))
-            return True
-        if existing['tenant_settings'] != self.tenant_settings:
+        if self.sku is not None:
+            if existing['sku']['name'] != self.sku['name']:
+                self.log("sku diff: origin {0} / update {1}".format(existing['sku']['name'], self.sku['name']))
+                return True
+            if existing['sku']['size'] != self.sku['size']:
+                self.log("size diff: origin {0} / update {1}".format(existing['sku']['size'], self.sku['size']))
+                return True
+        if self.tenant_settings is not None and existing['tenant_settings'] != self.tenant_settings:
             self.log("tenant_settings diff: origin {0} / update {1}".format(existing['tenant_settings'], self.tenant_settings))
             return True
-        if existing['shard_count'] != self.shard_count:
+        if self.shard_count is not None and existing['shard_count'] != self.shard_count:
             self.log("shard_count diff: origin {0} / update {1}".format(existing['shard_count'], self.shard_count))
             return True
-        if existing['subnet'] != self.subnet:
+        if self.subnet is not None and existing['subnet'] != self.subnet:
             self.log("subnet diff: origin {0} / update {1}".format(existing['subnet'], self.subnet))
             return True
-        if existing['static_ip'] != self.static_ip:
+        if self.static_ip is not None and existing['static_ip'] != self.static_ip:
             self.log("static_ip diff: origin {0} / update {1}".format(existing['static_ip'], self.static_ip))
             return True
+        for config in self.redis_configuration_properties:
+            if getattr(self, config) is not None and existing.get(config, None) != getattr(self, config, None):
+                self.log("redis_configuration {0} diff: origin {1} / update {2}".format(config, existing.get(config, None), getattr(self, config, None)))
+                return True
         return False
 
     def create_rediscache(self):
@@ -386,16 +448,21 @@ class AzureRMRedisCaches(AzureRMModuleBase):
             "Creating redis cache instance {0}".format(self.name))
 
         try:
+            redis_config = dict()
+            for key in self.redis_configuration_properties:
+                if getattr(self, key, None):
+                    redis_config[underline_to_hyphen(key)] = underline_to_hyphen(getattr(self, key))
+
             params = RedisCreateParameters(
-                self.location,
-                Sku(self.sku['name'].title(), self.sku['size'][0], self.sku['size'][1:]),
-                self.tags,
-                self.configuration,
-                self.enable_non_ssl_port,
-                self.tenant_settings,
-                self.shard_count,
-                self.subnet,
-                self.static_ip
+                location=self.location,
+                sku=Sku(self.sku['name'].title(), self.sku['size'][0], self.sku['size'][1:]),
+                tags=self.tags,
+                redis_configuration=redis_config,
+                enable_non_ssl_port=self.enable_non_ssl_port,
+                tenant_settings=self.tenant_settings,
+                shard_count=self.shard_count,
+                subnet_id=self.subnet,
+                static_ip=self.static_ip
             )
 
             response = self._client.redis.create(resource_group_name=self.resource_group,
@@ -420,15 +487,17 @@ class AzureRMRedisCaches(AzureRMModuleBase):
             "Updating redis cache instance {0}".format(self.name))
 
         try:
+            redis_config = dict()
+            for key in self.redis_configuration_properties:
+                if getattr(self, key, None):
+                    redis_config[underline_to_hyphen(key)] = underline_to_hyphen(getattr(self, key))
             params = RedisUpdateParameters(
-                self.configuration,
-                self.enable_non_ssl_port,
-                self.tenant_settings,
-                self.shard_count,
-                self.subnet,
-                self.static_ip
-                Sku(self.sku['name'].title(), self.sku['size'][0], self.sku['size'][1:]),
-                self.tags
+                redis_configuration=redis_config,
+                enable_non_ssl_port=self.enable_non_ssl_port,
+                tenant_settings=self.tenant_settings,
+                shard_count=self.shard_count,
+                sku=Sku(self.sku['name'].title(), self.sku['size'][0], self.sku['size'][1:]),
+                tags=self.tags
             )
 
             response = self._client.redis.update(resource_group_name=self.resource_group,
@@ -521,8 +590,9 @@ class AzureRMRedisCaches(AzureRMModuleBase):
 
 def main():
     """Main execution"""
-    AzureRMWebApps()
+    AzureRMRedisCaches()
 
 
 if __name__ == '__main__':
     main()
+
