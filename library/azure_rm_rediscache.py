@@ -335,15 +335,9 @@ class AzureRMRedisCaches(AzureRMModuleBase):
 
         # check subnet exists
         if self.subnet:
-            if self.parse_subnet():
-                subnet_id = self.get_subnet()
-                if not subnet_id:
-                    self.fail("Subnet {0} not exists".format(self.subnet))
-                self.subnet = subnet_id
-            else:
-                self.fail("Invalid subnet configuration, either be a subnet resource id, or dict with name, virtual_network_name and resource_group")
+            self.subnet = self.parse_subnet()
 
-        # get existing redis cache
+        #ubnet = self.parse_subnet()get existing redis cache
         old_response = self.get_rediscache()
 
         if old_response:
@@ -578,14 +572,15 @@ class AzureRMRedisCaches(AzureRMModuleBase):
 
     def parse_subnet(self):
         if isinstance(self.subnet, dict):
-            if not hasattr(self.subnet, 'virtual_network_name') or \
-               not hasattr(self.subnet, 'name'):
+            if 'virtual_network_name' not in self.subnet or \
+               'name' not in self.subnet:
                 self.fail("Subnet dict must contains virtual_network_name and name")
-            if not hasattr(self.subnet, 'resource_group'):
+            if 'resource_group' not in self.subnet:
                 self.subnet['resource_group'] = self.resource_group
+            subnet_id = self.get_subnet()
         else:
-            return re.match(self.subnet, string)
-        return True
+            subnet_id = self.subnet
+        return subnet_id
 
 
 def main():
