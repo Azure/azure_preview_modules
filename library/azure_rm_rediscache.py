@@ -128,29 +128,54 @@ author:
 '''
 
 EXAMPLES = '''
-    - name: Create a windows web app with non-exist app service plan
-      azure_rm_webapp:
-        resource_group: myresourcegroup
-        name: mywinwebapp
-        plan:
-          resource_group: myappserviceplan_rg
-          name: myappserviceplan
-          is_linux: false
-          sku: S1
+  - name: Create a redis cache
+    azure_rm_rediscache:
+        resource_group: myResourceGroup
+        name: myRedisCache
+        sku:
+          name: basic
+          size: C1
+
+
+  - name: Scale up the redis cache
+    azure_rm_rediscache:
+      resource_group: myResourceGroup
+        name: myRedisCache
+        sku:
+          name: standard
+          size: C1
+        tags:
+          testing: foo
+
+  - name: Create redis with subnet
+    azure_rm_rediscache:
+      resource_group: myResourceGroup
+      name: myRedisCache2
+      sku:
+        name: premium
+        size: P1
+      subnet: /subscriptions/<subs_id>/resourceGroups/redistest1/providers/Microsoft.Network/virtualNetworks/testredisvnet1/subnets/subnet1
+
 '''
 
 RETURN = '''
-azure_webapp:
-    description: Id of current web app.
+id:
+    description: Id of the redis cache.
     returned: always
-    type: dict
+    type: string
     sample: {
-        "id": "/subscriptions/<subscription_id>/resourceGroups/ansiblewebapp1/providers/Microsoft.Web/sites/ansiblewindowsaaa"
+        "id": "/subscriptions/<subs_id>/resourceGroups/rg/providers/Microsoft.Cache/Redis/redis1"
+    }
+host_name:
+    description: Host name of the redis cache.
+    returned: state is present
+    type: string
+    sample: {
+        "host_name": "redis1.redis.cache.windows.net"
     }
 '''
 
 import time
-import re
 from ansible.module_utils.azure_rm_common import AzureRMModuleBase
 
 try:
@@ -207,8 +232,6 @@ def underline_to_hyphen(input):
         return input.replace("_", "-")
     return input
 
-
-SUBNET_ID_PATTERN = r'^/subscriptions/[^/]*/resourceGroups/[^/]*/providers/Microsoft.(ClassicNetwork|Network)/virtualNetworks/[^/]*/subnets/[^/]*$'
 
 class Actions:
     NoAction, Create, Update, Delete = range(4)
@@ -297,6 +320,7 @@ class AzureRMRedisCaches(AzureRMModuleBase):
         self.results = dict(
             changed=False,
             id=None,
+            host_name=None
         )
         self.state = None
         self.to_do = Actions.NoAction
@@ -485,6 +509,7 @@ class AzureRMRedisCaches(AzureRMModuleBase):
             for key in self.redis_configuration_properties:
                 if getattr(self, key, None):
                     redis_config[underline_to_hyphen(key)] = underline_to_hyphen(getattr(self, key))
+
             params = RedisUpdateParameters(
                 redis_configuration=redis_config,
                 enable_non_ssl_port=self.enable_non_ssl_port,
