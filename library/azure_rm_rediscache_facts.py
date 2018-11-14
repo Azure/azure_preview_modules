@@ -54,6 +54,9 @@ rediscaches:
         maxfragmentationmemory-reserved: '50'
         maxmemory-delta: '50'
         maxmemory-reserved: '50'
+      access_keys:
+        primary: X2xXXxx7xxxxxx5xxxx0xxxxx75xxxxxxxxXXXxxxxx=
+        secondary: X2xxxxx7xxxxxx5xxxx0xxxxx75xxxxxxxxXXXxxxxx=
       enable_non_ssl_port: false
       host_name: testredis1aa.redis.cache.windows.net
       id: /subscriptions/2085065b-00f8-4cba-9675-ba15f4d4ab66/resourceGroups/rerdistest1/providers/Microsoft.Cache/Redis/testredis1aa
