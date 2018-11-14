@@ -48,42 +48,27 @@ author:
 '''
 
 EXAMPLES = '''
-cdnendpoints: [
-        {
-            "content_types_to_compress": [
-                "text/plain",
-                "text/html",
-                "text/css",
-                "text/javascript",
-                "application/x-javascript",
-                "application/javascript",
-                "application/json",
-                "application/xml"
-            ]
-            "id": "/subscriptions/XXXXX.....XXXXX/resourcegroups/cdntest1/providers/Microsoft.Cdn/profiles/cdnprofiled7b06e4355/endpoints/fasdfasd"
-            "is_compression_enabled": true
-            "is_http_allowed": true
-            "is_https_allowed": true
-            "location": "EastUs"
-            "name": "fasdfasd"
-            "origin": {
-                "host_name": "xxxxxxxx.blob.core.windows.net",
-                "http_port": null,
-                "https_port": null,
-                "name": "xxxxxxxx-blob-core-windows-net"
-            }
-            "origin_host_header": "xxxxxxxx.blob.core.windows.net"
-            "origin_path": null
-            "profile_name": "cdnprofiled7b06e4355"
-            "provisioning_state": "Succeeded"
-            "query_string_caching_behavior": "IgnoreQueryString"
-            "resource_group": "cdntest1"
-            "resource_state": "Running"
-            "state": "present"
-            "tags": {}
-            "type": "Microsoft.Cdn/profiles/endpoints"
-        }
-    ]
+rediscaches:
+    - configuration:
+        maxclients: '1000'
+        maxfragmentationmemory-reserved: '50'
+        maxmemory-delta: '50'
+        maxmemory-reserved: '50'
+      enable_non_ssl_port: false
+      host_name: testredis1aa.redis.cache.windows.net
+      id: /subscriptions/2085065b-00f8-4cba-9675-ba15f4d4ab66/resourceGroups/rerdistest1/providers/Microsoft.Cache/Redis/testredis1aa
+      location: East US
+      name: testredis1aa
+      provisioning_state: Creating
+      resource_group: ''
+      shard_count: null
+      sku:
+        name: Basic
+        size: C1
+      static_ip: 104.211.14.104
+      subnet: null
+      tags: {}
+      tenant_settings: null
 '''
 
 RETURN = '''
@@ -108,7 +93,7 @@ rediscaches:
             description
                 - ID of the Azure redis cache.
             type: str
-            sample: /subscriptions/XXXXX.....XXXXX/resourcegroups/cdntest1/providers/Microsoft.Cdn/profiles/cdnprofiled7b06e4355/endpoints/testendpoint
+            sample: /subscriptions/<subs_id>/resourceGroups/<resourcegroup>/providers/Microsoft.Cache/Redis/testredis1
         provisioning_state:
             description:
                 - Provisioning state of the redis cahe
@@ -200,6 +185,7 @@ from ansible.module_utils.azure_rm_common import AzureRMModuleBase
 try:
     from azure.common import AzureHttpError
     from azure.mgmt.redis import RedisManagementClient
+    from msrestazure.azure_exceptions import CloudError
 except:
     # handled in azure_rm_common
     pass
@@ -258,7 +244,7 @@ class AzureRMRedisCacheFacts(AzureRMModuleBase):
         if self.name:
             self.results['rediscaches'] = self.get_item()
         else:
-            self.results['rediscaches'] = self.list_by_profile()
+            self.results['rediscaches'] = self.list_by_resourcegroup()
 
         return self.results
 
@@ -271,12 +257,15 @@ class AzureRMRedisCacheFacts(AzureRMModuleBase):
         result = []
 
         try:
-            item = self._client.redis.get(resource_group_name=self.resource_group_name, name=self.name)
+            item = self._client.redis.get(resource_group_name=self.resource_group, name=self.name)
         except CloudError:
             pass
 
         if item and self.has_tags(item.tags, self.tags):
-            result = [self.serialize_rediscache(item)]
+            keys = None
+            if self.return_access_keys:
+                keys = self.list_keys(self.resource_group, self.name)
+            result = [self.serialize_rediscache(item, keys)]
 
         return result
 
@@ -293,11 +282,26 @@ class AzureRMRedisCacheFacts(AzureRMModuleBase):
         results = []
         for item in response:
             if self.has_tags(item.tags, self.tags):
-                results.append(self.serialize_rediscache(item))
+                keys = None
+                if self.return_access_keys:
+                    keys = self.list_keys(self.resource_group, item.name)
+                results.append(self.serialize_rediscache(item, keys))
 
         return results
 
-    def serialize_rediscache(self, rediscache):
+    def list_keys(self, resource_group, name):
+        """List Azure Azure redis cache keys"""
+
+        self.log('List all Azure redis cache keys')
+
+        try:
+            response = self._client.redis.list_keys(resource_group, name)
+        except CloudError as exc:
+            self.fail('Failed to list keys - {0}'.format(str(exc)))
+
+        return response
+
+    def serialize_rediscache(self, rediscache, keys):
         '''
         Convert a Azure redis cache object to dict.
         :param cdn: Azure redis cache object
@@ -312,7 +316,7 @@ class AzureRMRedisCacheFacts(AzureRMModuleBase):
         new_result['configuration'] = rediscache.redis_configuration
         new_result['tenant_settings'] = rediscache.tenant_settings
         new_result['shard_count'] = rediscache.shard_count
-        new_result['enable_non_ssl_port'] = redis.enable_non_ssl_port
+        new_result['enable_non_ssl_port'] = rediscache.enable_non_ssl_port
         new_result['static_ip'] = rediscache.static_ip
         new_result['subnet'] = rediscache.subnet_id
         new_result['host_name'] = rediscache.host_name
@@ -321,12 +325,12 @@ class AzureRMRedisCacheFacts(AzureRMModuleBase):
         if rediscache.sku:
             new_result['sku'] = dict(
                 name=rediscache.sku.name,
-                size=rediscache.sku.family + redis.sku.size
+                size=rediscache.sku.family.lower() + str(rediscache.sku.capacity)
             )
-        if self.return_access_keys:
+        if self.return_access_keys and keys:
             new_result['access_keys'] = dict(
-                primary=rediscache.access_keys.primary_key,
-                secondary=rediscache.access_keys.secondary_key
+                primary=keys.primary_key,
+                secondary=keys.secondary_key
             )
         return new_result
 
