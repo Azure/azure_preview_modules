@@ -536,8 +536,7 @@ class AzureRMManagedCluster(AzureRMModuleBase):
             tags=self.tags,
             service_principal_profile=service_principal_profile,
             agent_pool_profiles=agentpools,
-            linux_profile=create_linux_profile_instance(self.linux_profile),
-            enable_rbac=self.enable_rbac
+            linux_profile=create_linux_profile_instance(self.linux_profile)
         )
 
         # self.log("service_principal_profile : {0}".format(parameters.service_principal_profile))
