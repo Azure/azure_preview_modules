@@ -8,8 +8,8 @@
     resource_group: "{{ resource_group }}"
     name: "cosmos{{ rpfx }}"
     location: eastus
-    locations:
-      - location_name: eastus
+    geo_rep_locations:
+      - name: eastus
         failover_priority: 0
     database_account_offer_type: Standard
   check_mode: yes
@@ -24,10 +24,10 @@
     resource_group: "{{ resource_group }}"
     name: "cosmos{{ rpfx }}"
     location: eastus
-    locations:
-      - location_name: eastus
+    geo_rep_locations:
+      - name: eastus
         failover_priority: 0
-      - location_name: westus
+      - name: westus
         failover_priority: 1
     database_account_offer_type: Standard
   register: output
@@ -41,10 +41,10 @@
     resource_group: "{{ resource_group }}"
     name: "cosmos{{ rpfx }}"
     location: eastus
-    locations:
-      - location_name: westus
+    geo_rep_locations:
+      - name: westus
         failover_priority: 1
-      - location_name: eastus
+      - name: eastus
         failover_priority: 0
     database_account_offer_type: Standard
   register: output
@@ -58,10 +58,10 @@
     resource_group: "{{ resource_group }}"
     name: "cosmos{{ rpfx }}"
     location: eastus
-    locations:
-      - location_name: westus
+    geo_rep_locations:
+      - name: westus
         failover_priority: 1
-      - location_name: eastus
+      - name: eastus
         failover_priority: 0
     database_account_offer_type: Standard
     enable_automatic_failover: yes

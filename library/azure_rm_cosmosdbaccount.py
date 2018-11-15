@@ -17,9 +17,9 @@ DOCUMENTATION = '''
 ---
 module: azure_rm_cosmosdbaccount
 version_added: "2.8"
-short_description: Manage Database Account instance.
+short_description: Manage Azure Cosmos DB Account instance.
 description:
-    - Create, update and delete instance of Database Account.
+    - Create, update and delete instance of Azure Cosmos DB Account.
 
 options:
     resource_group:
@@ -63,13 +63,14 @@ options:
                 description:
                     - "When used with the Bounded Staleness consistency level, this value represents the time amount of staleness (in seconds) tolerated.
                        Accepted range for this value is 5 - 86400. Required when defaultConsistencyPolicy is set to 'C(bounded_staleness)'."
-    locations:
+                type: number
+    geo_rep_locations:
         description:
             - An array that contains the georeplication locations enabled for the Cosmos DB account.
             - Required when C(state) is I(present).
         type: list
         suboptions:
-            location_name:
+            name:
                 description:
                     - The name of the region.
             failover_priority:
@@ -137,8 +138,8 @@ EXAMPLES = '''
       resource_group: rg1
       name: ddb1
       location: westus
-      locations:
-        - location_name: southcentralus
+      geo_rep_locations:
+        - name: southcentralus
           failover_priority: 0
       database_account_offer_type: Standard
 '''
@@ -195,7 +196,7 @@ class AzureRMDatabaseAccounts(AzureRMModuleBase):
             consistency_policy=dict(
                 type='dict'
             ),
-            locations=dict(
+            geo_rep_locations=dict(
                 type='list'
             ),
             database_account_offer_type=dict(
@@ -254,22 +255,12 @@ class AzureRMDatabaseAccounts(AzureRMModuleBase):
                         ev = 'GlobalDocumentDB'
                     elif ev == 'mongo_db':
                         ev = 'MongoDB'
-                    self.parameters["kind"] = _snake_to_camel(ev, True)
+                    elif ev == 'parse':
+                        ev = 'Parse'
+                    self.parameters["kind"] = ev
                 elif key == "consistency_policy":
-                    ev = kwargs[key]
-                    if 'default_consistency_level' in ev:
-                        if ev['default_consistency_level'] == 'eventual':
-                            ev['default_consistency_level'] = 'Eventual'
-                        elif ev['default_consistency_level'] == 'session':
-                            ev['default_consistency_level'] = 'Session'
-                        elif ev['default_consistency_level'] == 'bounded_staleness':
-                            ev['default_consistency_level'] = 'BoundedStaleness'
-                        elif ev['default_consistency_level'] == 'strong':
-                            ev['default_consistency_level'] = 'Strong'
-                        elif ev['default_consistency_level'] == 'consistent_prefix':
-                            ev['default_consistency_level'] = 'ConsistentPrefix'
-                    self.parameters["consistency_policy"] = ev
-                elif key == "locations":
+                    self.parameters["consistency_policy"] = _snake_to_camel(kwargs[key])
+                elif key == "geo_rep_locations":
                     self.parameters["locations"] = kwargs[key]
                 elif key == "database_account_offer_type":
                     self.parameters["database_account_offer_type"] = kwargs[key]
@@ -310,30 +301,7 @@ class AzureRMDatabaseAccounts(AzureRMModuleBase):
                 self.to_do = Actions.Delete
             elif self.state == 'present':
                 old_response['locations'] = old_response['failover_policies']
-                if (not compare(self.parameters, old_response, {
-                    'location': 'location',
-                    'kind': 'default',
-                    'consistency_policy': {
-                        'default_consistency_level': 'default',
-                        'max_staleness_prefix': 'default',
-                        'max_interval_in_seconds': 'default'
-                    },
-                    'locations': {
-                        'location_name': 'location',
-                        'failover_priority': 'index'
-                    },
-                    'database_account_offer_type': 'default',
-                    'ip_range_filter': 'default',
-                    'is_virtual_network_filter_enabled': 'default',
-                    'enable_automatic_failover': 'default',
-                    'capabilities': {
-                        'name': 'index'
-                    },
-                    'virtual_network_rules': {
-                        'id': 'index'
-                    },
-                    'enable_multiple_write_locations': 'default'
-                })):
+                if (not default_compare(self.parameters, old_response, '', None)):
                     self.to_do = Actions.Update
 
         if (self.to_do == Actions.Create) or (self.to_do == Actions.Update):
@@ -432,44 +400,34 @@ class AzureRMDatabaseAccounts(AzureRMModuleBase):
         return d
 
 
-def compare(a, b, t):
-    if isinstance(t, dict):
-        if isinstance(a, list) and isinstance(b, list):
-            s = None
-            for k in t.keys():
-                if t.get(k, None) == "index":
-                    s = k
-            if s is not None:
-                a = sorted(a, key=lambda x: x[s])
-                b = sorted(b, key=lambda x: x[s])
-            if len(a) != len(b):
+def default_compare(new, old, path):
+    if isinstance(new, dict):
+        if not isinstance(old, dict):
+            return False
+        for k in new.keys():
+            if not default_compare(new.get(k), old.get(k, None), path + '/' + k):
                 return False
-            for i in range(len(a)):
-                if not compare(a[i], b[i], t):
-                    return False
-            return True
-        elif isinstance(a, dict) and isinstance(b, dict):
-            for k in t.keys():
-                if not compare(a.get(k, None), b.get(k, None), t[k]):
-                    return False
-            return True
+        return True
+    elif isinstance(new, list):
+        if not isinstance(old, list) or len(new) != len(old):
+            return False
+        if isinstance(old[0], dict):
+            key = None
+            if 'id' in old[0] and 'id' in new[0]:
+                key = 'id'
+            elif 'name' in old[0] and 'name' in new[0]:
+                key = 'name'
+            new = sorted(new, key=lambda x: x.get(key, None))
+            old = sorted(old, key=lambda x: x.get(key, None))
         else:
-            return a is None
+            new = sorted(new)
+            old = sorted(old)
+        for i in range(len(new)):
+            if not default_compare(new[i], old[i], path + '/*'):
+                return False
+        return True
     else:
-        if a is None:
-            return True
-        if t == "location":
-            # location needs to be normalized, remove spaces, lowercase
-            a = a.replace(' ', '').lower()
-            b = b.replace(' ', '').lower()
-            return a == b
-        else:
-            # default comparison
-            if not isinstance(a, dict) and not isinstance(a, list):
-                a = str(a)
-            if not isinstance(b, dict) and not isinstance(b, list):
-                b = str(b)
-            return a == b
+        return new == old
 
 
 def _snake_to_camel(snake, capitalize_first=False):
