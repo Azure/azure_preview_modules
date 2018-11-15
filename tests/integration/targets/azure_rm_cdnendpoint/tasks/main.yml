@@ -15,7 +15,7 @@
   assert:
     that:
       - output.changed
-      - output.name == "{{ profile_name }}"
+      - output.id != ''
 
 - name: Create a Azure CDN endpoint(check mode)
   azure_rm_cdnendpoint:
