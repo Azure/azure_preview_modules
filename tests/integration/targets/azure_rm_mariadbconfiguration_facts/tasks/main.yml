@@ -1,0 +1,37 @@
+- name: Prepare random number
+  set_fact:
+    rpfx: "{{ resource_group | hash('md5') | truncate(7, True, '') }}{{ 1000 | random }}"
+  run_once: yes
+
+- name: Gather facts Configuration
+  azure_rm_mariadbconfiguration_facts:
+    resource_group: "{{ resource_group }}"
+  register: output
+- name: Assert that facts are returned
+  assert:
+    that:
+      - output.changed == False
+      - output.configurations.xxxunknownxxx.id != None
+      - output.configurations.xxxunknownxxx.name != None
+      - output.configurations.xxxunknownxxx.value != None
+      - output.configurations.xxxunknownxxx.description != None
+      - output.configurations.xxxunknownxxx.source != None
+
+- name: Gather facts Configuration
+  azure_rm_mariadbconfiguration_facts:
+    resource_group: "{{ resource_group }}"
+  register: output
+- name: Assert that facts are returned
+  assert:
+    that:
+      - output.changed == False
+      - output.configurations.xxxunknownxxx.id != None
+      - output.configurations.xxxunknownxxx.name != None
+      - output.configurations.xxxunknownxxx.value != None
+      - output.configurations.xxxunknownxxx.description != None
+      - output.configurations.xxxunknownxxx.source != None
+      - output.configurations.xxxunknownxxxsecond.id != None
+      - output.configurations.xxxunknownxxxsecond.name != None
+      - output.configurations.xxxunknownxxxsecond.value != None
+      - output.configurations.xxxunknownxxxsecond.description != None
+      - output.configurations.xxxunknownxxxsecond.source != None

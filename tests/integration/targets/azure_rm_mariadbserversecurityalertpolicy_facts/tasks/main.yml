@@ -1,0 +1,16 @@
+- name: Prepare random number
+  set_fact:
+    rpfx: "{{ resource_group | hash('md5') | truncate(7, True, '') }}{{ 1000 | random }}"
+  run_once: yes
+
+- name: Gather facts Server Security Alert Policy
+  azure_rm_mariadbserversecurityalertpolicy_facts:
+    resource_group: "{{ resource_group }}"
+  register: output
+- name: Assert that facts are returned
+  assert:
+    that:
+      - output.changed == False
+      - output.server_security_alert_policies.xxxunknownxxx.id != None
+      - output.server_security_alert_policies.xxxunknownxxx.name != None
+      - output.server_security_alert_policies.xxxunknownxxx.state != None

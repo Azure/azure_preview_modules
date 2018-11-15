@@ -1,0 +1,52 @@
+- name: Prepare random number
+  set_fact:
+    rpfx: "{{ resource_group | hash('md5') | truncate(7, True, '') }}{{ 1000 | random }}"
+  run_once: yes
+
+- name: Gather facts Server
+  azure_rm_mariadbserver_facts:
+    resource_group: "{{ resource_group }}"
+  register: output
+- name: Assert that facts are returned
+  assert:
+    that:
+      - output.changed == False
+      - output.servers.xxxunknownxxx.id != None
+      - output.servers.xxxunknownxxx.name != None
+      - output.servers.xxxunknownxxx.location != None
+      - output.servers.xxxunknownxxx.sku.name != None
+      - output.servers.xxxunknownxxx.sku.tier != None
+      - output.servers.xxxunknownxxx.sku.capacity != None
+      - output.servers.xxxunknownxxx.sku.family != None
+      - output.servers.xxxunknownxxx.version != None
+      - output.servers.xxxunknownxxx.user_visible_state != None
+      - output.servers.xxxunknownxxx.fully_qualified_domain_name != None
+
+- name: Gather facts Server
+  azure_rm_mariadbserver_facts:
+    resource_group: "{{ resource_group }}"
+  register: output
+- name: Assert that facts are returned
+  assert:
+    that:
+      - output.changed == False
+      - output.servers.xxxunknownxxx.id != None
+      - output.servers.xxxunknownxxx.name != None
+      - output.servers.xxxunknownxxx.location != None
+      - output.servers.xxxunknownxxx.sku.name != None
+      - output.servers.xxxunknownxxx.sku.tier != None
+      - output.servers.xxxunknownxxx.sku.capacity != None
+      - output.servers.xxxunknownxxx.sku.family != None
+      - output.servers.xxxunknownxxx.version != None
+      - output.servers.xxxunknownxxx.user_visible_state != None
+      - output.servers.xxxunknownxxx.fully_qualified_domain_name != None
+      - output.servers.xxxunknownxxxsecond.id != None
+      - output.servers.xxxunknownxxxsecond.name != None
+      - output.servers.xxxunknownxxxsecond.location != None
+      - output.servers.xxxunknownxxxsecond.sku.name != None
+      - output.servers.xxxunknownxxxsecond.sku.tier != None
+      - output.servers.xxxunknownxxxsecond.sku.capacity != None
+      - output.servers.xxxunknownxxxsecond.sku.family != None
+      - output.servers.xxxunknownxxxsecond.version != None
+      - output.servers.xxxunknownxxxsecond.user_visible_state != None
+      - output.servers.xxxunknownxxxsecond.fully_qualified_domain_name != None
