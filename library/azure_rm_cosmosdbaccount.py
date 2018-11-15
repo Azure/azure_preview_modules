@@ -261,7 +261,10 @@ class AzureRMDatabaseAccounts(AzureRMModuleBase):
                 elif key == "consistency_policy":
                     self.parameters["consistency_policy"] = _snake_to_camel(kwargs[key])
                 elif key == "geo_rep_locations":
-                    self.parameters["locations"] = kwargs[key]
+                    locations = kwargs[key]
+                    for i in range(len(locations)):
+                        locations[i]['location_name'] = locations[i].pop('name')
+                    self.parameters["locations"] = locations
                 elif key == "database_account_offer_type":
                     self.parameters["database_account_offer_type"] = kwargs[key]
                 elif key == "ip_range_filter":
