@@ -46,6 +46,7 @@
 - name: Delete instance of Lab -- check mode
   azure_rm_devtestlabslab:
     resource_group: "{{ resource_group }}"
+    name: "lab{{ rpfx}}"
     state: absent
   check_mode: yes
   register: output
@@ -57,6 +58,7 @@
 - name: Delete instance of Lab
   azure_rm_devtestlabslab:
     resource_group: "{{ resource_group }}"
+    name: "lab{{ rpfx}}"
     state: absent
   register: output
 - name: Assert the state has changed
@@ -67,6 +69,7 @@
 - name: Delete unexisting instance of Lab
   azure_rm_devtestlabslab:
     resource_group: "{{ resource_group }}"
+    name: "lab{{ rpfx}}"
     state: absent
   register: output
 - name: Assert the state has changed
