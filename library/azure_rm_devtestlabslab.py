@@ -30,30 +30,23 @@ options:
         description:
             - The name of the I(lab).
         required: True
-    lab:
+    location:
         description:
-            - A lab.
-        suboptions:
-            location:
-                description:
-                    - The location of the resource.
-            lab_storage_type:
-                description:
-                    - Type of storage used by the lab. It can be either C(premium) or C(standard). Default is C(premium).
-                choices:
-                    - 'standard'
-                    - 'premium'
-            premium_data_disks:
-                description:
-                    - "The setting to enable usage of C(premium) data disks.\n"
-                    - "When its value is 'C(enabled)', creation of C(standard) or C(premium) data disks is allowed.\n"
-                    - "When its value is 'C(disabled)', only creation of C(standard) data disks is allowed."
-                choices:
-                    - 'disabled'
-                    - 'enabled'
-            unique_identifier:
-                description:
-                    - The unique immutable identifier of a resource (Guid).
+            - The location of the resource.
+    lab_storage_type:
+        description:
+            - Type of storage used by the lab. It can be either C(premium) or C(standard). Default is C(premium).
+        choices:
+            - 'standard'
+            - 'premium'
+    premium_data_disks:
+        description:
+            - "The setting to enable usage of C(premium) data disks.\n"
+            - "When its value is 'C(enabled)', creation of C(standard) or C(premium) data disks is allowed.\n"
+            - "When its value is 'C(disabled)', only creation of C(standard) data disks is allowed."
+        choices:
+            - 'disabled'
+            - 'enabled'
     state:
       description:
         - Assert the state of the Lab.
@@ -119,8 +112,14 @@ class AzureRMLabs(AzureRMModuleBase):
                 type='str',
                 required=True
             ),
-            lab=dict(
-                type='dict'
+            lab_storage_type=dict(
+                type='str'
+            ),
+            premium_data_disks=dict(
+                type='str'
+            ),
+            location=dict(
+                type='str'
             ),
             state=dict(
                 type='str',
