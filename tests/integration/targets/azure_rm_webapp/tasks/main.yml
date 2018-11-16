@@ -4,6 +4,8 @@
     win_app_name: "{{ (resource_prefix | replace('-','x'))[-8:] }}{{ 1000 | random}}winapp"
     win_plan_name: "{{ (resource_prefix | replace('-','x'))[-8:] }}winplan"
     linux_plan_name: "{{ (resource_group_secondary | replace('-','x'))[-8:] }}linplan"
+    slot1_name: stage
+    slot2_name: testing
 
 - name: Create a windows web app with non-exist app service plan
   azure_rm_webapp:
@@ -35,17 +37,16 @@
     that:
       output.changed
 
-# enable after webapp_facts merged
-# - name: get the web app
-#   azure_rm_webapp_facts:
-#     resource_group: "{{ resource_group }}"
-#     name: "{{ win_app_name }}2"
-#   register: stopped
+- name: get the web app
+  azure_rm_webapp_facts:
+    resource_group: "{{ resource_group }}"
+    name: "{{ win_app_name }}2"
+  register: stopped
 
-# - name: assert web app is stopped
-#   assert:
-#     that:
-#       - stopped.properties.state == "Stopped"
+- name: assert web app is stopped
+  assert:
+    that:
+      - stopped.properties.state == "Stopped"
 
 - name: Create a windows web app with existing app service plan, try to update some root level params
   azure_rm_webapp:
@@ -328,3 +329,99 @@
   assert:
     that:
       - facts.webapps[0].ftp_publish_url != ''
+
+- name: Create a webapp slot (Check mode)
+  azure_rm_webapp_slot:
+    resource_group: "{{ resource_group }}"
+    webapp_name: "{{ win_app_name }}13"
+    name: "{{ slot1_name }}"
+    configuration_source: "{{ win_app_name }}13"
+    app_settings:
+        testkey: testvalue
+  check_mode: yes
+  register: output
+
+- name: Assert slot check mode creation
+  assert:
+    that:
+      - output.changed
+
+- name: Create a webapp slot
+  azure_rm_webapp_slot:
+    resource_group: "{{ resource_group }}"
+    webapp_name: "{{ win_app_name }}13"
+    name: "{{ slot1_name }}"
+    configuration_source: "{{ win_app_name }}13"
+    app_settings:
+        testkey: testvalue
+  register: output
+
+- name: Assert slot creation
+  assert:
+    that:
+      - output.changed
+
+- name: Update webapp slot (idempotence)
+  azure_rm_webapp_slot:
+    resource_group: "{{ resource_group }}"
+    webapp_name: "{{ win_app_name }}13"
+    name: "{{ slot1_name }}"
+    app_settings:
+        testkey: testvalue
+  register: output
+
+- name: Assert idempotence
+  assert:
+    that:
+      - not output.changed
+
+- name: Update webapp slot
+  azure_rm_webapp_slot:
+    resource_group: "{{ resource_group }}"
+    webapp_name: "{{ win_app_name }}13"
+    name: "{{ slot1_name }}"
+    framework:
+      name: "node"
+      version: "10.1"
+    app_settings:
+        testkey: testvalue2
+  register: output
+
+- name: Assert updating
+  assert:
+    that:
+      - output.changed
+
+- name: Swap webapp slot
+  azure_rm_webapp_slot:
+    resource_group: "{{ resource_group }}"
+    webapp_name: "{{ win_app_name }}13"
+    name: "{{ slot1_name }}"
+    swap:
+      action: swap
+  register: output
+
+- name: Assert swap
+  assert:
+    that:
+      - output.changed
+
+- name: Stop webapp slot
+  azure_rm_webapp_slot:
+    resource_group: "{{ resource_group }}"
+    webapp_name: "{{ win_app_name }}13"
+    name: "{{ slot1_name }}"
+    app_ state: stopped
+  register: output
+
+- name: Assert stopped
+  assert:
+    that:
+      - output.changed
+
+- name: delete slot
+  azure_rm_webapp_slot:
+    resource_group: "{{ resource_group }}"
+    webapp_name: "{{ win_app_name }}13"
+    name: "{{ slot1_name }}"
+    state: absent
