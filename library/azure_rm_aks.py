@@ -89,13 +89,6 @@ options:
                 description:
                     - The secret password associated with the service principal.
                 required: true
-    enable_rbac:
-        description:
-            - Enable RBAC.
-            - Existing non-RBAC enabled AKS clusters cannot currently be updated for RBAC use.
-        type: bool
-        default: no
-        version_added: 2.8
 
 extends_documentation_fragment:
     - azure
@@ -255,8 +248,7 @@ def create_aks_dict(aks):
         agent_pool_profiles=create_agent_pool_profiles_dict(
             aks.agent_pool_profiles),
         type=aks.type,
-        kube_config=aks.kube_config,
-        enable_rbac=aks.enable_rbac
+        kube_config=aks.kube_config
     )
 
 
@@ -368,10 +360,6 @@ class AzureRMManagedCluster(AzureRMModuleBase):
             service_principal=dict(
                 type='dict',
                 options=service_principal_spec
-            ),
-            enable_rbac=dict(
-                type='bool',
-                default=False
             )
         )
 
@@ -385,7 +373,6 @@ class AzureRMManagedCluster(AzureRMModuleBase):
         self.linux_profile = None
         self.agent_pool_profiles = None
         self.service_principal = None
-        self.enable_rbac = False
 
         required_if = [
             ('state', 'present', [
@@ -466,9 +453,6 @@ class AzureRMManagedCluster(AzureRMModuleBase):
                         to_be_updated = True
 
                     if response['kubernetes_version'] != self.kubernetes_version:
-                        to_be_updated = True
-
-                    if response['enable_rbac'] != self.enable_rbac:
                         to_be_updated = True
 
                     for profile_result in response['agent_pool_profiles']:
