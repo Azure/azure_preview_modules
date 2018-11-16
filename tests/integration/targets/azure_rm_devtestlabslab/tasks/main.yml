@@ -7,10 +7,9 @@
   azure_rm_devtestlabslab:
     resource_group: "{{ resource_group }}"
     name: "lab{{ rpfx}}"
-    lab:
-      location: eastus
-      lab_storage_type: standard
-      premium_data_disks: disabled
+    location: eastus
+    lab_storage_type: standard
+    premium_data_disks: disabled
   check_mode: yes
   register: output
 - name: Assert the resource instance is well created
@@ -22,10 +21,9 @@
   azure_rm_devtestlabslab:
     resource_group: "{{ resource_group }}"
     name: "lab{{ rpfx}}"
-    lab:
-      location: eastus
-      lab_storage_type: standard
-      premium_data_disks: disabled
+    location: eastus
+    lab_storage_type: standard
+    premium_data_disks: disabled
   register: output
 - name: Assert the resource instance is well created
   assert:
@@ -36,10 +34,9 @@
   azure_rm_devtestlabslab:
     resource_group: "{{ resource_group }}"
     name: "lab{{ rpfx}}"
-    lab:
-      location: eastus
-      lab_storage_type: standard
-      premium_data_disks: disabled
+    location: eastus
+    lab_storage_type: standard
+    premium_data_disks: disabled
   register: output
 - name: Assert the state has not changed
   assert:
