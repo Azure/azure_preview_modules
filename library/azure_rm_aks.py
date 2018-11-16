@@ -234,75 +234,6 @@ def create_ssh_configuration_instance(sshconf):
     )
 
 
-def create_aks_dict(aks):
-    '''
-    Helper method to deserialize a ContainerService to a dict
-    :param: aks: ContainerService or AzureOperationPoller with the Azure callback object
-    :return: dict with the state on Azure
-    '''
-
-    return dict(
-        id=aks.id,
-        name=aks.name,
-        location=aks.location,
-        dns_prefix=aks.dns_prefix,
-        kubernetes_version=aks.kubernetes_version,
-        tags=aks.tags,
-        linux_profile=create_linux_profile_dict(aks.linux_profile),
-        service_principal_profile=create_service_principal_profile_dict(
-            aks.service_principal_profile),
-        provisioning_state=aks.provisioning_state,
-        agent_pool_profiles=create_agent_pool_profiles_dict(
-            aks.agent_pool_profiles),
-        type=aks.type,
-        kube_config=aks.kube_config,
-        enable_rbac=aks.enable_rbac
-    )
-
-
-def create_linux_profile_dict(linuxprofile):
-    '''
-    Helper method to deserialize a ContainerServiceLinuxProfile to a dict
-    :param: linuxprofile: ContainerServiceLinuxProfile with the Azure callback object
-    :return: dict with the state on Azure
-    '''
-    return dict(
-        ssh_key=linuxprofile.ssh.public_keys[0].key_data,
-        admin_username=linuxprofile.admin_username
-    )
-
-
-def create_service_principal_profile_dict(serviceprincipalprofile):
-    '''
-    Helper method to deserialize a ContainerServiceServicePrincipalProfile to a dict
-    Note: For security reason, the service principal secret is skipped on purpose.
-    :param: serviceprincipalprofile: ContainerServiceServicePrincipalProfile with the Azure callback object
-    :return: dict with the state on Azure
-    '''
-    return dict(
-        client_id=serviceprincipalprofile.client_id
-    )
-
-
-def create_agent_pool_profiles_dict(agentpoolprofiles):
-    '''
-    Helper method to deserialize a ContainerServiceAgentPoolProfile to a dict
-    :param: agentpoolprofiles: ContainerServiceAgentPoolProfile with the Azure callback object
-    :return: dict with the state on Azure
-    '''
-    return [dict(
-        count=profile.count,
-        vm_size=profile.vm_size,
-        name=profile.name,
-        os_disk_size_gb=profile.os_disk_size_gb,
-        #dns_prefix=profile.dns_prefix,
-        ports=profile.ports,
-        storage_profile=profile.storage_profile,
-        vnet_subnet_id=profile.vnet_subnet_id,
-        os_type=profile.os_type
-    ) for profile in agentpoolprofiles] if agentpoolprofiles else None
-
-
 linux_profile_spec = dict(
     admin_username=dict(type='str', required=True),
     ssh_key=dict(type='str', required=True)
@@ -550,7 +481,7 @@ class AzureRMManagedCluster(AzureRMModuleBase):
             poller = self.containerservice_client.managed_clusters.create_or_update(self.resource_group, self.name, parameters)
             response = self.get_poller_result(poller)
             response.kube_config = self.get_aks_kubeconfig()
-            return create_aks_dict(response)
+            return response.as_dict()
         except CloudError as exc:
             self.log('Error attempting to create the AKS instance.')
             self.fail("Error creating the AKS instance: {0}".format(exc.message))
@@ -586,7 +517,7 @@ class AzureRMManagedCluster(AzureRMModuleBase):
             self.log("Response : {0}".format(response))
             self.log("AKS instance : {0} found".format(response.name))
             response.kube_config = self.get_aks_kubeconfig()
-            return create_aks_dict(response)
+            return response.as_dict()
         except CloudError:
             self.log('Did not find the AKS instance.')
             return False
