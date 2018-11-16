@@ -43,7 +43,7 @@ options:
     auto_swap_slot_name:
         description:
             - Target slot name to auto swap.
-            - Set it to 'False' to disable auto slot swap.
+            - Set it to 'None' to disable auto slot swap.
     swap:
         description:
             - Swap deployment slots of a web app.
@@ -59,9 +59,15 @@ options:
                     - preview
                     - swap
                     - reset
+                default: preview
             target_slot:
                 description:
                     - Name of target slot to swap. If set to None, then swap with production slot.
+            preserve_vnet:
+                description:
+                    - True to preserve virtual network to the slot during swap. Otherwise False.
+                type: bool
+                default: True
     frameworks:
         description:
             - Set of run time framework settings. Each setting is a dictionary.
@@ -271,17 +277,22 @@ except ImportError:
     # This is handled in azure_rm_common
     pass
 
-swap_sepc = dict(
+swap_spec = dict(
     action=dict(
         type='str',
         choices=[
             'preview',
             'swap',
             'reset'
-        ]
+        ],
+        default='preview'
     ),
     target_slot=dict(
         type='str'
+    ),
+    preserve_vnet=dict(
+        type=bool,
+        default=True
     )
 )
 
@@ -314,49 +325,6 @@ framework_spec = dict(
 )
 
 
-def _normalize_sku(sku):
-    if sku is None:
-        return sku
-
-    sku = sku.upper()
-    if sku == 'FREE':
-        return 'F1'
-    elif sku == 'SHARED':
-        return 'D1'
-    return sku
-
-
-def get_sku_name(tier):
-    tier = tier.upper()
-    if tier == 'F1' or tier == "FREE":
-        return 'FREE'
-    elif tier == 'D1' or tier == "SHARED":
-        return 'SHARED'
-    elif tier in ['B1', 'B2', 'B3', 'BASIC']:
-        return 'BASIC'
-    elif tier in ['S1', 'S2', 'S3']:
-        return 'STANDARD'
-    elif tier in ['P1', 'P2', 'P3']:
-        return 'PREMIUM'
-    elif tier in ['P1V2', 'P2V2', 'P3V2']:
-        return 'PREMIUMV2'
-    else:
-        return None
-
-
-def appserviceplan_to_dict(plan):
-    return dict(
-        id=plan.id,
-        name=plan.name,
-        kind=plan.kind,
-        location=plan.location,
-        reserved=plan.reserved,
-        is_linux=plan.reserved,
-        provisioning_state=plan.provisioning_state,
-        tags=plan.tags if plan.tags else None
-    )
-
-
 def webapp_to_dict(webapp):
     return dict(
         id=webapp.id,
@@ -379,13 +347,21 @@ def webapp_to_dict(webapp):
 def slot_to_dict(slot):
     return dict(
         id=slot.id,
+        resource_group=slot.resource_group,
+        server_farm_id=slot.server_farm_id,
+        target_swap_slot=slot.target_swap_slot,
+        enabled_host_names=slot.enabled_host_names,
+        slot_swap_status=slot.slot_swap_status,
         name=slot.name,
         location=slot.location,
         enabled=slot.enabled,
         reserved=slot.reserved,
-        server_farm_id=slot.server_farm_id,
         host_names_disabled=slot.host_names_disabled,
         state=slot.state,
+        repository_site_name=slot.repository_site_name,
+        default_host_name=slot.default_host_name,
+        kind=slot.kind,
+        site_config=slot.site_config,
         tags=slot.tags if slot.tags else None
     )
 
@@ -410,18 +386,14 @@ class AzureRMWebAppSlots(AzureRMModuleBase):
             webapp_name=dict(
                 type='str',
                 required=True
-            )
+            ),
             location=dict(
                 type='str'
             ),
             configuration_source=dict(
                 type='str'
             ),
-            enable_auto_swap=dict(
-                type='bool',
-                default=False
-            ),
-            auto_swap_slot=dict(
+            auto_swap_slot_name=dict(
                 type='str'
             ),
             swap=dict(
@@ -476,6 +448,7 @@ class AzureRMWebAppSlots(AzureRMModuleBase):
         self.auto_swap_slot_name = None
         self.swap = None
         self.tags = None
+        self.startup_file = None
 
         # site config, e.g app settings, ssl
         self.site_config = dict()
@@ -603,6 +576,10 @@ class AzureRMWebAppSlots(AzureRMModuleBase):
                 if self.container_settings.get('registry_server_password'):
                     self.app_settings['DOCKER_REGISTRY_SERVER_PASSWORD'] = self.container_settings['registry_server_password']
 
+            # set auto_swap_slot_name
+            if self.auto_swap_slot_name:
+                self.site_config['auto_swap_slot_name'] = self.auto_swap_slot_name
+
             # init site
             self.site = Site(location=self.location, site_config=self.site_config)
 
@@ -615,9 +592,8 @@ class AzureRMWebAppSlots(AzureRMModuleBase):
                 self.site.tags = self.tags
 
                 # if linux, setup startup_file
-                if old_plan['is_linux']:
-                    if hasattr(self, 'startup_file'):
-                        self.site_config['app_command_line'] = self.startup_file
+                if self.startup_file:
+                    self.site_config['app_command_line'] = self.startup_file
 
                 # set app setting
                 if self.app_settings:
@@ -627,9 +603,6 @@ class AzureRMWebAppSlots(AzureRMModuleBase):
 
                     self.site_config['app_settings'] = app_settings
 
-                # set auto_swap_slot_name
-                if self.auto_swap_slot_name:
-                    self.site_config['auto_swap_slot_name'] = self.auto_swap_slot_name
             else:
                 # existing slot, do update
                 self.log("Web App slot already exists")
@@ -649,7 +622,7 @@ class AzureRMWebAppSlots(AzureRMModuleBase):
                     self.to_do = Actions.CreateOrUpdate
 
                 # check if linux_fx_version changed
-                if old_config.linux_fx_version != self.site_config.get('linux_fx_version', ''):
+                if self.site_config.get('linux_fx_version', None) and old_config.linux_fx_version != self.site_config.get('linux_fx_version'):
                     to_be_updated = True
                     self.to_do = Actions.CreateOrUpdate
 
@@ -658,12 +631,13 @@ class AzureRMWebAppSlots(AzureRMModuleBase):
                 # purge existing app_settings:
                 if self.purge_app_settings:
                     to_be_updated = True
+                    self.to_do = Actions.UpdateAppSettings
                     self.app_settings_strDic.properties = dict()
 
                 # check if app settings changed
                 if self.purge_app_settings or self.is_app_settings_changed():
                     to_be_updated = True
-                    self.to_do = Actions.CreateOrUpdate
+                    self.to_do = Actions.UpdateAppSettings
 
                     if self.app_settings:
                         for key in self.app_settings.keys():
@@ -695,12 +669,15 @@ class AzureRMWebAppSlots(AzureRMModuleBase):
                 response = self.create_update_slot()
 
                 self.results['id'] = response['id']
+            
+            if self.to_do == Actions.UpdateAppSettings:
+                self.update_app_settings()
 
         slot = None
-        if old_response:
-            slot = old_response
         if response:
             slot = response
+        if old_response:
+            slot = old_response
 
         if slot:
             if (slot['state'] != 'Stopped' and self.app_state == 'stopped') or \
@@ -715,8 +692,8 @@ class AzureRMWebAppSlots(AzureRMModuleBase):
 
             if self.swap:
                 self.results['changed'] = True
-                    if self.check_mode:
-                        return self.results
+                if self.check_mode:
+                    return self.results
 
                 self.swap_slot()
 
@@ -729,9 +706,9 @@ class AzureRMWebAppSlots(AzureRMModuleBase):
                 if not getattr(existing_config, fx_version) or \
                         getattr(existing_config, fx_version).upper() != self.site_config.get(fx_version).upper():
                             return True
-        if self.auto_swap_slot_name is False:
-            if existing_config.auto_swap_slot_name is not None:
-                return True
+
+        if self.auto_swap_slot_name is None and existing_config.auto_swap_slot_name is not None:
+            return True
         elif self.auto_swap_slot_name and self.auto_swap_slot_name != getattr(existing_config, 'auto_swap_slot_name', None):
             return True
         return False
@@ -742,11 +719,8 @@ class AzureRMWebAppSlots(AzureRMModuleBase):
             if len(self.app_settings_strDic.properties) != len(self.app_settings):
                 return True
 
-            elif self.app_settings_strDic.properties and len(self.app_settings_strDic.properties) > 0:
-                for key in self.app_settings.keys():
-                    if not self.app_settings_strDic.properties.get(key) \
-                            or self.app_settings[key] != self.app_settings_strDic.properties[key]:
-                        return True
+            if self.app_settings_strDic.properties != self.app_settings:
+                return True
         return False
 
     # comparing deployment source with input, determine wheather it's changed
@@ -839,16 +813,16 @@ class AzureRMWebAppSlots(AzureRMModuleBase):
         response = None
 
         try:
-            response = self.web_client.web_apps.get(resource_group_name=self.resource_group,
-                                                    name=self.webapp_name,
-                                                    slot=self.name)
+            response = self.web_client.web_apps.get_slot(resource_group_name=self.resource_group,
+                                                         name=self.webapp_name,
+                                                         slot=self.name)
 
             self.log("Response : {0}".format(response))
             self.log("Web App slot: {0} found".format(response.name))
             return slot_to_dict(response)
 
         except CloudError as ex:
-            self.log("Didn't find web app slot s{0} in resource group {1}".format(self.name, self.resource_group))
+            self.log("Does not find web app slot {0} in resource group {1}".format(self.name, self.resource_group))
 
         return False
 
@@ -862,15 +836,13 @@ class AzureRMWebAppSlots(AzureRMModuleBase):
         try:
 
             response = self.web_client.web_apps.list_application_settings_slot(
-                resource_group_name=self.resource_group, name=self.webapp_name, slot=self.slot)
+                resource_group_name=self.resource_group, name=self.webapp_name, slot=self.name)
             self.log("Response : {0}".format(response))
 
             return response
         except CloudError as ex:
-            self.log("Failed to list application settings for web app slot {0} in resource group {1}".format(
-                self.name, self.resource_group))
-
-            return False
+            self.fail("Failed to list application settings for web app slot {0} in resource group {1}: {2}".format(
+                self.name, self.resource_group, str(ex)))
 
     def update_app_settings(self):
         '''
@@ -883,16 +855,16 @@ class AzureRMWebAppSlots(AzureRMModuleBase):
             response = self.web_client.web_apps.update_application_settings_slot(resource_group_name=self.resource_group, 
                                                                                  name=self.webapp_name,
                                                                                  slot=self.name,
-                                                                                 kind='Microsoft.web/slot',
-                                                                                 properties=self.app_settings_strDic)
+                                                                                 kind=None,
+                                                                                 app_settings=self.app_settings_strDic)
             self.log("Response : {0}".format(response))
 
             return response.as_dict()
         except CloudError as ex:
-            self.log("Failed to update application settings for web app slot {0} in resource group {1}".format(
-                self.name, self.resource_group))
+            self.fail("Failed to update application settings for web app slot {0} in resource group {1}: {2}".format(
+                self.name, self.resource_group, str(ex)))
 
-        return False
+        return response
 
     def create_or_update_source_control(self):
         '''
@@ -917,8 +889,8 @@ class AzureRMWebAppSlots(AzureRMModuleBase):
 
             return response.as_dict()
         except CloudError as ex:
-            self.fail("Failed to update site source control for web app slot {0} in resource group {1}".format(
-                self.name, self.resource_group))
+            self.fail("Failed to update site source control for web app slot {0} in resource group {1}: {2}".format(
+                self.name, self.resource_group, str(ex)))
 
     def get_configuration(self):
         '''
@@ -935,10 +907,8 @@ class AzureRMWebAppSlots(AzureRMModuleBase):
 
             return response
         except CloudError as ex:
-            self.log("Failed to get configuration for web app slot {0} in resource group {1}: {2}".format(
+            self.fail("Failed to get configuration for web app slot {0} in resource group {1}: {2}".format(
                 self.name, self.resource_group, str(ex)))
-
-            return False
 
     def set_slot_state(self, appstate):
         '''
@@ -960,7 +930,7 @@ class AzureRMWebAppSlots(AzureRMModuleBase):
             return response
         except CloudError as ex:
             request_id = ex.request_id if ex.request_id else ''
-            self.log("Failed to {0} web app slot {1} in resource group {2}, request_id {3} - {4}".format(
+            self.fail("Failed to {0} web app slot {1} in resource group {2}, request_id {3} - {4}".format(
                 appstate, self.name, self.resource_group, request_id, str(ex)))
 
     def swap_slot(self):
@@ -975,26 +945,30 @@ class AzureRMWebAppSlots(AzureRMModuleBase):
                 if self.swap['target_slot'] is None:
                     response = self.web_client.web_apps.swap_slot_with_production(resource_group_name=self.resource_group,
                                                                                   name=self.webapp_name,
-                                                                                  target_slot=self.name)
+                                                                                  target_slot=self.name,
+                                                                                  preserve_vnet=self.swap['preserve_vnet'])
                 else:
                     response = self.web_client.web_apps.swap_slot_slot(resource_group_name=self.resource_group,
                                                                        name=self.webapp_name,
                                                                        slot=self.name,
-                                                                       target_slot=self.swap['target_slot'])
+                                                                       target_slot=self.swap['target_slot'],
+                                                                       preserve_vnet=self.swap['preserve_vnet'])
             elif self.swap['action'] == 'preview':
                 if self.swap['target_slot'] is None:
                     response = self.web_client.web_apps.apply_slot_config_to_production(resource_group_name=self.resource_group,
                                                                                         name=self.webapp_name,
-                                                                                        target_slot=self.name)
+                                                                                        target_slot=self.name,
+                                                                                        preserve_vnet=self.swap['preserve_vnet'])
                 else:
                     response = self.web_client.web_apps.apply_slot_configuration_slot(resource_group_name=self.resource_group,
                                                                                       name=self.webapp_name,
                                                                                       slot=self.name,
-                                                                                      target_slot=self.swap['target_slot'])
+                                                                                      target_slot=self.swap['target_slot'],
+                                                                                      preserve_vnet=self.swap['preserve_vnet'])
             elif self.swap['action'] == 'reset':
                 if self.swap['target_slot'] is None:
                     response = self.web_client.web_apps.reset_production_slot_config(resource_group_name=self.resource_group,
-                                                                                     name=self.webapp_name
+                                                                                     name=self.webapp_name)
                 else:
                     response = self.web_client.web_apps.reset_slot_configuration_slot(resource_group_name=self.resource_group,
                                                                                       name=self.webapp_name,
