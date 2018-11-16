@@ -14,12 +14,9 @@ import json
 from os.path import expanduser
 
 from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.ansible_release import __version__ as ANSIBLE_VERSION
 from ansible.module_utils.six.moves import configparser
 import ansible.module_utils.six.moves.urllib.parse as urlparse
-try:
-    from ansible.release import __version__ as ANSIBLE_VERSION
-except ImportError:
-    ANSIBLE_VERSION = 'unknown'
 
 AZURE_COMMON_ARGS = dict(
     auth_source=dict(
@@ -64,7 +61,7 @@ AZURE_API_PROFILES = {
             snapshots='2017-03-30',
             virtual_machine_run_commands='2017-03-30'
         ),
-        'NetworkManagementClient': '2017-11-01',
+        'NetworkManagementClient': '2018-08-01',
         'ResourceManagementClient': '2017-05-10',
         'StorageManagementClient': '2017-10-01',
         'WebsiteManagementClient': '2016-08-01',
@@ -164,7 +161,6 @@ try:
     from azure.mgmt.containerregistry import ContainerRegistryManagementClient
     from azure.mgmt.containerinstance import ContainerInstanceManagementClient
     from azure.mgmt.cdn import CdnManagementClient
-
 except ImportError as exc:
     HAS_AZURE_EXC = exc
     HAS_AZURE = False
@@ -217,7 +213,7 @@ AZURE_PKG_VERSIONS = {
     },
     'NetworkManagementClient': {
         'package_name': 'network',
-        'expected_version': '1.7.1'
+        'expected_version': '2.2.1'
     },
     'ResourceManagementClient': {
         'package_name': 'resource',
@@ -297,7 +293,6 @@ class AzureRMModuleBase(object):
         self._containerservice_client = None
         self._traffic_manager_management_client = None
         self._monitor_client = None
-        self._cdn_client = None
         self._resource = None
 
         self.check_mode = self.module.check_mode
@@ -802,13 +797,13 @@ class AzureRMModuleBase(object):
         if not self._network_client:
             self._network_client = self.get_mgmt_svc_client(NetworkManagementClient,
                                                             base_url=self._cloud_environment.endpoints.resource_manager,
-                                                            api_version='2017-11-01')
+                                                            api_version='2018-08-01')
         return self._network_client
 
     @property
     def network_models(self):
         self.log("Getting network models...")
-        return NetworkManagementClient.models("2017-11-01")
+        return NetworkManagementClient.models("2018-08-01")
 
     @property
     def rm_client(self):
@@ -939,15 +934,6 @@ class AzureRMModuleBase(object):
                                                             base_url=self._cloud_environment.endpoints.resource_manager)
         return self._monitor_client
 
-    @property
-    def cdn_client(self):
-        self.log('Getting cdn management client')
-        if not self._cdn_client:
-            self._cdn_client = self.get_mgmt_svc_client(CdnManagementClient,
-                                                        base_url=self._cloud_environment.endpoints.resource_manager,
-                                                        api_version='2017-04-02')
-        return self._cdn_client
-
 
 class AzureRMAuthException(Exception):
     pass
@@ -1007,7 +993,7 @@ class AzureRMAuth(object):
                 try:
                     self._cloud_environment = azure_cloud.get_cloud_from_metadata_endpoint(raw_cloud_env)
                 except Exception as e:
-                    self.fail("cloud_environment {0} could not be resolved: {1}".format(raw_cloud_env, e.message), exception=traceback.format_exc(e))
+                    self.fail("cloud_environment {0} could not be resolved: {1}".format(raw_cloud_env, e.message), exception=traceback.format_exc())
 
         if self.credentials.get('subscription_id', None) is None and self.credentials.get('credentials') is None:
             self.fail("Credentials did not include a subscription_id value.")

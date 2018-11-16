@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# Copyright (c) 2018 Hai Cao, <t-haicao@microsoft.com>
+# Copyright (c) 2018 Hai Cao, <t-haicao@microsoft.com>, Yunge Zhu <yungez@microsoft.com>
 #
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
@@ -16,12 +16,12 @@ DOCUMENTATION = '''
 ---
 module: azure_rm_cdnprofile_facts
 
-version_added: "2.7"
+version_added: "2.8"
 
-short_description: Get CDN profile facts
+short_description: Get Azure CDN profile facts
 
 description:
-    - Get facts for a specific CDN profile or all CDN profiles.
+    - Get facts for a specific Azure CDN profile or all CDN profiles.
 
 options:
     name:
@@ -39,6 +39,7 @@ extends_documentation_fragment:
 
 author:
     - "Hai Cao <t-haicao@microsoft.com>"
+    - "Yunge Zhu <yungez@microsoft.com>"
 '''
 
 EXAMPLES = '''
@@ -74,18 +75,13 @@ cdnprofiles:
             returned: always
             type: str
             sample: Testing
-        state:
-            description:
-                - The state of the CDN profile.
-            type: str
-            sample: present
         location:
             description:
                 - Location of the CDN profile.
             type: str
             sample: WestUS
         id:
-            description
+            description:
                 - ID of the CDN profile.
             type: str
             sample: /subscriptions/XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX/resourcegroups/cdntest/providers/Microsoft.Cdn/profiles/cdntest
@@ -101,9 +97,9 @@ cdnprofiles:
             sample: Active
         sku:
             description:
-                - The pricing tier (defines a CDN provider, feature list and rate) of the CDN profile.
+                - The pricing tier, defines a CDN provider, feature list and rate of the CDN profile.
             type: str
-            sample: Standard_Verizon
+            sample: standard_verizon
         type:
             description:
                 - The type of the CDN profile.
@@ -123,6 +119,7 @@ from ansible.module_utils.azure_rm_common import AzureRMModuleBase
 try:
     from azure.mgmt.cdn.models import ErrorResponseException
     from azure.common import AzureHttpError
+    from azure.mgmt.cdn import CdnManagementClient
 except:
     # handled in azure_rm_common
     pass
@@ -151,6 +148,7 @@ class AzureRMCdnprofileFacts(AzureRMModuleBase):
         self.name = None
         self.resource_group = None
         self.tags = None
+        self.cdn_client = None
 
         super(AzureRMCdnprofileFacts, self).__init__(
             derived_arg_spec=self.module_args,
@@ -162,6 +160,8 @@ class AzureRMCdnprofileFacts(AzureRMModuleBase):
 
         for key in self.module_args:
             setattr(self, key, kwargs[key])
+
+        self.cdn_client = self.get_cdn_client()
 
         if self.name and not self.resource_group:
             self.fail("Parameter error: resource group required when filtering by name.")
@@ -240,12 +240,18 @@ class AzureRMCdnprofileFacts(AzureRMModuleBase):
         new_result['name'] = cdnprofile.name
         new_result['type'] = cdnprofile.type
         new_result['location'] = cdnprofile.location
-        new_result['state'] = 'present'
         new_result['resource_state'] = cdnprofile.resource_state
         new_result['sku'] = cdnprofile.sku.name
         new_result['provisioning_state'] = cdnprofile.provisioning_state
         new_result['tags'] = cdnprofile.tags
         return new_result
+
+    def get_cdn_client(self):
+        if not self.cdn_client:
+            self.cdn_client = self.get_mgmt_svc_client(CdnManagementClient,
+                                                       base_url=self._cloud_environment.endpoints.resource_manager,
+                                                       api_version='2017-04-02')
+        return self.cdn_client
 
 
 def main():
