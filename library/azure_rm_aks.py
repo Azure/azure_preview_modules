@@ -580,7 +580,7 @@ class AzureRMManagedCluster(AzureRMModuleBase):
 
         :return: AKS instance kubeconfig
         '''
-        access_profile = self.containerservice_client.managed_clusters.get_access_profiles(
+        access_profile = self.containerservice_client.managed_clusters.get_access_profile(
             self.resource_group, self.name, "clusterUser")
         return base64.b64decode(access_profile.kube_config)
 
