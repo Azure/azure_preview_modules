@@ -360,8 +360,7 @@ class AzureRMManagedCluster(AzureRMModuleBase):
 
             else:
                 self.log('Results : {0}'.format(response))
-                update_tags, response['tags'] = self.update_tags(
-                    response['tags'])
+                update_tags, response['tags'] = self.update_tags(response.get('tags', None))
 
                 if response['provisioning_state'] == "Succeeded":
                     if update_tags:
