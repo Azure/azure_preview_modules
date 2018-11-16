@@ -68,7 +68,7 @@ before_install:
       while [ $m -le $max_retry_count ]; do
         echo Run test $m time;
 
-        travis_wait 50 ansible-playbook tests/integration/main.yml;
+        travis_wait 50 ansible-playbook -vvv tests/integration/main.yml;
 
         if [ $? -ne 0 ]; then
           echo test $test_name failed;
