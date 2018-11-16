@@ -295,7 +295,7 @@ def create_agent_pool_profiles_dict(agentpoolprofiles):
         vm_size=profile.vm_size,
         name=profile.name,
         os_disk_size_gb=profile.os_disk_size_gb,
-        dns_prefix=profile.dns_prefix,
+        #dns_prefix=profile.dns_prefix,
         ports=profile.ports,
         storage_profile=profile.storage_profile,
         vnet_subnet_id=profile.vnet_subnet_id,
