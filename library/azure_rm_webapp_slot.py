@@ -17,9 +17,9 @@ DOCUMENTATION = '''
 ---
 module: azure_rm_webapp_slot
 version_added: "2.8"
-short_description: Manage Web App slot.
+short_description: Manage Azure Web App slot.
 description:
-    - Create, update and delete Web App slot.
+    - Create, update and delete Azure Web App slot.
 
 options:
     resource_group:
@@ -39,7 +39,7 @@ options:
             - Resource location. If not set, location from the resource group will be used as default.
     configuration_source:
         description:
-            - Source slot to clone configurations from. Use webapp's name to refer to the production slot.
+            - Source slot to clone configurations from when creating slot. Use webapp's name to refer to the production slot.
     auto_swap_slot_name:
         description:
             - Target slot name to auto swap.
@@ -47,7 +47,6 @@ options:
     swap:
         description:
             - Swap deployment slots of a web app.
-        type: dict
         suboptions:
             action:
                 description:
@@ -123,10 +122,10 @@ options:
                     - The container registry server password.
     app_settings:
         description:
-            - Configure web app application settings. Suboptions are in key value pair format.s
+            - Configure web app slot application settings. Suboptions are in key value pair format.
     purge_app_settings:
         description:
-            - Purge any existing application settings. Replace web app application settings with app_settings.
+            - Purge any existing application settings. Replace slot application settings with app_settings.
         type: bool
     deployment_source:
         description:
@@ -135,24 +134,22 @@ options:
             url:
                 description:
                     - Repository url of deployment source.
-
             branch:
                 description:
                     - The branch name of the repository.
     app_state:
         description:
-            - Start/Stop/Restart the web app.
+            - Start/Stop/Restart the slot.
         type: str
         choices:
             - started
             - stopped
             - restarted
         default: started
-
     state:
       description:
         - Assert the state of the Web App deployment slot.
-        - Use 'present' to create or update a deployment slot and 'absent' to delete it.
+        - Use 'present' to create or update a  slot and 'absent' to delete it.
       default: present
       choices:
         - absent
@@ -168,97 +165,55 @@ author:
 '''
 
 EXAMPLES = '''
-    - name: Create a windows web app with non-exist app service plan
-      azure_rm_webapp:
-        resource_group: myresourcegroup
-        name: mywinwebapp
-        plan:
-          resource_group: myappserviceplan_rg
-          name: myappserviceplan
-          is_linux: false
-          sku: S1
-
-    - name: Create a docker web app with some app settings, with docker image
-      azure_rm_webapp:
-        resource_group: myresourcegroup
-        name: mydockerwebapp
-        plan:
-          resource_group: appserviceplan_test
-          name: myappplan
-          is_linux: true
-          sku: S1
-          number_of_workers: 2
-        app_settings:
+  - name: Create a webapp slot
+    azure_rm_webapp_slot:
+      resource_group: myRG
+      webapp_name: myJavaWebApp
+      name: stage
+      configuration_source: myJavaWebApp
+      app_settings:
           testkey: testvalue
-          testkey2: testvalue2
-        container_settings:
-          name: ansible/ansible:ubuntu1404
 
-    - name: Create a docker web app with private acr registry
-      azure_rm_webapp:
-        resource_group: myresourcegroup
-        name: mydockerwebapp
-        plan: myappplan
-        app_settings:
-          testkey: testvalue
-        container_settings:
-          name: ansible/ubuntu1404
-          registry_server_url: myregistry.io
-          registry_server_user: user
-          registry_server_password: pass
+  - name: swap the slot with production slot
+    azure_rm_webapp_slot:
+      resource_group: myRG
+      webapp_name: myJavaWebApp
+      name: stage
+      swap:
+        action: swap
 
-    - name: Create a linux web app with Node 6.6 framework
-      azure_rm_webapp:
-        resource_group: myresourcegroup
-        name: mylinuxwebapp
-        plan:
-          resource_group: appserviceplan_test
-          name: myappplan
-        app_settings:
-          testkey: testvalue
-        frameworks:
-          - name: "node"
-            version: "6.6"
+  - name: stop the slot
+    azure_rm_webapp_slot:
+      resource_group: myRG
+      webapp_name: myJavaWebApp
+      name: stage
+      app_state: stopped
 
-    - name: Create a windows web app with node, php
-      azure_rm_webapp:
-        resource_group: myresourcegroup
-        name: mywinwebapp
-        plan:
-          resource_group: appserviceplan_test
-          name: myappplan
-        app_settings:
+  - name: udpate a webapp slot app settings
+    azure_rm_webapp_slot:
+      resource_group: myRG
+      webapp_name: myJavaWebApp
+      name: stage
+      app_settings:
           testkey: testvalue
-        frameworks:
-          - name: "node"
-            version: 6.6
-          - name: "php"
-            version: "7.0"
 
-    - name: Create a linux web app with java framework
-      azure_rm_webapp:
-        resource_group: myresourcegroup
-        name: mylinuxwebapp
-        plan:
-          resource_group: appserviceplan_test
-          name: myappplan
-        app_settings:
-          testkey: testvalue
-        frameworks:
-          - name: "java"
-            version: "8"
-            settings:
-              java_container: "Tomcat"
-              java_container_version: "8.5"
+  - name: udpate a webapp frameworks
+    azure_rm_webapp_slot:
+      resource_group: myRG
+      webapp_name: myJavaWebApp
+      name: stage
+      frameworks:
+        - name: node
+          version: 10.1
 '''
 
 RETURN = '''
-azure_webapp:
-    description: Id of current web app.
+id:
+    description: Id of current slot.
     returned: always
-    type: dict
+    type: str
     sample: {
-        "id": "/subscriptions/<subscription_id>/resourceGroups/ansiblewebapp1/providers/Microsoft.Web/sites/ansiblewindowsaaa"
+        "id": "/subscriptions/<subsid>/resourceGroups/myRG/providers/Microsoft.Web/sites/testapp/slots/stage1"
     }
 '''
 
@@ -449,6 +404,8 @@ class AzureRMWebAppSlots(AzureRMModuleBase):
         self.swap = None
         self.tags = None
         self.startup_file = None
+        self.configuration_source = None
+        self.clone = False
 
         # site config, e.g app settings, ssl
         self.site_config = dict()
@@ -481,7 +438,8 @@ class AzureRMWebAppSlots(AzureRMModuleBase):
                                                  "java_version",
                                                  "php_version",
                                                  "python_version",
-                                                 "scm_type"]
+                                                 "scm_type",
+                                                 "linux_fx_version"]
 
         self.supported_linux_frameworks = ['ruby', 'php', 'dotnetcore', 'node', 'java']
         self.supported_windows_frameworks = ['net_framework', 'php', 'python', 'node', 'java']
@@ -602,6 +560,10 @@ class AzureRMWebAppSlots(AzureRMModuleBase):
                         app_settings.append(NameValuePair(key, self.app_settings[key]))
 
                     self.site_config['app_settings'] = app_settings
+                
+                # clone slot
+                if self.configuration_source:
+                    self.clone = True
 
             else:
                 # existing slot, do update
@@ -615,18 +577,13 @@ class AzureRMWebAppSlots(AzureRMModuleBase):
                     to_be_updated = True
 
                 # check if site_config changed
-                old_config = self.get_configuration()
+                old_config = self.get_configuration_slot(self.name)
 
                 if self.is_site_config_changed(old_config):
                     to_be_updated = True
                     self.to_do = Actions.CreateOrUpdate
 
-                # check if linux_fx_version changed
-                if self.site_config.get('linux_fx_version', None) and old_config.linux_fx_version != self.site_config.get('linux_fx_version'):
-                    to_be_updated = True
-                    self.to_do = Actions.CreateOrUpdate
-
-                self.app_settings_strDic = self.list_app_settings()
+                self.app_settings_strDic = self.list_app_settings_slot(self.name)
 
                 # purge existing app_settings:
                 if self.purge_app_settings:
@@ -669,9 +626,13 @@ class AzureRMWebAppSlots(AzureRMModuleBase):
                 response = self.create_update_slot()
 
                 self.results['id'] = response['id']
+
+                if self.clone:
+                    self.clone_slot()
             
             if self.to_do == Actions.UpdateAppSettings:
-                self.update_app_settings()
+                self.update_app_settings_slot()
+                
 
         slot = None
         if response:
@@ -688,7 +649,7 @@ class AzureRMWebAppSlots(AzureRMModuleBase):
                 if self.check_mode:
                     return self.results
 
-                self.set_slot_state(self.app_state)
+                self.set_state_slot(self.app_state)
 
             if self.swap:
                 self.results['changed'] = True
@@ -828,6 +789,24 @@ class AzureRMWebAppSlots(AzureRMModuleBase):
 
     def list_app_settings(self):
         '''
+        List webapp application settings
+        :return: deserialized list response
+        '''
+        self.log("List webapp application setting")
+
+        try:
+
+            response = self.web_client.web_apps.list_application_settings(
+                resource_group_name=self.resource_group, name=self.webapp_name)
+            self.log("Response : {0}".format(response))
+
+            return response
+        except CloudError as ex:
+            self.fail("Failed to list application settings for web app {0} in resource group {1}: {2}".format(
+                self.name, self.resource_group, str(ex)))
+
+    def list_app_settings_slot(self, slot_name):
+        '''
         List application settings
         :return: deserialized list response
         '''
@@ -836,7 +815,7 @@ class AzureRMWebAppSlots(AzureRMModuleBase):
         try:
 
             response = self.web_client.web_apps.list_application_settings_slot(
-                resource_group_name=self.resource_group, name=self.webapp_name, slot=self.name)
+                resource_group_name=self.resource_group, name=self.webapp_name, slot=slot_name)
             self.log("Response : {0}".format(response))
 
             return response
@@ -844,19 +823,23 @@ class AzureRMWebAppSlots(AzureRMModuleBase):
             self.fail("Failed to list application settings for web app slot {0} in resource group {1}: {2}".format(
                 self.name, self.resource_group, str(ex)))
 
-    def update_app_settings(self):
+    def update_app_settings_slot(self, slot_name=None, app_settings=None):
         '''
         Update application settings
         :return: deserialized updating response
         '''
         self.log("Update application setting")
 
+        if slot_name is None:
+            slot_name = self.name
+        if app_settings is None:
+            app_settings = self.app_settings_strDic
         try:
             response = self.web_client.web_apps.update_application_settings_slot(resource_group_name=self.resource_group, 
                                                                                  name=self.webapp_name,
-                                                                                 slot=self.name,
+                                                                                 slot=slot_name,
                                                                                  kind=None,
-                                                                                 app_settings=self.app_settings_strDic)
+                                                                                 app_settings=app_settings)
             self.log("Response : {0}".format(response))
 
             return response.as_dict()
@@ -866,7 +849,7 @@ class AzureRMWebAppSlots(AzureRMModuleBase):
 
         return response
 
-    def create_or_update_source_control(self):
+    def create_or_update_source_control_slot(self):
         '''
         Update site source control
         :return: deserialized updating response
@@ -895,22 +878,62 @@ class AzureRMWebAppSlots(AzureRMModuleBase):
     def get_configuration(self):
         '''
         Get web app configuration
-        :return: deserialized web app slot configuration response
+        :return: deserialized web app configuration response
+        '''
+        self.log("Get web app configuration")
+
+        try:
+
+            response = self.web_client.web_apps.get_configuration(
+                resource_group_name=self.resource_group, name=self.webapp_name)
+            self.log("Response : {0}".format(response))
+
+            return response
+        except CloudError as ex:
+            self.fail("Failed to get configuration for web app {0} in resource group {1}: {2}".format(
+                self.webapp_name, self.resource_group, str(ex)))
+
+    def get_configuration_slot(self, slot_name):
+        '''
+        Get slot configuration
+        :return: deserialized slot configuration response
         '''
         self.log("Get web app slot configuration")
 
         try:
 
             response = self.web_client.web_apps.get_configuration_slot(
-                resource_group_name=self.resource_group, name=self.webapp_name, slot=self.name)
+                resource_group_name=self.resource_group, name=self.webapp_name, slot=slot_name)
             self.log("Response : {0}".format(response))
 
             return response
         except CloudError as ex:
             self.fail("Failed to get configuration for web app slot {0} in resource group {1}: {2}".format(
-                self.name, self.resource_group, str(ex)))
+                slot_name, self.resource_group, str(ex)))
 
-    def set_slot_state(self, appstate):
+    def update_configuration_slot(self, slot_name=None, site_config=None):
+        '''
+        Update slot configuration
+        :return: deserialized slot configuration response
+        '''
+        self.log("Update web app slot configuration")
+
+        if slot_name is None:
+            slot_name = self.name
+        if site_config is None:
+            site_config = self.site_config
+        try:
+
+            response = self.web_client.web_apps.update_configuration_slot(
+                resource_group_name=self.resource_group, name=self.webapp_name, slot=slot_name, site_config=site_config)
+            self.log("Response : {0}".format(response))
+
+            return response
+        except CloudError as ex:
+            self.fail("Failed to update configuration for web app slot {0} in resource group {1}: {2}".format(
+                slot_name, self.resource_group, str(ex)))
+
+    def set_state_slot(self, appstate):
         '''
         Start/stop/restart web app slot
         :return: deserialized updating response
@@ -982,6 +1005,27 @@ class AzureRMWebAppSlots(AzureRMModuleBase):
             return response
         except CloudError as ex:
             self.fail("Failed to swap web app slot {0} in resource group {1}: {2}".format(self.name, self.resource_group, str(ex)))
+
+    def clone_slot(self):
+        if self.configuration_source:
+            src_slot = None if self.configuration_source.lower() == self.webapp_name.lower() else self.configuration_source
+
+            if src_slot is None:
+                site_config_clone_from = self.get_configuration()
+            else:
+                site_config_clone_from = self.get_configuration_slot(slot_name=src_slot)
+
+            self.update_configuration_slot(site_config=site_config_clone_from)
+
+            if src_slot is None:
+                app_setting_clone_from = self.list_app_settings()
+            else:
+                app_setting_clone_from = self.list_app_settings_slot(src_slot)
+
+            if self.app_settings:
+                app_settings_clone_from.properties.update(self.app_settings)
+
+            self.update_app_settings_slot(app_settings=app_setting_clone_from)
 
 
 def main():
