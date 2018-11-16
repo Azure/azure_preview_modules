@@ -1,0 +1,15 @@
+- name: Prepare random number
+  set_fact:
+    rpfx: "{{ resource_group | hash('md5') | truncate(7, True, '') }}{{ 1000 | random }}"
+  run_once: yes
+
+- name: Gather facts Virtual Machine Schedule
+  azure_rm_devtestlabsvirtualmachineschedule_facts:
+    resource_group: "{{ resource_group }}"
+  register: output
+- name: Assert that facts are returned
+  assert:
+    that:
+      - output.changed == False
+      - output.virtual_machine_schedules.xxxunknownxxx.id != None
+      - output.virtual_machine_schedules.xxxunknownxxx.status != None
