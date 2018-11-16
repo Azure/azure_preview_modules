@@ -184,6 +184,7 @@ from ansible.module_utils.azure_rm_common import AzureRMModuleBase
 
 try:
     from azure.mgmt.cdn.models import Endpoint, DeepCreatedOrigin, EndpointUpdateParameters, QueryStringCachingBehavior, ErrorResponseException
+    from azure.mgmt.cdn import CdnManagementClient
 except ImportError:
     # This is handled in azure_rm_common
     pass
@@ -350,6 +351,8 @@ class AzureRMCdnendpoint(AzureRMModuleBase):
         self.is_https_allowed = None
         self.query_string_caching_behavior = None
 
+        self.cdn_client = None
+
         self.results = dict(changed=False)
 
         super(AzureRMCdnendpoint, self).__init__(derived_arg_spec=self.module_arg_spec,
@@ -362,6 +365,7 @@ class AzureRMCdnendpoint(AzureRMModuleBase):
         for key in list(self.module_arg_spec.keys()) + ['tags']:
             setattr(self, key, kwargs[key])
 
+        self.cdn_client = self.get_cdn_client()
         to_be_updated = False
 
         resource_group = self.get_resource_group(self.resource_group)
@@ -651,6 +655,13 @@ class AzureRMCdnendpoint(AzureRMModuleBase):
             return True
 
         return False
+
+    def get_cdn_client(self):
+        if not self.cdn_client:
+            self.cdn_client = self.get_mgmt_svc_client(CdnManagementClient,
+                                                       base_url=self._cloud_environment.endpoints.resource_manager,
+                                                       api_version='2017-04-02')
+        return self.cdn_client
 
 
 def main():
