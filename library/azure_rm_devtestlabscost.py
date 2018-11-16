@@ -26,7 +26,7 @@ options:
         description:
             - The name of the resource group.
         required: True
-    name:
+    lab_name:
         description:
             - The name of the lab.
         required: True
@@ -134,7 +134,7 @@ EXAMPLES = '''
   - name: Create (or update) Cost
     azure_rm_devtestlabscost:
       resource_group: NOT FOUND
-      name: NOT FOUND
+      lab_name: NOT FOUND
       name: NOT FOUND
 '''
 
@@ -174,7 +174,7 @@ class AzureRMCosts(AzureRMModuleBase):
                 type='str',
                 required=True
             ),
-            name=dict(
+            lab_name=dict(
                 type='str',
                 required=True
             ),
@@ -194,7 +194,7 @@ class AzureRMCosts(AzureRMModuleBase):
         )
 
         self.resource_group = None
-        self.name = None
+        self.lab_name = None
         self.name = None
         self.lab_cost = dict()
 
@@ -260,8 +260,7 @@ class AzureRMCosts(AzureRMModuleBase):
             if self.state == 'absent':
                 self.to_do = Actions.Delete
             elif self.state == 'present':
-                if (not default_compare(self.parameters, old_response, '', {
-                       })):
+                if (not default_compare(self.parameters, old_response, '')):
                     self.to_do = Actions.Update
 
         if (self.to_do == Actions.Create) or (self.to_do == Actions.Update):
@@ -306,7 +305,7 @@ class AzureRMCosts(AzureRMModuleBase):
 
         try:
             response = self.mgmt_client.costs.create_or_update(resource_group_name=self.resource_group,
-                                                               lab_name=self.name,
+                                                               lab_name=self.lab_name,
                                                                name=self.name,
                                                                lab_cost=self.lab_cost)
             if isinstance(response, LROPoller) or isinstance(response, AzureOperationPoller):
@@ -342,7 +341,7 @@ class AzureRMCosts(AzureRMModuleBase):
         found = False
         try:
             response = self.mgmt_client.costs.get(resource_group_name=self.resource_group,
-                                                  lab_name=self.name,
+                                                  lab_name=self.lab_name,
                                                   name=self.name)
             found = True
             self.log("Response : {0}".format(response))

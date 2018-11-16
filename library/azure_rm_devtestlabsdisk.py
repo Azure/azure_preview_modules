@@ -30,7 +30,7 @@ options:
         description:
             - The name of the lab.
         required: True
-    name:
+    user_name:
         description:
             - The name of the user profile.
         required: True
@@ -96,7 +96,7 @@ EXAMPLES = '''
     azure_rm_devtestlabsdisk:
       resource_group: NOT FOUND
       lab_name: NOT FOUND
-      name: NOT FOUND
+      user_name: NOT FOUND
       name: NOT FOUND
 '''
 
@@ -140,7 +140,7 @@ class AzureRMDisks(AzureRMModuleBase):
                 type='str',
                 required=True
             ),
-            name=dict(
+            user_name=dict(
                 type='str',
                 required=True
             ),
@@ -161,7 +161,7 @@ class AzureRMDisks(AzureRMModuleBase):
 
         self.resource_group = None
         self.lab_name = None
-        self.name = None
+        self.user_name = None
         self.name = None
         self.disk = dict()
 
@@ -220,8 +220,7 @@ class AzureRMDisks(AzureRMModuleBase):
             if self.state == 'absent':
                 self.to_do = Actions.Delete
             elif self.state == 'present':
-                if (not default_compare(self.parameters, old_response, '', {
-                       })):
+                if (not default_compare(self.parameters, old_response, '')):
                     self.to_do = Actions.Update
 
         if (self.to_do == Actions.Create) or (self.to_do == Actions.Update):
@@ -267,7 +266,7 @@ class AzureRMDisks(AzureRMModuleBase):
         try:
             response = self.mgmt_client.disks.create_or_update(resource_group_name=self.resource_group,
                                                                lab_name=self.lab_name,
-                                                               user_name=self.name,
+                                                               user_name=self.user_name,
                                                                name=self.name,
                                                                disk=self.disk)
             if isinstance(response, LROPoller) or isinstance(response, AzureOperationPoller):
@@ -288,7 +287,7 @@ class AzureRMDisks(AzureRMModuleBase):
         try:
             response = self.mgmt_client.disks.delete(resource_group_name=self.resource_group,
                                                      lab_name=self.lab_name,
-                                                     user_name=self.name,
+                                                     user_name=self.user_name,
                                                      name=self.name)
         except CloudError as e:
             self.log('Error attempting to delete the Disk instance.')
@@ -307,7 +306,7 @@ class AzureRMDisks(AzureRMModuleBase):
         try:
             response = self.mgmt_client.disks.get(resource_group_name=self.resource_group,
                                                   lab_name=self.lab_name,
-                                                  user_name=self.name,
+                                                  user_name=self.user_name,
                                                   name=self.name)
             found = True
             self.log("Response : {0}".format(response))

@@ -26,7 +26,7 @@ options:
         description:
             - The name of the resource group.
         required: True
-    name:
+    lab_name:
         description:
             - The name of the lab.
         required: True
@@ -123,7 +123,7 @@ EXAMPLES = '''
   - name: Create (or update) Schedule
     azure_rm_devtestlabsschedule:
       resource_group: NOT FOUND
-      name: NOT FOUND
+      lab_name: NOT FOUND
       name: NOT FOUND
 '''
 
@@ -169,7 +169,7 @@ class AzureRMSchedules(AzureRMModuleBase):
                 type='str',
                 required=True
             ),
-            name=dict(
+            lab_name=dict(
                 type='str',
                 required=True
             ),
@@ -189,7 +189,7 @@ class AzureRMSchedules(AzureRMModuleBase):
         )
 
         self.resource_group = None
-        self.name = None
+        self.lab_name = None
         self.name = None
         self.schedule = dict()
 
@@ -256,8 +256,7 @@ class AzureRMSchedules(AzureRMModuleBase):
             if self.state == 'absent':
                 self.to_do = Actions.Delete
             elif self.state == 'present':
-                if (not default_compare(self.parameters, old_response, '', {
-                       })):
+                if (not default_compare(self.parameters, old_response, '')):
                     self.to_do = Actions.Update
 
         if (self.to_do == Actions.Create) or (self.to_do == Actions.Update):
@@ -302,7 +301,7 @@ class AzureRMSchedules(AzureRMModuleBase):
 
         try:
             response = self.mgmt_client.schedules.create_or_update(resource_group_name=self.resource_group,
-                                                                   lab_name=self.name,
+                                                                   lab_name=self.lab_name,
                                                                    name=self.name,
                                                                    schedule=self.schedule)
             if isinstance(response, LROPoller) or isinstance(response, AzureOperationPoller):
@@ -322,7 +321,7 @@ class AzureRMSchedules(AzureRMModuleBase):
         self.log("Deleting the Schedule instance {0}".format(self.name))
         try:
             response = self.mgmt_client.schedules.delete(resource_group_name=self.resource_group,
-                                                         lab_name=self.name,
+                                                         lab_name=self.lab_name,
                                                          name=self.name)
         except CloudError as e:
             self.log('Error attempting to delete the Schedule instance.')
@@ -340,7 +339,7 @@ class AzureRMSchedules(AzureRMModuleBase):
         found = False
         try:
             response = self.mgmt_client.schedules.get(resource_group_name=self.resource_group,
-                                                      lab_name=self.name,
+                                                      lab_name=self.lab_name,
                                                       name=self.name)
             found = True
             self.log("Response : {0}".format(response))
