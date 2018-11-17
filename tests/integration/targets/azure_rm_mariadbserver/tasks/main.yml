@@ -7,6 +7,16 @@
   azure_rm_mariadbserver:
     resource_group: "{{ resource_group }}"
     name: "mdbs{{ rpfx }}"
+    sku:
+      name: GP_Gen5_2
+      tier: GeneralPurpose
+      capacity: 2
+      family: Gen5
+    location: westus
+    storage_mb: 51200
+    ssl_enforcement: enabled 
+    administrator_login: zimxyz
+    administrator_login_password: Testpasswordxyz12!
   check_mode: yes
   register: output
 - name: Assert the resource instance is well created
@@ -18,6 +28,16 @@
   azure_rm_mariadbserver:
     resource_group: "{{ resource_group }}"
     name: "mdbs{{ rpfx }}"
+    sku:
+      name: GP_Gen5_2
+      tier: GeneralPurpose
+      capacity: 2
+      family: Gen5
+    location: westus
+    storage_mb: 51200
+    ssl_enforcement: enabled 
+    administrator_login: zimxyz
+    administrator_login_password: Testpasswordxyz12!
   register: output
 - name: Assert the resource instance is well created
   assert:
@@ -28,6 +48,16 @@
   azure_rm_mariadbserver:
     resource_group: "{{ resource_group }}"
     name: "mdbs{{ rpfx }}"
+    sku:
+      name: GP_Gen5_2
+      tier: GeneralPurpose
+      capacity: 2
+      family: Gen5
+    location: westus
+    storage_mb: 51200
+    ssl_enforcement: enabled 
+    administrator_login: zimxyz
+    administrator_login_password: Testpasswordxyz12!
   register: output
 - name: Assert the state has not changed
   assert:
