@@ -127,8 +127,7 @@ class AzureRMDatabases(AzureRMModuleBase):
         self.resource_group = None
         self.server_name = None
         self.name = None
-        self.charset = None
-        self.collation = None
+        self.parameters = dict()
 
         self.results = dict(changed=False)
         self.mgmt_client = None
@@ -145,6 +144,11 @@ class AzureRMDatabases(AzureRMModuleBase):
         for key in list(self.module_arg_spec.keys()) + ['tags']:
             if hasattr(self, key):
                 setattr(self, key, kwargs[key])
+            elif kwargs[key] is not None:
+                if key == "charset":
+                    self.parameters["charset"] = kwargs[key]
+                elif key == "collation":
+                    self.parameters["collation"] = kwargs[key]
 
         response = None
 
@@ -166,8 +170,7 @@ class AzureRMDatabases(AzureRMModuleBase):
             if self.state == 'absent':
                 self.to_do = Actions.Delete
             elif self.state == 'present':
-                if (not default_compare(self.parameters, old_response, '', {
-                       })):
+                if (not default_compare(self.parameters, old_response, ''):
                     self.to_do = Actions.Update
 
         if (self.to_do == Actions.Create) or (self.to_do == Actions.Update):
@@ -213,7 +216,8 @@ class AzureRMDatabases(AzureRMModuleBase):
         try:
             response = self.mgmt_client.databases.create_or_update(resource_group_name=self.resource_group,
                                                                    server_name=self.server_name,
-                                                                   database_name=self.name)
+                                                                   database_name=self.name,
+                                                                   parameters=self.parameters)
             if isinstance(response, LROPoller) or isinstance(response, AzureOperationPoller):
                 response = self.get_poller_result(response)
 
