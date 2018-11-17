@@ -79,10 +79,6 @@ options:
             storage_mb:
                 description:
                     - Max storage allowed for a server.
-    create_mode:
-        description:
-            - Constant filled by server.
-            - Required when C(state) is I(present).
     admin_username:
         description:
             - "The administrator's login name of a server. Can only be specified when the server is being created (and is required for creation)."
@@ -203,7 +199,8 @@ class AzureRMServers(AzureRMModuleBase):
                 type='dict'
             ),
             create_mode=dict(
-                type='str'
+                type='str',
+                default='Default'
             ),
             admin_username=dict(
                 type='str'
