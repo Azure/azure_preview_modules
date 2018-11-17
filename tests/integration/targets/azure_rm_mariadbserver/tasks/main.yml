@@ -13,7 +13,6 @@
       capacity: 2
       family: Gen5
     location: westus
-    storage_mb: 51200
     enforce_ssl: True
     admin_username: zimxyz
     admin_password: Testpasswordxyz12!
