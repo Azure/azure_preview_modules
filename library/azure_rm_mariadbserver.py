@@ -164,7 +164,7 @@ try:
     from msrestazure.azure_exceptions import CloudError
     from msrest.polling import LROPoller
     from msrestazure.azure_operation import AzureOperationPoller
-    from azure.mgmt.mariadb import MariaDBManagementClient
+    from azure.mgmt.rdbms.mariadb import MariaDBManagementClient
     from msrest.serialization import Model
 except ImportError:
     # This is handled in azure_rm_common
