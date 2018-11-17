@@ -67,7 +67,7 @@
 - name: Create second instance of MariaDB Server
   azure_rm_mariadbserver:
     resource_group: "{{ resource_group }}"
-    name: "mdbs{{ rpfx }}"second
+    name: "mdbs{{ rpfx }}second"
     sku:
       name: GP_Gen5_2
       tier: GeneralPurpose
