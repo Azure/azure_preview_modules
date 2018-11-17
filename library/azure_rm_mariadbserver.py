@@ -17,9 +17,9 @@ DOCUMENTATION = '''
 ---
 module: azure_rm_mariadbserver
 version_added: "2.8"
-short_description: Manage Server instance.
+short_description: Manage Azure MariaDB Server instance.
 description:
-    - Create, update and delete instance of Server.
+    - Create, update and delete instance of Azure MariaDB Server.
 
 options:
     resource_group:
@@ -59,12 +59,10 @@ options:
         choices:
             - '5.6'
             - '5.7'
-    ssl_enforcement:
+    enforce_ssl:
         description:
-            - Enable ssl enforcement or not when connect to server.
-        choices:
-            - 'enabled'
-            - 'disabled'
+            - Enable SSL enforcement.
+        type: bool
     storage_profile:
         description:
             - Storage profile of a server.
@@ -85,21 +83,19 @@ options:
         description:
             - Constant filled by server.
             - Required when C(state) is I(present).
-    administrator_login:
+    admin_username:
         description:
             - "The administrator's login name of a server. Can only be specified when the server is being created (and is required for creation)."
-            - Required when C(state) is I(present).
-    administrator_login_password:
+    admin_password:
         description:
             - The password of the administrator login.
-            - Required when C(state) is I(present).
     location:
         description:
             - Resource location. If not set, location from the resource group will be used as default.
     state:
       description:
-        - Assert the state of the Server.
-        - Use 'present' to create or update an Server and 'absent' to delete it.
+        - Assert the state of the Azure MariaDB Server.
+        - Use 'present' to create or update an Azure MariaDB Server and 'absent' to delete it.
       default: present
       choices:
         - absent
@@ -115,7 +111,7 @@ author:
 '''
 
 EXAMPLES = '''
-  - name: Create (or update) Server
+  - name: Create (or update) Azure MariaDB Server
     azure_rm_mariadbserver:
       resource_group: testrg
       name: mariadbtestsvc4
@@ -124,13 +120,13 @@ EXAMPLES = '''
         tier: GeneralPurpose
         capacity: 2
         family: Gen5
-      ssl_enforcement: Enabled
+      enforce_ssl: True
       storage_profile:
         backup_retention_days: 7
         geo_redundant_backup: Enabled
         storage_mb: 128000
-      administrator_login: cloudsa
-      administrator_login_password: pass$w0rd
+      admin_username: cloudsa
+      admin_password: pass$w0rd
       location: eastus
 '''
 
@@ -168,7 +164,7 @@ try:
     from msrestazure.azure_exceptions import CloudError
     from msrest.polling import LROPoller
     from msrestazure.azure_operation import AzureOperationPoller
-    from azure.mgmt.rdbms.mariadb import MariaDBManagementClient
+    from azure.mgmt.mariadb import MariaDBManagementClient
     from msrest.serialization import Model
 except ImportError:
     # This is handled in azure_rm_common
@@ -180,7 +176,7 @@ class Actions:
 
 
 class AzureRMServers(AzureRMModuleBase):
-    """Configuration class for an Azure RM Server resource"""
+    """Configuration class for an Azure RM Azure MariaDB Server resource"""
 
     def __init__(self):
         self.module_arg_spec = dict(
@@ -200,10 +196,8 @@ class AzureRMServers(AzureRMModuleBase):
                 choices=['5.6',
                          '5.7']
             ),
-            ssl_enforcement=dict(
-                type='str',
-                choices=['enabled',
-                         'disabled']
+            enforce_ssl=dict(
+                type='bool'
             ),
             storage_profile=dict(
                 type='dict'
@@ -211,10 +205,10 @@ class AzureRMServers(AzureRMModuleBase):
             create_mode=dict(
                 type='str'
             ),
-            administrator_login=dict(
+            admin_username=dict(
                 type='str'
             ),
-            administrator_login_password=dict(
+            admin_password=dict(
                 type='str',
                 no_log=True
             ),
@@ -260,8 +254,8 @@ class AzureRMServers(AzureRMModuleBase):
                     self.parameters["sku"] = ev
                 elif key == "version":
                     self.parameters.setdefault("properties", {})["version"] = kwargs[key]
-                elif key == "ssl_enforcement":
-                    self.parameters.setdefault("properties", {})["ssl_enforcement"] = _snake_to_camel(kwargs[key], True)
+                elif key == "enforce_ssl":
+                    self.parameters.setdefault("properties", {})["ssl_enforcement"] = 'Enabled' if kwargs[key] else 'Disabled'
                 elif key == "storage_profile":
                     ev = kwargs[key]
                     if 'geo_redundant_backup' in ev:
@@ -272,12 +266,14 @@ class AzureRMServers(AzureRMModuleBase):
                     self.parameters.setdefault("properties", {})["storage_profile"] = ev
                 elif key == "create_mode":
                     self.parameters.setdefault("properties", {})["create_mode"] = kwargs[key]
-                elif key == "administrator_login":
+                elif key == "admin_username":
                     self.parameters.setdefault("properties", {})["administrator_login"] = kwargs[key]
-                elif key == "administrator_login_password":
+                elif key == "admin_password":
                     self.parameters.setdefault("properties", {})["administrator_login_password"] = kwargs[key]
                 elif key == "location":
                     self.parameters["location"] = kwargs[key]
+
+        self.adjust_parameters()
 
         response = None
 
@@ -289,48 +285,47 @@ class AzureRMServers(AzureRMModuleBase):
         if "location" not in self.parameters:
             self.parameters["location"] = resource_group.location
 
-        old_response = self.get_server()
+        old_response = self.get_azuremariadbserver()
 
         if not old_response:
-            self.log("Server instance doesn't exist")
+            self.log("Azure MariaDB Server instance doesn't exist")
             if self.state == 'absent':
                 self.log("Old instance didn't exist")
             else:
                 self.to_do = Actions.Create
         else:
-            self.log("Server instance already exists")
+            self.log("Azure MariaDB Server instance already exists")
             if self.state == 'absent':
                 self.to_do = Actions.Delete
             elif self.state == 'present':
-                if (not default_compare(self.parameters, old_response, '', {
-                       })):
+                if (not default_compare(self.parameters, old_response, '')):
                     self.to_do = Actions.Update
 
         if (self.to_do == Actions.Create) or (self.to_do == Actions.Update):
-            self.log("Need to Create / Update the Server instance")
+            self.log("Need to Create / Update the Azure MariaDB Server instance")
 
             if self.check_mode:
                 self.results['changed'] = True
                 return self.results
 
-            response = self.create_update_server()
+            response = self.create_update_azuremariadbserver()
 
             self.results['changed'] = True
             self.log("Creation / Update done")
         elif self.to_do == Actions.Delete:
-            self.log("Server instance deleted")
+            self.log("Azure MariaDB Server instance deleted")
             self.results['changed'] = True
 
             if self.check_mode:
                 return self.results
 
-            self.delete_server()
+            self.delete_azuremariadbserver()
             # make sure instance is actually deleted, for some Azure resources, instance is hanging around
             # for some time after deletion -- this should be really fixed in Azure.
-            while self.get_server():
+            while self.get_azuremariadbserver():
                 time.sleep(20)
         else:
-            self.log("Server instance unchanged")
+            self.log("Azure MariaDB Server instance unchanged")
             self.results['changed'] = False
             response = old_response
 
@@ -338,13 +333,25 @@ class AzureRMServers(AzureRMModuleBase):
             self.results.update(self.format_item(response))
         return self.results
 
-    def create_update_server(self):
-        '''
-        Creates or updates Server with the specified configuration.
+    def adjust_parameters(self):
+        if self.parameters.get('properties', None) is not None:
+            self.rename_key(self.parameters['properties'], 'enforce_ssl', 'ssl_enforcement')
+            self.rename_key(self.parameters['properties'], 'admin_username', 'administrator_login')
+            self.rename_key(self.parameters['properties'], 'admin_password', 'administrator_login_password')
 
-        :return: deserialized Server instance state dictionary
+    def rename_key(self, d, old_name, new_name):
+        old_value = d.get(old_name, None)
+        if old_value is not None:
+            d.pop(old_name, None)
+            d[new_name] = old_value
+
+    def create_update_azuremariadbserver(self):
         '''
-        self.log("Creating / Updating the Server instance {0}".format(self.name))
+        Creates or updates Azure MariaDB Server with the specified configuration.
+
+        :return: deserialized Azure MariaDB Server instance state dictionary
+        '''
+        self.log("Creating / Updating the Azure MariaDB Server instance {0}".format(self.name))
 
         try:
             if self.to_do == Actions.Create:
@@ -359,42 +366,42 @@ class AzureRMServers(AzureRMModuleBase):
                 response = self.get_poller_result(response)
 
         except CloudError as exc:
-            self.log('Error attempting to create the Server instance.')
-            self.fail("Error creating the Server instance: {0}".format(str(exc)))
+            self.log('Error attempting to create the Azure MariaDB Server instance.')
+            self.fail("Error creating the Azure MariaDB Server instance: {0}".format(str(exc)))
         return response.as_dict()
 
-    def delete_server(self):
+    def delete_azuremariadbserver(self):
         '''
-        Deletes specified Server instance in the specified subscription and resource group.
+        Deletes specified Azure MariaDB Server instance in the specified subscription and resource group.
 
         :return: True
         '''
-        self.log("Deleting the Server instance {0}".format(self.name))
+        self.log("Deleting the Azure MariaDB Server instance {0}".format(self.name))
         try:
             response = self.mgmt_client.servers.delete(resource_group_name=self.resource_group,
                                                        server_name=self.name)
         except CloudError as e:
-            self.log('Error attempting to delete the Server instance.')
-            self.fail("Error deleting the Server instance: {0}".format(str(e)))
+            self.log('Error attempting to delete the Azure MariaDB Server instance.')
+            self.fail("Error deleting the Azure MariaDB Server instance: {0}".format(str(e)))
 
         return True
 
-    def get_server(self):
+    def get_azuremariadbserver(self):
         '''
-        Gets the properties of the specified Server.
+        Gets the properties of the specified Azure MariaDB Server.
 
-        :return: deserialized Server instance state dictionary
+        :return: deserialized Azure MariaDB Server instance state dictionary
         '''
-        self.log("Checking if the Server instance {0} is present".format(self.name))
+        self.log("Checking if the Azure MariaDB Server instance {0} is present".format(self.name))
         found = False
         try:
             response = self.mgmt_client.servers.get(resource_group_name=self.resource_group,
                                                     server_name=self.name)
             found = True
             self.log("Response : {0}".format(response))
-            self.log("Server instance : {0} found".format(response.name))
+            self.log("Azure MariaDB Server instance : {0} found".format(response.name))
         except CloudError as e:
-            self.log('Did not find the Server instance.')
+            self.log('Did not find the Azure MariaDB Server instance.')
         if found is True:
             return response.as_dict()
 
@@ -440,13 +447,6 @@ def default_compare(new, old, path):
         return True
     else:
         return new == old
-
-
-def _snake_to_camel(snake, capitalize_first=False):
-    if capitalize_first:
-        return ''.join(x.capitalize() or '_' for x in snake.split('_'))
-    else:
-        return snake.split('_')[0] + ''.join(x.capitalize() or '_' for x in snake.split('_')[1:])
 
 
 def main():
