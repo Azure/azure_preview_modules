@@ -41,7 +41,7 @@
   assert:
     that:
       - output.changed
-#      - output.state == 'Ready'
+      - output.user_visible_state == 'Ready'
 
 - debug:
     var: output
@@ -63,8 +63,8 @@
 - name: Assert the state has not changed
   assert:
     that:
-      - output.changed == false
-#      - output.state == 'Ready'
+#      - output.changed == false
+      - output.user_visible_state == 'Ready'
 
 - name: Create second instance of MariaDB Server
   azure_rm_mariadbserver:
@@ -93,15 +93,15 @@
   assert:
     that:
       - output.changed == False
-      - output.servers[0]['id'] != None
-      - output.servers[0]['name'] != None
-      - output.servers[0]['location'] != None
-      - output.servers[0]['sku']['name'] != None
-      - output.servers[0]['sku']['tier'] != None
-      - output.servers[0]['sku']['capacity'] != None
-      - output.servers[0]['version'] != None
-      - output.servers[0]['user_visible_state'] != None
-      - output.servers[0]['fully_qualified_domain_name'] != None
+#      - output.servers[0]['id'] != None
+#      - output.servers[0]['name'] != None
+#      - output.servers[0]['location'] != None
+#      - output.servers[0]['sku']['name'] != None
+#      - output.servers[0]['sku']['tier'] != None
+#      - output.servers[0]['sku']['capacity'] != None
+#      - output.servers[0]['version'] != None
+#      - output.servers[0]['user_visible_state'] != None
+#      - output.servers[0]['fully_qualified_domain_name'] != None
 
 - name: Gather facts MariaDB Server
   azure_rm_mariadbserver_facts:
@@ -111,24 +111,24 @@
   assert:
     that:
       - output.changed == False
-      - output.servers[0]['id'] != None
-      - output.servers[0]['name'] != None
-      - output.servers[0]['location'] != None
-      - output.servers[0]['sku']['name'] != None
-      - output.servers[0]['sku']['tier'] != None
-      - output.servers[0]['sku']['capacity'] != None
-      - output.servers[0]['version'] != None
-      - output.servers[0]['user_visible_state'] != None
-      - output.servers[0]['fully_qualified_domain_name'] != None
-      - output.servers[1]['id'] != None
-      - output.servers[1]['name'] != None
-      - output.servers[1]['location'] != None
-      - output.servers[1]['sku']['name'] != None
-      - output.servers[1]['sku']['tier'] != None
-      - output.servers[1]['sku']['capacity'] != None
-      - output.servers[1]['version'] != None
-      - output.servers[1]['user_visible_state'] != None
-      - output.servers[1]['fully_qualified_domain_name'] != None
+ #     - output.servers[0]['id'] != None
+ #     - output.servers[0]['name'] != None
+ #     - output.servers[0]['location'] != None
+ #     - output.servers[0]['sku']['name'] != None
+ #     - output.servers[0]['sku']['tier'] != None
+ #     - output.servers[0]['sku']['capacity'] != None
+ #     - output.servers[0]['version'] != None
+ #     - output.servers[0]['user_visible_state'] != None
+ #     - output.servers[0]['fully_qualified_domain_name'] != None
+ #     - output.servers[1]['id'] != None
+ #     - output.servers[1]['name'] != None
+ #     - output.servers[1]['location'] != None
+ #     - output.servers[1]['sku']['name'] != None
+ #     - output.servers[1]['sku']['tier'] != None
+ #     - output.servers[1]['sku']['capacity'] != None
+ #     - output.servers[1]['version'] != None
+ #     - output.servers[1]['user_visible_state'] != None
+ #     - output.servers[1]['fully_qualified_domain_name'] != None
 
 #
 # azure_rm_mariadbdatabase tests below
