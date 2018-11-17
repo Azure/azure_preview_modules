@@ -3,7 +3,7 @@
     rpfx: "{{ resource_group | hash('md5') | truncate(7, True, '') }}{{ 1000 | random }}"
   run_once: yes
 
-- name: Create instance of Server -- check mode
+- name: Create instance of MariaDB Server -- check mode
   azure_rm_mariadbserver:
     resource_group: "{{ resource_group }}"
     name: "mdbs{{ rpfx }}"
@@ -14,9 +14,9 @@
       family: Gen5
     location: westus
     storage_mb: 51200
-    ssl_enforcement: enabled 
-    administrator_login: zimxyz
-    administrator_login_password: Testpasswordxyz12!
+    enforce_ssl: True
+    admin_username: zimxyz
+    admin_password: Testpasswordxyz12!
   check_mode: yes
   register: output
 - name: Assert the resource instance is well created
@@ -24,7 +24,7 @@
     that:
       - output.changed
 
-- name: Create instance of Server
+- name: Create instance of MariaDB Server
   azure_rm_mariadbserver:
     resource_group: "{{ resource_group }}"
     name: "mdbs{{ rpfx }}"
@@ -34,16 +34,17 @@
       capacity: 2
       family: Gen5
     location: westus
-    ssl_enforcement: enabled 
-    administrator_login: zimxyz
-    administrator_login_password: Testpasswordxyz12!
+    enforce_ssl: True
+    admin_username: zimxyz
+    admin_password: Testpasswordxyz12!
   register: output
 - name: Assert the resource instance is well created
   assert:
     that:
       - output.changed
+      - output.state == 'Ready'
 
-- name: Create again instance of Server
+- name: Create again instance of MariaDB Server
   azure_rm_mariadbserver:
     resource_group: "{{ resource_group }}"
     name: "mdbs{{ rpfx }}"
@@ -53,16 +54,197 @@
       capacity: 2
       family: Gen5
     location: westus
-    ssl_enforcement: enabled 
-    administrator_login: zimxyz
-    administrator_login_password: Testpasswordxyz12!
+    enforce_ssl: True
+    admin_username: zimxyz
+    admin_password: Testpasswordxyz12!
   register: output
 - name: Assert the state has not changed
   assert:
     that:
       - output.changed == false
+      - output.state == 'Ready'
 
-- name: Delete instance of Server -- check mode
+- name: Create second instance of MariaDB Server
+  azure_rm_mariadbserver:
+    resource_group: "{{ resource_group }}"
+    name: "mdbs{{ rpfx }}"second
+    sku:
+      name: GP_Gen5_2
+      tier: GeneralPurpose
+      capacity: 2
+      family: Gen5
+    location: westus
+    enforce_ssl: True
+    admin_username: zimxyz
+    admin_password: Testpasswordxyz12!
+
+- name: Gather facts MariaDB Server
+  azure_rm_mariadbserver_facts:
+    resource_group: "{{ resource_group }}"
+    name: "mdbs{{ rpfx }}"
+  register: output 
+
+- name: Assert that facts are returned
+  assert:
+    that:
+      - output.changed == False
+      - output.servers[0]['id'] != None
+      - output.servers[0]['name'] != None
+      - output.servers[0]['location'] != None
+      - output.servers[0]['sku']['name'] != None
+      - output.servers[0]['sku']['tier'] != None
+      - output.servers[0]['sku']['capacity'] != None
+      - output.servers[0]['version'] != None
+      - output.servers[0]['user_visible_state'] != None
+      - output.servers[0]['fully_qualified_domain_name'] != None
+
+- name: Gather facts MariaDB Server
+  azure_rm_mariadbserver_facts:
+    resource_group: "{{ resource_group }}"
+  register: output
+- name: Assert that facts are returned
+  assert:
+    that:
+      - output.changed == False
+      - output.servers[0]['id'] != None
+      - output.servers[0]['name'] != None
+      - output.servers[0]['location'] != None
+      - output.servers[0]['sku']['name'] != None
+      - output.servers[0]['sku']['tier'] != None
+      - output.servers[0]['sku']['capacity'] != None
+      - output.servers[0]['version'] != None
+      - output.servers[0]['user_visible_state'] != None
+      - output.servers[0]['fully_qualified_domain_name'] != None
+      - output.servers[1]['id'] != None
+      - output.servers[1]['name'] != None
+      - output.servers[1]['location'] != None
+      - output.servers[1]['sku']['name'] != None
+      - output.servers[1]['sku']['tier'] != None
+      - output.servers[1]['sku']['capacity'] != None
+      - output.servers[1]['version'] != None
+      - output.servers[1]['user_visible_state'] != None
+      - output.servers[1]['fully_qualified_domain_name'] != None
+
+#
+# azure_rm_mariadbdatabase tests below
+#
+- name: Create instance of MariaDB Database -- check mode
+  azure_rm_mariadbdatabase:
+    resource_group: "{{ resource_group }}"
+    server_name: "mdbs{{ rpfx }}"
+    name: testdatabase
+  check_mode: yes
+  register: output
+- name: Assert the resource instance is well created
+  assert:
+    that:
+      - output.changed
+
+- name: Create instance of MariaDB Database
+  azure_rm_mariadbdatabase:
+    resource_group: "{{ resource_group }}"
+    server_name: "mdbs{{ rpfx }}"
+    name: testdatabase
+  register: output
+- name: Assert the resource instance is well created
+  assert:
+    that:
+      - output.changed
+      - output.name == 'testdatabase'
+
+- name: Create again instance of MariaDB Database
+  azure_rm_mariadbdatabase:
+    resource_group: "{{ resource_group }}"
+    server_name: "mdbs{{ rpfx }}"
+    name: testdatabase
+  register: output
+- name: Assert the state has not changed
+  assert:
+    that:
+      - output.changed == false
+      - output.name == 'testdatabase'
+
+- name: Create second instance of MariaDB Database
+  azure_rm_mariadbdatabase:
+    resource_group: "{{ resource_group }}"
+    server_name: "mdbs{{ rpfx }}"
+    name: testdatabase2
+
+- name: Gather facts MariaDB Database
+  azure_rm_mariadbdatabase_facts:
+    resource_group: "{{ resource_group }}"
+    server_name: "mdbs{{ rpfx }}"
+    name: testdatabase
+  register: output 
+
+- name: Assert that facts are returned
+  assert:
+    that:
+      - output.changed == False
+      - output.databases[0]['server_name'] != None
+      - output.databases[0]['name'] != None
+      - output.databases[0]['charset'] != None
+      - output.databases[0]['collation'] != None
+
+- name: Gather facts MariaDB Database
+  azure_rm_mariadbdatabase_facts:
+    resource_group: "{{ resource_group }}"
+    server_name: "mdbs{{ rpfx }}"
+  register: output
+- name: Assert that facts are returned
+  assert:
+    that:
+      - output.changed == False
+      - output.databases[0]['server_name'] != None
+      - output.databases[0]['name'] != None
+      - output.databases[0]['charset'] != None
+      - output.databases[0]['collation'] != None
+      - output.databases[1]['server_name'] != None
+      - output.databases[1]['name'] != None
+      - output.databases[1]['charset'] != None
+      - output.databases[1]['collation'] != None
+
+- name: Delete instance of MariaDB Database -- check mode
+  azure_rm_mariadbdatabase:
+    resource_group: "{{ resource_group }}"
+    server_name: "mdbs{{ rpfx }}"
+    name: testdatabase
+    state: absent
+  check_mode: yes
+  register: output
+- name: Assert the state has changed
+  assert:
+    that:
+      - output.changed
+
+- name: Delete instance of MariaDB Database
+  azure_rm_mariadbdatabase:
+    resource_group: "{{ resource_group }}"
+    server_name: "mdbs{{ rpfx }}"
+    name: testdatabase
+    state: absent
+  register: output
+- name: Assert the state has changed
+  assert:
+    that:
+      - output.changed
+
+- name: Delete unexisting instance of MariaDB Database
+  azure_rm_mariadbdatabase:
+    resource_group: "{{ resource_group }}"
+    server_name: "mdbs{{ rpfx }}"
+    name: testdatabase
+    state: absent
+  register: output
+- name: Assert the state has changed
+  assert:
+    that:
+      - output.changed == false
+
+#
+# clean up azure_rm_mariadbserver test
+#
+- name: Delete instance of MariaDB Server -- check mode
   azure_rm_mariadbserver:
     resource_group: "{{ resource_group }}"
     name: "mdbs{{ rpfx }}"
@@ -74,7 +256,7 @@
     that:
       - output.changed
 
-- name: Delete instance of Server
+- name: Delete instance of MariaDB Server
   azure_rm_mariadbserver:
     resource_group: "{{ resource_group }}"
     name: "mdbs{{ rpfx }}"
@@ -85,7 +267,7 @@
     that:
       - output.changed
 
-- name: Delete unexisting instance of Server
+- name: Delete unexisting instance of MariaDB Server
   azure_rm_mariadbserver:
     resource_group: "{{ resource_group }}"
     name: "mdbs{{ rpfx }}"
