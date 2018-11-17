@@ -377,7 +377,7 @@ class AzureRMManagedCluster(AzureRMModuleBase):
                     # Cannot Update the SSH Key for now // Let service to handle it
                     if is_property_changed('linux_profile', 'ssh_key'):
                         self.log(("Linux Profile Diff SSH, Was {0} / Now {1}"
-                                  .format(response['linux_profile']['ssh_key'], self.linux_profile.get('ssh_key'))))
+                                  .format(response['linux_profile'].get('ssh_key', None), self.linux_profile.get('ssh_key', None))))
                         to_be_updated = True
                         # self.module.warn("linux_profile.ssh_key cannot be updated")
 
@@ -386,7 +386,7 @@ class AzureRMManagedCluster(AzureRMModuleBase):
                     # Cannot Update the Username for now // Let service to handle it
                     if is_property_changed('linux_profile', 'admin_username'):
                         self.log(("Linux Profile Diff User, Was {0} / Now {1}"
-                                  .format(response['linux_profile']['admin_username'], self.linux_profile.get('admin_username'))))
+                                  .format(response['linux_profile'].get('admin_username', None), self.linux_profile.get('admin_username', None))))
                         to_be_updated = True
                         # self.module.warn("linux_profile.admin_username cannot be updated")
 
