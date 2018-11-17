@@ -36,43 +36,38 @@ options:
         required: True
     name:
         description:
-            - The name of the I(disk).
+            - The name of the disk.
         required: True
-    disk:
+    location:
         description:
-            - A Disk.
-        required: True
-        suboptions:
-            location:
-                description:
-                    - The location of the resource.
-            disk_type:
-                description:
-                    - The storage type for the disk (i.e. C(standard), C(premium)).
-                choices:
-                    - 'standard'
-                    - 'premium'
-            disk_size_gi_b:
-                description:
-                    - The size of the disk in GibiBytes.
-            leased_by_lab_vm_id:
-                description:
-                    - The resource ID of the VM to which this disk is leased.
-            disk_blob_name:
-                description:
-                    - When backed by a blob, the name of the VHD blob without extension.
-            disk_uri:
-                description:
-                    - When backed by a blob, the URI of underlying blob.
-            host_caching:
-                description:
-                    - The host caching policy of the disk (i.e. None, ReadOnly, ReadWrite).
-            managed_disk_id:
-                description:
-                    - When backed by managed disk, this is the ID of the compute disk resource.
-            unique_identifier:
-                description:
-                    - The unique immutable identifier of a resource (Guid).
+            - The location of the resource.
+    disk_type:
+        description:
+            - The storage type for the disk (i.e. C(standard), C(premium)).
+        choices:
+            - 'standard'
+            - 'premium'
+    disk_size_gi_b:
+        description:
+            - The size of the disk in GibiBytes.
+    leased_by_lab_vm_id:
+        description:
+            - The resource ID of the VM to which this disk is leased.
+    disk_blob_name:
+        description:
+            - When backed by a blob, the name of the VHD blob without extension.
+    disk_uri:
+        description:
+            - When backed by a blob, the URI of underlying blob.
+    host_caching:
+        description:
+            - The host caching policy of the disk (i.e. None, ReadOnly, ReadWrite).
+    managed_disk_id:
+        description:
+            - When backed by managed disk, this is the ID of the compute disk resource.
+    unique_identifier:
+        description:
+            - The unique immutable identifier of a resource (Guid).
     state:
       description:
         - Assert the state of the Disk.
@@ -148,9 +143,34 @@ class AzureRMDisks(AzureRMModuleBase):
                 type='str',
                 required=True
             ),
-            disk=dict(
-                type='dict',
-                required=True
+            location=dict(
+                type='str'
+            ),
+            disk_type=dict(
+                type='str',
+                choices=['standard',
+                         'premium']
+            ),
+            disk_size_gi_b=dict(
+                type='int'
+            ),
+            leased_by_lab_vm_id=dict(
+                type='str'
+            ),
+            disk_blob_name=dict(
+                type='str'
+            ),
+            disk_uri=dict(
+                type='str'
+            ),
+            host_caching=dict(
+                type='str'
+            ),
+            managed_disk_id=dict(
+                type='str'
+            ),
+            unique_identifier=dict(
+                type='str'
             ),
             state=dict(
                 type='str',

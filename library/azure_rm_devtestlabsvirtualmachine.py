@@ -34,390 +34,384 @@ options:
         description:
             - The name of the virtual machine.
         required: True
-    lab_virtual_machine:
+    location:
         description:
-            - A virtual machine.
-        required: True
+            - The location of the resource.
+    notes:
+        description:
+            - The notes of the virtual machine.
+    owner_object_id:
+        description:
+            - The object identifier of the owner of the virtual machine.
+    owner_user_principal_name:
+        description:
+            - The user principal name of the virtual machine owner.
+    created_by_user_id:
+        description:
+            - The object identifier of the creator of the virtual machine.
+    created_by_user:
+        description:
+            - The email address of creator of the virtual machine.
+    created_date:
+        description:
+            - The creation date of the virtual machine.
+    custom_image_id:
+        description:
+            - The custom image identifier of the virtual machine.
+    os_type:
+        description:
+            - The OS type of the virtual machine.
+    size:
+        description:
+            - The size of the virtual machine.
+    user_name:
+        description:
+            - The user name of the virtual machine.
+    password:
+        description:
+            - The password of the virtual machine administrator.
+    ssh_key:
+        description:
+            - The SSH key of the virtual machine administrator.
+    is_authentication_with_ssh_key:
+        description:
+            - Indicates whether this virtual machine uses an SSH key for authentication.
+    fqdn:
+        description:
+            - The fully-qualified domain name of the virtual machine.
+    lab_subnet_name:
+        description:
+            - The lab subnet name of the virtual machine.
+    lab_virtual_network_id:
+        description:
+            - The lab virtual network identifier of the virtual machine.
+    disallow_public_ip_address:
+        description:
+            - Indicates whether the virtual machine is to be created without a public IP address.
+    artifacts:
+        description:
+            - The artifacts to be installed on the virtual machine.
+        type: list
+        suboptions:
+            artifact_id:
+                description:
+                    - "The artifact's identifier."
+            parameters:
+                description:
+                    - The parameters of the artifact.
+                type: list
+                suboptions:
+                    name:
+                        description:
+                            - The name of the artifact parameter.
+                    value:
+                        description:
+                            - The value of the artifact parameter.
+            status:
+                description:
+                    - The status of the artifact.
+            deployment_status_message:
+                description:
+                    - The I(status) message from the deployment.
+            vm_extension_status_message:
+                description:
+                    - The I(status) message from the virtual machine extension.
+            install_time:
+                description:
+                    - The time that the artifact starts to install on the virtual machine.
+    artifact_deployment_status:
+        description:
+            - The artifact deployment status for the virtual machine.
+        suboptions:
+            deployment_status:
+                description:
+                    - The deployment status of the artifact.
+            artifacts_applied:
+                description:
+                    - The total count of the artifacts that were successfully applied.
+            total_artifacts:
+                description:
+                    - The total count of the artifacts that were tentatively applied.
+    gallery_image_reference:
+        description:
+            - The Microsoft Azure Marketplace image reference of the virtual machine.
+        suboptions:
+            offer:
+                description:
+                    - The offer of the gallery image.
+            publisher:
+                description:
+                    - The publisher of the gallery image.
+            sku:
+                description:
+                    - The SKU of the gallery image.
+            os_type:
+                description:
+                    - The OS type of the gallery image.
+            version:
+                description:
+                    - The version of the gallery image.
+    compute_vm:
+        description:
+            - The compute virtual machine properties.
+        suboptions:
+            statuses:
+                description:
+                    - Gets the statuses of the virtual machine.
+                type: list
+                suboptions:
+                    code:
+                        description:
+                            - Gets the status Code.
+                    display_status:
+                        description:
+                            - Gets the short localizable label for the status.
+                    message:
+                        description:
+                            - Gets the message associated with the status.
+            os_type:
+                description:
+                    - Gets the OS type of the virtual machine.
+            vm_size:
+                description:
+                    - Gets the size of the virtual machine.
+            network_interface_id:
+                description:
+                    - Gets the network interface ID of the virtual machine.
+            os_disk_id:
+                description:
+                    - Gets OS disk blob uri for the virtual machine.
+            data_disk_ids:
+                description:
+                    - Gets data disks blob uri for the virtual machine.
+                type: list
+            data_disks:
+                description:
+                    - Gets all data disks attached to the virtual machine.
+                type: list
+                suboptions:
+                    name:
+                        description:
+                            - Gets data disk name.
+                    disk_uri:
+                        description:
+                            - When backed by a blob, the URI of underlying blob.
+                    managed_disk_id:
+                        description:
+                            - When backed by managed disk, this is the ID of the compute disk resource.
+                    disk_size_gi_b:
+                        description:
+                            - Gets data disk size in GiB.
+    network_interface:
+        description:
+            - The network interface properties.
+        suboptions:
+            virtual_network_id:
+                description:
+                    - The resource ID of the virtual network.
+            subnet_id:
+                description:
+                    - The resource ID of the sub net.
+            public_ip_address_id:
+                description:
+                    - The resource ID of the public IP address.
+            public_ip_address:
+                description:
+                    - The public IP address.
+            private_ip_address:
+                description:
+                    - The private IP address.
+            dns_name:
+                description:
+                    - The DNS name.
+            rdp_authority:
+                description:
+                    - The RdpAuthority property is a server DNS host name or IP address followed by the service port number for RDP (Remote Desktop Protocol).
+            ssh_authority:
+                description:
+                    - The SshAuthority property is a server DNS host name or IP address followed by the service port number for SSH.
+            shared_public_ip_address_configuration:
+                description:
+                    - The configuration for sharing a public IP address across multiple virtual machines.
+                suboptions:
+                    inbound_nat_rules:
+                        description:
+                            - The incoming NAT rules
+                        type: list
+                        suboptions:
+                            transport_protocol:
+                                description:
+                                    - The transport protocol for the endpoint.
+                                choices:
+                                    - 'tcp'
+                                    - 'udp'
+                            frontend_port:
+                                description:
+                                    - "The external endpoint port of the inbound connection. Possible values range between 1 and 65535, inclusive. If
+                                       unspecified, a value will be allocated automatically."
+                            backend_port:
+                                description:
+                                    - The port to which the external traffic will be redirected.
+    applicable_schedule:
+        description:
+            - The applicable schedule for the virtual machine.
         suboptions:
             location:
                 description:
                     - The location of the resource.
-            notes:
+            lab_vms_shutdown:
                 description:
-                    - The notes of the virtual machine.
-            owner_object_id:
-                description:
-                    - The object identifier of the owner of the virtual machine.
-            owner_user_principal_name:
-                description:
-                    - The user principal name of the virtual machine owner.
-            created_by_user_id:
-                description:
-                    - The object identifier of the creator of the virtual machine.
-            created_by_user:
-                description:
-                    - The email address of creator of the virtual machine.
-            created_date:
-                description:
-                    - The creation date of the virtual machine.
-            custom_image_id:
-                description:
-                    - The custom image identifier of the virtual machine.
-            os_type:
-                description:
-                    - The OS type of the virtual machine.
-            size:
-                description:
-                    - The size of the virtual machine.
-            user_name:
-                description:
-                    - The user name of the virtual machine.
-            password:
-                description:
-                    - The password of the virtual machine administrator.
-            ssh_key:
-                description:
-                    - The SSH key of the virtual machine administrator.
-            is_authentication_with_ssh_key:
-                description:
-                    - Indicates whether this virtual machine uses an SSH key for authentication.
-            fqdn:
-                description:
-                    - The fully-qualified domain name of the virtual machine.
-            lab_subnet_name:
-                description:
-                    - The lab subnet name of the virtual machine.
-            lab_virtual_network_id:
-                description:
-                    - The lab virtual network identifier of the virtual machine.
-            disallow_public_ip_address:
-                description:
-                    - Indicates whether the virtual machine is to be created without a public IP address.
-            artifacts:
-                description:
-                    - The artifacts to be installed on the virtual machine.
-                type: list
-                suboptions:
-                    artifact_id:
-                        description:
-                            - "The artifact's identifier."
-                    parameters:
-                        description:
-                            - The parameters of the artifact.
-                        type: list
-                        suboptions:
-                            name:
-                                description:
-                                    - The name of the artifact parameter.
-                            value:
-                                description:
-                                    - The value of the artifact parameter.
-                    status:
-                        description:
-                            - The status of the artifact.
-                    deployment_status_message:
-                        description:
-                            - The I(status) message from the deployment.
-                    vm_extension_status_message:
-                        description:
-                            - The I(status) message from the virtual machine extension.
-                    install_time:
-                        description:
-                            - The time that the artifact starts to install on the virtual machine.
-            artifact_deployment_status:
-                description:
-                    - The artifact deployment status for the virtual machine.
-                suboptions:
-                    deployment_status:
-                        description:
-                            - The deployment status of the artifact.
-                    artifacts_applied:
-                        description:
-                            - The total count of the artifacts that were successfully applied.
-                    total_artifacts:
-                        description:
-                            - The total count of the artifacts that were tentatively applied.
-            gallery_image_reference:
-                description:
-                    - The Microsoft Azure Marketplace image reference of the virtual machine.
-                suboptions:
-                    offer:
-                        description:
-                            - The offer of the gallery image.
-                    publisher:
-                        description:
-                            - The publisher of the gallery image.
-                    sku:
-                        description:
-                            - The SKU of the gallery image.
-                    os_type:
-                        description:
-                            - The OS type of the gallery image.
-                    version:
-                        description:
-                            - The version of the gallery image.
-            compute_vm:
-                description:
-                    - The compute virtual machine properties.
-                suboptions:
-                    statuses:
-                        description:
-                            - Gets the statuses of the virtual machine.
-                        type: list
-                        suboptions:
-                            code:
-                                description:
-                                    - Gets the status Code.
-                            display_status:
-                                description:
-                                    - Gets the short localizable label for the status.
-                            message:
-                                description:
-                                    - Gets the message associated with the status.
-                    os_type:
-                        description:
-                            - Gets the OS type of the virtual machine.
-                    vm_size:
-                        description:
-                            - Gets the size of the virtual machine.
-                    network_interface_id:
-                        description:
-                            - Gets the network interface ID of the virtual machine.
-                    os_disk_id:
-                        description:
-                            - Gets OS disk blob uri for the virtual machine.
-                    data_disk_ids:
-                        description:
-                            - Gets data disks blob uri for the virtual machine.
-                        type: list
-                    data_disks:
-                        description:
-                            - Gets all data disks attached to the virtual machine.
-                        type: list
-                        suboptions:
-                            name:
-                                description:
-                                    - Gets data disk name.
-                            disk_uri:
-                                description:
-                                    - When backed by a blob, the URI of underlying blob.
-                            managed_disk_id:
-                                description:
-                                    - When backed by managed disk, this is the ID of the compute disk resource.
-                            disk_size_gi_b:
-                                description:
-                                    - Gets data disk size in GiB.
-            network_interface:
-                description:
-                    - The network interface properties.
-                suboptions:
-                    virtual_network_id:
-                        description:
-                            - The resource ID of the virtual network.
-                    subnet_id:
-                        description:
-                            - The resource ID of the sub net.
-                    public_ip_address_id:
-                        description:
-                            - The resource ID of the public IP address.
-                    public_ip_address:
-                        description:
-                            - The public IP address.
-                    private_ip_address:
-                        description:
-                            - The private IP address.
-                    dns_name:
-                        description:
-                            - The DNS name.
-                    rdp_authority:
-                        description:
-                            - "The RdpAuthority property is a server DNS host name or IP address followed by the service port number for RDP (Remote Desktop
-                               Protocol)."
-                    ssh_authority:
-                        description:
-                            - The SshAuthority property is a server DNS host name or IP address followed by the service port number for SSH.
-                    shared_public_ip_address_configuration:
-                        description:
-                            - The configuration for sharing a public IP address across multiple virtual machines.
-                        suboptions:
-                            inbound_nat_rules:
-                                description:
-                                    - The incoming NAT rules
-                                type: list
-                                suboptions:
-                                    transport_protocol:
-                                        description:
-                                            - The transport protocol for the endpoint.
-                                        choices:
-                                            - 'tcp'
-                                            - 'udp'
-                                    frontend_port:
-                                        description:
-                                            - "The external endpoint port of the inbound connection. Possible values range between 1 and 65535, inclusive.
-                                               If unspecified, a value will be allocated automatically."
-                                    backend_port:
-                                        description:
-                                            - The port to which the external traffic will be redirected.
-            applicable_schedule:
-                description:
-                    - The applicable schedule for the virtual machine.
+                    - The auto-shutdown schedule, if one has been set at the lab or lab resource level.
                 suboptions:
                     location:
                         description:
                             - The location of the resource.
-                    lab_vms_shutdown:
+                    status:
                         description:
-                            - The auto-shutdown schedule, if one has been set at the lab or lab resource level.
+                            - The status of the schedule (i.e. C(enabled), C(disabled)).
+                        choices:
+                            - 'enabled'
+                            - 'disabled'
+                    task_type:
+                        description:
+                            - The task type of the schedule (e.g. LabVmsShutdownTask, LabVmAutoStart).
+                    weekly_recurrence:
+                        description:
+                            - If the schedule will occur only some days of the week, specify the weekly recurrence.
                         suboptions:
-                            location:
+                            weekdays:
                                 description:
-                                    - The location of the resource.
+                                    - The days of the week for which the schedule is set (e.g. Sunday, Monday, Tuesday, etc.).
+                                type: list
+                            time:
+                                description:
+                                    - The time of the day the schedule will occur.
+                    daily_recurrence:
+                        description:
+                            - If the schedule will occur once each day of the week, specify the daily recurrence.
+                        suboptions:
+                            time:
+                                description:
+                                    - The time of day the schedule will occur.
+                    hourly_recurrence:
+                        description:
+                            - If the schedule will occur multiple times a day, specify the hourly recurrence.
+                        suboptions:
+                            minute:
+                                description:
+                                    - Minutes of the hour the schedule will run.
+                    time_zone_id:
+                        description:
+                            - The time zone ID (e.g. Pacific Standard time).
+                    notification_settings:
+                        description:
+                            - Notification settings.
+                        suboptions:
                             status:
                                 description:
-                                    - The status of the schedule (i.e. C(enabled), C(disabled)).
+                                    - If notifications are C(enabled) for this schedule (i.e. C(enabled), C(disabled)).
                                 choices:
-                                    - 'enabled'
                                     - 'disabled'
-                            task_type:
+                                    - 'enabled'
+                            time_in_minutes:
                                 description:
-                                    - The task type of the schedule (e.g. LabVmsShutdownTask, LabVmAutoStart).
-                            weekly_recurrence:
+                                    - Time in minutes before event at which notification will be sent.
+                            webhook_url:
                                 description:
-                                    - If the schedule will occur only some days of the week, specify the weekly recurrence.
-                                suboptions:
-                                    weekdays:
-                                        description:
-                                            - The days of the week for which the schedule is set (e.g. Sunday, Monday, Tuesday, etc.).
-                                        type: list
-                                    time:
-                                        description:
-                                            - The time of the day the schedule will occur.
-                            daily_recurrence:
-                                description:
-                                    - If the schedule will occur once each day of the week, specify the daily recurrence.
-                                suboptions:
-                                    time:
-                                        description:
-                                            - The time of day the schedule will occur.
-                            hourly_recurrence:
-                                description:
-                                    - If the schedule will occur multiple times a day, specify the hourly recurrence.
-                                suboptions:
-                                    minute:
-                                        description:
-                                            - Minutes of the hour the schedule will run.
-                            time_zone_id:
-                                description:
-                                    - The time zone ID (e.g. Pacific Standard time).
-                            notification_settings:
-                                description:
-                                    - Notification settings.
-                                suboptions:
-                                    status:
-                                        description:
-                                            - If notifications are C(enabled) for this schedule (i.e. C(enabled), C(disabled)).
-                                        choices:
-                                            - 'disabled'
-                                            - 'enabled'
-                                    time_in_minutes:
-                                        description:
-                                            - Time in minutes before event at which notification will be sent.
-                                    webhook_url:
-                                        description:
-                                            - The webhook URL to which the notification will be sent.
-                            target_resource_id:
-                                description:
-                                    - The resource ID to which the schedule belongs
-                            unique_identifier:
-                                description:
-                                    - The unique immutable identifier of a resource (Guid).
-                    lab_vms_startup:
+                                    - The webhook URL to which the notification will be sent.
+                    target_resource_id:
                         description:
-                            - The auto-startup schedule, if one has been set at the lab or lab resource level.
+                            - The resource ID to which the schedule belongs
+                    unique_identifier:
+                        description:
+                            - The unique immutable identifier of a resource (Guid).
+            lab_vms_startup:
+                description:
+                    - The auto-startup schedule, if one has been set at the lab or lab resource level.
+                suboptions:
+                    location:
+                        description:
+                            - The location of the resource.
+                    status:
+                        description:
+                            - The status of the schedule (i.e. C(enabled), C(disabled)).
+                        choices:
+                            - 'enabled'
+                            - 'disabled'
+                    task_type:
+                        description:
+                            - The task type of the schedule (e.g. LabVmsShutdownTask, LabVmAutoStart).
+                    weekly_recurrence:
+                        description:
+                            - If the schedule will occur only some days of the week, specify the weekly recurrence.
                         suboptions:
-                            location:
+                            weekdays:
                                 description:
-                                    - The location of the resource.
+                                    - The days of the week for which the schedule is set (e.g. Sunday, Monday, Tuesday, etc.).
+                                type: list
+                            time:
+                                description:
+                                    - The time of the day the schedule will occur.
+                    daily_recurrence:
+                        description:
+                            - If the schedule will occur once each day of the week, specify the daily recurrence.
+                        suboptions:
+                            time:
+                                description:
+                                    - The time of day the schedule will occur.
+                    hourly_recurrence:
+                        description:
+                            - If the schedule will occur multiple times a day, specify the hourly recurrence.
+                        suboptions:
+                            minute:
+                                description:
+                                    - Minutes of the hour the schedule will run.
+                    time_zone_id:
+                        description:
+                            - The time zone ID (e.g. Pacific Standard time).
+                    notification_settings:
+                        description:
+                            - Notification settings.
+                        suboptions:
                             status:
                                 description:
-                                    - The status of the schedule (i.e. C(enabled), C(disabled)).
+                                    - If notifications are C(enabled) for this schedule (i.e. C(enabled), C(disabled)).
                                 choices:
-                                    - 'enabled'
                                     - 'disabled'
-                            task_type:
+                                    - 'enabled'
+                            time_in_minutes:
                                 description:
-                                    - The task type of the schedule (e.g. LabVmsShutdownTask, LabVmAutoStart).
-                            weekly_recurrence:
+                                    - Time in minutes before event at which notification will be sent.
+                            webhook_url:
                                 description:
-                                    - If the schedule will occur only some days of the week, specify the weekly recurrence.
-                                suboptions:
-                                    weekdays:
-                                        description:
-                                            - The days of the week for which the schedule is set (e.g. Sunday, Monday, Tuesday, etc.).
-                                        type: list
-                                    time:
-                                        description:
-                                            - The time of the day the schedule will occur.
-                            daily_recurrence:
-                                description:
-                                    - If the schedule will occur once each day of the week, specify the daily recurrence.
-                                suboptions:
-                                    time:
-                                        description:
-                                            - The time of day the schedule will occur.
-                            hourly_recurrence:
-                                description:
-                                    - If the schedule will occur multiple times a day, specify the hourly recurrence.
-                                suboptions:
-                                    minute:
-                                        description:
-                                            - Minutes of the hour the schedule will run.
-                            time_zone_id:
-                                description:
-                                    - The time zone ID (e.g. Pacific Standard time).
-                            notification_settings:
-                                description:
-                                    - Notification settings.
-                                suboptions:
-                                    status:
-                                        description:
-                                            - If notifications are C(enabled) for this schedule (i.e. C(enabled), C(disabled)).
-                                        choices:
-                                            - 'disabled'
-                                            - 'enabled'
-                                    time_in_minutes:
-                                        description:
-                                            - Time in minutes before event at which notification will be sent.
-                                    webhook_url:
-                                        description:
-                                            - The webhook URL to which the notification will be sent.
-                            target_resource_id:
-                                description:
-                                    - The resource ID to which the schedule belongs
-                            unique_identifier:
-                                description:
-                                    - The unique immutable identifier of a resource (Guid).
-            expiration_date:
-                description:
-                    - The expiration date for VM.
-            allow_claim:
-                description:
-                    - Indicates whether another user can take ownership of the virtual machine
-            storage_type:
-                description:
-                    - Storage type to use for virtual machine (i.e. Standard, Premium).
-            virtual_machine_creation_source:
-                description:
-                    - Tells source of creation of lab virtual machine. Output property only.
-                choices:
-                    - 'from_custom_image'
-                    - 'from_gallery_image'
-            environment_id:
-                description:
-                    - The resource ID of the environment that contains this virtual machine, if any.
-            unique_identifier:
-                description:
-                    - The unique immutable identifier of a resource (Guid).
+                                    - The webhook URL to which the notification will be sent.
+                    target_resource_id:
+                        description:
+                            - The resource ID to which the schedule belongs
+                    unique_identifier:
+                        description:
+                            - The unique immutable identifier of a resource (Guid).
+    expiration_date:
+        description:
+            - The expiration date for VM.
+    allow_claim:
+        description:
+            - Indicates whether another user can take ownership of the virtual machine
+    storage_type:
+        description:
+            - Storage type to use for virtual machine (i.e. Standard, Premium).
+    virtual_machine_creation_source:
+        description:
+            - Tells source of creation of lab virtual machine. Output property only.
+        choices:
+            - 'from_custom_image'
+            - 'from_gallery_image'
+    environment_id:
+        description:
+            - The resource ID of the environment that contains this virtual machine, if any.
+    unique_identifier:
+        description:
+            - The unique immutable identifier of a resource (Guid).
     state:
       description:
         - Assert the state of the Virtual Machine.
@@ -488,9 +482,98 @@ class AzureRMVirtualMachines(AzureRMModuleBase):
                 type='str',
                 required=True
             ),
-            lab_virtual_machine=dict(
-                type='dict',
-                required=True
+            location=dict(
+                type='str'
+            ),
+            notes=dict(
+                type='str'
+            ),
+            owner_object_id=dict(
+                type='str'
+            ),
+            owner_user_principal_name=dict(
+                type='str'
+            ),
+            created_by_user_id=dict(
+                type='str'
+            ),
+            created_by_user=dict(
+                type='str'
+            ),
+            created_date=dict(
+                type='datetime'
+            ),
+            custom_image_id=dict(
+                type='str'
+            ),
+            os_type=dict(
+                type='str'
+            ),
+            size=dict(
+                type='str'
+            ),
+            user_name=dict(
+                type='str'
+            ),
+            password=dict(
+                type='str',
+                no_log=True
+            ),
+            ssh_key=dict(
+                type='str'
+            ),
+            is_authentication_with_ssh_key=dict(
+                type='str'
+            ),
+            fqdn=dict(
+                type='str'
+            ),
+            lab_subnet_name=dict(
+                type='str'
+            ),
+            lab_virtual_network_id=dict(
+                type='str'
+            ),
+            disallow_public_ip_address=dict(
+                type='str'
+            ),
+            artifacts=dict(
+                type='list'
+            ),
+            artifact_deployment_status=dict(
+                type='dict'
+            ),
+            gallery_image_reference=dict(
+                type='dict'
+            ),
+            compute_vm=dict(
+                type='dict'
+            ),
+            network_interface=dict(
+                type='dict'
+            ),
+            applicable_schedule=dict(
+                type='dict'
+            ),
+            expiration_date=dict(
+                type='datetime'
+            ),
+            allow_claim=dict(
+                type='str'
+            ),
+            storage_type=dict(
+                type='str'
+            ),
+            virtual_machine_creation_source=dict(
+                type='str',
+                choices=['from_custom_image',
+                         'from_gallery_image']
+            ),
+            environment_id=dict(
+                type='str'
+            ),
+            unique_identifier=dict(
+                type='str'
             ),
             state=dict(
                 type='str',

@@ -34,30 +34,25 @@ options:
         description:
             - The name of the service runner.
         required: True
-    service_runner:
+    location:
         description:
-            - A container for a managed identity to execute DevTest lab services.
-        required: True
+            - The location of the resource.
+    identity:
+        description:
+            - The identity of the resource.
         suboptions:
-            location:
+            type:
                 description:
-                    - The location of the resource.
-            identity:
+                    - Managed identity.
+            principal_id:
                 description:
-                    - The identity of the resource.
-                suboptions:
-                    type:
-                        description:
-                            - Managed identity.
-                    principal_id:
-                        description:
-                            - The principal id of resource identity.
-                    tenant_id:
-                        description:
-                            - The tenant identifier of resource.
-                    client_secret_url:
-                        description:
-                            - The client secret URL of the identity.
+                    - The principal id of resource identity.
+            tenant_id:
+                description:
+                    - The tenant identifier of resource.
+            client_secret_url:
+                description:
+                    - The client secret URL of the identity.
     state:
       description:
         - Assert the state of the Service Runner.
@@ -128,9 +123,11 @@ class AzureRMServiceRunners(AzureRMModuleBase):
                 type='str',
                 required=True
             ),
-            service_runner=dict(
-                type='dict',
-                required=True
+            location=dict(
+                type='str'
+            ),
+            identity=dict(
+                type='dict'
             ),
             state=dict(
                 type='str',

@@ -36,22 +36,17 @@ options:
         required: True
     name:
         description:
-            - The name of the I(secret).
+            - The name of the secret.
         required: True
-    secret:
+    location:
         description:
-            - A secret.
-        required: True
-        suboptions:
-            location:
-                description:
-                    - The location of the resource.
-            value:
-                description:
-                    - The value of the secret for secret creation.
-            unique_identifier:
-                description:
-                    - The unique immutable identifier of a resource (Guid).
+            - The location of the resource.
+    value:
+        description:
+            - The value of the secret for secret creation.
+    unique_identifier:
+        description:
+            - The unique immutable identifier of a resource (Guid).
     state:
       description:
         - Assert the state of the Secret.
@@ -127,9 +122,14 @@ class AzureRMSecrets(AzureRMModuleBase):
                 type='str',
                 required=True
             ),
-            secret=dict(
-                type='dict',
-                required=True
+            location=dict(
+                type='str'
+            ),
+            value=dict(
+                type='str'
+            ),
+            unique_identifier=dict(
+                type='str'
             ),
             state=dict(
                 type='str',

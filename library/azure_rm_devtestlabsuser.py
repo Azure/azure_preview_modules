@@ -32,49 +32,44 @@ options:
         required: True
     name:
         description:
-            - The name of the I(user) profile.
+            - The name of the user profile.
         required: True
-    user:
+    location:
         description:
-            - Profile of a lab user.
-        required: True
+            - The location of the resource.
+    identity:
+        description:
+            - The identity of the user.
         suboptions:
-            location:
+            principal_name:
                 description:
-                    - The location of the resource.
-            identity:
+                    - Set to the principal name / UPN of the client JWT making the request.
+            principal_id:
                 description:
-                    - The identity of the user.
-                suboptions:
-                    principal_name:
-                        description:
-                            - Set to the principal name / UPN of the client JWT making the request.
-                    principal_id:
-                        description:
-                            - Set to the principal Id of the client JWT making the request. Service principal will not have the principal Id.
-                    tenant_id:
-                        description:
-                            - Set to the tenant ID of the client JWT making the request.
-                    object_id:
-                        description:
-                            - "Set to the object Id of the client JWT making the request. Not all users have object Id. For CSP (reseller) scenarios for
-                               example, object Id is not available."
-                    app_id:
-                        description:
-                            - Set to the app Id of the client JWT making the request.
-            secret_store:
+                    - Set to the principal Id of the client JWT making the request. Service principal will not have the principal Id.
+            tenant_id:
                 description:
-                    - The secret store of the user.
-                suboptions:
-                    key_vault_uri:
-                        description:
-                            - "The URI of the user's Key vault."
-                    key_vault_id:
-                        description:
-                            - "The ID of the user's Key vault."
-            unique_identifier:
+                    - Set to the tenant ID of the client JWT making the request.
+            object_id:
                 description:
-                    - The unique immutable identifier of a resource (Guid).
+                    - "Set to the object Id of the client JWT making the request. Not all users have object Id. For CSP (reseller) scenarios for example,
+                       object Id is not available."
+            app_id:
+                description:
+                    - Set to the app Id of the client JWT making the request.
+    secret_store:
+        description:
+            - The secret store of the user.
+        suboptions:
+            key_vault_uri:
+                description:
+                    - "The URI of the user's Key vault."
+            key_vault_id:
+                description:
+                    - "The ID of the user's Key vault."
+    unique_identifier:
+        description:
+            - The unique immutable identifier of a resource (Guid).
     state:
       description:
         - Assert the state of the User.
@@ -145,9 +140,17 @@ class AzureRMUsers(AzureRMModuleBase):
                 type='str',
                 required=True
             ),
-            user=dict(
-                type='dict',
-                required=True
+            location=dict(
+                type='str'
+            ),
+            identity=dict(
+                type='dict'
+            ),
+            secret_store=dict(
+                type='dict'
+            ),
+            unique_identifier=dict(
+                type='str'
             ),
             state=dict(
                 type='str',

@@ -34,84 +34,79 @@ options:
         description:
             - The name of the cost.
         required: True
-    lab_cost:
+    location:
         description:
-            - A cost item.
-        required: True
+            - The location of the resource.
+    target_cost:
+        description:
+            - The target cost properties
         suboptions:
-            location:
+            status:
                 description:
-                    - The location of the resource.
-            target_cost:
+                    - I(target) cost status.
+                choices:
+                    - 'enabled'
+                    - 'disabled'
+            target:
                 description:
-                    - The target cost properties
+                    - Lab target cost
+            cost_thresholds:
+                description:
+                    - Cost thresholds.
+                type: list
                 suboptions:
-                    status:
+                    threshold_id:
                         description:
-                            - I(target) cost status.
+                            - The ID of the cost threshold item.
+                    percentage_threshold:
+                        description:
+                            - The value of the percentage cost threshold.
+                        suboptions:
+                            threshold_value:
+                                description:
+                                    - The cost threshold value.
+                    display_on_chart:
+                        description:
+                            - Indicates whether this threshold will be displayed on cost charts.
                         choices:
                             - 'enabled'
                             - 'disabled'
-                    target:
+                    send_notification_when_exceeded:
                         description:
-                            - Lab target cost
-                    cost_thresholds:
-                        description:
-                            - Cost thresholds.
-                        type: list
-                        suboptions:
-                            threshold_id:
-                                description:
-                                    - The ID of the cost threshold item.
-                            percentage_threshold:
-                                description:
-                                    - The value of the percentage cost threshold.
-                                suboptions:
-                                    threshold_value:
-                                        description:
-                                            - The cost threshold value.
-                            display_on_chart:
-                                description:
-                                    - Indicates whether this threshold will be displayed on cost charts.
-                                choices:
-                                    - 'enabled'
-                                    - 'disabled'
-                            send_notification_when_exceeded:
-                                description:
-                                    - Indicates whether notifications will be sent when this threshold is exceeded.
-                                choices:
-                                    - 'enabled'
-                                    - 'disabled'
-                            notification_sent:
-                                description:
-                                    - Indicates the datetime when notifications were last sent for this threshold.
-                    cycle_start_date_time:
-                        description:
-                            - Reporting cycle start date.
-                    cycle_end_date_time:
-                        description:
-                            - Reporting cycle end date.
-                    cycle_type:
-                        description:
-                            - Reporting cycle type.
+                            - Indicates whether notifications will be sent when this threshold is exceeded.
                         choices:
-                            - 'calendar_month'
-                            - 'custom'
-            currency_code:
+                            - 'enabled'
+                            - 'disabled'
+                    notification_sent:
+                        description:
+                            - Indicates the datetime when notifications were last sent for this threshold.
+            cycle_start_date_time:
                 description:
-                    - The currency code of the cost.
-            start_date_time:
+                    - Reporting cycle start date.
+            cycle_end_date_time:
                 description:
-                    - The start time of the cost data.
-            end_date_time:
+                    - Reporting cycle end date.
+            cycle_type:
                 description:
-                    - The end time of the cost data.
-            created_date:
-                description:
-                    - The creation date of the cost.
-            unique_identifier:
-                description:
-                    - The unique immutable identifier of a resource (Guid).
+                    - Reporting cycle type.
+                choices:
+                    - 'calendar_month'
+                    - 'custom'
+    currency_code:
+        description:
+            - The currency code of the cost.
+    start_date_time:
+        description:
+            - The start time of the cost data.
+    end_date_time:
+        description:
+            - The end time of the cost data.
+    created_date:
+        description:
+            - The creation date of the cost.
+    unique_identifier:
+        description:
+            - The unique immutable identifier of a resource (Guid).
     state:
       description:
         - Assert the state of the Cost.
@@ -182,9 +177,26 @@ class AzureRMCosts(AzureRMModuleBase):
                 type='str',
                 required=True
             ),
-            lab_cost=dict(
-                type='dict',
-                required=True
+            location=dict(
+                type='str'
+            ),
+            target_cost=dict(
+                type='dict'
+            ),
+            currency_code=dict(
+                type='str'
+            ),
+            start_date_time=dict(
+                type='datetime'
+            ),
+            end_date_time=dict(
+                type='datetime'
+            ),
+            created_date=dict(
+                type='datetime'
+            ),
+            unique_identifier=dict(
+                type='str'
             ),
             state=dict(
                 type='str',

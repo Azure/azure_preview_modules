@@ -34,73 +34,68 @@ options:
         description:
             - The name of the custom image.
         required: True
-    custom_image:
+    location:
         description:
-            - A custom image.
-        required: True
+            - The location of the resource.
+    vm:
+        description:
+            - The virtual machine from which the image is to be created.
         suboptions:
-            location:
+            source_vm_id:
                 description:
-                    - The location of the resource.
-            vm:
+                    - The source vm identifier.
+            windows_os_info:
                 description:
-                    - The virtual machine from which the image is to be created.
+                    - The Windows OS information of the VM.
                 suboptions:
-                    source_vm_id:
+                    windows_os_state:
                         description:
-                            - The source vm identifier.
-                    windows_os_info:
-                        description:
-                            - The Windows OS information of the VM.
-                        suboptions:
-                            windows_os_state:
-                                description:
-                                    - The state of the Windows OS (i.e. C(non_sysprepped), C(sysprep_requested), C(sysprep_applied)).
-                                choices:
-                                    - 'non_sysprepped'
-                                    - 'sysprep_requested'
-                                    - 'sysprep_applied'
-                    linux_os_info:
-                        description:
-                            - The Linux OS information of the VM.
-                        suboptions:
-                            linux_os_state:
-                                description:
-                                    - The state of the Linux OS (i.e. C(non_deprovisioned), C(deprovision_requested), C(deprovision_applied)).
-                                choices:
-                                    - 'non_deprovisioned'
-                                    - 'deprovision_requested'
-                                    - 'deprovision_applied'
-            vhd:
-                description:
-                    - The VHD from which the image is to be created.
-                suboptions:
-                    image_name:
-                        description:
-                            - The image name.
-                    sys_prep:
-                        description:
-                            - Indicates whether sysprep has been run on the VHD.
-                    os_type:
-                        description:
-                            - The OS type of the custom image (i.e. C(windows), C(linux)).
-                            - Required when C(state) is I(present).
+                            - The state of the Windows OS (i.e. C(non_sysprepped), C(sysprep_requested), C(sysprep_applied)).
                         choices:
-                            - 'windows'
-                            - 'linux'
-                            - 'none'
-            description:
+                            - 'non_sysprepped'
+                            - 'sysprep_requested'
+                            - 'sysprep_applied'
+            linux_os_info:
                 description:
-                    - The description of the custom image.
-            author:
+                    - The Linux OS information of the VM.
+                suboptions:
+                    linux_os_state:
+                        description:
+                            - The state of the Linux OS (i.e. C(non_deprovisioned), C(deprovision_requested), C(deprovision_applied)).
+                        choices:
+                            - 'non_deprovisioned'
+                            - 'deprovision_requested'
+                            - 'deprovision_applied'
+    vhd:
+        description:
+            - The VHD from which the image is to be created.
+        suboptions:
+            image_name:
                 description:
-                    - The author of the custom image.
-            managed_image_id:
+                    - The image name.
+            sys_prep:
                 description:
-                    - The Managed Image Id backing the custom image.
-            unique_identifier:
+                    - Indicates whether sysprep has been run on the VHD.
+            os_type:
                 description:
-                    - The unique immutable identifier of a resource (Guid).
+                    - The OS type of the custom image (i.e. C(windows), C(linux)).
+                    - Required when C(state) is I(present).
+                choices:
+                    - 'windows'
+                    - 'linux'
+                    - 'none'
+    description:
+        description:
+            - The description of the custom image.
+    author:
+        description:
+            - The author of the custom image.
+    managed_image_id:
+        description:
+            - The Managed Image Id backing the custom image.
+    unique_identifier:
+        description:
+            - The unique immutable identifier of a resource (Guid).
     state:
       description:
         - Assert the state of the Custom Image.
@@ -171,9 +166,26 @@ class AzureRMCustomImages(AzureRMModuleBase):
                 type='str',
                 required=True
             ),
-            custom_image=dict(
-                type='dict',
-                required=True
+            location=dict(
+                type='str'
+            ),
+            vm=dict(
+                type='dict'
+            ),
+            vhd=dict(
+                type='dict'
+            ),
+            description=dict(
+                type='str'
+            ),
+            author=dict(
+                type='str'
+            ),
+            managed_image_id=dict(
+                type='str'
+            ),
+            unique_identifier=dict(
+                type='str'
             ),
             state=dict(
                 type='str',

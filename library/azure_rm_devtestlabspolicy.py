@@ -32,56 +32,51 @@ options:
         required: True
     policy_set_name:
         description:
-            - The name of the I(policy) set.
+            - The name of the policy set.
         required: True
     name:
         description:
-            - The name of the I(policy).
+            - The name of the policy.
         required: True
-    policy:
+    location:
         description:
-            - A Policy.
-        required: True
-        suboptions:
-            location:
-                description:
-                    - The location of the resource.
-            description:
-                description:
-                    - The description of the policy.
-            status:
-                description:
-                    - The status of the policy.
-                choices:
-                    - 'enabled'
-                    - 'disabled'
-            fact_name:
-                description:
-                    - The fact name of the policy (e.g. C(lab_vm_count), C(lab_vm_size), MaxVmsAllowedPerLab, etc.
-                choices:
-                    - 'user_owned_lab_vm_count'
-                    - 'user_owned_lab_premium_vm_count'
-                    - 'lab_vm_count'
-                    - 'lab_premium_vm_count'
-                    - 'lab_vm_size'
-                    - 'gallery_image'
-                    - 'user_owned_lab_vm_count_in_subnet'
-                    - 'lab_target_cost'
-            fact_data:
-                description:
-                    - The fact data of the policy.
-            threshold:
-                description:
-                    - The threshold of the policy (i.e. a number for C(max_value_policy), and a JSON array of values for C(allowed_values_policy)).
-            evaluator_type:
-                description:
-                    - The evaluator type of the policy (i.e. C(allowed_values_policy), C(max_value_policy)).
-                choices:
-                    - 'allowed_values_policy'
-                    - 'max_value_policy'
-            unique_identifier:
-                description:
-                    - The unique immutable identifier of a resource (Guid).
+            - The location of the resource.
+    description:
+        description:
+            - The description of the policy.
+    status:
+        description:
+            - The status of the policy.
+        choices:
+            - 'enabled'
+            - 'disabled'
+    fact_name:
+        description:
+            - The fact name of the policy (e.g. C(lab_vm_count), C(lab_vm_size), MaxVmsAllowedPerLab, etc.
+        choices:
+            - 'user_owned_lab_vm_count'
+            - 'user_owned_lab_premium_vm_count'
+            - 'lab_vm_count'
+            - 'lab_premium_vm_count'
+            - 'lab_vm_size'
+            - 'gallery_image'
+            - 'user_owned_lab_vm_count_in_subnet'
+            - 'lab_target_cost'
+    fact_data:
+        description:
+            - The fact data of the policy.
+    threshold:
+        description:
+            - The threshold of the policy (i.e. a number for C(max_value_policy), and a JSON array of values for C(allowed_values_policy)).
+    evaluator_type:
+        description:
+            - The evaluator type of the policy (i.e. C(allowed_values_policy), C(max_value_policy)).
+        choices:
+            - 'allowed_values_policy'
+            - 'max_value_policy'
+    unique_identifier:
+        description:
+            - The unique immutable identifier of a resource (Guid).
     state:
       description:
         - Assert the state of the Policy.
@@ -163,9 +158,41 @@ class AzureRMPolicies(AzureRMModuleBase):
                 type='str',
                 required=True
             ),
-            policy=dict(
-                type='dict',
-                required=True
+            location=dict(
+                type='str'
+            ),
+            description=dict(
+                type='str'
+            ),
+            status=dict(
+                type='str',
+                choices=['enabled',
+                         'disabled']
+            ),
+            fact_name=dict(
+                type='str',
+                choices=['user_owned_lab_vm_count',
+                         'user_owned_lab_premium_vm_count',
+                         'lab_vm_count',
+                         'lab_premium_vm_count',
+                         'lab_vm_size',
+                         'gallery_image',
+                         'user_owned_lab_vm_count_in_subnet',
+                         'lab_target_cost']
+            ),
+            fact_data=dict(
+                type='str'
+            ),
+            threshold=dict(
+                type='str'
+            ),
+            evaluator_type=dict(
+                type='str',
+                choices=['allowed_values_policy',
+                         'max_value_policy']
+            ),
+            unique_identifier=dict(
+                type='str'
             ),
             state=dict(
                 type='str',

@@ -32,36 +32,31 @@ options:
         required: True
     name:
         description:
-            - The name of the I(notification_channel).
+            - The name of the notificationChannel.
         required: True
-    notification_channel:
+    location:
         description:
-            - A notification.
-        required: True
+            - The location of the resource.
+    web_hook_url:
+        description:
+            - The webhook URL to send notifications to.
+    description:
+        description:
+            - Description of notification.
+    events:
+        description:
+            - The list of event for which this notification is enabled.
+        type: list
         suboptions:
-            location:
+            event_name:
                 description:
-                    - The location of the resource.
-            web_hook_url:
-                description:
-                    - The webhook URL to send notifications to.
-            description:
-                description:
-                    - Description of notification.
-            events:
-                description:
-                    - The list of event for which this notification is enabled.
-                type: list
-                suboptions:
-                    event_name:
-                        description:
-                            - The event type for which this notification is enabled (i.e. C(auto_shutdown), C(cost)).
-                        choices:
-                            - 'auto_shutdown'
-                            - 'cost'
-            unique_identifier:
-                description:
-                    - The unique immutable identifier of a resource (Guid).
+                    - The event type for which this notification is enabled (i.e. C(auto_shutdown), C(cost)).
+                choices:
+                    - 'auto_shutdown'
+                    - 'cost'
+    unique_identifier:
+        description:
+            - The unique immutable identifier of a resource (Guid).
     state:
       description:
         - Assert the state of the Notification Channel.
@@ -132,9 +127,20 @@ class AzureRMNotificationChannels(AzureRMModuleBase):
                 type='str',
                 required=True
             ),
-            notification_channel=dict(
-                type='dict',
-                required=True
+            location=dict(
+                type='str'
+            ),
+            web_hook_url=dict(
+                type='str'
+            ),
+            description=dict(
+                type='str'
+            ),
+            events=dict(
+                type='list'
+            ),
+            unique_identifier=dict(
+                type='str'
             ),
             state=dict(
                 type='str',

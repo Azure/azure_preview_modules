@@ -34,98 +34,93 @@ options:
         description:
             - The name of the virtual network.
         required: True
-    virtual_network:
+    location:
         description:
-            - A virtual network.
-        required: True
+            - The location of the resource.
+    allowed_subnets:
+        description:
+            - The allowed subnets of the virtual network.
+        type: list
         suboptions:
-            location:
+            resource_id:
                 description:
-                    - The location of the resource.
-            allowed_subnets:
+                    - The resource ID of the subnet.
+            lab_subnet_name:
                 description:
-                    - The allowed subnets of the virtual network.
-                type: list
+                    - The name of the subnet as seen in the lab.
+            allow_public_ip:
+                description:
+                    - The permission policy of the subnet for allowing public IP addresses (i.e. C(allow), C(deny))).
+                choices:
+                    - 'default'
+                    - 'deny'
+                    - 'allow'
+    description:
+        description:
+            - The description of the virtual network.
+    external_provider_resource_id:
+        description:
+            - The Microsoft.Network resource identifier of the virtual network.
+    external_subnets:
+        description:
+            - The external subnet properties.
+        type: list
+        suboptions:
+            id:
+                description:
+                    - Gets or sets the identifier.
+            name:
+                description:
+                    - Gets or sets the name.
+    subnet_overrides:
+        description:
+            - The subnet overrides of the virtual network.
+        type: list
+        suboptions:
+            resource_id:
+                description:
+                    - The resource ID of the subnet.
+            lab_subnet_name:
+                description:
+                    - The name given to the subnet within the lab.
+            use_in_vm_creation_permission:
+                description:
+                    - Indicates whether this subnet can be used during virtual machine creation (i.e. C(C(allow)), C(C(deny))).
+                choices:
+                    - 'default'
+                    - 'deny'
+                    - 'allow'
+            use_public_ip_address_permission:
+                description:
+                    - Indicates whether public IP addresses can be assigned to virtual machines on this subnet (i.e. C(C(allow)), C(C(deny))).
+                choices:
+                    - 'default'
+                    - 'deny'
+                    - 'allow'
+            shared_public_ip_address_configuration:
+                description:
+                    - Properties that virtual machines on this subnet will share.
                 suboptions:
-                    resource_id:
+                    allowed_ports:
                         description:
-                            - The resource ID of the subnet.
-                    lab_subnet_name:
-                        description:
-                            - The name of the subnet as seen in the lab.
-                    allow_public_ip:
-                        description:
-                            - The permission policy of the subnet for allowing public IP addresses (i.e. C(allow), C(deny))).
-                        choices:
-                            - 'default'
-                            - 'deny'
-                            - 'allow'
-            description:
-                description:
-                    - The description of the virtual network.
-            external_provider_resource_id:
-                description:
-                    - The Microsoft.Network resource identifier of the virtual network.
-            external_subnets:
-                description:
-                    - The external subnet properties.
-                type: list
-                suboptions:
-                    id:
-                        description:
-                            - Gets or sets the identifier.
-                    name:
-                        description:
-                            - Gets or sets the name.
-            subnet_overrides:
-                description:
-                    - The subnet overrides of the virtual network.
-                type: list
-                suboptions:
-                    resource_id:
-                        description:
-                            - The resource ID of the subnet.
-                    lab_subnet_name:
-                        description:
-                            - The name given to the subnet within the lab.
-                    use_in_vm_creation_permission:
-                        description:
-                            - Indicates whether this subnet can be used during virtual machine creation (i.e. C(C(allow)), C(C(deny))).
-                        choices:
-                            - 'default'
-                            - 'deny'
-                            - 'allow'
-                    use_public_ip_address_permission:
-                        description:
-                            - Indicates whether public IP addresses can be assigned to virtual machines on this subnet (i.e. C(C(allow)), C(C(deny))).
-                        choices:
-                            - 'default'
-                            - 'deny'
-                            - 'allow'
-                    shared_public_ip_address_configuration:
-                        description:
-                            - Properties that virtual machines on this subnet will share.
+                            - Backend ports that virtual machines on this subnet are allowed to expose
+                        type: list
                         suboptions:
-                            allowed_ports:
+                            transport_protocol:
                                 description:
-                                    - Backend ports that virtual machines on this subnet are allowed to expose
-                                type: list
-                                suboptions:
-                                    transport_protocol:
-                                        description:
-                                            - Protocol type of the port.
-                                        choices:
-                                            - 'tcp'
-                                            - 'udp'
-                                    backend_port:
-                                        description:
-                                            - Backend port of the target virtual machine.
-                    virtual_network_pool_name:
-                        description:
-                            - The virtual network pool associated with this subnet.
-            unique_identifier:
+                                    - Protocol type of the port.
+                                choices:
+                                    - 'tcp'
+                                    - 'udp'
+                            backend_port:
+                                description:
+                                    - Backend port of the target virtual machine.
+            virtual_network_pool_name:
                 description:
-                    - The unique immutable identifier of a resource (Guid).
+                    - The virtual network pool associated with this subnet.
+    unique_identifier:
+        description:
+            - The unique immutable identifier of a resource (Guid).
     state:
       description:
         - Assert the state of the Virtual Network.
@@ -196,9 +191,26 @@ class AzureRMVirtualNetworks(AzureRMModuleBase):
                 type='str',
                 required=True
             ),
-            virtual_network=dict(
-                type='dict',
-                required=True
+            location=dict(
+                type='str'
+            ),
+            allowed_subnets=dict(
+                type='list'
+            ),
+            description=dict(
+                type='str'
+            ),
+            external_provider_resource_id=dict(
+                type='str'
+            ),
+            external_subnets=dict(
+                type='list'
+            ),
+            subnet_overrides=dict(
+                type='list'
+            ),
+            unique_identifier=dict(
+                type='str'
             ),
             state=dict(
                 type='str',

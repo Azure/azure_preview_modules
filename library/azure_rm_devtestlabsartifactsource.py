@@ -34,47 +34,42 @@ options:
         description:
             - The name of the artifact source.
         required: True
-    artifact_source:
+    location:
         description:
-            - Properties of an artifact source.
-        required: True
-        suboptions:
-            location:
-                description:
-                    - The location of the resource.
-            display_name:
-                description:
-                    - "The artifact source's display name."
-            uri:
-                description:
-                    - "The artifact source's URI."
-            source_type:
-                description:
-                    - "The artifact source's type."
-                choices:
-                    - 'vso_git'
-                    - 'git_hub'
-            folder_path:
-                description:
-                    - The folder containing artifacts.
-            arm_template_folder_path:
-                description:
-                    - The folder containing Azure Resource Manager templates.
-            branch_ref:
-                description:
-                    - "The artifact source's branch reference."
-            security_token:
-                description:
-                    - The security token to authenticate to the artifact source.
-            status:
-                description:
-                    - "Indicates if the artifact source is C(enabled) (values: C(enabled), C(disabled))."
-                choices:
-                    - 'enabled'
-                    - 'disabled'
-            unique_identifier:
-                description:
-                    - The unique immutable identifier of a resource (Guid).
+            - The location of the resource.
+    display_name:
+        description:
+            - "The artifact source's display name."
+    uri:
+        description:
+            - "The artifact source's URI."
+    source_type:
+        description:
+            - "The artifact source's type."
+        choices:
+            - 'vso_git'
+            - 'git_hub'
+    folder_path:
+        description:
+            - The folder containing artifacts.
+    arm_template_folder_path:
+        description:
+            - The folder containing Azure Resource Manager templates.
+    branch_ref:
+        description:
+            - "The artifact source's branch reference."
+    security_token:
+        description:
+            - The security token to authenticate to the artifact source.
+    status:
+        description:
+            - "Indicates if the artifact source is C(enabled) (values: C(enabled), C(disabled))."
+        choices:
+            - 'enabled'
+            - 'disabled'
+    unique_identifier:
+        description:
+            - The unique immutable identifier of a resource (Guid).
     state:
       description:
         - Assert the state of the Artifact Source.
@@ -151,9 +146,39 @@ class AzureRMArtifactSources(AzureRMModuleBase):
                 type='str',
                 required=True
             ),
-            artifact_source=dict(
-                type='dict',
-                required=True
+            location=dict(
+                type='str'
+            ),
+            display_name=dict(
+                type='str'
+            ),
+            uri=dict(
+                type='str'
+            ),
+            source_type=dict(
+                type='str',
+                choices=['vso_git',
+                         'git_hub']
+            ),
+            folder_path=dict(
+                type='str'
+            ),
+            arm_template_folder_path=dict(
+                type='str'
+            ),
+            branch_ref=dict(
+                type='str'
+            ),
+            security_token=dict(
+                type='str'
+            ),
+            status=dict(
+                type='str',
+                choices=['enabled',
+                         'disabled']
+            ),
+            unique_identifier=dict(
+                type='str'
             ),
             state=dict(
                 type='str',

@@ -32,75 +32,70 @@ options:
         required: True
     name:
         description:
-            - The name of the I(schedule).
+            - The name of the schedule.
         required: True
-    schedule:
+    location:
         description:
-            - A schedule.
-        required: True
+            - The location of the resource.
+    status:
+        description:
+            - The status of the schedule (i.e. C(enabled), C(disabled)).
+        choices:
+            - 'enabled'
+            - 'disabled'
+    task_type:
+        description:
+            - The task type of the schedule (e.g. LabVmsShutdownTask, LabVmAutoStart).
+    weekly_recurrence:
+        description:
+            - If the schedule will occur only some days of the week, specify the weekly recurrence.
         suboptions:
-            location:
+            weekdays:
                 description:
-                    - The location of the resource.
+                    - The days of the week for which the schedule is set (e.g. Sunday, Monday, Tuesday, etc.).
+                type: list
+            time:
+                description:
+                    - The time of the day the schedule will occur.
+    daily_recurrence:
+        description:
+            - If the schedule will occur once each day of the week, specify the daily recurrence.
+        suboptions:
+            time:
+                description:
+                    - The time of day the schedule will occur.
+    hourly_recurrence:
+        description:
+            - If the schedule will occur multiple times a day, specify the hourly recurrence.
+        suboptions:
+            minute:
+                description:
+                    - Minutes of the hour the schedule will run.
+    time_zone_id:
+        description:
+            - The time zone ID (e.g. Pacific Standard time).
+    notification_settings:
+        description:
+            - Notification settings.
+        suboptions:
             status:
                 description:
-                    - The status of the schedule (i.e. C(enabled), C(disabled)).
+                    - If notifications are C(enabled) for this schedule (i.e. C(enabled), C(disabled)).
                 choices:
-                    - 'enabled'
                     - 'disabled'
-            task_type:
+                    - 'enabled'
+            time_in_minutes:
                 description:
-                    - The task type of the schedule (e.g. LabVmsShutdownTask, LabVmAutoStart).
-            weekly_recurrence:
+                    - Time in minutes before event at which notification will be sent.
+            webhook_url:
                 description:
-                    - If the schedule will occur only some days of the week, specify the weekly recurrence.
-                suboptions:
-                    weekdays:
-                        description:
-                            - The days of the week for which the schedule is set (e.g. Sunday, Monday, Tuesday, etc.).
-                        type: list
-                    time:
-                        description:
-                            - The time of the day the schedule will occur.
-            daily_recurrence:
-                description:
-                    - If the schedule will occur once each day of the week, specify the daily recurrence.
-                suboptions:
-                    time:
-                        description:
-                            - The time of day the schedule will occur.
-            hourly_recurrence:
-                description:
-                    - If the schedule will occur multiple times a day, specify the hourly recurrence.
-                suboptions:
-                    minute:
-                        description:
-                            - Minutes of the hour the schedule will run.
-            time_zone_id:
-                description:
-                    - The time zone ID (e.g. Pacific Standard time).
-            notification_settings:
-                description:
-                    - Notification settings.
-                suboptions:
-                    status:
-                        description:
-                            - If notifications are C(enabled) for this schedule (i.e. C(enabled), C(disabled)).
-                        choices:
-                            - 'disabled'
-                            - 'enabled'
-                    time_in_minutes:
-                        description:
-                            - Time in minutes before event at which notification will be sent.
-                    webhook_url:
-                        description:
-                            - The webhook URL to which the notification will be sent.
-            target_resource_id:
-                description:
-                    - The resource ID to which the schedule belongs
-            unique_identifier:
-                description:
-                    - The unique immutable identifier of a resource (Guid).
+                    - The webhook URL to which the notification will be sent.
+    target_resource_id:
+        description:
+            - The resource ID to which the schedule belongs
+    unique_identifier:
+        description:
+            - The unique immutable identifier of a resource (Guid).
     state:
       description:
         - Assert the state of the Schedule.
@@ -177,9 +172,37 @@ class AzureRMSchedules(AzureRMModuleBase):
                 type='str',
                 required=True
             ),
-            schedule=dict(
-                type='dict',
-                required=True
+            location=dict(
+                type='str'
+            ),
+            status=dict(
+                type='str',
+                choices=['enabled',
+                         'disabled']
+            ),
+            task_type=dict(
+                type='str'
+            ),
+            weekly_recurrence=dict(
+                type='dict'
+            ),
+            daily_recurrence=dict(
+                type='dict'
+            ),
+            hourly_recurrence=dict(
+                type='dict'
+            ),
+            time_zone_id=dict(
+                type='str'
+            ),
+            notification_settings=dict(
+                type='dict'
+            ),
+            target_resource_id=dict(
+                type='str'
+            ),
+            unique_identifier=dict(
+                type='str'
             ),
             state=dict(
                 type='str',

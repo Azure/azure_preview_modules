@@ -38,38 +38,33 @@ options:
         description:
             - The name of the environment.
         required: True
-    dtl_environment:
+    location:
         description:
-            - An environment, which is essentially an ARM template deployment.
-        required: True
+            - The location of the resource.
+    deployment_properties:
+        description:
+            - The deployment properties of the environment.
         suboptions:
-            location:
+            arm_template_id:
                 description:
-                    - The location of the resource.
-            deployment_properties:
+                    - "The Azure Resource Manager template's identifier."
+            parameters:
                 description:
-                    - The deployment properties of the environment.
+                    - The parameters of the Azure Resource Manager template.
+                type: list
                 suboptions:
-                    arm_template_id:
+                    name:
                         description:
-                            - "The Azure Resource Manager template's identifier."
-                    parameters:
+                            - The name of the template parameter.
+                    value:
                         description:
-                            - The parameters of the Azure Resource Manager template.
-                        type: list
-                        suboptions:
-                            name:
-                                description:
-                                    - The name of the template parameter.
-                            value:
-                                description:
-                                    - The value of the template parameter.
-            arm_template_display_name:
-                description:
-                    - The display name of the Azure Resource Manager template that produced the environment.
-            unique_identifier:
-                description:
-                    - The unique immutable identifier of a resource (Guid).
+                            - The value of the template parameter.
+    arm_template_display_name:
+        description:
+            - The display name of the Azure Resource Manager template that produced the environment.
+    unique_identifier:
+        description:
+            - The unique immutable identifier of a resource (Guid).
     state:
       description:
         - Assert the state of the Environment.
@@ -145,9 +140,17 @@ class AzureRMEnvironments(AzureRMModuleBase):
                 type='str',
                 required=True
             ),
-            dtl_environment=dict(
-                type='dict',
-                required=True
+            location=dict(
+                type='str'
+            ),
+            deployment_properties=dict(
+                type='dict'
+            ),
+            arm_template_display_name=dict(
+                type='str'
+            ),
+            unique_identifier=dict(
+                type='str'
             ),
             state=dict(
                 type='str',
