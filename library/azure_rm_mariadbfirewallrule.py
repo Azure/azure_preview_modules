@@ -170,7 +170,7 @@ class AzureRMFirewallRules(AzureRMModuleBase):
             if self.state == 'absent':
                 self.to_do = Actions.Delete
             elif self.state == 'present':
-                if not default_compare({'start_ip_address': self.start_ip_address, 'end_ip_address': self.end_ip_address}, old_response, ):
+                if not default_compare({'start_ip_address': self.start_ip_address, 'end_ip_address': self.end_ip_address}, old_response, ''):
                     self.to_do = Actions.Update
 
         if (self.to_do == Actions.Create) or (self.to_do == Actions.Update):
