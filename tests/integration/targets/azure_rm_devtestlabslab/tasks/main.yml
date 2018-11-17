@@ -53,7 +53,22 @@
     location: eastus
     uri: https://github.com/zikalino/ansible-hatchery
     source_type: git_hub
-  check_mode: yes
+  register: output
+- name: Assert the state has changed
+  assert:
+    that:
+      - output.changed
+
+# custom image
+
+- name: Create instance of dev test labs artifacts source
+  azure_rm_devtestlabscustomimage:
+    resource_group: "{{ resource_group }}"
+    lab_name: "lab{{ rpfx}}"
+    name: "artifacts{{ rpfx }}"
+    location: eastus
+    vm:
+      source_vm_id: "xxxxxxxxxxxx"
   register: output
 - name: Assert the state has changed
   assert:
