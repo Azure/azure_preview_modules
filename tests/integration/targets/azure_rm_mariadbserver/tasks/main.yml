@@ -6,6 +6,7 @@
 - name: Create instance of Server -- check mode
   azure_rm_mariadbserver:
     resource_group: "{{ resource_group }}"
+    name: "mdbs{{ rpfx }}"
   check_mode: yes
   register: output
 - name: Assert the resource instance is well created
@@ -16,6 +17,7 @@
 - name: Create instance of Server
   azure_rm_mariadbserver:
     resource_group: "{{ resource_group }}"
+    name: "mdbs{{ rpfx }}"
   register: output
 - name: Assert the resource instance is well created
   assert:
@@ -25,6 +27,7 @@
 - name: Create again instance of Server
   azure_rm_mariadbserver:
     resource_group: "{{ resource_group }}"
+    name: "mdbs{{ rpfx }}"
   register: output
 - name: Assert the state has not changed
   assert:
@@ -34,6 +37,7 @@
 - name: Delete instance of Server -- check mode
   azure_rm_mariadbserver:
     resource_group: "{{ resource_group }}"
+    name: "mdbs{{ rpfx }}"
     state: absent
   check_mode: yes
   register: output
@@ -45,6 +49,7 @@
 - name: Delete instance of Server
   azure_rm_mariadbserver:
     resource_group: "{{ resource_group }}"
+    name: "mdbs{{ rpfx }}"
     state: absent
   register: output
 - name: Assert the state has changed
@@ -55,6 +60,7 @@
 - name: Delete unexisting instance of Server
   azure_rm_mariadbserver:
     resource_group: "{{ resource_group }}"
+    name: "mdbs{{ rpfx }}"
     state: absent
   register: output
 - name: Assert the state has changed
