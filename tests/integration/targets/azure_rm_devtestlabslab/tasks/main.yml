@@ -191,7 +191,7 @@
     name: "policy{{ rpfx }}"
     location: eastus
   register: output
-  ignore_errors: yes
+#  ignore_errors: yes
 #- name: Assert the state has changed
 #  assert:
 #    that:
