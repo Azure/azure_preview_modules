@@ -54,6 +54,7 @@
     uri: https://github.com/zikalino/ansible-hatchery
     source_type: git_hub
     folder_path: /tests
+    security_token: xxxxxxxx
   register: output
 - name: Assert the state has changed
   assert:
