@@ -37,11 +37,9 @@ options:
     start_ip_address:
         description:
             - The start IP address of the server firewall rule. Must be IPv4 format.
-        required: True
     end_ip_address:
         description:
             - The end IP address of the server firewall rule. Must be IPv4 format.
-        required: True
     state:
       description:
         - Assert the state of the Firewall Rule.
@@ -114,12 +112,10 @@ class AzureRMFirewallRules(AzureRMModuleBase):
                 required=True
             ),
             start_ip_address=dict(
-                type='str',
-                required=True
+                type='str'
             ),
             end_ip_address=dict(
-                type='str',
-                required=True
+                type='str'
             ),
             state=dict(
                 type='str',
