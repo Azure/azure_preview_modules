@@ -51,7 +51,7 @@
     lab_name: "lab{{ rpfx}}"
     name: "artifacts{{ rpfx }}"
     location: eastus
-    uri: https://github.com/zikalino/ansible-hatchery
+    uri: https://github.com/zikalino/ansible-hatchery.git
     source_type: git_hub
     folder_path: /tests
     security_token: xxxxxxxx
