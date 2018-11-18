@@ -398,7 +398,7 @@
   assert:
     that:
       - output.changed == False
-      - "output.rules | length == 0"
+      - "output.firewall_rules | length == 0"
 
 
 
