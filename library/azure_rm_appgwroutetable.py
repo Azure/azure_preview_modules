@@ -110,7 +110,7 @@ from ansible.module_utils.azure_rm_common import AzureRMModuleBase
 
 try:
     from msrestazure.azure_exceptions import CloudError
-    from msrestazure.azure_operation import AzureOperationPoller
+    from msrest.polling import LROPoller
     from azure.mgmt.network import NetworkManagementClient
     from msrest.serialization import Model
 except ImportError:
@@ -280,7 +280,7 @@ class AzureRMRouteTables(AzureRMModuleBase):
             response = self.mgmt_client.route_tables.create_or_update(resource_group_name=self.resource_group,
                                                                       route_table_name=self.route_table_name,
                                                                       parameters=self.parameters)
-            if isinstance(response, AzureOperationPoller):
+            if isinstance(response, LROPoller):
                 response = self.get_poller_result(response)
 
         except CloudError as exc:
