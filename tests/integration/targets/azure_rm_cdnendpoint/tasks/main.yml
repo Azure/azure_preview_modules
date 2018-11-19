@@ -8,14 +8,14 @@
   azure_rm_cdnprofile:
       resource_group: "{{ resource_group }}"
       name: "{{ profile_name }}"
-      sku: Standard_Akamai
+      sku: standard_akamai
   register: output
 
 - name: Assert the Azure CDN profile is well created
   assert:
     that:
       - output.changed
-      - output.name == "{{ profile_name }}"
+      - output.id != ''
 
 - name: Create a Azure CDN endpoint(check mode)
   azure_rm_cdnendpoint:
