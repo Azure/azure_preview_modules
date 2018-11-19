@@ -58,11 +58,12 @@ options:
             max_staleness_prefix:
                 description:
                     - "When used with the Bounded Staleness consistency level, this value represents the number of stale requests tolerated. Accepted range
-                       for this value is 1 - 2,147,483,647. Required when defaultConsistencyPolicy is set to 'C(bounded_staleness)'."
+                       for this value is 1 - 2,147,483,647. Required when I(default_consistency_policy) is set to C(bounded_staleness)."
+                type: number
             max_interval_in_seconds:
                 description:
                     - "When used with the Bounded Staleness consistency level, this value represents the time amount of staleness (in seconds) tolerated.
-                       Accepted range for this value is 5 - 86400. Required when defaultConsistencyPolicy is set to 'C(bounded_staleness)'."
+                       Accepted range for this value is 5 - 86400. Required when I(default_consistency_policy) is set to C(bounded_staleness)."
                 type: number
     geo_rep_locations:
         description:
@@ -129,19 +130,37 @@ extends_documentation_fragment:
 
 author:
     - "Zim Kalinowski (@zikalino)"
-
 '''
 
 EXAMPLES = '''
-  - name: Create (or update) Database Account
+  - name: Create Cosmos DB Account - min
     azure_rm_cosmosdbaccount:
-      resource_group: rg1
+      resource_group: testResourceGroup
       name: ddb1
       location: westus
       geo_rep_locations:
         - name: southcentralus
           failover_priority: 0
       database_account_offer_type: Standard
+
+  - name: Create Cosmos DB Account - max
+    azure_rm_cosmosdbaccount:
+      resource_group: testResourceGroup
+      name: ddb1
+      location: westus
+      kind: mongo_db
+      geo_rep_locations:
+        - name: southcentralus
+          failover_priority: 0
+      database_account_offer_type: Standard
+      ip_range_filter: 10.10.10.10
+      enable_multiple_write_locations: yes
+      virtual_network_rules:
+        - id: /subscriptions/subId/resourceGroups/rg/providers/Microsoft.Network/virtualNetworks/vnet1/subnets/subnet1
+      consistency_policy:
+        default_consistency_level: bounded_staleness
+        max_staleness_prefix: 10
+        max_interval_in_seconds: 1000
 '''
 
 RETURN = '''
@@ -304,7 +323,7 @@ class AzureRMDatabaseAccounts(AzureRMModuleBase):
                 self.to_do = Actions.Delete
             elif self.state == 'present':
                 old_response['locations'] = old_response['failover_policies']
-                if (not default_compare(self.parameters, old_response, '')):
+                if not default_compare(self.parameters, old_response, '', {'/locations/location_name': 'location', '/location': 'location'}):
                     self.to_do = Actions.Update
 
         if (self.to_do == Actions.Create) or (self.to_do == Actions.Update):
@@ -403,12 +422,13 @@ class AzureRMDatabaseAccounts(AzureRMModuleBase):
         return d
 
 
-def default_compare(new, old, path):
+def default_compare(new, old, path, exceptions):
+    rule = exceptions.get(path, 'default')
     if isinstance(new, dict):
         if not isinstance(old, dict):
             return False
         for k in new.keys():
-            if not default_compare(new.get(k), old.get(k, None), path + '/' + k):
+            if not default_compare(new.get(k), old.get(k, None), path + '/' + k, exceptions):
                 return False
         return True
     elif isinstance(new, list):
@@ -426,11 +446,14 @@ def default_compare(new, old, path):
             new = sorted(new)
             old = sorted(old)
         for i in range(len(new)):
-            if not default_compare(new[i], old[i], path + '/*'):
+            if not default_compare(new[i], old[i], path + '/*', exceptions):
                 return False
         return True
     else:
-        return new == old
+        if rule == 'location':
+            new.replace(' ','').lower() == old.replace(' ', '').lower()
+        else:
+            return new == old
 
 
 def _snake_to_camel(snake, capitalize_first=False):
