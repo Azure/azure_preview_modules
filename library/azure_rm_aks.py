@@ -360,7 +360,7 @@ class AzureRMManagedCluster(AzureRMModuleBase):
             service_principal=dict(
                 type='dict',
                 options=service_principal_spec
-            ),
+            )
         )
 
         self.resource_group = None
