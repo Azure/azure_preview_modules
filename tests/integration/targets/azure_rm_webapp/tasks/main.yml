@@ -5,7 +5,6 @@
     win_plan_name: "{{ (resource_prefix | replace('-','x'))[-8:] }}winplan"
     linux_plan_name: "{{ (resource_group_secondary | replace('-','x'))[-8:] }}linplan"
     slot1_name: stage
-    slot2_name: testing
 
 - name: Create a windows web app with non-exist app service plan
   azure_rm_webapp:
@@ -380,9 +379,9 @@
     resource_group: "{{ resource_group }}"
     webapp_name: "{{ win_app_name }}13"
     name: "{{ slot1_name }}"
-    framework:
-      name: "node"
-      version: "10.1"
+    frameworks:
+      - name: "node"
+        version: "10.1"
     app_settings:
         testkey: testvalue2
   register: output
@@ -411,17 +410,10 @@
     resource_group: "{{ resource_group }}"
     webapp_name: "{{ win_app_name }}13"
     name: "{{ slot1_name }}"
-    app_ state: stopped
+    app_state: stopped
   register: output
 
 - name: Assert stopped
   assert:
     that:
       - output.changed
-
-- name: delete slot
-  azure_rm_webapp_slot:
-    resource_group: "{{ resource_group }}"
-    webapp_name: "{{ win_app_name }}13"
-    name: "{{ slot1_name }}"
-    state: absent
