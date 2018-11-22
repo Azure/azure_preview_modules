@@ -215,7 +215,23 @@ class AzureRMCosmosDBAccount(AzureRMModuleBase):
                          'parse']
             ),
             consistency_policy=dict(
-                type='dict'
+                type='dict',
+                options=dict(
+                    default_consistency_level=dict(
+                        type='str',
+                        choices=['eventual',
+                                'session',
+                                'bounded_staleness',
+                                'strong',
+                                'consistent_prefix']
+                    ),
+                    max_staleness_prefix=dict(
+                        type='number'
+                    ),
+                    max_interval_in_seconds=dict(
+                        type='number'
+                    )
+                )
             ),
             geo_rep_locations=dict(
                 type='list',
@@ -252,6 +268,7 @@ class AzureRMCosmosDBAccount(AzureRMModuleBase):
                         type='str',
                         required=True
                     )
+                )
             ),
             enable_multiple_write_locations=dict(
                 type='str'
