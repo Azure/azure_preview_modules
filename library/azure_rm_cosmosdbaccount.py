@@ -428,13 +428,13 @@ def default_compare(new, old, path, result):
                 return False
         return True
     else:
-        if path == '/location':
+        if path == '/location' or path.endswith('location_name'):
             new = new.replace(' ', '').lower()
             old = new.replace(' ', '').lower()
         if new == old:
             return True
         else:
-            result['compare'] = 'changed [' + path + '] ' + new + ' != ' + old
+            result['compare'] = 'changed [' + path + '] ' + str(new) + ' != ' + str(old)
             return False
 
 #
