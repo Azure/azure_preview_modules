@@ -101,8 +101,7 @@ options:
         suboptions:
             name:
                 description:
-                    - "Name of the Cosmos DB capability. For example, 'name': 'EnableCassandra'. Current values also include 'EnableTable' and
-                       'EnableGremlin'."
+                    - "Name of the Cosmos DB capability. For example I(EnableCassandra), I(EnableTable) or I(EnableGremlin)"
     virtual_network_rules:
         description:
             - List of Virtual Network ACL rules configured for the Cosmos DB account.
