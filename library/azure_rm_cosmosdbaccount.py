@@ -476,6 +476,8 @@ def expand(d, path, **kwargs):
                         new_value = _snake_to_camel(old_value, False)
                     elif upper:
                         new_value = old_value.upper()
+                    else:
+                        new_value = old_value
             if expandx is None:
                 # just rename
                 if new_name != old_name:
