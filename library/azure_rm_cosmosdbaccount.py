@@ -323,7 +323,7 @@ class AzureRMDatabaseAccounts(AzureRMModuleBase):
                 self.to_do = Actions.Delete
             elif self.state == 'present':
                 old_response['locations'] = old_response['failover_policies']
-                if not default_compare(self.parameters, old_response, '', {'/locations/location_name': 'location', '/location': 'location'}):
+                if not default_compare(self.parameters, old_response, '', results):
                     self.to_do = Actions.Update
 
         if (self.to_do == Actions.Create) or (self.to_do == Actions.Update):
@@ -422,17 +422,20 @@ class AzureRMDatabaseAccounts(AzureRMModuleBase):
         return d
 
 
-def default_compare(new, old, path, exceptions):
-    rule = exceptions.get(path, 'default')
-    if isinstance(new, dict):
+def default_compare(new, old, path, result):
+    if new is None:
+        return True
+    elif isinstance(new, dict):
         if not isinstance(old, dict):
+            result['compare'] = 'changed [' + path + '] old dict is null' 
             return False
         for k in new.keys():
-            if not default_compare(new.get(k), old.get(k, None), path + '/' + k, exceptions):
+            if not default_compare(new.get(k), old.get(k, None), path + '/' + k, result):
                 return False
         return True
     elif isinstance(new, list):
         if not isinstance(old, list) or len(new) != len(old):
+            result['compare'] = 'changed [' + path + '] length is different or null' 
             return False
         if isinstance(old[0], dict):
             key = None
@@ -446,14 +449,18 @@ def default_compare(new, old, path, exceptions):
             new = sorted(new)
             old = sorted(old)
         for i in range(len(new)):
-            if not default_compare(new[i], old[i], path + '/*', exceptions):
+            if not default_compare(new[i], old[i], path + '/*', result):
                 return False
         return True
     else:
-        if rule == 'location':
-            new.replace(' ','').lower() == old.replace(' ', '').lower()
+        if path == '/location':
+            new = new.replace(' ', '').lower()
+            old = new.replace(' ', '').lower()
+        if new == old:
+            return True
         else:
-            return new == old
+            result['compare'] = 'changed [' + path + '] ' + new + ' != ' + old
+            return False 
 
 
 def _snake_to_camel(snake, capitalize_first=False):
