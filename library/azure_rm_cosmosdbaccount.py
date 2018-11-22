@@ -80,6 +80,7 @@ options:
                        (total number of regions - 1). Failover priority values must be unique for each of the regions in which the database account exists."
     database_account_offer_type:
         description:
+            - Database account offer type, for example I(Standard)
             - Required when C(state) is I(present).
     ip_range_filter:
         description:
@@ -217,7 +218,17 @@ class AzureRMCosmosDBAccount(AzureRMModuleBase):
                 type='dict'
             ),
             geo_rep_locations=dict(
-                type='list'
+                type='list',
+                options=dict(
+                    name=dict(
+                        type='str',
+                        required=True
+                    ),
+                    failover_priority=dict(
+                        type='number',
+                        required=True
+                    )
+                )
             ),
             database_account_offer_type=dict(
                 type='str'
@@ -235,7 +246,12 @@ class AzureRMCosmosDBAccount(AzureRMModuleBase):
                 type='list'
             ),
             virtual_network_rules=dict(
-                type='list'
+                type='list',
+                options=dict(
+                    id=dict(
+                        type='str',
+                        required=True
+                    )
             ),
             enable_multiple_write_locations=dict(
                 type='str'
