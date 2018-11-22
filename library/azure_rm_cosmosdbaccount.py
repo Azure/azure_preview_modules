@@ -17,9 +17,9 @@ DOCUMENTATION = '''
 ---
 module: azure_rm_cosmosdbaccount
 version_added: "2.8"
-short_description: Manage Azure Cosmos DB Account instance.
+short_description: Manage Azure Database Account instance.
 description:
-    - Create, update and delete instance of Azure Cosmos DB Account.
+    - Create, update and delete instance of Azure Database Account.
 
 options:
     resource_group:
@@ -130,6 +130,7 @@ extends_documentation_fragment:
 
 author:
     - "Zim Kalinowski (@zikalino)"
+
 '''
 
 EXAMPLES = '''
@@ -190,7 +191,7 @@ class Actions:
     NoAction, Create, Update, Delete = range(4)
 
 
-class AzureRMDatabaseAccounts(AzureRMModuleBase):
+class AzureRMCosmosDBAccount(AzureRMModuleBase):
     """Configuration class for an Azure RM Database Account resource"""
 
     def __init__(self):
@@ -255,7 +256,7 @@ class AzureRMDatabaseAccounts(AzureRMModuleBase):
         self.state = None
         self.to_do = Actions.NoAction
 
-        super(AzureRMDatabaseAccounts, self).__init__(derived_arg_spec=self.module_arg_spec,
+        super(AzureRMCosmosDBAccount, self).__init__(derived_arg_spec=self.module_arg_spec,
                                                       supports_check_mode=True,
                                                       supports_tags=True)
 
@@ -266,38 +267,10 @@ class AzureRMDatabaseAccounts(AzureRMModuleBase):
             if hasattr(self, key):
                 setattr(self, key, kwargs[key])
             elif kwargs[key] is not None:
-                if key == "location":
-                    self.parameters["location"] = kwargs[key]
-                elif key == "kind":
-                    ev = kwargs[key]
-                    if ev == 'global_document_db':
-                        ev = 'GlobalDocumentDB'
-                    elif ev == 'mongo_db':
-                        ev = 'MongoDB'
-                    elif ev == 'parse':
-                        ev = 'Parse'
-                    self.parameters["kind"] = ev
-                elif key == "consistency_policy":
-                    self.parameters["consistency_policy"] = _snake_to_camel(kwargs[key])
-                elif key == "geo_rep_locations":
-                    locations = kwargs[key]
-                    for i in range(len(locations)):
-                        locations[i]['location_name'] = locations[i].pop('name')
-                    self.parameters["locations"] = locations
-                elif key == "database_account_offer_type":
-                    self.parameters["database_account_offer_type"] = kwargs[key]
-                elif key == "ip_range_filter":
-                    self.parameters["ip_range_filter"] = kwargs[key]
-                elif key == "is_virtual_network_filter_enabled":
-                    self.parameters["is_virtual_network_filter_enabled"] = kwargs[key]
-                elif key == "enable_automatic_failover":
-                    self.parameters["enable_automatic_failover"] = kwargs[key]
-                elif key == "capabilities":
-                    self.parameters["capabilities"] = kwargs[key]
-                elif key == "virtual_network_rules":
-                    self.parameters["virtual_network_rules"] = kwargs[key]
-                elif key == "enable_multiple_write_locations":
-                    self.parameters["enable_multiple_write_locations"] = kwargs[key]
+                self.parameters[key] = kwargs[key]
+
+        expand(self.parameters, ['kind'], camelize={'global_document_db': 'GlobalDocumentDB', 'mongo_db': 'MongoDB'})
+        expand(self.parameters, ['consistency_policy', 'default_consistency_level'], camelize=True)
 
         response = None
 
@@ -355,7 +328,7 @@ class AzureRMDatabaseAccounts(AzureRMModuleBase):
             response = old_response
 
         if self.state == 'present':
-            self.results.update(self.format_item(response))
+            self.results.update(self.format_response(response))
         return self.results
 
     def create_update_databaseaccount(self):
@@ -415,7 +388,7 @@ class AzureRMDatabaseAccounts(AzureRMModuleBase):
 
         return False
 
-    def format_item(self, d):
+    def format_response(self, d):
         d = {
             'id': d.get('id', None)
         }
@@ -427,7 +400,7 @@ def default_compare(new, old, path, result):
         return True
     elif isinstance(new, dict):
         if not isinstance(old, dict):
-            result['compare'] = 'changed [' + path + '] old dict is null' 
+            result['compare'] = 'changed [' + path + '] old dict is null'
             return False
         for k in new.keys():
             if not default_compare(new.get(k), old.get(k, None), path + '/' + k, result):
@@ -435,7 +408,7 @@ def default_compare(new, old, path, result):
         return True
     elif isinstance(new, list):
         if not isinstance(old, list) or len(new) != len(old):
-            result['compare'] = 'changed [' + path + '] length is different or null' 
+            result['compare'] = 'changed [' + path + '] length is different or null'
             return False
         if isinstance(old[0], dict):
             key = None
@@ -460,7 +433,49 @@ def default_compare(new, old, path, result):
             return True
         else:
             result['compare'] = 'changed [' + path + '] ' + new + ' != ' + old
-            return False 
+            return False
+
+
+def expand(d, path, **kwargs):
+    expandx = kwargs.get('expand', None)
+    rename = kwargs.get('rename', None)
+    camelize = kwargs.get('camelize', False)
+    camelize_lower = kwargs.get('camelize_lower', False)
+    upper = kwargs.get('upper', False)
+    map = kwargs.get('map', None)
+    if isinstance(d, list):
+        for i in range(len(d)):
+            expand(d[i], path, **kwargs)
+    elif isinstance(d, dict):
+        if len(path) == 1:
+            old_name = path[0]
+            new_name = old_name if rename is None else rename
+            old_value = d.get(old_name, None)
+            new_value = None
+            if old_value is not None:
+                if map is not None:
+                    new_value = map.get(old_value, None)
+                if new_value is None:
+                    if camelize:
+                        new_value = _snake_to_camel(old_value, True)
+                    elif camelize_lower:
+                        new_value = _snake_to_camel(old_value, False)
+                    elif upper:
+                        new_value = old_value.upper()
+            if expandx is None:
+                # just rename
+                if new_name != old_name:
+                    d.pop(old_name, None)
+            else:
+                # expand and rename
+                d[expandx] = d.get(expandx, {})
+                d.pop(old_name, None)
+                d = d[expandx]
+            d[new_name] = new_value
+        else:
+            sd = d.get(path[0], None)
+            if sd is not None:
+                expand(sd, path[1:], **kwargs)
 
 
 def _snake_to_camel(snake, capitalize_first=False):
@@ -472,7 +487,7 @@ def _snake_to_camel(snake, capitalize_first=False):
 
 def main():
     """Main execution"""
-    AzureRMDatabaseAccounts()
+    AzureRMCosmosDBAccount()
 
 
 if __name__ == '__main__':
