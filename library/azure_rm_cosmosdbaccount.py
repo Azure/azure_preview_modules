@@ -269,8 +269,10 @@ class AzureRMCosmosDBAccount(AzureRMModuleBase):
             elif kwargs[key] is not None:
                 self.parameters[key] = kwargs[key]
 
-        expand(self.parameters, ['kind'], camelize={'global_document_db': 'GlobalDocumentDB', 'mongo_db': 'MongoDB'})
+        expand(self.parameters, ['kind'], map={'global_document_db': 'GlobalDocumentDB', 'mongo_db': 'MongoDB'}, camelize=True)
         expand(self.parameters, ['consistency_policy', 'default_consistency_level'], camelize=True)
+        expand(self.parameters, ['geo_rep_locations', 'name'], rename='location_name')
+        expand(self.parameters, ['geo_rep_locations'], rename='locations')
 
         response = None
 
@@ -435,7 +437,19 @@ def default_compare(new, old, path, result):
             result['compare'] = 'changed [' + path + '] ' + new + ' != ' + old
             return False
 
-
+#
+# Dictionary transformation helper.
+#
+# Parameters:
+#  d: dictionary
+#  path: path in the dictionary, array of strings
+#  kwargs: optional operation parameters
+#   rename='new_name'               - rename item
+#   expand='new_dictionary_name'    - move item to a new dictionary
+#   camelize=True                   - camelize value
+#   camelize_lower=True             - camelize value, first part will start with lower case
+#   upper=Tru                       - convert value to upper case
+#   map={}                          - dictionary used to map values
 def expand(d, path, **kwargs):
     expandx = kwargs.get('expand', None)
     rename = kwargs.get('rename', None)
