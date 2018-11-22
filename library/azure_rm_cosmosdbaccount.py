@@ -269,10 +269,10 @@ class AzureRMCosmosDBAccount(AzureRMModuleBase):
             elif kwargs[key] is not None:
                 self.parameters[key] = kwargs[key]
 
-        expand(self.parameters, ['kind'], map={'global_document_db': 'GlobalDocumentDB', 'mongo_db': 'MongoDB'}, camelize=True)
-        expand(self.parameters, ['consistency_policy', 'default_consistency_level'], camelize=True)
-        expand(self.parameters, ['geo_rep_locations', 'name'], rename='location_name')
-        expand(self.parameters, ['geo_rep_locations'], rename='locations')
+        dict_camelize(self.parameters, ['kind'], True)
+        dict_camelize(self.parameters, ['consistency_policy', 'default_consistency_level'], True)
+        dict_rename(self.parameters, ['geo_rep_locations', 'name'], 'location_name')
+        dict_rename(self.parameters, ['geo_rep_locations'], 'locations')
 
         response = None
 
@@ -439,61 +439,65 @@ def default_compare(new, old, path, result):
             result['compare'] = 'changed [' + path + '] ' + str(new) + ' != ' + str(old)
             return False
 
-#
-# Dictionary transformation helper.
-#
-# Parameters:
-#  d: dictionary
-#  path: path in the dictionary, array of strings
-#  kwargs: optional operation parameters
-#   rename='new_name'               - rename item
-#   expand='new_dictionary_name'    - move item to a new dictionary
-#   camelize=True                   - camelize value
-#   camelize_lower=True             - camelize value, first part will start with lower case
-#   upper=Tru                       - convert value to upper case
-#   map={}                          - dictionary used to map values
-def expand(d, path, **kwargs):
-    expandx = kwargs.get('expand', None)
-    rename = kwargs.get('rename', None)
-    camelize = kwargs.get('camelize', False)
-    camelize_lower = kwargs.get('camelize_lower', False)
-    upper = kwargs.get('upper', False)
-    map = kwargs.get('map', None)
+def dict_camelize(d, path, camelize_first):
     if isinstance(d, list):
         for i in range(len(d)):
-            expand(d[i], path, **kwargs)
+            dict_camelize(d[i], path, camelize_first)
     elif isinstance(d, dict):
         if len(path) == 1:
-            old_name = path[0]
-            new_name = old_name if rename is None else rename
-            old_value = d.get(old_name, None)
-            new_value = None
+            old_value = d.get(path[0], None)
             if old_value is not None:
-                if map is not None:
-                    new_value = map.get(old_value, None)
-                if new_value is None:
-                    if camelize:
-                        new_value = _snake_to_camel(old_value, True)
-                    elif camelize_lower:
-                        new_value = _snake_to_camel(old_value, False)
-                    elif upper:
-                        new_value = old_value.upper()
-                    else:
-                        new_value = old_value
-            if expandx is None:
-                # just rename
-                if new_name != old_name:
-                    d.pop(old_name, None)
-            else:
-                # expand and rename
-                d[expandx] = d.get(expandx, {})
-                d.pop(old_name, None)
-                d = d[expandx]
-            d[new_name] = new_value
+                d[path[0]] = _snake_to_camel(old_value, camelize_first)
         else:
             sd = d.get(path[0], None)
             if sd is not None:
-                expand(sd, path[1:], **kwargs)
+                dict_camelize(sd, path[1:], camelize_first)
+
+
+def dict_upper(d, path):
+    if isinstance(d, list):
+        for i in range(len(d)):
+            dict_upper(d[i], path)
+    elif isinstance(d, dict):
+        if len(path) == 1:
+            old_value = d.get(path[0], None)
+            if old_value is not None:
+                d[path[0]] = old_value.upper()
+        else:
+            sd = d.get(path[0], None)
+            if sd is not None:
+                dict_upper(sd, path[1:])
+
+
+def dict_rename(d, path, new_name):
+    if isinstance(d, list):
+        for i in range(len(d)):
+            dict_rename(d[i], path, new_name)
+    elif isinstance(d, dict):
+        if len(path) == 1:
+            old_value = d.pop(path[0], None)
+            if old_value is not None:
+                d[new_name] = old_value
+        else:
+            sd = d.get(path[0], None)
+            if sd is not None:
+                dict_rename(sd, path[1:], new_name)
+
+
+def dict_expand(d, path, outer_dict_name):
+    if isinstance(d, list):
+        for i in range(len(d)):
+            dict_expand(d[i], path, outer_dict_name)
+    elif isinstance(d, dict):
+        if len(path) == 1:
+            old_value = d.pop(path[0], None)
+            if old_value is not None:
+                d[outer_dict_name] = d.get(outer_dict_name, {})
+                d[outer_dict_name] = old_value
+        else:
+            sd = d.get(path[0], None)
+            if sd is not None:
+                dict_expand(sd, path[1:], outer_dict_name)
 
 
 def _snake_to_camel(snake, capitalize_first=False):
