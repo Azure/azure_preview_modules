@@ -391,6 +391,9 @@ class AzureRMCosmosDBAccount(AzureRMModuleBase):
         try:
             response = self.mgmt_client.database_accounts.delete(resource_group_name=self.resource_group,
                                                                  account_name=self.name)
+
+            if isinstance(response, LROPoller) or isinstance(response, AzureOperationPoller):
+                response = self.get_poller_result(response)
         except CloudError as e:
             self.log('Error attempting to delete the Database Account instance.')
             self.fail("Error deleting the Database Account instance: {0}".format(str(e)))
