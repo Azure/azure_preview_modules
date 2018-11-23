@@ -365,7 +365,7 @@ class AzureRMCosmosDBAccount(AzureRMModuleBase):
             response = old_response
 
         if self.state == 'present':
-            self.results.update({'id': d.get('id', None)})
+            self.results.update({'id': response.get('id', None)})
         return self.results
 
     def create_update_databaseaccount(self):
