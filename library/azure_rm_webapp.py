@@ -967,10 +967,8 @@ class AzureRMWebApps(AzureRMModuleBase):
 
             return response
         except CloudError as ex:
-            self.log("Failed to update application settings for web app {0} in resource group {1}".format(
-                self.name, self.resource_group))
-
-        return False
+            self.fail("Failed to update application settings for web app {0} in resource group {1}: {2}".format(
+                self.name, self.resource_group, str(ex)))
 
     def create_or_update_source_control(self):
         '''
