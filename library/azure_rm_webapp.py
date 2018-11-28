@@ -746,7 +746,7 @@ class AzureRMWebApps(AzureRMModuleBase):
 
                 self.results['id'] = response['id']
 
-            if self.to_do == Actions:UpdateAppSettings:
+            if self.to_do == Actions.UpdateAppSettings:
                 update_response = self.update_app_settings()
                 self.results = update_response.id
 
