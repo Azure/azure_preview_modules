@@ -131,8 +131,8 @@
   assert:
     that:
     - output.webapps[0].app_settings | length == 2
-    - output.webapps[0].tags.testkey == 'testvalue'
-    - output.webapps[0].tags.testkey2 == 'testvalue2'
+    - output.webapps[0].app_settings['testkey'] == 'testvalue'
+    - output.webapps[0].app_settings['testkey2'] == 'testvalue2'
 
 - name: get web app with return publishing profile
   azure_rm_webapp_facts:
