@@ -77,7 +77,7 @@
     plan: "{{ win_plan_name }}"
     frameworks:
       - name: "java"
-        version: "1.8"
+        version: "8"
         settings:
           java_container: "Tomcat"
           java_container_version: "8.0"
@@ -108,7 +108,7 @@
     plan: "{{ win_plan_name }}"
     frameworks:
       - name: "java"
-        version: "1.8"
+        version: "8"
         settings:
           java_container: "Tomcat"
           java_container_version: "8.0"
@@ -289,7 +289,7 @@
       - name: "python"
         version: "2.7"
       - name: "java"
-        version: "1.8"
+        version: "8"
   register: fail_win_java_version_mutual_exclusive
   failed_when: 'fail_win_java_version_mutual_exclusive.msg != "Java is mutually exclusive with other frameworks."'
 

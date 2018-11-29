@@ -77,7 +77,7 @@ options:
                     - node supported value sample, 6.6, 6.9.
                     - dotnetcore supported value sample, 1.0, 1,1, 1.2.
                     - ruby supported value sample, 2.3.
-                    - java supported value sample, 1.8, 1.9 for windows web app. 8 for linux web app.
+                    - java supported value sample, 8, 9.
             settings:
                 description:
                     - List of settings of the framework.
@@ -748,7 +748,7 @@ class AzureRMWebApps(AzureRMModuleBase):
 
             if self.to_do == Actions.UpdateAppSettings:
                 update_response = self.update_app_settings()
-                self.results = update_response.id
+                self.results['id'] = update_response.id
 
         webapp = None
         if old_response:
@@ -790,14 +790,12 @@ class AzureRMWebApps(AzureRMModuleBase):
     # comparing existing app setting with input, determine whether it's changed
     def is_app_settings_changed(self):
         if self.app_settings:
-            if len(self.app_settings_strDic.properties) != len(self.app_settings):
-                return True
-
-            elif self.app_settings_strDic.properties and len(self.app_settings_strDic.properties) > 0:
+            if self.app_settings_strDic.properties:
                 for key in self.app_settings.keys():
-                    if not self.app_settings_strDic.properties.get(key) \
-                            or self.app_settings[key] != self.app_settings_strDic.properties[key]:
+                    if self.app_settings[key] != self.app_settings_strDic.properties.get(key, None):
                         return True
+            else:
+                return True
         return False
 
     # comparing deployment source with input, determine wheather it's changed
@@ -948,10 +946,8 @@ class AzureRMWebApps(AzureRMModuleBase):
 
             return response
         except CloudError as ex:
-            self.log("Failed to list application settings for web app {0} in resource group {1}".format(
-                self.name, self.resource_group))
-
-            return False
+            self.fail("Failed to list application settings for web app {0} in resource group {1}: {2}".format(
+                self.name, self.resource_group, str(ex)))
 
     def update_app_settings(self):
         '''
