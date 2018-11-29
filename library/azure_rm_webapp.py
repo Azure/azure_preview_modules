@@ -77,7 +77,7 @@ options:
                     - node supported value sample, 6.6, 6.9.
                     - dotnetcore supported value sample, 1.0, 1,1, 1.2.
                     - ruby supported value sample, 2.3.
-                    - java supported value sample, 8, 9.
+                    - java supported value sample, 1.8, 1.9 for windows web app. 8 for linux web app.
             settings:
                 description:
                     - List of settings of the framework.
