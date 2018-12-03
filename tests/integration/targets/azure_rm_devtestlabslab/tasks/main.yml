@@ -59,7 +59,7 @@
     name: "lab{{ rpfx }}"
     display_name: My Artifacts Source
     location: eastus
-    uri: https://github.com/zikalino/azure-devtestlab.git
+    uri: https://github.com/testormoo/azure-devtestlab.git
     source_type: github
     folder_path: /Artifacts
     security_token: b1d8da94506a3eb76a99da9330169ce8c1e51d87
