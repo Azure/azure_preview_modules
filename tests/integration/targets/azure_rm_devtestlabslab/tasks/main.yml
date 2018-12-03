@@ -65,13 +65,6 @@
     #security_token: "{{ github_token }}"
   register: artifacts_output
 
-- name: Get facts of artifacts source
-  azure_rm_devtestlabsartifactsource_facts:
-    resource_group: "{{ resource_group }}"
-    lab_name: "lab{{ rpfx}}"
-    name: "lab{{ rpfx }}"
-  register: output
-
 - name: Create instance of dev test labs virtual machine
   azure_rm_devtestlabsvirtualmachine:
     resource_group: "{{ resource_group }}"
