@@ -62,7 +62,7 @@
     uri: https://github.com/testormoo/azure-devtestlab.git
     source_type: github
     folder_path: /Artifacts
-    security_token: "9911dc01a9de36ec85663ffade6a3f1baa33d5cd"
+    security_token: "f0b590c0b1620f5fbc969ba6ce91a116bea572ff"
   register: artifacts_output
 
 - name: Create instance of dev test labs virtual machine
