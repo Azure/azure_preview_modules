@@ -17,9 +17,9 @@ DOCUMENTATION = '''
 ---
 module: azure_rm_devtestlabslab
 version_added: "2.8"
-short_description: Manage Azure Lab instance.
+short_description: Manage Azure DevTest Lab instance.
 description:
-    - Create, update and delete instance of Azure Lab.
+    - Create, update and delete instance of Azure DevTest Lab.
 
 options:
     resource_group:
@@ -47,8 +47,8 @@ options:
         type: bool
     state:
       description:
-        - Assert the state of the Lab.
-        - Use 'present' to create or update an Lab and 'absent' to delete it.
+        - Assert the state of the DevTest Lab.
+        - Use 'present' to create or update an DevTest Lab and 'absent' to delete it.
       default: present
       choices:
         - absent
@@ -64,7 +64,7 @@ author:
 '''
 
 EXAMPLES = '''
-  - name: Create (or update) Lab
+  - name: Create (or update) DevTest Lab
     azure_rm_devtestlabslab:
       resource_group: NOT FOUND
       name: NOT FOUND
@@ -82,6 +82,7 @@ id:
 
 import time
 from ansible.module_utils.azure_rm_common import AzureRMModuleBase
+from ansible.module_utils.common.dict_transformations import _snake_to_camel
 
 try:
     from msrestazure.azure_exceptions import CloudError
@@ -98,8 +99,8 @@ class Actions:
     NoAction, Create, Update, Delete = range(4)
 
 
-class AzureRMLabs(AzureRMModuleBase):
-    """Configuration class for an Azure RM Lab resource"""
+class AzureRMDevTestLab(AzureRMModuleBase):
+    """Configuration class for an Azure RM DevTest Lab resource"""
 
     def __init__(self):
         self.module_arg_spec = dict(
@@ -138,9 +139,9 @@ class AzureRMLabs(AzureRMModuleBase):
         self.state = None
         self.to_do = Actions.NoAction
 
-        super(AzureRMLabs, self).__init__(derived_arg_spec=self.module_arg_spec,
-                                          supports_check_mode=True,
-                                          supports_tags=True)
+        super(AzureRMDevTestLab, self).__init__(derived_arg_spec=self.module_arg_spec,
+                                                 supports_check_mode=True,
+                                                 supports_tags=True)
 
     def exec_module(self, **kwargs):
         """Main module execution method"""
@@ -151,8 +152,8 @@ class AzureRMLabs(AzureRMModuleBase):
             elif kwargs[key] is not None:
                 self.lab[key] = kwargs[key]
 
-        expand(self.lab, ['lab_storage_type'], camelize=True)
-        expand(self.lab, ['premium_data_disks'], map={True: 'Enabled', False: 'Disabled'})
+        dict_camelize(self.lab, ['lab_storage_type'], True)
+        dict_map(self.lab, ['premium_data_disks'], {True: 'Enabled', False: 'Disabled'})
 
         response = None
 
@@ -161,61 +162,62 @@ class AzureRMLabs(AzureRMModuleBase):
 
         resource_group = self.get_resource_group(self.resource_group)
 
-        old_response = self.get_lab()
+        old_response = self.get_devtestlab()
 
         if not old_response:
-            self.log("Lab instance doesn't exist")
+            self.log("DevTest Lab instance doesn't exist")
             if self.state == 'absent':
                 self.log("Old instance didn't exist")
             else:
                 self.to_do = Actions.Create
         else:
-            self.log("Lab instance already exists")
+            self.log("DevTest Lab instance already exists")
             if self.state == 'absent':
                 self.to_do = Actions.Delete
             elif self.state == 'present':
-                if (not default_compare(self.lab, old_response, '')):
+                if (not default_compare(self.lab, old_response, '', self.results)):
                     self.to_do = Actions.Update
 
         if (self.to_do == Actions.Create) or (self.to_do == Actions.Update):
-            self.log("Need to Create / Update the Lab instance")
+            self.log("Need to Create / Update the DevTest Lab instance")
 
             if self.check_mode:
                 self.results['changed'] = True
                 return self.results
 
-            response = self.create_update_lab()
+            response = self.create_update_devtestlab()
 
             self.results['changed'] = True
             self.log("Creation / Update done")
         elif self.to_do == Actions.Delete:
-            self.log("Lab instance deleted")
+            self.log("DevTest Lab instance deleted")
             self.results['changed'] = True
 
             if self.check_mode:
                 return self.results
 
-            self.delete_lab()
-            # make sure instance is actually deleted, for some Azure resources, instance is hanging around
-            # for some time after deletion -- this should be really fixed in Azure.
-            while self.get_lab():
-                time.sleep(20)
+            self.delete_devtestlab()
+            # This currently doesnt' work as there is a bug in SDK / Service
+            if isinstance(response, LROPoller) or isinstance(response, AzureOperationPoller):
+                response = self.get_poller_result(response)
         else:
-            self.log("Lab instance unchanged")
+            self.log("DevTest Lab instance unchanged")
             self.results['changed'] = False
             response = old_response
 
         if self.state == 'present':
-            self.results.update(self.format_item(response))
+            self.results.update({
+                'id': response.get('id', None)
+                })
         return self.results
 
-    def create_update_lab(self):
+    def create_update_devtestlab(self):
         '''
-        Creates or updates Lab with the specified configuration.
+        Creates or updates DevTest Lab with the specified configuration.
 
-        :return: deserialized Lab instance state dictionary
+        :return: deserialized DevTest Lab instance state dictionary
         '''
-        self.log("Creating / Updating the Lab instance {0}".format(self.name))
+        self.log("Creating / Updating the DevTest Lab instance {0}".format(self.name))
 
         try:
             response = self.mgmt_client.labs.create_or_update(resource_group_name=self.resource_group,
@@ -225,66 +227,62 @@ class AzureRMLabs(AzureRMModuleBase):
                 response = self.get_poller_result(response)
 
         except CloudError as exc:
-            self.log('Error attempting to create the Lab instance.')
-            self.fail("Error creating the Lab instance: {0}".format(str(exc)))
+            self.log('Error attempting to create the DevTest Lab instance.')
+            self.fail("Error creating the DevTest Lab instance: {0}".format(str(exc)))
         return response.as_dict()
 
-    def delete_lab(self):
+    def delete_devtestlab(self):
         '''
-        Deletes specified Lab instance in the specified subscription and resource group.
+        Deletes specified DevTest Lab instance in the specified subscription and resource group.
 
         :return: True
         '''
-        self.log("Deleting the Lab instance {0}".format(self.name))
+        self.log("Deleting the DevTest Lab instance {0}".format(self.name))
         try:
             response = self.mgmt_client.labs.delete(resource_group_name=self.resource_group,
                                                     name=self.name)
         except CloudError as e:
-            self.log('Error attempting to delete the Lab instance.')
-            self.fail("Error deleting the Lab instance: {0}".format(str(e)))
+            self.log('Error attempting to delete the DevTest Lab instance.')
+            self.fail("Error deleting the DevTest Lab instance: {0}".format(str(e)))
 
         return True
 
-    def get_lab(self):
+    def get_devtestlab(self):
         '''
-        Gets the properties of the specified Lab.
+        Gets the properties of the specified DevTest Lab.
 
-        :return: deserialized Lab instance state dictionary
+        :return: deserialized DevTest Lab instance state dictionary
         '''
-        self.log("Checking if the Lab instance {0} is present".format(self.name))
+        self.log("Checking if the DevTest Lab instance {0} is present".format(self.name))
         found = False
         try:
             response = self.mgmt_client.labs.get(resource_group_name=self.resource_group,
                                                  name=self.name)
             found = True
             self.log("Response : {0}".format(response))
-            self.log("Lab instance : {0} found".format(response.name))
+            self.log("DevTest Lab instance : {0} found".format(response.name))
         except CloudError as e:
-            self.log('Did not find the Lab instance.')
+            self.log('Did not find the DevTest Lab instance.')
         if found is True:
             return response.as_dict()
 
         return False
 
-    def format_item(self, d):
-        d = {
-            'id': d.get('id', None)
-        }
-        return d
 
-
-def default_compare(new, old, path):
+def default_compare(new, old, path, result):
     if new is None:
         return True
     elif isinstance(new, dict):
         if not isinstance(old, dict):
+            result['compare'] = 'changed [' + path + '] old dict is null'
             return False
         for k in new.keys():
-            if not default_compare(new.get(k), old.get(k, None), path + '/' + k):
+            if not default_compare(new.get(k), old.get(k, None), path + '/' + k, result):
                 return False
         return True
     elif isinstance(new, list):
         if not isinstance(old, list) or len(new) != len(old):
+            result['compare'] = 'changed [' + path + '] length is different or null'
             return False
         if isinstance(old[0], dict):
             key = None
@@ -292,70 +290,61 @@ def default_compare(new, old, path):
                 key = 'id'
             elif 'name' in old[0] and 'name' in new[0]:
                 key = 'name'
+            else:
+                key = list(old[0])[0]
             new = sorted(new, key=lambda x: x.get(key, None))
             old = sorted(old, key=lambda x: x.get(key, None))
         else:
             new = sorted(new)
             old = sorted(old)
         for i in range(len(new)):
-            if not default_compare(new[i], old[i], path + '/*'):
+            if not default_compare(new[i], old[i], path + '/*', result):
                 return False
         return True
     else:
-        return new == old
+        if path == '/location':
+            new = new.replace(' ', '').lower()
+            old = new.replace(' ', '').lower()
+        if new == old:
+            return True
+        else:
+            result['compare'] = 'changed [' + path + '] ' + str(new) + ' != ' + str(old)
+            return False
 
 
-def expand(d, path, **kwargs):
-    expand = kwargs.get('expand', None)
-    rename = kwargs.get('rename', None)
-    camelize = kwargs.get('camelize', False)
-    camelize_lower = kwargs.get('camelize_lower', False)
-    upper = kwargs.get('upper', False)
-    map = kwargs.get('map', None)
+def dict_camelize(d, path, camelize_first):
     if isinstance(d, list):
         for i in range(len(d)):
-            expand(d[i], path, **kwargs)
+            dict_camelize(d[i], path, camelize_first)
     elif isinstance(d, dict):
         if len(path) == 1:
-            old_name = path[0]
-            new_name = old_name if rename is None else rename
-            old_value = d.get(old_name, None)
-            new_value = None
-            if map is not None:
-                new_value = map.get(old_value, None)
-            if new_value is None:
-                if camelize:
-                    new_value = _snake_to_camel(old_value, True)
-                elif camelize_lower:
-                    new_value = _snake_to_camel(old_value, False)
-                elif upper:
-                    new_value = old_value.upper()
-            if expand is None:
-                # just rename
-                if new_name != old_name:
-                    d.pop(old_name, None)
-            else:
-                # expand and rename
-                d[expand] = d.get(expand, {})
-                d.pop(old_name, None)
-                d = d[expand]
-            d[new_name] = new_value
+            old_value = d.get(path[0], None)
+            if old_value is not None:
+                d[path[0]] = _snake_to_camel(old_value, camelize_first)
         else:
             sd = d.get(path[0], None)
             if sd is not None:
-                expand(sd, path[1:], **kwargs)
+                dict_camelize(sd, path[1:], camelize_first)
 
 
-def _snake_to_camel(snake, capitalize_first=False):
-    if capitalize_first:
-        return ''.join(x.capitalize() or '_' for x in snake.split('_'))
-    else:
-        return snake.split('_')[0] + ''.join(x.capitalize() or '_' for x in snake.split('_')[1:])
+def dict_map(d, path, map):
+    if isinstance(d, list):
+        for i in range(len(d)):
+            dict_map(d[i], path, map)
+    elif isinstance(d, dict):
+        if len(path) == 1:
+            old_value = d.get(path[0], None)
+            if old_value is not None:
+                d[path[0]] = map.get(old_value, old_value)
+        else:
+            sd = d.get(path[0], None)
+            if sd is not None:
+                dict_map(sd, path[1:], map)
 
 
 def main():
     """Main execution"""
-    AzureRMLabs()
+    AzureRMDevTestLab()
 
 
 if __name__ == '__main__':
