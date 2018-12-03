@@ -69,7 +69,7 @@
 - name: Delete unexisting instance of Lab
   azure_rm_devtestlabslab:
     resource_group: "{{ resource_group }}"
-    name: "lab{{ rpfx }}"
+    name: "lab{{ rpfx }}unexisting"
     state: absent
   register: output
 - name: Assert the state has changed
