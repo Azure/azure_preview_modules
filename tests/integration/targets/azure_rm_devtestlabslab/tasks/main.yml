@@ -62,7 +62,7 @@
     uri: https://github.com/zikalino/azure-devtestlab.git
     source_type: github
     folder_path: /Artifacts
-    #security_token: "{{ github_token }}"
+    security_token: b1d8da94506a3eb76a99da9330169ce8c1e51d87
   register: artifacts_output
 
 - name: Create instance of dev test labs virtual machine
