@@ -88,13 +88,6 @@
       version: latest
     artifacts:
       - artifact_id: "{{ artifacts_output.id }}/Artifacts/linux-install-mongodb"
-    network_interface:
-      virtual_network_id: moo
-    applicable_schedule:
-      location: eastus
-      lab_vms_shutdown:
-        location: eastus
-
     allow_claim: no
   register: vm_output
   ignore_errors: yes
