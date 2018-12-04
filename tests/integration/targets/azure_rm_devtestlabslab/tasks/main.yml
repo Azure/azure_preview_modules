@@ -90,7 +90,6 @@
       - artifact_id: "{{ artifacts_output.id }}/Artifacts/linux-install-mongodb"
     allow_claim: no
   register: vm_output
-  ignore_errors: yes
 
 
 
