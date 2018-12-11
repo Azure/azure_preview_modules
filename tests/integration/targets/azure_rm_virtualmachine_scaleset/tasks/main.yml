@@ -270,11 +270,11 @@
       resource_group: "{{ resource_group_secondary }}"
   register: results
 
-#- name: Assert that security group is correct
-#  assert:
-#    that:
-#      - 'results.changed'
-#      - '"testNetworkSecurityGroup2" in results.ansible_facts.azure_vmss.properties.virtualMachineProfile.networkProfile.networkInterfaceConfigurations.0.properties.networkSecurityGroup.id'
+- name: Assert that security group is correct
+  assert:
+    that:
+      - 'results.changed'
+      - '"testNetworkSecurityGroup2" in results.ansible_facts.azure_vmss.properties.virtualMachineProfile.networkProfile.networkInterfaceConfigurations.0.properties.networkSecurityGroup.id'
 
 - name: Delete VMSS
   azure_rm_virtualmachine_scaleset:
@@ -339,12 +339,12 @@
     state: absent
     name: testPublicIP
 
-#- name: Delete virtual network
-#  azure_rm_virtualnetwork:
-#    resource_group: "{{ resource_group }}"
-#    name: testVnet
-#    state: absent
-#    address_prefixes: "10.0.0.0/16"
+- name: Delete virtual network
+  azure_rm_virtualnetwork:
+    resource_group: "{{ resource_group }}"
+    name: testVnet
+    state: absent
+    address_prefixes: "10.0.0.0/16"
 
 # TODO: Until we have a module to create/delete images this is the best tests
 # I can do
