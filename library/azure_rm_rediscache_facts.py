@@ -48,27 +48,24 @@ author:
 '''
 
 EXAMPLES = '''
-rediscaches:
+    rediscaches:
     - configuration:
         maxclients: '1000'
         maxfragmentationmemory-reserved: '50'
         maxmemory-delta: '50'
         maxmemory-reserved: '50'
-      access_keys:
-        primary: X2xXXxx7xxxxxx5xxxx0xxxxx75xxxxxxxxXXXxxxxx=
-        secondary: X2xxxxx7xxxxxx5xxxx0xxxxx75xxxxxxxxXXXxxxxx=
       enable_non_ssl_port: false
-      host_name: testredis1aa.redis.cache.windows.net
-      id: /subscriptions/2085065b-00f8-4cba-9675-ba15f4d4ab66/resourceGroups/rerdistest1/providers/Microsoft.Cache/Redis/testredis1aa
+      host_name: testredis1.redis.cache.windows.net
+      id: /subscriptions/<subs_id>/resourceGroups/rerdistest1/providers/Microsoft.Cache/Redis/testredis1
       location: East US
-      name: testredis1aa
+      name: testredis1
       provisioning_state: Creating
-      resource_group: ''
+      resource_group: testrg1
       shard_count: null
       sku:
         name: Basic
         size: C1
-      static_ip: 104.211.14.104
+      static_ip: 1.2.3.4
       subnet: null
       tags: {}
       tenant_settings: null
@@ -93,8 +90,9 @@ rediscaches:
             type: str
             sample: testRedis
         id:
-            description
-                - ID of the Azure redis cache.
+            description:
+                - Id of the Azure redis cache.
+            returned: always
             type: str
             sample: /subscriptions/<subs_id>/resourceGroups/<resourcegroup>/providers/Microsoft.Cache/Redis/testredis1
         provisioning_state:
@@ -119,14 +117,12 @@ rediscaches:
             type: dict
             contains:
                 name:
-                    description:
-                        - Name of the sku.
+                    description: Name of the sku.
                     returned: always
                     type: str
                     sample: standard
                 size:
-                    description:
-                        - Size of the redis cache.
+                    description: Size of the redis cache.
                     returned: always
                     type: str
                     sample: C1
@@ -139,8 +135,8 @@ rediscaches:
             description:
                 - The full resource ID of a subnet in a virtual network to deploy the Redis cache in.
             type: str
-            sample: 
-                - /subscriptions/{subid}/resourceGroups/{resourceGroupName}/Microsoft.{Network|ClassicNetwork}/VirtualNetworks/vnet1/subnets/subnet1
+            sample:
+                - /subscriptions/<subid>/resourceGroups/<resourceGroupName>/Microsoft.Network|ClassicNetwork/VirtualNetworks/vnet1/subnets/subnet1
         configuration:
             description:
                 - Dict of redis configuration.
@@ -164,9 +160,8 @@ rediscaches:
             description:
                 - List of tags.
             type: list
-            sample: [
-                {"foo": "bar"}
-            ]
+            sample:
+                - foo
         access_keys:
             description:
                 - Redis cache access keys.
@@ -194,8 +189,6 @@ except:
     pass
 
 import re
-
-AZURE_OBJECT_CLASS = 'endpoints'
 
 
 class AzureRMRedisCacheFacts(AzureRMModuleBase):
@@ -265,10 +258,7 @@ class AzureRMRedisCacheFacts(AzureRMModuleBase):
             pass
 
         if item and self.has_tags(item.tags, self.tags):
-            keys = None
-            if self.return_access_keys:
-                keys = self.list_keys(self.resource_group, self.name)
-            result = [self.serialize_rediscache(item, keys)]
+            result = [self.serialize_rediscache(item)]
 
         return result
 
@@ -285,55 +275,41 @@ class AzureRMRedisCacheFacts(AzureRMModuleBase):
         results = []
         for item in response:
             if self.has_tags(item.tags, self.tags):
-                keys = None
-                if self.return_access_keys:
-                    keys = self.list_keys(self.resource_group, item.name)
-                results.append(self.serialize_rediscache(item, keys))
+                results.append(self.serialize_rediscache(item))
 
         return results
 
-    def list_keys(self, resource_group, name):
-        """List Azure Azure redis cache keys"""
-
-        self.log('List all Azure redis cache keys')
-
-        try:
-            response = self._client.redis.list_keys(resource_group, name)
-        except CloudError as exc:
-            self.fail('Failed to list keys - {0}'.format(str(exc)))
-
-        return response
-
-    def serialize_rediscache(self, rediscache, keys):
+    def serialize_rediscache(self, rediscache):
         '''
         Convert a Azure redis cache object to dict.
         :param cdn: Azure redis cache object
         :return: dict
         '''
-        new_result = {}
-        new_result['id'] = rediscache.id
-        new_result['resource_group'] = re.sub('\\/.*', '', re.sub('.*resourcegroups\\/', '', rediscache.id))
-        new_result['name'] = rediscache.name
-        new_result['location'] = rediscache.location
-        new_result['provisioning_state'] = rediscache.provisioning_state
-        new_result['configuration'] = rediscache.redis_configuration
-        new_result['tenant_settings'] = rediscache.tenant_settings
-        new_result['shard_count'] = rediscache.shard_count
-        new_result['enable_non_ssl_port'] = rediscache.enable_non_ssl_port
-        new_result['static_ip'] = rediscache.static_ip
-        new_result['subnet'] = rediscache.subnet_id
-        new_result['host_name'] = rediscache.host_name
-        new_result['tags'] = rediscache.tags
+        new_result = dict(
+            id=rediscache.id,
+            resource_group=re.sub('\\/.*', '', re.sub('.*resourceGroups\\/', '', rediscache.id)),
+            name=rediscache.name,
+            location=rediscache.location,
+            provisioning_state=rediscache.provisioning_state,
+            configuration=rediscache.redis_configuration,
+            tenant_settings=rediscache.tenant_settings,
+            shard_count=rediscache.shard_count,
+            enable_non_ssl_port=rediscache.enable_non_ssl_port,
+            static_ip=rediscache.static_ip,
+            subnet=rediscache.subnet_id,
+            host_name=rediscache.host_name,
+            tags=rediscache.tags
+        )
 
         if rediscache.sku:
             new_result['sku'] = dict(
                 name=rediscache.sku.name,
                 size=rediscache.sku.family.lower() + str(rediscache.sku.capacity)
             )
-        if self.return_access_keys and keys:
+        if self.return_access_keys:
             new_result['access_keys'] = dict(
-                primary=keys.primary_key,
-                secondary=keys.secondary_key
+                primary=rediscache.access_keys.primary_key,
+                secondary=rediscache.access_keys.secondary_key
             )
         return new_result
 
