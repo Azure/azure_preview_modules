@@ -40,8 +40,8 @@ extends_documentation_fragment:
     - azure
 
 author:
-    - "Chris Houseknecht house@redhat.com"
-    - "Matt Davis mdavis@redhat.com"
+    - "Chris Houseknecht (@chouseknecht) <house@redhat.com>"
+    - "Matt Davis (@nitzmahone) <mdavis@redhat.com>"
 
 '''
 
@@ -86,7 +86,7 @@ azure_virtualnetworks:
 
 try:
     from msrestazure.azure_exceptions import CloudError
-except:
+except Exception:
     # This is handled in azure_rm_common
     pass
 
