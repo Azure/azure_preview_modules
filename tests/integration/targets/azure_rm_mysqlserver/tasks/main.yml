@@ -3,10 +3,18 @@
     rpfx: "{{ resource_group | hash('md5') | truncate(7, True, '') }}{{ 1000 | random }}"
   run_once: yes
 
+- name: Various names
+  set_fact:
+    server_name: "mysqlsrv{{ rpfx }}"
+    second_server_name: "mysqlsrv{{ rpfx }}"
+    admin_username: sqladmin
+    admin_password: "{{ admin_password }}"
+  run_once: yes
+
 - name: Create instance of MySQL Server -- check mode
   azure_rm_mysqlserver:
     resource_group: "{{ resource_group }}"
-    name: mysqlsrv{{ rpfx }}
+    name: "{{ server_name }}"
     sku:
       name: B_Gen5_1
       tier: Basic
@@ -14,8 +22,8 @@
     storage_mb: 51200
     version: 5.6
     enforce_ssl: True
-    admin_username: zimxyz
-    admin_password: Testpasswordxyz12!
+    admin_username: "{{ admin_username }}"
+    admin_password: "{{ admin_password }}"
   check_mode: yes
   register: output
 - name: Assert the resource instance is well created
@@ -26,7 +34,7 @@
 - name: Create instance of MySQL Server
   azure_rm_mysqlserver:
     resource_group: "{{ resource_group }}"
-    name: mysqlsrv{{ rpfx }}
+    name: "{{ server_name }}"
     sku:
       name: B_Gen5_1
       tier: Basic
@@ -34,8 +42,8 @@
     storage_mb: 51200
     version: 5.6
     enforce_ssl: True
-    admin_username: zimxyz
-    admin_password: Testpasswordxyz12!
+    admin_username: "{{ admin_username }}"
+    admin_password: "{{ admin_password }}"
   register: output
 - name: Assert the resource instance is well created
   assert:
@@ -46,7 +54,7 @@
 - name: Create again instance of MySQL Server
   azure_rm_mysqlserver:
     resource_group: "{{ resource_group }}"
-    name: mysqlsrv{{ rpfx }}
+    name: "{{ server_name }}"
     sku:
       name: B_Gen5_1
       tier: Basic
@@ -54,8 +62,8 @@
     storage_mb: 51200
     version: 5.6
     enforce_ssl: True
-    admin_username: zimxyz
-    admin_password: Testpasswordxyz12!
+    admin_username: "{{ admin_username }}"
+    admin_password: "{{ admin_password }}"
   register: output
 - name: Assert the state has not changed
   assert:
@@ -66,7 +74,7 @@
 - name: Create second instance of MySQL Server
   azure_rm_mysqlserver:
     resource_group: "{{ resource_group }}"
-    name: mysqlsrv{{ rpfx }}second
+    name:  "{{ second_server_name }}"
     sku:
       name: B_Gen5_1
       tier: Basic
@@ -74,15 +82,15 @@
     storage_mb: 51200
     version: 5.6
     enforce_ssl: True
-    admin_username: zimxyz
-    admin_password: Testpasswordxyz12!
+    admin_username: "{{ admin_username }}"
+    admin_password: "{{ admin_password }}"
     tags:
       aaa: bbb
 
 - name: Create second instance of MySQL Server
   azure_rm_mysqlserver:
     resource_group: "{{ resource_group }}"
-    name: mysqlsrv{{ rpfx }}second
+    name:  "{{ second_server_name }}"
     sku:
       name: B_Gen5_1
       tier: Basic
@@ -90,15 +98,15 @@
     storage_mb: 51200
     version: 5.6
     enforce_ssl: True
-    admin_username: zimxyz
-    admin_password: Testpasswordxyz12!
+    admin_username: "{{ admin_username }}"
+    admin_password: "{{ admin_password }}"
     tags:
       ccc: ddd
 
 - name: Gather facts MySQL Server
   azure_rm_mysqlserver_facts:
     resource_group: "{{ resource_group }}"
-    name: mysqlsrv{{ rpfx }}second
+    name:  "{{ second_server_name }}"
   register: output 
 
 - name: Assert that facts are returned
@@ -150,7 +158,7 @@
 - name: Create instance of MySQL Database -- check mode
   azure_rm_mysqldatabase:
     resource_group: "{{ resource_group }}"
-    server_name: mysqlsrv{{ rpfx }}
+    server_name: "{{ server_name }}"
     name: testdatabase
   check_mode: yes
   register: output
@@ -162,7 +170,7 @@
 - name: Create instance of MySQL Database
   azure_rm_mysqldatabase:
     resource_group: "{{ resource_group }}"
-    server_name: mysqlsrv{{ rpfx }}
+    server_name: "{{ server_name }}"
     name: testdatabase
   register: output
 - name: Assert the resource instance is well created
@@ -174,7 +182,7 @@
 - name: Create again instance of MySQL Database
   azure_rm_mysqldatabase:
     resource_group: "{{ resource_group }}"
-    server_name: mysqlsrv{{ rpfx }}
+    server_name: "{{ server_name }}"
     name: testdatabase
   register: output
 - name: Assert the state has not changed
@@ -186,13 +194,13 @@
 - name: Create second instance of MySQL Database
   azure_rm_mysqldatabase:
     resource_group: "{{ resource_group }}"
-    server_name: mysqlsrv{{ rpfx }}
+    server_name: "{{ server_name }}"
     name: testdatabase2
 
 - name: Gather facts MySQL Database
   azure_rm_mysqldatabase_facts:
     resource_group: "{{ resource_group }}"
-    server_name: mysqlsrv{{ rpfx }}
+    server_name: "{{ server_name }}"
     name: testdatabase
   register: output 
 
@@ -208,7 +216,7 @@
 - name: Gather facts MySQL Database
   azure_rm_mysqldatabase_facts:
     resource_group: "{{ resource_group }}"
-    server_name: mysqlsrv{{ rpfx }}
+    server_name: "{{ server_name }}"
   register: output
 - name: Assert that facts are returned
   assert:
@@ -226,7 +234,7 @@
 - name: Delete instance of MySQL Database -- check mode
   azure_rm_mysqldatabase:
     resource_group: "{{ resource_group }}"
-    server_name: mysqlsrv{{ rpfx }}
+    server_name: "{{ server_name }}"
     name: testdatabase
     state: absent
   check_mode: yes
@@ -239,7 +247,7 @@
 - name: Delete instance of MySQL Database
   azure_rm_mysqldatabase:
     resource_group: "{{ resource_group }}"
-    server_name: mysqlsrv{{ rpfx }}
+    server_name: "{{ server_name }}"
     name: testdatabase
     state: absent
   register: output
@@ -251,7 +259,7 @@
 - name: Delete unexisting instance of MySQL Database
   azure_rm_mysqldatabase:
     resource_group: "{{ resource_group }}"
-    server_name: mysqlsrv{{ rpfx }}
+    server_name: "{{ server_name }}"
     name: testdatabase
     state: absent
   register: output
@@ -266,7 +274,7 @@
 - name: Create instance of Firewall Rule -- check mode
   azure_rm_mysqlfirewallrule:
     resource_group: "{{ resource_group }}"
-    server_name: mysqlsrv{{ rpfx }}
+    server_name: "{{ server_name }}"
     name: firewallrule{{ rpfx }}
     start_ip_address: 172.28.10.136
     end_ip_address: 172.28.10.138
@@ -280,7 +288,7 @@
 - name: Create instance of Firewall Rule
   azure_rm_mysqlfirewallrule:
     resource_group: "{{ resource_group }}"
-    server_name: mysqlsrv{{ rpfx }}
+    server_name: "{{ server_name }}"
     name: firewallrule{{ rpfx }}
     start_ip_address: 172.28.10.136
     end_ip_address: 172.28.10.138
@@ -293,7 +301,7 @@
 - name: Create again instance of Firewall Rule
   azure_rm_mysqlfirewallrule:
     resource_group: "{{ resource_group }}"
-    server_name: mysqlsrv{{ rpfx }}
+    server_name: "{{ server_name }}"
     name: firewallrule{{ rpfx }}
     start_ip_address: 172.28.10.136
     end_ip_address: 172.28.10.138
@@ -306,7 +314,7 @@
 - name: Delete instance of Firewall Rule -- check mode
   azure_rm_mysqlfirewallrule:
     resource_group: "{{ resource_group }}"
-    server_name: mysqlsrv{{ rpfx }}
+    server_name: "{{ server_name }}"
     name: firewallrule{{ rpfx }}
     state: absent
   check_mode: yes
@@ -319,7 +327,7 @@
 - name: Create instance of Firewall Rule -- second
   azure_rm_mysqlfirewallrule:
     resource_group: "{{ resource_group }}"
-    server_name: mysqlsrv{{ rpfx }}
+    server_name: "{{ server_name }}"
     name: firewallrule{{ rpfx }}second
     start_ip_address: 172.28.10.136
     end_ip_address: 172.28.10.138
@@ -332,7 +340,7 @@
 - name: Gather facts MySQL Firewall Rule
   azure_rm_mysqlfirewallrule_facts:
     resource_group: "{{ resource_group }}"
-    server_name: mysqlsrv{{ rpfx }}
+    server_name: "{{ server_name }}"
     name: firewallrule{{ rpfx }}
   register: output
 - name: Assert that facts are returned
@@ -349,7 +357,7 @@
 - name: Gather facts MySQL Firewall Rule
   azure_rm_mysqlfirewallrule_facts:
     resource_group: "{{ resource_group }}"
-    server_name: mysqlsrv{{ rpfx }}
+    server_name: "{{ server_name }}"
   register: output
 - name: Assert that facts are returned
   assert:
@@ -369,7 +377,7 @@
 - name: Delete instance of Firewall Rule
   azure_rm_mysqlfirewallrule:
     resource_group: "{{ resource_group }}"
-    server_name: mysqlsrv{{ rpfx }}
+    server_name: "{{ server_name }}"
     name: firewallrule{{ rpfx }}
     state: absent
   register: output
@@ -381,7 +389,7 @@
 - name: Delete unexisting instance of Firewall Rule
   azure_rm_mysqlfirewallrule:
     resource_group: "{{ resource_group }}"
-    server_name: mysqlsrv{{ rpfx }}
+    server_name: "{{ server_name }}"
     name: firewallrule{{ rpfx }}
     state: absent
   register: output
@@ -393,14 +401,14 @@
 - name: Delete instance of Firewall Rule - second
   azure_rm_mysqlfirewallrule:
     resource_group: "{{ resource_group }}"
-    server_name: mysqlsrv{{ rpfx }}
+    server_name: "{{ server_name }}"
     name: firewallrule{{ rpfx }}second
     state: absent
 
 - name: Gather facts MySQL Firewall Rule
   azure_rm_mysqlfirewallrule_facts:
     resource_group: "{{ resource_group }}"
-    server_name: mysqlsrv{{ rpfx }}
+    server_name: "{{ server_name }}"
     name: firewallrule{{ rpfx }}
   register: output
 - name: Assert that empty list was returned
@@ -410,13 +418,89 @@
       - "output.rules | length == 0"
 
 #
+# configuration
+#
+- name: Create instance of Configuration -- check mode
+  azure_rm_mysqlconfiguration:
+    resource_group: "{{ resource_group }}"
+    server_name: "{{ server_name }}"
+    name: event_scheduler
+    value: "ON"
+    source: user-override
+  check_mode: yes
+  register: output
+- name: Assert the resource instance is well created
+  assert:
+    that:
+      - output.changed
+
+- name: Create instance of Configuration
+  azure_rm_mysqlconfiguration:
+    resource_group: "{{ resource_group }}"
+    server_name: "{{ server_name }}"
+    name: event_scheduler
+    value: "ON"
+    source: user-override
+  register: output
+- name: Assert the resource instance is well created
+  assert:
+    that:
+      - output.changed
+
+- name: Create again instance of Configuration
+  azure_rm_mysqlconfiguration:
+    resource_group: "{{ resource_group }}"
+    server_name: "{{ server_name }}"
+    name: event_scheduler
+    value: "ON"
+    source: user-override
+  register: output
+- name: Assert the state has not changed
+  assert:
+    that:
+      - output.changed == false
+
+- name: Gather facts MySQL Configuration
+  azure_rm_mysqlconfiguration_facts:
+    resource_group: "{{ resource_group }}"
+    server_name: "{{ server_name }}"
+    configuration_name: event_scheduler
+  register: output
+- name: Assert that facts are returned
+  assert:
+    that:
+      - output.changed == False
+      - output.configurations.event_scheduler.id != None
+      - output.configurations.event_scheduler.name != None
+      - output.configurations.event_scheduler.type != None
+      - output.configurations.event_scheduler.value != None
+      - output.configurations.event_scheduler.description != None
+      - output.configurations.event_scheduler.source != None
+
+- name: Gather facts MySQL Configuration
+  azure_rm_mysqlconfiguration_facts:
+    resource_group: "{{ resource_group }}"
+    server_name: "{{ server_name }}"
+  register: output
+- name: Assert that facts are returned
+  assert:
+    that:
+      - output.changed == False
+      - output.configurations.event_scheduler.id != None
+      - output.configurations.event_scheduler.name != None
+      - output.configurations.event_scheduler.type != None
+      - output.configurations.event_scheduler.value != None
+      - output.configurations.event_scheduler.description != None
+      - output.configurations.event_scheduler.source != None
+
+#
 # clean up azure_rm_mysqlserver test
 #
 
 - name: Delete instance of MySQL Server -- check mode
   azure_rm_mysqlserver:
     resource_group: "{{ resource_group }}"
-    name: mysqlsrv{{ rpfx }}
+    name: "{{ server_name }}"
     state: absent
   check_mode: yes
   register: output
@@ -428,7 +512,7 @@
 - name: Delete instance of MySQL Server
   azure_rm_mysqlserver:
     resource_group: "{{ resource_group }}"
-    name: mysqlsrv{{ rpfx }}
+    name: "{{ server_name }}"
     state: absent
   register: output
 - name: Assert the state has changed
@@ -439,7 +523,7 @@
 - name: Delete unexisting instance of MySQL Server
   azure_rm_mysqlserver:
     resource_group: "{{ resource_group }}"
-    name: mysqlsrv{{ rpfx }}
+    name: "{{ server_name }}"
     state: absent
   register: output
 - name: Assert the state has changed
@@ -450,7 +534,7 @@
 - name: Delete second instance of MySQL Server
   azure_rm_mysqlserver:
     resource_group: "{{ resource_group }}"
-    name: mysqlsrv{{ rpfx }}second
+    name:  "{{ second_server_name }}"
     state: absent
   async: 400
   poll: 0
