@@ -7,8 +7,8 @@
   set_fact:
     server_name: "postgresqlsrv{{ rpfx }}"
     second_server_name: "postgresqlsrv{{ rpfx }}"
-    admin_username: sqladmin
-    admin_password: Testpasswordxyz12!
+    admin_usr: sqladmin
+    admin_pwd: Testpasswordxyz12!
   run_once: yes
 
 - name: Create instance of PostgreSQL Server -- check mode
@@ -21,8 +21,8 @@
     location: eastus
     storage_mb: 51200
     enforce_ssl: True
-    admin_username: "{{ admin_username }}"
-    admin_password: "{{ admin_password }}"
+    admin_username: "{{ admin_usr }}"
+    admin_password: "{{ admin_pwd }}"
   check_mode: yes
   register: output
 - name: Assert the resource instance is well created
@@ -40,8 +40,8 @@
     location: westus2
     storage_mb: 51200
     enforce_ssl: True
-    admin_username: "{{ admin_username }}"
-    admin_password: "{{ admin_password }}"
+    admin_username: "{{ admin_usr }}"
+    admin_password: "{{ admin_pwd }}"
   register: output
 - name: Assert the resource instance is well created
   assert:
@@ -59,8 +59,8 @@
     location: westus2
     storage_mb: 51200
     enforce_ssl: True
-    admin_username: "{{ admin_username }}"
-    admin_password: "{{ admin_password }}"
+    admin_username: "{{ admin_usr }}"
+    admin_password: "{{ admin_pwd }}"
   register: output
 - name: Assert the state has not changed
   assert:
@@ -78,8 +78,8 @@
     location: westus2
     storage_mb: 52200
     enforce_ssl: False
-    admin_username: "{{ admin_username }}"
-    admin_password: "{{ admin_password }}"
+    admin_username: "{{ admin_usr }}"
+    admin_password: "{{ admin_pwd }}"
   register: output
 - name: Assert the resource was changed
   assert:
@@ -97,8 +97,8 @@
     location: westus2
     storage_mb: 51200
     enforce_ssl: True
-    admin_username: "{{ admin_username }}"
-    admin_password: "{{ admin_password }}"
+    admin_username: "{{ admin_usr }}"
+    admin_password: "{{ admin_pwd }}"
     tags:
       aaa: bbb
 
@@ -112,8 +112,8 @@
     location: westus2
     storage_mb: 51200
     enforce_ssl: True
-    admin_username: "{{ admin_username }}"
-    admin_password: "{{ admin_password }}"
+    admin_username: "{{ admin_usr }}"
+    admin_password: "{{ admin_pwd }}"
     tags:
       ccc: ddd
 
