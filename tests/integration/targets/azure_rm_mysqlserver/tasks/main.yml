@@ -81,9 +81,11 @@
     location: westus2
     storage_mb: 52200
     version: 5.6
-    enforce_ssl: True
+    enforce_ssl: False
     admin_username: "{{ admin_usr }}"
     admin_password: "{{ admin_pwd }}"
+    tags:
+      aaa: bbb
   register: output
 - name: Assert the state has changed
   assert:

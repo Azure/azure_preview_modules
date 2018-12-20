@@ -80,6 +80,8 @@
     enforce_ssl: False
     admin_username: "{{ admin_usr }}"
     admin_password: "{{ admin_pwd }}"
+    tags:
+      abc: def
   register: output
 - name: Assert the resource was changed
   assert:
