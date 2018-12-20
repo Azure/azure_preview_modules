@@ -42,8 +42,8 @@
     storage_mb: 51200
     version: 5.6
     enforce_ssl: True
-    admin_usr: sqladmin
-    admin_pwd: Testpasswordxyz12!
+    admin_username: "{{ admin_usr }}"
+    admin_password: "{{ admin_pwd }}"
   register: output
 - name: Assert the resource instance is well created
   assert:
