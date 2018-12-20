@@ -6,7 +6,7 @@
 - name: Various names
   set_fact:
     server_name: "mysqlsrv{{ rpfx }}"
-    second_server_name: "mysqlsrv{{ rpfx }}"
+    second_server_name: "mysqlsrv{{ rpfx }}2"
     admin_usr: sqladmin
     admin_pwd: Testpasswordxyz12!
   run_once: yes
