@@ -133,7 +133,7 @@
     - output.webapps[0].app_settings | length == 2
     - output.webapps[0].app_settings['testkey'] == 'testvalue'
     - output.webapps[0].app_settings['testkey2'] == 'testvalue2'
-    - next((x for x in output.webapps[0].frameworks if x['name'] == 'java' and x['version'] == '1.7'), None) is not None
+    - next((x for x in output.webapps[0].frameworks if x['name'] == 'java' and x['version'] == '1.7'))
 
 - name: get web app with return publishing profile
   azure_rm_webapp_facts:
