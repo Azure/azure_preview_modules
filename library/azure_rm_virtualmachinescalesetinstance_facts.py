@@ -54,7 +54,7 @@ EXAMPLES = '''
 
 RETURN = '''
 instances:
-    description: A list of dictionaries containing facts for Virtual Machine Scale Set V M.
+    description: A list of dictionaries containing facts for Virtual Machine Scale Set VM.
     returned: always
     type: complex
     contains:
@@ -83,7 +83,7 @@ instances:
             returned: always
             type: str
             sample: myVMSS_2
-        latest_model_applied:
+        latest_model:
             description:
                 - Is latest model applied?
             returned: always
@@ -95,6 +95,12 @@ instances:
             returned: always
             type: str
             sample: Succeeded
+        power_state:
+            description:
+                - Provisioning state of the Virtual Machine
+            returned: always
+            type: str
+            sample: running
         vm_id:
             description:
                 - Virtual Machine Id
@@ -165,7 +171,7 @@ class AzureRMVirtualMachineScaleSetVMFacts(AzureRMModuleBase):
                                                                           instance_id=self.instance_id)
             self.log("Response : {0}".format(response))
         except CloudError as e:
-            self.log('Could not get facts for Virtual Machine Scale Set V M.')
+            self.log('Could not get facts for Virtual Machine Scale Set VM.')
 
         if response and self.has_tags(response.tags, self.tags):
             results.append(self.format_response(response))
@@ -189,14 +195,24 @@ class AzureRMVirtualMachineScaleSetVMFacts(AzureRMModuleBase):
 
     def format_response(self, item):
         d = item.as_dict()
+        iv = self.mgmt_client.virtual_machine_scale_set_vms.get_instance_view(resource_group_name=self.resource_group,
+                                                                              vm_scale_set_name=self.vmss_name,
+                                                                              instance_id=d.get('instance_id', None)).as_dict()
+        power_state = ""
+        for index in range(len(iv['statuses'])):
+            code = iv['statuses'][index]['code'].split('/')
+            if code[0] == 'PowerState':
+                power_state = code[1]
+                break
         d = {
             'resource_group': self.resource_group,
             'id': d.get('id', None),
             'tags': d.get('tags', None),
             'instance_id': d.get('instance_id', None),
-            'latest_model_applied': d.get('latest_model_applied', None),
+            'latest_model': d.get('latest_model_applied', None),
             'name': d.get('name', None),
             'provisioning_state': d.get('provisioning_state', None),
+            'power_state': power_state,
             'vm_id': d.get('vm_id', None)
         }
         return d

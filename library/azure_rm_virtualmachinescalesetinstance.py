@@ -38,6 +38,22 @@ options:
         type: bool
         description:
             - Set to C(yes) to upgrade to the latest model.
+    power_state:
+        description:
+            - Power state of the VM.
+        required: True
+        choices:
+            - 'running'
+            - 'stopped'
+            - 'deallocated'
+    state:
+        description:
+            - Assert the state of the SQL server. Use 'present' to create or update a server and
+              'absent' to delete a server.
+        default: present
+        choices:
+            - absent
+            - present
 
 extends_documentation_fragment:
     - azure
@@ -80,6 +96,12 @@ instances:
             returned: always
             type: bool
             sample: True
+        power_state:
+            description:
+                - Provisioning state of the Virtual Machine
+            returned: always
+            type: str
+            sample: running
 '''
 
 from ansible.module_utils.azure_rm_common import AzureRMModuleBase
@@ -110,6 +132,15 @@ class AzureRMVirtualMachineScaleSetInstance(AzureRMModuleBase):
             ),
             latest_model=dict(
                 type='bool'
+            ),
+            power_state=dict(
+                type='str',
+                choices=['running', 'stopped', 'deallocated']
+            ),
+            state=dict(
+                type='str',
+                default='present',
+                choices=['present', 'absent']
             )
         )
         # store the results of the module operation
@@ -121,6 +152,8 @@ class AzureRMVirtualMachineScaleSetInstance(AzureRMModuleBase):
         self.vmss_name = None
         self.instance_id = None
         self.latest_model = None
+        self.power_state = None
+        self.state = None
         super(AzureRMVirtualMachineScaleSetInstance, self).__init__(self.module_arg_spec, supports_tags=False)
 
     def exec_module(self, **kwargs):
@@ -131,12 +164,35 @@ class AzureRMVirtualMachineScaleSetInstance(AzureRMModuleBase):
 
         self.results['instances'] = self.get()
 
-        self.results['aaa'] = (self.latest_model is not None)
-        self.results['bbb'] = not self.results['instances'][0].get('latest_model_applied', None)
+        if self.state == 'absent':
+            for item in self.results['instances']:
+                if not self.check_mode:
+                    self.delete(item['instance_id'])
+                self.results['changed'] = True
+            self.results['instances'] = []
+        else:
+            if self.latest_model is not None:
+                for item in self.results['instances']:
+                    if not item.get('latest_model_applied', None):
+                        if not self.check_mode:
+                            self.apply_latest_model(item['instance_id'])
+                        item['latest_model'] = True
+                        self.results['changed'] = True
 
-        if self.latest_model is not None and not self.results['instances'][0].get('latest_model_applied', None):
-            self.apply_latest_model()
-            self.results['instances'][0]['latest_model'] = True
+            if self.power_state is not None:
+                for item in self.results['instances']:
+                    if self.power_state == 'stopped' and item['power_state'] not in ['stopped', 'stopping']:
+                        if not self.check_mode:
+                            self.stop(item['instance_id'])
+                        self.results['changed'] = True
+                    elif self.power_state == 'deallocated' and item['power_state'] not in ['deallocated']:
+                        if not self.check_mode:
+                            self.deallocate(item['instance_id'])
+                        self.results['changed'] = True
+                    elif self.power_state == 'running' and item['power_state'] not in ['running']:
+                        if not self.check_mode:
+                            self.start(item['instance_id'])
+                        self.results['changed'] = True
 
         return self.results
 
@@ -156,22 +212,63 @@ class AzureRMVirtualMachineScaleSetInstance(AzureRMModuleBase):
 
         return results
 
-    def apply_latest_model(self):
+    def apply_latest_model(self, instance_id):
         try:
             poller = self.compute_client.virtual_machine_scale_sets.update_instances(resource_group_name=self.resource_group,
                                                                                      vm_scale_set_name=self.vmss_name,
-                                                                                     instance_ids=[self.instance_id])
+                                                                                     instance_ids=[instance_id])
             self.get_poller_result(poller)
         except CloudError as exc:
             self.fail("Error applying latest model {0} - {1}".format(self.name, str(exc)))
 
+    def delete(self, instance_id):
+        try:
+            self.mgmt_client.virtual_machine_scale_set_vms.delete(resource_group_name=self.resource_group,
+                                                                  vm_scale_set_name=self.vmss_name,
+                                                                  instance_id=instance_id)
+        except CloudError as e:
+            self.log('Could not delete instance of Virtual Machine Scale Set VM.')
+
+    def start(self, instance_id):
+        try:
+            self.mgmt_client.virtual_machine_scale_set_vms.start(resource_group_name=self.resource_group,
+                                                                 vm_scale_set_name=self.vmss_name,
+                                                                 instance_id=instance_id)
+        except CloudError as e:
+            self.log('Could not start instance of Virtual Machine Scale Set VM.')
+
+    def stop(self, instance_id):
+        try:
+            self.mgmt_client.virtual_machine_scale_set_vms.power_off(resource_group_name=self.resource_group,
+                                                                  vm_scale_set_name=self.vmss_name,
+                                                                  instance_id=instance_id)
+        except CloudError as e:
+            self.log('Could not stop instance of Virtual Machine Scale Set VM.')
+
+    def deallocate(self, instance_id):
+        try:
+            self.mgmt_client.virtual_machine_scale_set_vms.deallocate(resource_group_name=self.resource_group,
+                                                                      vm_scale_set_name=self.vmss_name,
+                                                                      instance_id=instance_id)
+        except CloudError as e:
+            self.log('Could not deallocate instance of Virtual Machine Scale Set VM.')
 
     def format_response(self, item):
         d = item.as_dict()
+        iv = self.mgmt_client.virtual_machine_scale_set_vms.get_instance_view(resource_group_name=self.resource_group,
+                                                                              vm_scale_set_name=self.vmss_name,
+                                                                              instance_id=d.get('instance_id', None)).as_dict()
+        power_state = ""
+        for index in range(len(iv['statuses'])):
+            code = iv['statuses'][index]['code'].split('/')
+            if code[0] == 'PowerState':
+                power_state = code[1]
+                break
         d = {
             'tags': d.get('tags', None),
             'instance_id': d.get('instance_id', None),
-            'latest_model': d.get('latest_model_applied', None)
+            'latest_model': d.get('latest_model_applied', None),
+            'power_state': power_state
         }
         return d
 
