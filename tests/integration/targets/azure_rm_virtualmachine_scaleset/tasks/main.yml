@@ -243,7 +243,7 @@
 - name: Install VMSS Extension
   azure_rm_virtualmachinescalesetextension:
     resource_group: "{{ resource_group }}"
-    vmss_name: "{{ vmss_name }}"
+    vmss_name: testVMSS{{ rpfx }}
     name: testExtension
     publisher: Microsoft.Azure.Extensions
     type: CustomScript
@@ -259,7 +259,7 @@
 - name: Install Again VMSS Extension - again
   azure_rm_virtualmachinescalesetextension:
     resource_group: "{{ resource_group }}"
-    vmss_name: "{{ vmss_name }}"
+    vmss_name: testVMSS{{ rpfx }}
     name: testExtension
     publisher: Microsoft.Azure.Extensions
     type: CustomScript
