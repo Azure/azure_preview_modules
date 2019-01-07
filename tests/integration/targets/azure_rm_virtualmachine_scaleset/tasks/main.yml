@@ -309,7 +309,7 @@
     that: results.changed
 
 - name: Delete instance
-  azure_rm_computevirtualmachinescalesetinstance:
+  azure_rm_virtualmachinescalesetinstance:
     resource_group: "{{ resource_group }}"
     vmss_name: testVMSS{{ rpfx }}
     instance_id: "{{ instances.instances[0].instance_id }}"
