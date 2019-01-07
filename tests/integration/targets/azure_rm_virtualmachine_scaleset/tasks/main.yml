@@ -275,12 +275,48 @@
 - name: Delete VMSS Extension
   azure_rm_virtualmachinescalesetextension:
     resource_group: "{{ resource_group }}"
-    vmss_name: "{{ vmss_name }}"
+    vmss_name: testVMSS{{ rpfx }}
     name: testExtension
     state: absent
   register: results
 
 - name: Assert that change was reported
+  assert:
+    that: results.changed
+
+- name: Upgrade instance to the latest image
+  azure_rm_computevirtualmachinescalesetinstance:
+    resource_group: "{{ resource_group }}"
+    vmss_name: testVMSS{{ rpfx }}
+    instance_id: "{{ instances.instances[0].instance_id }}"
+    latest_model: yes
+  register: results
+
+- name: Assert that nothing was changed
+  assert:
+    that: not results.changed
+
+- name: Upgrade instance to the latest image
+  azure_rm_computevirtualmachinescalesetinstance:
+    resource_group: "{{ resource_group }}"
+    vmss_name: testVMSS{{ rpfx }}
+    instance_id: "{{ instances.instances[0].instance_id }}"
+    power_state: stopped
+  register: results
+
+- name: Assert that something has changed
+  assert:
+    that: results.changed
+
+- name: Delete instance
+  azure_rm_computevirtualmachinescalesetinstance:
+    resource_group: "{{ resource_group }}"
+    vmss_name: testVMSS{{ rpfx }}
+    instance_id: "{{ instances.instances[0].instance_id }}"
+    state: absent
+  register: results
+
+- name: Assert that something has changed
   assert:
     that: results.changed
 
