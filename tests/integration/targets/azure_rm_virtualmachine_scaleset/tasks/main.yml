@@ -285,7 +285,7 @@
     that: results.changed
 
 - name: Upgrade instance to the latest image
-  azure_rm_computevirtualmachinescalesetinstance:
+  azure_rm_virtualmachinescalesetinstance:
     resource_group: "{{ resource_group }}"
     vmss_name: testVMSS{{ rpfx }}
     instance_id: "{{ instances.instances[0].instance_id }}"
@@ -297,7 +297,7 @@
     that: not results.changed
 
 - name: Upgrade instance to the latest image
-  azure_rm_computevirtualmachinescalesetinstance:
+  azure_rm_virtualmachinescalesetinstance:
     resource_group: "{{ resource_group }}"
     vmss_name: testVMSS{{ rpfx }}
     instance_id: "{{ instances.instances[0].instance_id }}"
