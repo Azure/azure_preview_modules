@@ -27,54 +27,46 @@ description:
 options:
     resource_group:
         description:
-            - Name of a resource group where the vm extension exists or will be created.
+            - Name of a resource group where the VMSS extension exists or will be created.
         required: true
     name:
         description:
-            - Name of the vm extension
+            - Name of the VMSS extension
         required: true
+    location:
+        description:
+            - Valid azure location. Defaults to location of the resource group.
+    vmss_name:
+        description:
+            - The name of the virtual machine where the extension should be create or updated.
+    publisher:
+        description:
+            - The name of the extension handler publisher.
+    type:
+        description:
+            - The type of the extension handler.
+    type_handler_version:
+        description:
+            - The type version of the extension handler.
+    settings:
+        description:
+            - Json formatted public settings for the extension.
+    protected_settings:
+        description:
+            - Json formatted protected settings for the extension.
+    auto_upgrade_minor_version:
+        description:
+            - Whether the extension handler should be automatically upgraded across minor versions.
+        type: bool
     state:
         description:
-            - Assert the state of the vm extension. Use 'present' to create or update a vm extension and
-              'absent' to delete a vm extension.
+            - Assert the state of the SQL server. Use 'present' to create or update a server and
+              'absent' to delete a server.
         default: present
         choices:
             - absent
             - present
-        required: false
-    location:
-        description:
-            - Valid azure location. Defaults to location of the resource group.
-        required: false
-    vmss_name:
-        description:
-            - The name of the virtual machine where the extension should be create or updated.
-        required: false
-    publisher:
-        description:
-            - The name of the extension handler publisher.
-        required: false
-    type:
-        description:
-            - The type of the extension handler.
-        required: false
-    type_handler_version:
-        description:
-            - The type version of the extension handler.
-        required: false
-    settings:
-        description:
-            - Json formatted public settings for the extension.
-        required: false
-    protected_settings:
-        description:
-            - Json formatted protected settings for the extension.
-        required: false
-    auto_upgrade_minor_version:
-        description:
-            - Whether the extension handler should be automatically upgraded across minor versions.
-        required: false
-        type: bool
+
 
 extends_documentation_fragment:
     - azure
@@ -86,7 +78,7 @@ author:
 EXAMPLES = '''
     - name: Create VMSS Extension
       azure_rm_virtualmachinescalesetextension:
-        name: myvmextension
+        name: myvmssextension
         location: eastus
         resource_group: Testing
         vmss_name: myvm
@@ -96,9 +88,9 @@ EXAMPLES = '''
         settings: '{"commandToExecute": "hostname"}'
         auto_upgrade_minor_version: true
 
-    - name: Delete VM Extension
+    - name: Delete VMSS Extension
       azure_rm_virtualmachinescalesetextension:
-        name: myvmextension
+        name: myvmssextension
         location: eastus
         resource_group: Testing
         vmss_name: myvm
@@ -107,7 +99,7 @@ EXAMPLES = '''
 
 RETURN = '''
 state:
-    description: Current state of the vm extension
+    description: Current state of the VMSS extension
     returned: always
     type: dict
 changed:
@@ -139,41 +131,32 @@ class AzureRMVMSSExtension(AzureRMModuleBase):
             ),
             state=dict(
                 type='str',
-                required=False,
                 default='present',
                 choices=['present', 'absent']
             ),
             location=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             vmss_name=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             publisher=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             type=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             type_handler_version=dict(
-                type='str',
-                required=False
+                type='str'
             ),
             auto_upgrade_minor_version=dict(
-                type='bool',
-                required=False
+                type='bool'
             ),
             settings=dict(
-                type='dict',
-                required=False
+                type='dict'
             ),
             protected_settings=dict(
-                type='dict',
-                required=False
+                type='dict'
             )
         )
 
@@ -229,7 +212,7 @@ class AzureRMVMSSExtension(AzureRMModuleBase):
         return self.results
 
     def create_or_update_vmssextension(self):
-        self.log("Creating VM extension {0}".format(self.name))
+        self.log("Creating VMSS extension {0}".format(self.name))
         try:
             params = self.compute_models.VirtualMachineScaleSetExtension(
                 location=self.location,
@@ -248,8 +231,8 @@ class AzureRMVMSSExtension(AzureRMModuleBase):
             return response.as_dict()
 
         except CloudError as e:
-            self.log('Error attempting to create the VM extension.')
-            self.fail("Error creating the VM extension: {0}".format(str(e)))
+            self.log('Error attempting to create the VMSS extension.')
+            self.fail("Error creating the VMSS extension: {0}".format(str(e)))
 
     def delete_vmssextension(self):
         self.log("Deleting vmextension {0}".format(self.name))
@@ -263,13 +246,13 @@ class AzureRMVMSSExtension(AzureRMModuleBase):
             self.fail("Error deleting the vmextension: {0}".format(str(e)))
 
     def get_vmssextension(self):
-        self.log("Checking if the vm extension {0} is present".format(self.name))
+        self.log("Checking if the VMSS extension {0} is present".format(self.name))
         found = False
         try:
             response = self.compute_client.virtual_machine_scale_set_extensions.get(self.resource_group, self.vmss_name, self.name)
             found = True
         except CloudError as e:
-            self.log('Did not find vm extension')
+            self.log('Did not find VMSS extension')
         if found:
             return response.as_dict()
         else:
