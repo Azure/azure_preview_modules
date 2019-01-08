@@ -29,16 +29,16 @@ options:
         description:
             - Name of a resource group where the VMSS extension exists or will be created.
         required: true
-    name:
-        description:
-            - Name of the VMSS extension
-        required: true
-    location:
-        description:
-            - Valid azure location. Defaults to location of the resource group.
     vmss_name:
         description:
             - The name of the virtual machine where the extension should be create or updated.
+        required: true
+    name:
+        description:
+            - Name of the VMSS extension
+    location:
+        description:
+            - Valid azure location. Defaults to location of the resource group.
     publisher:
         description:
             - The name of the extension handler publisher.
@@ -76,7 +76,7 @@ author:
 '''
 
 EXAMPLES = '''
-    - name: Create VMSS Extension
+    - name: Install VMSS Extension
       azure_rm_virtualmachinescalesetextension:
         name: myvmssextension
         location: eastus
@@ -88,7 +88,7 @@ EXAMPLES = '''
         settings: '{"commandToExecute": "hostname"}'
         auto_upgrade_minor_version: true
 
-    - name: Delete VMSS Extension
+    - name: Remove VMSS Extension
       azure_rm_virtualmachinescalesetextension:
         name: myvmssextension
         location: eastus
@@ -100,7 +100,7 @@ EXAMPLES = '''
 RETURN = '''
 id:
     description:
-        - Instance resource ID
+        - VMSS extension resource ID
     returned: always
     type: str
     sample: /subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/TestGroup/providers/Microsoft.Compute/scalesets/myscaleset/extensions/myext
@@ -123,19 +123,15 @@ class AzureRMVMSSExtension(AzureRMModuleBase):
                 type='str',
                 required=True
             ),
+            vmss_name=dict(
+                type='str',
+                required=True
+            ),
             name=dict(
                 type='str',
                 required=True
             ),
-            state=dict(
-                type='str',
-                default='present',
-                choices=['present', 'absent']
-            ),
             location=dict(
-                type='str'
-            ),
-            vmss_name=dict(
                 type='str'
             ),
             publisher=dict(
@@ -155,7 +151,12 @@ class AzureRMVMSSExtension(AzureRMModuleBase):
             ),
             protected_settings=dict(
                 type='dict'
-            )
+            ),
+            state=dict(
+                type='str',
+                default='present',
+                choices=['present', 'absent']
+            ),
         )
 
         self.resource_group = None
@@ -172,7 +173,7 @@ class AzureRMVMSSExtension(AzureRMModuleBase):
         self.results = dict(changed=False, state=dict())
 
         super(AzureRMVMSSExtension, self).__init__(derived_arg_spec=self.module_arg_spec,
-                                                 supports_tags=False)
+                                                   supports_tags=False)
 
     def exec_module(self, **kwargs):
         for key in list(self.module_arg_spec.keys()):

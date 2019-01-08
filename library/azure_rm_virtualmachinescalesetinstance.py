@@ -202,6 +202,7 @@ class AzureRMVirtualMachineScaleSetInstance(AzureRMModuleBase):
                                                                                      instance_ids=[instance_id])
             self.get_poller_result(poller)
         except CloudError as exc:
+            self.log("Error applying latest model {0} - {1}".format(self.name, str(exc)))
             self.fail("Error applying latest model {0} - {1}".format(self.name, str(exc)))
 
     def delete(self, instance_id):
@@ -211,6 +212,7 @@ class AzureRMVirtualMachineScaleSetInstance(AzureRMModuleBase):
                                                                   instance_id=instance_id)
         except CloudError as e:
             self.log('Could not delete instance of Virtual Machine Scale Set VM.')
+            self.fail('Could not delete instance of Virtual Machine Scale Set VM.')
 
     def start(self, instance_id):
         try:
@@ -219,6 +221,7 @@ class AzureRMVirtualMachineScaleSetInstance(AzureRMModuleBase):
                                                                  instance_id=instance_id)
         except CloudError as e:
             self.log('Could not start instance of Virtual Machine Scale Set VM.')
+            self.fail('Could not start instance of Virtual Machine Scale Set VM.')
 
     def stop(self, instance_id):
         try:
@@ -227,6 +230,7 @@ class AzureRMVirtualMachineScaleSetInstance(AzureRMModuleBase):
                                                                   instance_id=instance_id)
         except CloudError as e:
             self.log('Could not stop instance of Virtual Machine Scale Set VM.')
+            self.fail('Could not stop instance of Virtual Machine Scale Set VM.')
 
     def deallocate(self, instance_id):
         try:
@@ -235,6 +239,7 @@ class AzureRMVirtualMachineScaleSetInstance(AzureRMModuleBase):
                                                                       instance_id=instance_id)
         except CloudError as e:
             self.log('Could not deallocate instance of Virtual Machine Scale Set VM.')
+            self.fail('Could not deallocate instance of Virtual Machine Scale Set VM.')
 
     def format_response(self, item):
         d = item.as_dict()
