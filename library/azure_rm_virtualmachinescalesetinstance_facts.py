@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# Copyright (c) 2019 Zim Kalinowski, (@zikalino)
+# Copyright (c) 2019 Zim Kalinowski, <zikalino@microsoft.com>
 #
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
@@ -195,6 +195,7 @@ class AzureRMVirtualMachineScaleSetVMFacts(AzureRMModuleBase):
 
     def format_response(self, item):
         d = item.as_dict()
+
         iv = self.mgmt_client.virtual_machine_scale_set_vms.get_instance_view(resource_group_name=self.resource_group,
                                                                               vm_scale_set_name=self.vmss_name,
                                                                               instance_id=d.get('instance_id', None)).as_dict()
