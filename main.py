@@ -119,6 +119,8 @@ def copy_folder_non_overwrite(path):
         dest_file_name = os.path.join(dest, name)
         if os.path.isfile(dest_file_name):
             shutil.copy(src_file_name, dest_file_name)
+        if not os.path.exists(dest_file_name):
+            shutil.copy(src_file_name, dest_file_name)
 
 def copy_folder_specially(path):
     src, dest = get_joined_path(path)
@@ -128,6 +130,8 @@ def copy_folder_specially(path):
         if os.path.isdir(src_dir_path) and config["test_case_folder_prefix"] in dir_name:
             if os.path.isdir(dest_dir_path):
                 shutil.rmtree(dest_dir_path)
+                shutil.copytree(src_dir_path, dest_dir_path)
+            if not os.path.exists(dest_dir_path):
                 shutil.copytree(src_dir_path, dest_dir_path)
 
 
