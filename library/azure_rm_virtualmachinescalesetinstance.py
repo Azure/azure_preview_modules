@@ -40,7 +40,7 @@ options:
             - Set to C(yes) to upgrade to the latest model.
     power_state:
         description:
-            - Power state of the VM.
+            - Use this option to change power state of the instance.
         required: True
         choices:
             - 'running'
@@ -78,30 +78,12 @@ instances:
     returned: always
     type: complex
     contains:
-        instance_id:
+        id:
             description:
-                - Virtual Machine instance Id
+                - Instance resource ID
             returned: always
             type: str
-            sample: 0
-        tags:
-            description:
-                - Resource tags
-            returned: always
-            type: complex
-            sample: { 'tag1': 'abc' }
-        latest_model:
-            description:
-                - Is latest model applied?
-            returned: always
-            type: bool
-            sample: True
-        power_state:
-            description:
-                - Provisioning state of the Virtual Machine
-            returned: always
-            type: str
-            sample: running
+            sample: /subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/TestGroup/providers/Microsoft.Compute/scalesets/myscaleset/vms/myvm
 '''
 
 from ansible.module_utils.azure_rm_common import AzureRMModuleBase
@@ -162,7 +144,7 @@ class AzureRMVirtualMachineScaleSetInstance(AzureRMModuleBase):
         self.mgmt_client = self.get_mgmt_svc_client(ComputeManagementClient,
                                                     base_url=self._cloud_environment.endpoints.resource_manager)
 
-        self.results['instances'] = self.get()
+        instances = self.get()
 
         if self.state == 'absent':
             for item in self.results['instances']:
@@ -173,14 +155,14 @@ class AzureRMVirtualMachineScaleSetInstance(AzureRMModuleBase):
         else:
             if self.latest_model is not None:
                 for item in self.results['instances']:
-                    if not item.get('latest_model_applied', None):
+                    if not item.get('latest_model', None):
                         if not self.check_mode:
                             self.apply_latest_model(item['instance_id'])
                         item['latest_model'] = True
                         self.results['changed'] = True
 
             if self.power_state is not None:
-                for item in self.results['instances']:
+                for item in instances:
                     if self.power_state == 'stopped' and item['power_state'] not in ['stopped', 'stopping']:
                         if not self.check_mode:
                             self.stop(item['instance_id'])
@@ -194,6 +176,7 @@ class AzureRMVirtualMachineScaleSetInstance(AzureRMModuleBase):
                             self.start(item['instance_id'])
                         self.results['changed'] = True
 
+        self.results['instances'] = [{'id': item['id']} for item in instances]
         return self.results
 
     def get(self):
@@ -265,9 +248,10 @@ class AzureRMVirtualMachineScaleSetInstance(AzureRMModuleBase):
                 power_state = code[1]
                 break
         d = {
-            'tags': d.get('tags', None),
-            'instance_id': d.get('instance_id', None),
-            'latest_model': d.get('latest_model_applied', None),
+            'id': d.get('id'),
+            'tags': d.get('tags'),
+            'instance_id': d.get('instance_id'),
+            'latest_model': d.get('latest_model_applied'),
             'power_state': power_state
         }
         return d

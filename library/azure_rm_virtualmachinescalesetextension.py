@@ -98,14 +98,12 @@ EXAMPLES = '''
 '''
 
 RETURN = '''
-state:
-    description: Current state of the VMSS extension
+id:
+    description:
+        - Instance resource ID
     returned: always
-    type: dict
-changed:
-    description: Whether or not the resource has changed
-    returned: always
-    type: bool
+    type: str
+    sample: /subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/TestGroup/providers/Microsoft.Compute/scalesets/myscaleset/extensions/myext
 '''
 
 from ansible.module_utils.azure_rm_common import AzureRMModuleBase
@@ -174,7 +172,6 @@ class AzureRMVMSSExtension(AzureRMModuleBase):
         self.results = dict(changed=False, state=dict())
 
         super(AzureRMVMSSExtension, self).__init__(derived_arg_spec=self.module_arg_spec,
-                                                 supports_check_mode=False,
                                                  supports_tags=False)
 
     def exec_module(self, **kwargs):
@@ -203,11 +200,16 @@ class AzureRMVMSSExtension(AzureRMModuleBase):
                     to_be_updated = True
 
             if to_be_updated:
+                if not self.check_mode:
+                    response = self.create_or_update_vmssextension()
                 self.results['changed'] = True
-                self.results['state'] = self.create_or_update_vmssextension()
         elif self.state == 'absent':
-            self.delete_vmssextension()
+            if not self.check_mode:
+                self.delete_vmssextension()
             self.results['changed'] = True
+
+        if response:
+            self.results['id'] = response.get('id')
 
         return self.results
 
@@ -256,7 +258,7 @@ class AzureRMVMSSExtension(AzureRMModuleBase):
         if found:
             return response.as_dict()
         else:
-            return False
+            return None
 
 
 def main():
