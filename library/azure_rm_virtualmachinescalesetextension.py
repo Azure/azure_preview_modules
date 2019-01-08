@@ -52,12 +52,12 @@ options:
         description:
             - A dictionary containing extension settings.
             - Settings depend on extension type.
-            - Refer to https://docs.microsoft.com/en-us/azure/virtual-machines/extensions/overview for more information.
+            - Refer to U(https://docs.microsoft.com/en-us/azure/virtual-machines/extensions/overview) for more information.
     protected_settings:
         description:
             - A dictionary containing protected extension settings.
             - Settings depend on extension type.
-            - Refer to https://docs.microsoft.com/en-us/azure/virtual-machines/extensions/overview for more information.
+            - Refer to U(https://docs.microsoft.com/en-us/azure/virtual-machines/extensions/overview) for more information.
     auto_upgrade_minor_version:
         description:
             - Whether the extension handler should be automatically upgraded across minor versions.
@@ -208,7 +208,7 @@ class AzureRMVMSSExtension(AzureRMModuleBase):
                         response['protected_settings'] = self.protected_settings
                         to_be_updated = True
                 else:
-                    self.settings = response.get('protected_settings')
+                    self.protected_settings = response.get('protected_settings')
 
             if to_be_updated:
                 if not self.check_mode:
@@ -260,16 +260,12 @@ class AzureRMVMSSExtension(AzureRMModuleBase):
 
     def get_vmssextension(self):
         self.log("Checking if the VMSS extension {0} is present".format(self.name))
-        found = False
         try:
             response = self.compute_client.virtual_machine_scale_set_extensions.get(self.resource_group, self.vmss_name, self.name)
-            found = True
+            return response.as_dict()
         except CloudError as e:
             self.log('Did not find VMSS extension')
-        if found:
-            return response.as_dict()
-        else:
-            return None
+            return False
 
 
 def main():
