@@ -292,11 +292,11 @@
     latest_model: yes
   register: results
 
-- name: Assert that nothing was changed
+- name: Assert that something has changed
   assert:
-    that: not results.changed
+    that: results.changed
 
-- name: Upgrade instance to the latest image
+- name: Stop virtual machine
   azure_rm_virtualmachinescalesetinstance:
     resource_group: "{{ resource_group }}"
     vmss_name: testVMSS{{ rpfx }}
