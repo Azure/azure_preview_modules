@@ -147,14 +147,14 @@ class AzureRMVirtualMachineScaleSetInstance(AzureRMModuleBase):
         instances = self.get()
 
         if self.state == 'absent':
-            for item in self.results['instances']:
+            for item in instances:
                 if not self.check_mode:
                     self.delete(item['instance_id'])
                 self.results['changed'] = True
             self.results['instances'] = []
         else:
             if self.latest_model is not None:
-                for item in self.results['instances']:
+                for item in instances:
                     if not item.get('latest_model', None):
                         if not self.check_mode:
                             self.apply_latest_model(item['instance_id'])
