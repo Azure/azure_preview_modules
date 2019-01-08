@@ -50,10 +50,14 @@ options:
             - The type version of the extension handler.
     settings:
         description:
-            - Json formatted public settings for the extension.
+            - A dictionary containing extension settings.
+            - Settings depend on extension type.
+            - Refer to https://docs.microsoft.com/en-us/azure/virtual-machines/extensions/overview for more information.
     protected_settings:
         description:
-            - Json formatted protected settings for the extension.
+            - A dictionary containing protected extension settings.
+            - Settings depend on extension type.
+            - Refer to https://docs.microsoft.com/en-us/azure/virtual-machines/extensions/overview for more information.
     auto_upgrade_minor_version:
         description:
             - Whether the extension handler should be automatically upgraded across minor versions.
@@ -192,13 +196,19 @@ class AzureRMVMSSExtension(AzureRMModuleBase):
             if not response:
                 to_be_updated = True
             else:
-                if self.settings is not None and response.get('settings') != self.settings:
-                    response['settings'] = self.settings
-                    to_be_updated = True
+                if self.settings is not None:
+                    if response.get('settings') != self.settings:
+                        response['settings'] = self.settings
+                        to_be_updated = True
+                else:
+                    self.settings = response.get('settings')
 
-                if self.protected_settings is not None and response.get('protected_settings') != self.protected_settings:
-                    response['protected_settings'] = self.protected_settings
-                    to_be_updated = True
+                if self.protected_settings is not None:
+                    if response.get('protected_settings') != self.protected_settings:
+                        response['protected_settings'] = self.protected_settings
+                        to_be_updated = True
+                else:
+                    self.settings = response.get('protected_settings')
 
             if to_be_updated:
                 if not self.check_mode:
