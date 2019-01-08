@@ -294,7 +294,7 @@
 
 - name: Assert that something has changed
   assert:
-    that: not results.changed
+    that: results.changed
 
 - name: Stop virtual machine
   azure_rm_virtualmachinescalesetinstance:
