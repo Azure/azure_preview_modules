@@ -108,6 +108,7 @@
        custom_domain: { name: ansible.com, use_sub_domain: no }
    register: change_account
    ignore_errors: yes
+
  - name: Assert CNAME failure
    assert: { that: "'custom domain name could not be verified' in  change_account['msg']" }
 
