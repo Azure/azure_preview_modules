@@ -212,7 +212,7 @@ AZURE_PKG_VERSIONS = {
     },
     'NetworkManagementClient': {
         'package_name': 'network',
-        'expected_version': '2.2.1'
+        'expected_version': '2.3.0'
     },
     'ResourceManagementClient': {
         'package_name': 'resource',
@@ -374,7 +374,6 @@ class AzureRMModuleBase(object):
         :param tags: metadata tags from the object
         :return: bool, dict
         '''
-        tags = tags or dict()
         new_tags = copy.copy(tags) if isinstance(tags, dict) else dict()
         param_tags = self.module.params.get('tags') if isinstance(self.module.params.get('tags'), dict) else dict()
         append_tags = self.module.params.get('append_tags') if self.module.params.get('append_tags') is not None else True
@@ -790,6 +789,7 @@ class AzureRMModuleBase(object):
     @property
     def storage_models(self):
         return StorageManagementClient.models("2018-07-01")
+
 
     @property
     def network_client(self):
