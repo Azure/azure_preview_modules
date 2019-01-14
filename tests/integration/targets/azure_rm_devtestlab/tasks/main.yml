@@ -12,7 +12,7 @@
     premium_data_disks: no
   check_mode: yes
   register: output
-- name: Assert the resource instance is well created
+- name: Check if the change was correctly reported
   assert:
     that:
       - output.changed
@@ -25,7 +25,7 @@
     storage_type: standard
     premium_data_disks: no
   register: output
-- name: Assert the resource instance is well created
+- name: Check if the change was correctly reported
   assert:
     that:
       - output.changed
@@ -48,10 +48,10 @@
     resource_group: "{{ resource_group }}"
     name: "lab{{ rpfx }}"
     location: eastus
-    storage_type: premium
+    storage_type: standard
     premium_data_disks: yes
   register: output
-- name: Assert the state has not changed
+- name: Assert the state has changed
   assert:
     that:
       - output.changed
@@ -63,7 +63,7 @@
     name: "lab{{ rpfx }}"
   check_mode: yes
   register: output
-- name: Assert the state has changed
+- name: Assert if the change was correctly reported in check mode
   assert:
     that:
       - output.changed
@@ -74,7 +74,7 @@
     name: "lab{{ rpfx }}"
     state: absent
   register: output
-- name: Assert the state has changed
+- name: Assert the change was correctly reported
   assert:
     that:
       - output.changed
@@ -85,7 +85,7 @@
     name: "lab{{ rpfx }}unexisting"
     state: absent
   register: output
-- name: Assert the state has changed
+- name: Assert thes state has not changed
   assert:
     that:
       - output.changed == false
