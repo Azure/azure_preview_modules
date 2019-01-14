@@ -161,8 +161,6 @@ class AzureRMDevTestLab(AzureRMModuleBase):
                                                     base_url=self._cloud_environment.endpoints.resource_manager,
                                                     api_version='2018-10-15')
 
-        resource_group = self.get_resource_group(self.resource_group)
-
         old_response = self.get_devtestlab()
 
         if not old_response:
@@ -183,14 +181,12 @@ class AzureRMDevTestLab(AzureRMModuleBase):
 
         if (self.to_do == Actions.Create) or (self.to_do == Actions.Update):
             self.log("Need to Create / Update the DevTest Lab instance")
+            self.results['changed'] = True
 
             if self.check_mode:
-                self.results['changed'] = True
                 return self.results
 
             response = self.create_update_devtestlab()
-
-            self.results['changed'] = True
             self.log("Creation / Update done")
         elif self.to_do == Actions.Delete:
             self.log("DevTest Lab instance deleted")
