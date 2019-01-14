@@ -55,11 +55,11 @@ AZURE_API_PROFILES = {
     'latest': {
         'ContainerInstanceManagementClient': '2018-02-01-preview',
         'ComputeManagementClient': dict(
-            default_api_version='2017-12-01',
-            resource_skus='2017-09-01',
-            disks='2017-03-30',
-            snapshots='2017-03-30',
-            virtual_machine_run_commands='2017-03-30'
+            default_api_version='2018-10-01',
+            resource_skus='2018-10-01',
+            disks='2018-10-01',
+            snapshots='2018-10-01',
+            virtual_machine_run_commands='2018-10-01'
         ),
         'NetworkManagementClient': '2018-08-01',
         'ResourceManagementClient': '2017-05-10',
@@ -160,7 +160,6 @@ try:
     from azure.mgmt.rdbms.mysql import MySQLManagementClient
     from azure.mgmt.containerregistry import ContainerRegistryManagementClient
     from azure.mgmt.containerinstance import ContainerInstanceManagementClient
-    from azure.mgmt.cdn import CdnManagementClient
 except ImportError as exc:
     HAS_AZURE_EXC = exc
     HAS_AZURE = False
@@ -201,11 +200,11 @@ def normalize_location_name(name):
 AZURE_PKG_VERSIONS = {
     'StorageManagementClient': {
         'package_name': 'storage',
-        'expected_version': '1.5.0'
+        'expected_version': '3.1.0'
     },
     'ComputeManagementClient': {
         'package_name': 'compute',
-        'expected_version': '3.0.0'
+        'expected_version': '4.3.1'
     },
     'ContainerInstanceManagementClient': {
         'package_name': 'containerinstance',
@@ -213,7 +212,7 @@ AZURE_PKG_VERSIONS = {
     },
     'NetworkManagementClient': {
         'package_name': 'network',
-        'expected_version': '2.2.1'
+        'expected_version': '2.3.0'
     },
     'ResourceManagementClient': {
         'package_name': 'resource',
@@ -784,12 +783,13 @@ class AzureRMModuleBase(object):
         if not self._storage_client:
             self._storage_client = self.get_mgmt_svc_client(StorageManagementClient,
                                                             base_url=self._cloud_environment.endpoints.resource_manager,
-                                                            api_version='2017-10-01')
+                                                            api_version='2018-07-01')
         return self._storage_client
 
     @property
     def storage_models(self):
-        return StorageManagementClient.models("2017-10-01")
+        return StorageManagementClient.models("2018-07-01")
+
 
     @property
     def network_client(self):
@@ -1070,7 +1070,7 @@ class AzureRMAuth(object):
         for key in AZURE_CREDENTIAL_ENV_MAPPING:
             try:
                 credentials[key] = config.get(profile, key, raw=True)
-            except:
+            except Exception:
                 pass
 
         if credentials.get('subscription_id'):
