@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# Copyright (c) 2018 Zim Kalinowski, <zikalino@microsoft.com>
+# Copyright (c) 2019 Zim Kalinowski, <zikalino@microsoft.com>
 #
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
@@ -33,17 +33,17 @@ options:
     location:
         description:
             - The location of the resource.
+        required: True
     lab_storage_type:
         description:
             - Type of storage used by the lab. It can be either C(premium) or C(standard). Default is C(premium).
         choices:
             - 'standard'
             - 'premium'
+        default: premium
     premium_data_disks:
         description:
-            - "The setting to enable usage of C(premium) data disks.\n"
-            - "When its value is 'Enabled', creation of C(standard) or C(premium) data disks is allowed.\n"
-            - "When its value is 'Disabled', only creation of C(standard) data disks is allowed. Possible values include: 'Disabled', 'Enabled'"
+            - "Allow creation of C(premium) data disks."
         type: bool
     state:
       description:
@@ -66,9 +66,9 @@ author:
 EXAMPLES = '''
   - name: Create (or update) DevTest Lab
     azure_rm_devtestlabslab:
-      resource_group: NOT FOUND
-      name: NOT FOUND
-      premium_data_disks: premium_data_disks
+      resource_group: testrg
+      name: mylab
+      lab_storage_type: standard
 '''
 
 RETURN = '''
@@ -113,12 +113,14 @@ class AzureRMDevTestLab(AzureRMModuleBase):
                 required=True
             ),
             location=dict(
-                type='str'
+                type='str',
+                required=True
             ),
             lab_storage_type=dict(
                 type='str',
                 choices=['standard',
-                         'premium']
+                         'premium'],
+                default='premium'
             ),
             premium_data_disks=dict(
                 type='bool'

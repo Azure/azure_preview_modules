@@ -43,56 +43,18 @@
     that:
       - output.changed == false
 
-
-- name: Create instance of dev test labs virtual network
-  azure_rm_devtestlabsvirtualnetwork:
+- name: Create again instance of Lab
+  azure_rm_devtestlabslab:
     resource_group: "{{ resource_group }}"
-    lab_name: "lab{{ rpfx}}"
-    name: "vn{{ rpfx }}"
-    location: eastus
-  register: output_vn
-
-- name: Create instance of dev test labs artifacts source
-  azure_rm_devtestlabsartifactsource:
-    resource_group: "{{ resource_group }}"
-    lab_name: "lab{{ rpfx}}"
     name: "lab{{ rpfx }}"
-    display_name: My Artifacts Source
     location: eastus
-    uri: https://github.com/testormoo/azure-devtestlab.git
-    source_type: github
-    folder_path: /Artifacts
-    security_token: "{{ lookup('env', 'GITHUB_ACCESS_TOKEN') }}"
-  register: artifacts_output
-
-- name: Create instance of dev test labs virtual machine
-  azure_rm_devtestlabsvirtualmachine:
-    resource_group: "{{ resource_group }}"
-    lab_name: "lab{{ rpfx}}"
-    name: "vm{{ rpfx }}"
-    location: eastus
-    notes: Virtual machine notes, just something....
-    created_by_user: zikalino@microsoft.com
-    os_type: linux
-    size: Standard_A2_v2
-    user_name: zim
-    password: ZSuppas$$21!
-    lab_subnet_name: "vn{{ rpfx }}Subnet"
-    lab_virtual_network_id: "{{ output_vn.id }}"
-    disallow_public_ip_address: yes
-    gallery_image_reference:
-      offer: UbuntuServer
-      publisher: Canonical
-      sku: 16.04-LTS
-      os_type: Linux
-      version: latest
-    artifacts:
-      - artifact_id: "{{ artifacts_output.id }}/Artifacts/linux-install-mongodb"
-    allow_claim: no
-  register: vm_output
-
-
-
+    lab_storage_type: premium
+    premium_data_disks: yes
+  register: output
+- name: Assert the state has not changed
+  assert:
+    that:
+      - output.changed
 
 - name: Delete instance of Lab -- check mode
   azure_rm_devtestlabslab:
