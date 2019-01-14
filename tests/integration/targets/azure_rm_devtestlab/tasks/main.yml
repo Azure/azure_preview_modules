@@ -4,11 +4,11 @@
   run_once: yes
 
 - name: Create instance of Lab -- check mode
-  azure_rm_devtestlabslab:
+  azure_rm_devtestlab:
     resource_group: "{{ resource_group }}"
     name: "lab{{ rpfx }}"
     location: eastus
-    lab_storage_type: standard
+    storage_type: standard
     premium_data_disks: no
   check_mode: yes
   register: output
@@ -18,11 +18,11 @@
       - output.changed
 
 - name: Create instance of Lab
-  azure_rm_devtestlabslab:
+  azure_rm_devtestlab:
     resource_group: "{{ resource_group }}"
     name: "lab{{ rpfx }}"
     location: eastus
-    lab_storage_type: standard
+    storage_type: standard
     premium_data_disks: no
   register: output
 - name: Assert the resource instance is well created
@@ -31,11 +31,11 @@
       - output.changed
 
 - name: Create again instance of Lab
-  azure_rm_devtestlabslab:
+  azure_rm_devtestlab:
     resource_group: "{{ resource_group }}"
     name: "lab{{ rpfx }}"
     location: eastus
-    lab_storage_type: standard
+    storage_type: standard
     premium_data_disks: no
   register: output
 - name: Assert the state has not changed
@@ -44,11 +44,11 @@
       - output.changed == false
 
 - name: Create again instance of Lab
-  azure_rm_devtestlabslab:
+  azure_rm_devtestlab:
     resource_group: "{{ resource_group }}"
     name: "lab{{ rpfx }}"
     location: eastus
-    lab_storage_type: premium
+    storage_type: premium
     premium_data_disks: yes
   register: output
 - name: Assert the state has not changed
@@ -57,7 +57,7 @@
       - output.changed
 
 - name: Delete instance of Lab -- check mode
-  azure_rm_devtestlabslab:
+  azure_rm_devtestlab:
     resource_group: "{{ resource_group }}"
     state: absent
     name: "lab{{ rpfx }}"
@@ -69,7 +69,7 @@
       - output.changed
 
 - name: Delete instance of Lab
-  azure_rm_devtestlabslab:
+  azure_rm_devtestlab:
     resource_group: "{{ resource_group }}"
     name: "lab{{ rpfx }}"
     state: absent
@@ -80,7 +80,7 @@
       - output.changed
 
 - name: Delete unexisting instance of Lab
-  azure_rm_devtestlabslab:
+  azure_rm_devtestlab:
     resource_group: "{{ resource_group }}"
     name: "lab{{ rpfx }}unexisting"
     state: absent
