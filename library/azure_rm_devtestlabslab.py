@@ -152,8 +152,8 @@ class AzureRMDevTestLab(AzureRMModuleBase):
             elif kwargs[key] is not None:
                 self.lab[key] = kwargs[key]
 
-        dict_camelize(self.lab, ['lab_storage_type'], True)
-        dict_map(self.lab, ['premium_data_disks'], {True: 'Enabled', False: 'Disabled'})
+        _snake_to_camel(self.lab, ['lab_storage_type'], True)
+        self.lab['premium_data_disks'] = 'Enabled' if self.lab['premium_data_disks'] else 'Disabled'
 
         response = None
 
@@ -175,7 +175,9 @@ class AzureRMDevTestLab(AzureRMModuleBase):
             if self.state == 'absent':
                 self.to_do = Actions.Delete
             elif self.state == 'present':
-                if (not default_compare(self.lab, old_response, '', self.results)):
+                if self.lab.get('lab_storage_type') != old_response('lab_storage_type'):
+                    self.to_do = Actions.Update
+                if self.lab.get('premium_data_disks') != old_response('premium_data_disks'):
                     self.to_do = Actions.Update
 
         if (self.to_do == Actions.Create) or (self.to_do == Actions.Update):
@@ -267,79 +269,6 @@ class AzureRMDevTestLab(AzureRMModuleBase):
             return response.as_dict()
 
         return False
-
-
-def default_compare(new, old, path, result):
-    if new is None:
-        return True
-    elif isinstance(new, dict):
-        if not isinstance(old, dict):
-            result['compare'] = 'changed [' + path + '] old dict is null'
-            return False
-        for k in new.keys():
-            if not default_compare(new.get(k), old.get(k, None), path + '/' + k, result):
-                return False
-        return True
-    elif isinstance(new, list):
-        if not isinstance(old, list) or len(new) != len(old):
-            result['compare'] = 'changed [' + path + '] length is different or null'
-            return False
-        if isinstance(old[0], dict):
-            key = None
-            if 'id' in old[0] and 'id' in new[0]:
-                key = 'id'
-            elif 'name' in old[0] and 'name' in new[0]:
-                key = 'name'
-            else:
-                key = list(old[0])[0]
-            new = sorted(new, key=lambda x: x.get(key, None))
-            old = sorted(old, key=lambda x: x.get(key, None))
-        else:
-            new = sorted(new)
-            old = sorted(old)
-        for i in range(len(new)):
-            if not default_compare(new[i], old[i], path + '/*', result):
-                return False
-        return True
-    else:
-        if path == '/location':
-            new = new.replace(' ', '').lower()
-            old = new.replace(' ', '').lower()
-        if new == old:
-            return True
-        else:
-            result['compare'] = 'changed [' + path + '] ' + str(new) + ' != ' + str(old)
-            return False
-
-
-def dict_camelize(d, path, camelize_first):
-    if isinstance(d, list):
-        for i in range(len(d)):
-            dict_camelize(d[i], path, camelize_first)
-    elif isinstance(d, dict):
-        if len(path) == 1:
-            old_value = d.get(path[0], None)
-            if old_value is not None:
-                d[path[0]] = _snake_to_camel(old_value, camelize_first)
-        else:
-            sd = d.get(path[0], None)
-            if sd is not None:
-                dict_camelize(sd, path[1:], camelize_first)
-
-
-def dict_map(d, path, map):
-    if isinstance(d, list):
-        for i in range(len(d)):
-            dict_map(d[i], path, map)
-    elif isinstance(d, dict):
-        if len(path) == 1:
-            old_value = d.get(path[0], None)
-            if old_value is not None:
-                d[path[0]] = map.get(old_value, old_value)
-        else:
-            sd = d.get(path[0], None)
-            if sd is not None:
-                dict_map(sd, path[1:], map)
 
 
 def main():
