@@ -132,7 +132,7 @@ class AzureRMDevTestLab(AzureRMModuleBase):
 
         self.resource_group = None
         self.name = None
-        self.lab = dict()
+        self.lab = {}
 
         self.results = dict(changed=False)
         self.mgmt_client = None
@@ -152,8 +152,9 @@ class AzureRMDevTestLab(AzureRMModuleBase):
             elif kwargs[key] is not None:
                 self.lab[key] = kwargs[key]
 
-        _snake_to_camel(self.lab, ['lab_storage_type'], True)
-        self.lab['premium_data_disks'] = 'Enabled' if self.lab['premium_data_disks'] else 'Disabled'
+        self.lab['lab_storage_type'] = _snake_to_camel(self.lab['lab_storage_type'], True)
+        if self.lab.get('premium_data_disks') is not None:
+            self.lab['premium_data_disks'] = 'Enabled' if self.lab['premium_data_disks'] else 'Disabled'
 
         response = None
 
@@ -175,9 +176,9 @@ class AzureRMDevTestLab(AzureRMModuleBase):
             if self.state == 'absent':
                 self.to_do = Actions.Delete
             elif self.state == 'present':
-                if self.lab.get('lab_storage_type') != old_response('lab_storage_type'):
+                if self.lab.get('lab_storage_type') != old_response.get('lab_storage_type'):
                     self.to_do = Actions.Update
-                if self.lab.get('premium_data_disks') != old_response('premium_data_disks'):
+                if self.lab.get('premium_data_disks') != old_response.get('premium_data_disks'):
                     self.to_do = Actions.Update
 
         if (self.to_do == Actions.Create) or (self.to_do == Actions.Update):
