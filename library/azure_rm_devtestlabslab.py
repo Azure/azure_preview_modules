@@ -33,7 +33,6 @@ options:
     location:
         description:
             - The location of the resource.
-        required: True
     lab_storage_type:
         description:
             - Type of storage used by the lab. It can be either C(premium) or C(standard). Default is C(premium).
@@ -113,8 +112,7 @@ class AzureRMDevTestLab(AzureRMModuleBase):
                 required=True
             ),
             location=dict(
-                type='str',
-                required=True
+                type='str'
             ),
             lab_storage_type=dict(
                 type='str',
