@@ -46,7 +46,7 @@ options:
     state:
       description:
         - Assert the state of the DevTest Lab.
-        - Use 'present' to create or update an DevTest Lab and 'absent' to delete it.
+        - Use C(present) to create or update an DevTest Lab and C(absent) to delete it.
       default: present
       choices:
         - absent
