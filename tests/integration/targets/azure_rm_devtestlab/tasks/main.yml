@@ -56,6 +56,45 @@
     that:
       - output.changed
 
+- name: Create instance of DebTest Labs virtual network
+  azure_rm_devtestlabvirtualnetwork:
+    resource_group: "{{ resource_group }}"
+    lab_name: "lab{{ rpfx}}"
+    name: "vn{{ rpfx }}"
+    location: eastus
+    description: My DevTest Lab
+  register: output
+- name: Assert the change was registered
+  assert:
+    that:
+      - output.changed
+
+- name: Update instance of DebTest Labs with same parameters
+  azure_rm_devtestlabvirtualnetwork:
+    resource_group: "{{ resource_group }}"
+    lab_name: "lab{{ rpfx}}"
+    name: "vn{{ rpfx }}"
+    location: eastus
+    description: My DevTest Lab
+  register: output
+- name: Assert that nothing was changed
+  assert:
+    that:
+      - output.changed == false
+
+- name: Update instance of DebTest Labs with changed description
+  azure_rm_devtestlabvirtualnetwork:
+    resource_group: "{{ resource_group }}"
+    lab_name: "lab{{ rpfx}}"
+    name: "vn{{ rpfx }}"
+    location: eastus
+    description: My DevTest Lab Updated
+  register: output
+- name: Assert that nothing was changed
+  assert:
+    that:
+      - output.changed
+
 - name: Delete instance of Lab -- check mode
   azure_rm_devtestlab:
     resource_group: "{{ resource_group }}"
