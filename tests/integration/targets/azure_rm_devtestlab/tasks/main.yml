@@ -1,6 +1,7 @@
 - name: Prepare random number
   set_fact:
     lab_name: "lab{{ resource_group | hash('md5') | truncate(7, True, '') }}{{ 1000 | random }}"
+    vn_name: "vn{{ resource_group | hash('md5') | truncate(7, True, '') }}{{ 1000 | random }}"
   run_once: yes
 
 - name: Create instance of Lab -- check mode
@@ -59,8 +60,8 @@
 - name: Create instance of DebTest Labs virtual network
   azure_rm_devtestlabvirtualnetwork:
     resource_group: "{{ resource_group }}"
-    lab_name: "lab{{ rpfx}}"
-    name: "vn{{ rpfx }}"
+    lab_name: "{{ lab_name }}"
+    name: "{{ vn_name }}"
     location: eastus
     description: My DevTest Lab
   register: output
@@ -72,8 +73,8 @@
 - name: Update instance of DebTest Labs with same parameters
   azure_rm_devtestlabvirtualnetwork:
     resource_group: "{{ resource_group }}"
-    lab_name: "lab{{ rpfx}}"
-    name: "vn{{ rpfx }}"
+    lab_name: "{{ lab_name }}"
+    name: "{{ vn_name }}"
     location: eastus
     description: My DevTest Lab
   register: output
@@ -85,8 +86,8 @@
 - name: Update instance of DebTest Labs with changed description
   azure_rm_devtestlabvirtualnetwork:
     resource_group: "{{ resource_group }}"
-    lab_name: "lab{{ rpfx}}"
-    name: "vn{{ rpfx }}"
+    lab_name: "{{ lab_name }}"
+    name: "{{ vn_name }}"
     location: eastus
     description: My DevTest Lab Updated
   register: output

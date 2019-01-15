@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# Copyright (c) 2018 Zim Kalinowski, <zikalino@microsoft.com>
+# Copyright (c) 2019 Zim Kalinowski, <zikalino@microsoft.com>
 #
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
@@ -73,8 +73,15 @@ id:
         - The identifier of the resource.
     returned: always
     type: str
-    sample: id
-external_provider_resource_id: external_vn_id
+    sample: "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourcegroups/testrg/providers/microsoft.devtestlab/
+             mylab/labzimsxxxabcmooo/virtualnetworks/myvn"
+external_provider_resource_id:
+    description:
+        - The identifier of external virtual network.
+    returned: always
+    type: str
+    sample: "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/testrg/providers/Microsoft.Network/vi
+             rtualNetworks/myvn"
 '''
 
 import time
@@ -118,7 +125,7 @@ class AzureRMVirtualNetwork(AzureRMModuleBase):
             ),
             description=dict(
                 type='str'
-            )
+            ),
             state=dict(
                 type='str',
                 default='present',
@@ -169,8 +176,7 @@ class AzureRMVirtualNetwork(AzureRMModuleBase):
             if self.state == 'absent':
                 self.to_do = Actions.Delete
             elif self.state == 'present':
-                if self.virtual_network.get('description') is not None and
-                    self.virtual_network.get('description') != old_response.get('description'):
+                if self.virtual_network.get('description') is not None and self.virtual_network.get('description') != old_response.get('description'):
                     self.to_do = Actions.Update
 
         if (self.to_do == Actions.Create) or (self.to_do == Actions.Update):
