@@ -161,6 +161,10 @@ class AzureRMDevTestLab(AzureRMModuleBase):
                                                     base_url=self._cloud_environment.endpoints.resource_manager,
                                                     api_version='2018-10-15')
 
+        resource_group = self.get_resource_group(self.resource_group)
+        if self.lab.get('location') is None:
+            self.lab['location'] = resource_group.location
+
         old_response = self.get_devtestlab()
 
         if not old_response:

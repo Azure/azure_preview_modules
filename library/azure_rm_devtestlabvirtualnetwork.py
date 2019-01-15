@@ -19,7 +19,7 @@ module: azure_rm_devtestlabvirtualnetwork
 version_added: "2.8"
 short_description: Manage Azure DevTest Lab Virtual Network instance.
 description:
-    - Create, update and delete instance of DevTest Lab Virtual Network.
+    - Create, update and delete instance of Azure DevTest Lab Virtual Network.
 
 options:
     resource_group:
@@ -74,7 +74,7 @@ id:
     returned: always
     type: str
     sample: "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourcegroups/testrg/providers/microsoft.devtestlab/
-             mylab/labzimsxxxabcmooo/virtualnetworks/myvn"
+             mylab/mylab/virtualnetworks/myvn"
 external_provider_resource_id:
     description:
         - The identifier of external virtual network.
@@ -103,7 +103,7 @@ class Actions:
     NoAction, Create, Update, Delete = range(4)
 
 
-class AzureRMVirtualNetwork(AzureRMModuleBase):
+class AzureRMDevTestLabVirtualNetwork(AzureRMModuleBase):
     """Configuration class for an Azure RM Virtual Network resource"""
 
     def __init__(self):
@@ -143,7 +143,7 @@ class AzureRMVirtualNetwork(AzureRMModuleBase):
         self.state = None
         self.to_do = Actions.NoAction
 
-        super(AzureRMVirtualNetwork, self).__init__(derived_arg_spec=self.module_arg_spec,
+        super(AzureRMDevTestLabVirtualNetwork, self).__init__(derived_arg_spec=self.module_arg_spec,
                                                      supports_check_mode=True,
                                                      supports_tags=True)
 
@@ -159,9 +159,12 @@ class AzureRMVirtualNetwork(AzureRMModuleBase):
         response = None
 
         self.mgmt_client = self.get_mgmt_svc_client(DevTestLabsClient,
-                                                    base_url=self._cloud_environment.endpoints.resource_manager)
+                                                    base_url=self._cloud_environment.endpoints.resource_manager,
+                                                    api_version='2018-10-15')
 
         resource_group = self.get_resource_group(self.resource_group)
+        if self.virtual_network.get('location') is None:
+            self.virtual_network['location'] = resource_group.location
 
         old_response = self.get_virtualnetwork()
 
@@ -181,22 +184,16 @@ class AzureRMVirtualNetwork(AzureRMModuleBase):
 
         if (self.to_do == Actions.Create) or (self.to_do == Actions.Update):
             self.log("Need to Create / Update the Virtual Network instance")
-
-            if self.check_mode:
-                self.results['changed'] = True
-                return self.results
-
-            response = self.create_update_virtualnetwork()
-
             self.results['changed'] = True
+            if self.check_mode:
+                return self.results
+            response = self.create_update_virtualnetwork()
             self.log("Creation / Update done")
         elif self.to_do == Actions.Delete:
             self.log("Virtual Network instance deleted")
             self.results['changed'] = True
-
             if self.check_mode:
                 return self.results
-
             self.delete_virtualnetwork()
             # This currently doesnt' work as there is a bug in SDK / Service
             if isinstance(response, LROPoller) or isinstance(response, AzureOperationPoller):
@@ -276,7 +273,7 @@ class AzureRMVirtualNetwork(AzureRMModuleBase):
 
 def main():
     """Main execution"""
-    AzureRMVirtualNetwork()
+    AzureRMDevTestLabVirtualNetwork()
 
 
 if __name__ == '__main__':
