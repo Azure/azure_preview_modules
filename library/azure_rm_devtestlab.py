@@ -152,7 +152,7 @@ class AzureRMDevTestLab(AzureRMModuleBase):
 
         if self.lab.get('storage_type'):
             self.lab['storage_type'] = _snake_to_camel(self.lab['storage_type'], True)
-        if self.lab.get('premium_data_disks'):
+        if self.lab.get('premium_data_disks') is not None:
             self.lab['premium_data_disks'] = 'Enabled' if self.lab['premium_data_disks'] else 'Disabled'
 
         response = None
