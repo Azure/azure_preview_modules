@@ -151,7 +151,8 @@ class AzureRMDevTestLab(AzureRMModuleBase):
                 self.lab[key] = kwargs[key]
 
         if self.lab.get('storage_type'):
-            self.lab['storage_type'] = _snake_to_camel(self.lab['storage_type'], True)
+            self.lab['lab_storage_type'] = _snake_to_camel(self.lab['storage_type'], True)
+            self.lab.pop('storage_type', None)
         if self.lab.get('premium_data_disks') is not None:
             self.lab['premium_data_disks'] = 'Enabled' if self.lab['premium_data_disks'] else 'Disabled'
 
@@ -178,7 +179,7 @@ class AzureRMDevTestLab(AzureRMModuleBase):
             if self.state == 'absent':
                 self.to_do = Actions.Delete
             elif self.state == 'present':
-                if self.lab.get('storage_type') is not None and self.lab.get('storage_type').lower() != old_response.get('storage_type', '').lower():
+                if self.lab.get('lab_storage_type') is not None and self.lab.get('lab_storage_type').lower() != old_response.get('lab_storage_type', '').lower():
                     self.to_do = Actions.Update
                 if (self.lab.get('premium_data_disks') is not None and
                         self.lab.get('premium_data_disks').lower() != old_response.get('premium_data_disks').lower()):
