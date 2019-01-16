@@ -38,11 +38,11 @@
         - tls_ecdhe_ecdsa_with_aes_256_gcm_sha384
     authentication_certificates:
       - name: cert1
-        data: "{{ lookup('file', 'cert1.txt') }}"
+        data: "{{ lookup('file', '../files/cert1.txt') }}"
     ssl_certificates:
       - name: cert2
         password: your-password
-        data: "{{ lookup('file', 'cert2.txt') }}"
+        data: "{{ lookup('file', '../files/cert2.txt') }}"
     gateway_ip_configurations:
       - subnet:
           id: "{{ subnet_output.state.id }}"
@@ -128,11 +128,11 @@
         - tls_ecdhe_ecdsa_with_aes_256_gcm_sha384
     authentication_certificates:
       - name: cert1
-        data: "{{ lookup('file', 'cert1.txt') }}"
+        data: "{{ lookup('file', '../files/cert1.txt') }}"
     ssl_certificates:
       - name: cert2
         password: your-password
-        data: "{{ lookup('file', 'cert2.txt') }}"
+        data: "{{ lookup('file', '../files/cert2.txt') }}"
     gateway_ip_configurations:
       - subnet:
           id: "{{ subnet_output.state.id }}"
@@ -213,11 +213,11 @@
         - tls_ecdhe_ecdsa_with_aes_256_gcm_sha384
     authentication_certificates:
       - name: cert1
-        data: "{{ lookup('file', 'cert1.txt') }}"
+        data: "{{ lookup('file', '../files/cert1.txt') }}"
     ssl_certificates:
       - name: cert2
         password: your-password
-        data: "{{ lookup('file', 'cert2.txt') }}"
+        data: "{{ lookup('file', '../files/cert2.txt') }}"
     gateway_ip_configurations:
       - subnet:
           id: "{{ subnet_output.state.id }}"
@@ -298,11 +298,11 @@
         - tls_ecdhe_ecdsa_with_aes_256_gcm_sha384
     authentication_certificates:
       - name: cert1
-        data: "{{ lookup('file', 'cert1.txt') }}"
+        data: "{{ lookup('file', '../files/cert1.txt') }}"
     ssl_certificates:
       - name: cert2
         password: your-password
-        data: "{{ lookup('file', 'cert2.txt') }}"
+        data: "{{ lookup('file', '../files/cert2.txt') }}"
     gateway_ip_configurations:
       - subnet:
           id: "{{ subnet_output.state.id }}"
