@@ -15,38 +15,35 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 
 DOCUMENTATION = '''
 ---
-module: azure_rm_devtestlab
+module: azure_rm_devtestlabvirtualnetwork
 version_added: "2.8"
-short_description: Manage Azure DevTest Lab instance.
+short_description: Manage Azure DevTest Lab Virtual Network instance.
 description:
-    - Create, update and delete instance of Azure DevTest Lab.
+    - Create, update and delete instance of Azure DevTest Lab Virtual Network.
 
 options:
     resource_group:
         description:
             - The name of the resource group.
         required: True
-    name:
+    lab_name:
         description:
             - The name of the lab.
+        required: True
+    name:
+        description:
+            - The name of the virtual network.
         required: True
     location:
         description:
             - The location of the resource.
-    storage_type:
+    description:
         description:
-            - Type of storage used by the lab. It can be either C(premium) or C(standard). Default is C(premium).
-        choices:
-            - 'standard'
-            - 'premium'
-    premium_data_disks:
-        description:
-            - "Allow creation of C(premium) data disks."
-        type: bool
+            - The description of the virtual network.
     state:
       description:
-        - Assert the state of the DevTest Lab.
-        - Use C(present) to create or update an DevTest Lab and C(absent) to delete it.
+        - Assert the state of the Virtual Network.
+        - Use 'present' to create or update an Virtual Network and 'absent' to delete it.
       default: present
       choices:
         - absent
@@ -62,11 +59,12 @@ author:
 '''
 
 EXAMPLES = '''
-  - name: Create (or update) DevTest Lab
-    azure_rm_devtestlab:
+  - name: Create (or update) Virtual Network
+    azure_rm_devtestlabvirtualnetwork:
       resource_group: testrg
-      name: mylab
-      storage_type: standard
+      lab_name: mylab
+      name: myvn
+      description: My Lab Virtual Network
 '''
 
 RETURN = '''
@@ -75,7 +73,15 @@ id:
         - The identifier of the resource.
     returned: always
     type: str
-    sample: /subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourcegroups/testrg/providers/microsoft.devtestlab/labs/mylab
+    sample: "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourcegroups/testrg/providers/microsoft.devtestlab/
+             mylab/mylab/virtualnetworks/myvn"
+external_provider_resource_id:
+    description:
+        - The identifier of external virtual network.
+    returned: always
+    type: str
+    sample: "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/testrg/providers/Microsoft.Network/vi
+             rtualNetworks/myvn"
 '''
 
 import time
@@ -97,12 +103,16 @@ class Actions:
     NoAction, Create, Update, Delete = range(4)
 
 
-class AzureRMDevTestLab(AzureRMModuleBase):
-    """Configuration class for an Azure RM DevTest Lab resource"""
+class AzureRMDevTestLabVirtualNetwork(AzureRMModuleBase):
+    """Configuration class for an Azure RM Virtual Network resource"""
 
     def __init__(self):
         self.module_arg_spec = dict(
             resource_group=dict(
+                type='str',
+                required=True
+            ),
+            lab_name=dict(
                 type='str',
                 required=True
             ),
@@ -113,13 +123,8 @@ class AzureRMDevTestLab(AzureRMModuleBase):
             location=dict(
                 type='str'
             ),
-            storage_type=dict(
-                type='str',
-                choices=['standard',
-                         'premium']
-            ),
-            premium_data_disks=dict(
-                type='bool'
+            description=dict(
+                type='str'
             ),
             state=dict(
                 type='str',
@@ -129,17 +134,18 @@ class AzureRMDevTestLab(AzureRMModuleBase):
         )
 
         self.resource_group = None
+        self.lab_name = None
         self.name = None
-        self.lab = {}
+        self.virtual_network = {}
 
         self.results = dict(changed=False)
         self.mgmt_client = None
         self.state = None
         self.to_do = Actions.NoAction
 
-        super(AzureRMDevTestLab, self).__init__(derived_arg_spec=self.module_arg_spec,
-                                                supports_check_mode=True,
-                                                supports_tags=True)
+        super(AzureRMDevTestLabVirtualNetwork, self).__init__(derived_arg_spec=self.module_arg_spec,
+                                                              supports_check_mode=True,
+                                                              supports_tags=True)
 
     def exec_module(self, **kwargs):
         """Main module execution method"""
@@ -148,13 +154,7 @@ class AzureRMDevTestLab(AzureRMModuleBase):
             if hasattr(self, key):
                 setattr(self, key, kwargs[key])
             elif kwargs[key] is not None:
-                self.lab[key] = kwargs[key]
-
-        if self.lab.get('storage_type'):
-            self.lab['lab_storage_type'] = _snake_to_camel(self.lab['storage_type'], True)
-            self.lab.pop('storage_type', None)
-        if self.lab.get('premium_data_disks') is not None:
-            self.lab['premium_data_disks'] = 'Enabled' if self.lab['premium_data_disks'] else 'Disabled'
+                self.virtual_network[key] = kwargs[key]
 
         response = None
 
@@ -163,111 +163,108 @@ class AzureRMDevTestLab(AzureRMModuleBase):
                                                     api_version='2018-10-15')
 
         resource_group = self.get_resource_group(self.resource_group)
-        if self.lab.get('location') is None:
-            self.lab['location'] = resource_group.location
+        if self.virtual_network.get('location') is None:
+            self.virtual_network['location'] = resource_group.location
 
-        old_response = self.get_devtestlab()
+        old_response = self.get_virtualnetwork()
 
         if not old_response:
-            self.log("DevTest Lab instance doesn't exist")
+            self.log("Virtual Network instance doesn't exist")
             if self.state == 'absent':
                 self.log("Old instance didn't exist")
             else:
                 self.to_do = Actions.Create
         else:
-            self.log("DevTest Lab instance already exists")
+            self.log("Virtual Network instance already exists")
             if self.state == 'absent':
                 self.to_do = Actions.Delete
             elif self.state == 'present':
-                if self.lab.get('lab_storage_type') is not None and self.lab.get('lab_storage_type').lower() != old_response.get('lab_storage_type', '').lower():
-                    self.to_do = Actions.Update
-                if (self.lab.get('premium_data_disks') is not None and
-                        self.lab.get('premium_data_disks').lower() != old_response.get('premium_data_disks').lower()):
+                if self.virtual_network.get('description') is not None and self.virtual_network.get('description') != old_response.get('description'):
                     self.to_do = Actions.Update
 
         if (self.to_do == Actions.Create) or (self.to_do == Actions.Update):
-            self.log("Need to Create / Update the DevTest Lab instance")
+            self.log("Need to Create / Update the Virtual Network instance")
             self.results['changed'] = True
-
             if self.check_mode:
                 return self.results
-
-            response = self.create_update_devtestlab()
+            response = self.create_update_virtualnetwork()
             self.log("Creation / Update done")
         elif self.to_do == Actions.Delete:
-            self.log("DevTest Lab instance deleted")
+            self.log("Virtual Network instance deleted")
             self.results['changed'] = True
-
             if self.check_mode:
                 return self.results
-
-            self.delete_devtestlab()
+            self.delete_virtualnetwork()
             # This currently doesnt' work as there is a bug in SDK / Service
             if isinstance(response, LROPoller) or isinstance(response, AzureOperationPoller):
                 response = self.get_poller_result(response)
         else:
-            self.log("DevTest Lab instance unchanged")
+            self.log("Virtual Network instance unchanged")
             self.results['changed'] = False
             response = old_response
 
         if self.state == 'present':
             self.results.update({
-                'id': response.get('id', None)
+                'id': response.get('id', None),
+                'external_provider_resource_id': response.get('external_provider_resource_id', None)
             })
         return self.results
 
-    def create_update_devtestlab(self):
+    def create_update_virtualnetwork(self):
         '''
-        Creates or updates DevTest Lab with the specified configuration.
+        Creates or updates Virtual Network with the specified configuration.
 
-        :return: deserialized DevTest Lab instance state dictionary
+        :return: deserialized Virtual Network instance state dictionary
         '''
-        self.log("Creating / Updating the DevTest Lab instance {0}".format(self.name))
+        self.log("Creating / Updating the Virtual Network instance {0}".format(self.name))
 
         try:
-            response = self.mgmt_client.labs.create_or_update(resource_group_name=self.resource_group,
-                                                              name=self.name,
-                                                              lab=self.lab)
+            response = self.mgmt_client.virtual_networks.create_or_update(resource_group_name=self.resource_group,
+                                                                          lab_name=self.lab_name,
+                                                                          name=self.name,
+                                                                          virtual_network=self.virtual_network)
             if isinstance(response, LROPoller) or isinstance(response, AzureOperationPoller):
                 response = self.get_poller_result(response)
 
         except CloudError as exc:
-            self.log('Error attempting to create the DevTest Lab instance.')
-            self.fail("Error creating the DevTest Lab instance: {0}".format(str(exc)))
+            self.log('Error attempting to create the Virtual Network instance.')
+            self.fail("Error creating the Virtual Network instance: {0}".format(str(exc)))
         return response.as_dict()
 
-    def delete_devtestlab(self):
+    def delete_virtualnetwork(self):
         '''
-        Deletes specified DevTest Lab instance in the specified subscription and resource group.
+        Deletes specified Virtual Network instance in the specified subscription and resource group.
 
         :return: True
         '''
-        self.log("Deleting the DevTest Lab instance {0}".format(self.name))
+        self.log("Deleting the Virtual Network instance {0}".format(self.name))
         try:
-            response = self.mgmt_client.labs.delete(resource_group_name=self.resource_group,
-                                                    name=self.name)
+            response = self.mgmt_client.virtual_networks.delete(resource_group_name=self.resource_group,
+                                                                lab_name=self.lab_name,
+                                                                name=self.name)
         except CloudError as e:
-            self.log('Error attempting to delete the DevTest Lab instance.')
-            self.fail("Error deleting the DevTest Lab instance: {0}".format(str(e)))
+            self.log('Error attempting to delete the Virtual Network instance.')
+            self.fail("Error deleting the Virtual Network instance: {0}".format(str(e)))
 
         return True
 
-    def get_devtestlab(self):
+    def get_virtualnetwork(self):
         '''
-        Gets the properties of the specified DevTest Lab.
+        Gets the properties of the specified Virtual Network.
 
-        :return: deserialized DevTest Lab instance state dictionary
+        :return: deserialized Virtual Network instance state dictionary
         '''
-        self.log("Checking if the DevTest Lab instance {0} is present".format(self.name))
+        self.log("Checking if the Virtual Network instance {0} is present".format(self.name))
         found = False
         try:
-            response = self.mgmt_client.labs.get(resource_group_name=self.resource_group,
-                                                 name=self.name)
+            response = self.mgmt_client.virtual_networks.get(resource_group_name=self.resource_group,
+                                                             lab_name=self.lab_name,
+                                                             name=self.name)
             found = True
             self.log("Response : {0}".format(response))
-            self.log("DevTest Lab instance : {0} found".format(response.name))
+            self.log("Virtual Network instance : {0} found".format(response.name))
         except CloudError as e:
-            self.log('Did not find the DevTest Lab instance.')
+            self.log('Did not find the Virtual Network instance.')
         if found is True:
             return response.as_dict()
 
@@ -276,7 +273,7 @@ class AzureRMDevTestLab(AzureRMModuleBase):
 
 def main():
     """Main execution"""
-    AzureRMDevTestLab()
+    AzureRMDevTestLabVirtualNetwork()
 
 
 if __name__ == '__main__':
