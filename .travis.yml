@@ -1,10 +1,6 @@
 language: python
 python: '2.7'
 
-branches:
-  only:
-    - master
-
 env:
   global:
     - exit_code=0
@@ -175,6 +171,8 @@ install:
   - ansible --version
   - pip install -I -r ./files/requirements-azure.txt
   - pip freeze
+  - git remote set-branches --add origin master
+  - git fetch
 
 script:
   - scan_test
