@@ -99,7 +99,7 @@ before_install:
       run_all=false
  
       for item in ${diffstr[*]}; do
-        if [[ "$item" != *"main.yml" ]]; then
+        if [[ "$item" != *"main.yml" ]] && [[ "$item" != *"aliases" ]] && [[ "$item" != *"virtualmachines.yml" ]]; then
           if [[ "$item" != *"azure_rm_"*.py ]]; then
             run_all=true;
             break;
