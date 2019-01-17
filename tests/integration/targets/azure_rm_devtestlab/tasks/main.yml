@@ -149,6 +149,7 @@
     resource_group: "{{ resource_group }}"
     lab_name: "{{ lab_name }}"
     name: "{{ artifacts_name }}"
+    state: absent
   register: output 
 - name: Assert that change was correctly registered
   assert:
