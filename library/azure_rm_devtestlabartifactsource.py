@@ -242,7 +242,7 @@ class AzureRMDevTestLabArtifactsSource(AzureRMModuleBase):
                 if self.artifact_source.get('source_type').lower() != old_response.get('source_type').lower():
                     self.to_do = Actions.Update
 
-                if self.artifact_source.get('uri').lower() != old_response.get('uri'):
+                if self.artifact_source.get('uri') != old_response.get('uri'):
                     self.to_do = Actions.Update
 
                 if self.artifact_source.get('branch_ref') is not None:
