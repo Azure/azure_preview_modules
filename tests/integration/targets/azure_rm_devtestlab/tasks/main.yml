@@ -2,6 +2,7 @@
   set_fact:
     lab_name: "lab{{ resource_group | hash('md5') | truncate(7, True, '') }}{{ 1000 | random }}"
     vn_name: "vn{{ resource_group | hash('md5') | truncate(7, True, '') }}{{ 1000 | random }}"
+    vm_name: "vn{{ resource_group | hash('md5') | truncate(7, True, '') }}{{ 1000 | random }}"
     artifacts_name: myartifacts
     github_token: "{{ lookup('env','GITHUB_ACCESS_TOKEN') }}"
   run_once: yes
@@ -143,6 +144,33 @@
   assert:
     that:
       - output.changed
+
+- name: Create instance of DevTest Lab Virtual Machine
+  azure_rm_devtestlabsvirtualmachine:
+    resource_group: "{{ resource_group }}"
+    lab_name: "{{ lab_name }}"
+    name: "{{ vm_name }}"
+    location: eastus
+    notes: Virtual machine notes, just something....
+    created_by_user: zikalino@microsoft.com
+    os_type: linux
+    size: Standard_A2_v2
+    user_name: zim
+    password: ZSuppas$$21!
+    lab_subnet_name: "vn{{ rpfx }}Subnet"
+    lab_virtual_network_id: "{{ output_vn.id }}"
+    disallow_public_ip_address: yes
+    gallery_image_reference:
+      offer: UbuntuServer
+      publisher: Canonical
+      sku: 16.04-LTS
+      os_type: Linux
+      version: latest
+    artifacts:
+      - artifact_id: "{{ artifacts_output.id }}/Artifacts/linux-install-mongodb"
+    allow_claim: no
+  register: vm_output
+
 
 - name: Delete instance of DevTest Labs artifacts source
   azure_rm_devtestlabartifactsource:
