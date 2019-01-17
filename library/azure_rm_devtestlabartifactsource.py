@@ -192,9 +192,9 @@ class AzureRMDevTestLabArtifactsSource(AzureRMModuleBase):
         ]
 
         super(AzureRMDevTestLabArtifactsSource, self).__init__(derived_arg_spec=self.module_arg_spec,
-                                                                   supports_check_mode=True,
-                                                                   supports_tags=True,
-                                                                   required_if=required_if)
+                                                               supports_check_mode=True,
+                                                               supports_tags=True,
+                                                               required_if=required_if)
 
     def exec_module(self, **kwargs):
         """Main module execution method"""
@@ -216,7 +216,8 @@ class AzureRMDevTestLabArtifactsSource(AzureRMModuleBase):
         response = None
 
         self.mgmt_client = self.get_mgmt_svc_client(DevTestLabsClient,
-                                                    base_url=self._cloud_environment.endpoints.resource_manager)
+                                                    base_url=self._cloud_environment.endpoints.resource_manager,
+                                                    api_version='2018-10-15')
 
         old_response = self.get_devtestlabartifactssource()
 
