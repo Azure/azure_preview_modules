@@ -103,13 +103,54 @@
     resource_group: "{{ resource_group }}"
     lab_name: "{{ lab_name }}"
     name: "{{ artifacts_name }}"
-    location: eastus
-    uri: https://github.com/zikalino/ansible-hatchery.git
+    uri: https://github.com/Azure/azure_preview_modules.git
     source_type: github
-    folder_path: /tests
+    folder_path: /tasks
     security_token: "{{ github_token }}"
   register: output 
 - name: Assert if the change was correctly reported
+  assert:
+    that:
+      - output.changed
+
+- name: Update instance of DevTest Labs artifacts source with same parameters
+  azure_rm_devtestlabartifactsource:
+    resource_group: "{{ resource_group }}"
+    lab_name: "{{ lab_name }}"
+    name: "{{ artifacts_name }}"
+    uri: https://github.com/Azure/azure_preview_modules.git
+    source_type: github
+    folder_path: /tasks
+    security_token: "{{ github_token }}"
+  register: output 
+- name: Assert that nothing was changed
+  assert:
+    that:
+      - output.changed == false
+
+- name: Update instance of DevTest Labs artifacts source, add display name, change folder
+  azure_rm_devtestlabartifactsource:
+    resource_group: "{{ resource_group }}"
+    lab_name: "{{ lab_name }}"
+    name: "{{ artifacts_name }}"
+    uri: https://github.com/Azure/azure_preview_modules.git
+    source_type: github
+    folder_path: /library
+    security_token: "{{ github_token }}"
+    display_name: My Artifacts Ssurce
+  register: output 
+- name: Assert that nothing was changed
+  assert:
+    that:
+      - output.changed
+
+- name: Delete instance of DevTest Labs artifacts source
+  azure_rm_devtestlabartifactsource:
+    resource_group: "{{ resource_group }}"
+    lab_name: "{{ lab_name }}"
+    name: "{{ artifacts_name }}"
+  register: output 
+- name: Assert that change was correctly registered
   assert:
     that:
       - output.changed
