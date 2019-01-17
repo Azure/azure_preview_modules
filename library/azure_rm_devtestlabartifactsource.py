@@ -205,9 +205,9 @@ class AzureRMDevTestLabArtifactsSource(AzureRMModuleBase):
             elif kwargs[key] is not None:
                 self.artifact_source[key] = kwargs[key]
 
-        if self.artifact_source['source_type'] == 'github':
+        if self.artifact_source.get('source_type') == 'github':
             self.artifact_source['source_type'] = 'GitHub'
-        elif self.artifact_source['source_type'] == 'vso':
+        elif self.artifact_source.get('source_type') == 'vso':
             self.artifact_source['source_type'] = 'VsoGit'
 
         if self.artifact_source.get('status') is not None:
