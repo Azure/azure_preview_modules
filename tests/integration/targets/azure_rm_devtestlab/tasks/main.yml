@@ -137,7 +137,7 @@
     source_type: github
     folder_path: /library
     security_token: "{{ github_token }}"
-    display_name: My Artifacts Ssurce
+    display_name: My Artifacts Source
   register: output 
 - name: Assert that nothing was changed
   assert:
