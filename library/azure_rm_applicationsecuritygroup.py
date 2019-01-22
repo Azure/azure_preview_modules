@@ -215,8 +215,8 @@ class AzureRMApplicationSecurityGroup(AzureRMModuleBase):
         '''
         self.log("Deleting the Application Security Group instance {0}".format(self.name))
         try:
-            response = self.mgmt_client.application_security_groups.delete(resource_group_name=self.resource_group,
-                                                                           application_security_group_name=self.name)
+            response = self.network_client.application_security_groups.delete(resource_group_name=self.resource_group,
+                                                                              application_security_group_name=self.name)
         except CloudError as e:
             self.log('Error deleting the Application Security Group instance.')
             self.fail("Error deleting the Application Security Group instance: {0}".format(str(e)))
@@ -232,8 +232,8 @@ class AzureRMApplicationSecurityGroup(AzureRMModuleBase):
         self.log("Checking if the Application Security Group instance {0} is present".format(self.name))
         found = False
         try:
-            response = self.mgmt_client.application_security_groups.get(resource_group_name=self.resource_group,
-                                                                        application_security_group_name=self.name)
+            response = self.network_client.application_security_groups.get(resource_group_name=self.resource_group,
+                                                                           application_security_group_name=self.name)
             self.log("Response : {0}".format(response))
             self.log("Application Security Group instance : {0} found".format(response.name))
             return response.as_dict()
