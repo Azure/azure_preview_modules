@@ -123,7 +123,6 @@
     resource_group: "{{ resource_group }}"
     name: "{{ storage_account }}"
     type: Standard_LRS
-    force_delete_nonempty: true
     state: absent
 
 - name: Delete Network Security Group that allows SSH
