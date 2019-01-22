@@ -153,7 +153,7 @@
     notes: Virtual machine notes, just something....
     os_type: linux
     size: Standard_A2_v2
-    user_name: zim
+    user_name: dtladmin
     password: ZSuppas$$21!
     lab_subnet_name: "{{ vn_name }}Subnet"
     lab_virtual_network_name: "{{ vn_name }}"
@@ -184,7 +184,7 @@
     notes: Virtual machine notes, just something....
     os_type: linux
     size: Standard_A2_v2
-    user_name: zim
+    user_name: dtladmin
     password: ZSuppas$$21!
     lab_subnet_name: "{{ vn_name }}Subnet"
     lab_virtual_network_name: "{{ vn_name }}"
@@ -215,7 +215,7 @@
     notes: Virtual machine notes, just something.... more text
     os_type: linux
     size: Standard_A2_v2
-    user_name: zim
+    user_name: dtladmin
     password: ZSuppas$$21!
     lab_subnet_name: "{{ vn_name }}Subnet"
     lab_virtual_network_name: "{{ vn_name }}"
