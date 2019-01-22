@@ -15,11 +15,11 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 
 DOCUMENTATION = '''
 ---
-module: azure_rm_devtestlabsvirtualmachine
+module: azure_rm_devtestlabvirtualmachine
 version_added: "2.8"
-short_description: Manage Azure Virtual Machine instance.
+short_description: Manage Azure DevTest Lab Virtual Machine instance.
 description:
-    - Create, update and delete instance of Azure Virtual Machine.
+    - Create, update and delete instance of Azure DevTest Lab Virtual Machine.
 
 options:
     resource_group:
@@ -34,30 +34,9 @@ options:
         description:
             - The name of the virtual machine.
         required: True
-    location:
-        description:
-            - The location of the resource.
     notes:
         description:
             - The notes of the virtual machine.
-    owner_object_id:
-        description:
-            - The object identifier of the owner of the virtual machine.
-    owner_user_principal_name:
-        description:
-            - The user principal name of the virtual machine owner.
-    created_by_user_id:
-        description:
-            - The object identifier of the creator of the virtual machine.
-    created_by_user:
-        description:
-            - The email address of creator of the virtual machine.
-    created_date:
-        description:
-            - The creation date of the virtual machine.
-    custom_image_id:
-        description:
-            - The custom image identifier of the virtual machine.
     os_type:
         description:
             - The OS type of the virtual machine.
@@ -73,16 +52,10 @@ options:
     ssh_key:
         description:
             - The SSH key of the virtual machine administrator.
-    is_authentication_with_ssh_key:
-        description:
-            - Indicates whether this virtual machine uses an SSH key for authentication.
-    fqdn:
-        description:
-            - The fully-qualified domain name of the virtual machine.
     lab_subnet_name:
         description:
             - The lab subnet name of the virtual machine.
-    lab_virtual_network_id:
+    lab_virtual_network_name:
         description:
             - The lab virtual network identifier of the virtual machine.
     disallow_public_ip_address:
@@ -93,9 +66,12 @@ options:
             - The artifacts to be installed on the virtual machine.
         type: list
         suboptions:
-            artifact_id:
+            source_name:
                 description:
-                    - "The artifact's identifier."
+                    - "The artifact's source name."
+            source_path:
+                description:
+                    - "The artifact's path in the source repository."
             parameters:
                 description:
                     - The parameters of the artifact.
@@ -107,7 +83,7 @@ options:
                     value:
                         description:
                             - The value of the artifact parameter.
-    gallery_image_reference:
+    image:
         description:
             - The Microsoft Azure Marketplace image reference of the virtual machine.
         suboptions:
@@ -126,56 +102,6 @@ options:
             version:
                 description:
                     - The version of the gallery image.
-    network_interface:
-        description:
-            - The network interface properties.
-        suboptions:
-            virtual_network_id:
-                description:
-                    - The resource ID of the virtual network.
-            subnet_id:
-                description:
-                    - The resource ID of the sub net.
-            public_ip_address_id:
-                description:
-                    - The resource ID of the public IP address.
-            public_ip_address:
-                description:
-                    - The public IP address.
-            private_ip_address:
-                description:
-                    - The private IP address.
-            dns_name:
-                description:
-                    - The DNS name.
-            rdp_authority:
-                description:
-                    - The RdpAuthority property is a server DNS host name or IP address followed by the service port number for RDP (Remote Desktop Protocol).
-            ssh_authority:
-                description:
-                    - The SshAuthority property is a server DNS host name or IP address followed by the service port number for SSH.
-            shared_public_ip_address_configuration:
-                description:
-                    - The configuration for sharing a public IP address across multiple virtual machines.
-                suboptions:
-                    inbound_nat_rules:
-                        description:
-                            - The incoming NAT rules
-                        type: list
-                        suboptions:
-                            transport_protocol:
-                                description:
-                                    - The transport protocol for the endpoint.
-                                choices:
-                                    - 'tcp'
-                                    - 'udp'
-                            frontend_port:
-                                description:
-                                    - "The external endpoint port of the inbound connection. Possible values range between 1 and 65535, inclusive. If
-                                       unspecified, a value will be allocated automatically."
-                            backend_port:
-                                description:
-                                    - The port to which the external traffic will be redirected.
     expiration_date:
         description:
             - The expiration date for VM.
@@ -185,9 +111,6 @@ options:
     storage_type:
         description:
             - Storage type to use for virtual machine (i.e. Standard, Premium).
-    environment_id:
-        description:
-            - The resource ID of the environment that contains this virtual machine, if any.
     state:
       description:
         - Assert the state of the Virtual Machine.
@@ -268,28 +191,7 @@ class AzureRMVirtualMachine(AzureRMModuleBase):
                 type='str',
                 required=True
             ),
-            location=dict(
-                type='str'
-            ),
             notes=dict(
-                type='str'
-            ),
-            owner_object_id=dict(
-                type='str'
-            ),
-            owner_user_principal_name=dict(
-                type='str'
-            ),
-            created_by_user_id=dict(
-                type='str'
-            ),
-            created_by_user=dict(
-                type='str'
-            ),
-            created_date=dict(
-                type='datetime'
-            ),
-            custom_image_id=dict(
                 type='str'
             ),
             os_type=dict(
@@ -306,18 +208,13 @@ class AzureRMVirtualMachine(AzureRMModuleBase):
                 no_log=True
             ),
             ssh_key=dict(
-                type='str'
-            ),
-            is_authentication_with_ssh_key=dict(
-                type='str'
-            ),
-            fqdn=dict(
-                type='str'
+                type='str',
+                no_log=True
             ),
             lab_subnet_name=dict(
                 type='str'
             ),
-            lab_virtual_network_id=dict(
+            lab_virtual_network_name=dict(
                 type='str'
             ),
             disallow_public_ip_address=dict(
@@ -342,7 +239,7 @@ class AzureRMVirtualMachine(AzureRMModuleBase):
                     )
                 )
             ),
-            gallery_image_reference=dict(
+            image=dict(
                 type='dict',
                 options=dict(
                     offer=dict(
@@ -362,66 +259,13 @@ class AzureRMVirtualMachine(AzureRMModuleBase):
                     )
                 )
             ),
-            network_interface=dict(
-                type='dict',
-                options=dict(
-                    virtual_network_id=dict(
-                        type='str'
-                    ),
-                    subnet_id=dict(
-                        type='str'
-                    ),
-                    public_ip_address_id=dict(
-                        type='str'
-                    ),
-                    public_ip_address=dict(
-                        type='str'
-                    ),
-                    private_ip_address=dict(
-                        type='str'
-                    ),
-                    dns_name=dict(
-                        type='str'
-                    ),
-                    rdp_authority=dict(
-                        type='str'
-                    ),
-                    ssh_authority=dict(
-                        type='str'
-                    ),
-                    shared_public_ip_address_configuration=dict(
-                        type='dict',
-                        options=dict(
-                            inbound_nat_rules=dict(
-                                type='list',
-                                options=dict(
-                                    transport_protocol=dict(
-                                        type='str',
-                                        choices=['tcp',
-                                                 'udp']
-                                    ),
-                                    frontend_port=dict(
-                                        type='int'
-                                    ),
-                                    backend_port=dict(
-                                        type='int'
-                                    )
-                                )
-                            )
-                        )
-                    )
-                )
-            ),
             expiration_date=dict(
-                type='datetime'
+                type='str'
             ),
             allow_claim=dict(
                 type='str'
             ),
             storage_type=dict(
-                type='str'
-            ),
-            environment_id=dict(
                 type='str'
             ),
             state=dict(
@@ -430,6 +274,11 @@ class AzureRMVirtualMachine(AzureRMModuleBase):
                 choices=['present', 'absent']
             )
         )
+
+        required_if = [
+            ('state', 'present', [
+             'image', 'lab_virtual_network_name', 'lab_subnet_name'])
+        ]
 
         self.resource_group = None
         self.lab_name = None
@@ -443,7 +292,8 @@ class AzureRMVirtualMachine(AzureRMModuleBase):
 
         super(AzureRMVirtualMachine, self).__init__(derived_arg_spec=self.module_arg_spec,
                                                      supports_check_mode=True,
-                                                     supports_tags=True)
+                                                     supports_tags=True,
+                                                     required_if=required_if)
 
     def exec_module(self, **kwargs):
         """Main module execution method"""
@@ -454,23 +304,25 @@ class AzureRMVirtualMachine(AzureRMModuleBase):
             elif kwargs[key] is not None:
                 self.lab_virtual_machine[key] = kwargs[key]
 
-        dict_resource_id(self.lab_virtual_machine, ['owner_object_id'], subscription_id=self.subscription_id, resource_group=self.resource_group)
-        dict_resource_id(self.lab_virtual_machine, ['created_by_user_id'], subscription_id=self.subscription_id, resource_group=self.resource_group)
-        dict_resource_id(self.lab_virtual_machine, ['custom_image_id'], subscription_id=self.subscription_id, resource_group=self.resource_group)
-        dict_resource_id(self.lab_virtual_machine, ['lab_virtual_network_id'], subscription_id=self.subscription_id, resource_group=self.resource_group)
-        dict_resource_id(self.lab_virtual_machine, ['artifacts', 'artifact_id'], subscription_id=self.subscription_id, resource_group=self.resource_group)
-        dict_resource_id(self.lab_virtual_machine, ['network_interface', 'virtual_network_id'], subscription_id=self.subscription_id, resource_group=self.resource_group)
-        dict_resource_id(self.lab_virtual_machine, ['network_interface', 'subnet_id'], subscription_id=self.subscription_id, resource_group=self.resource_group)
-        dict_resource_id(self.lab_virtual_machine, ['network_interface', 'public_ip_address_id'], subscription_id=self.subscription_id, resource_group=self.resource_group)
-        dict_camelize(self.lab_virtual_machine, ['network_interface', 'shared_public_ip_address_configuration', 'inbound_nat_rules', 'transport_protocol'], True)
-        dict_resource_id(self.lab_virtual_machine, ['environment_id'], subscription_id=self.subscription_id, resource_group=self.resource_group)
+        self.lab_virtual_machine['gallery_image_reference'] = self.lab_virtual_machine.pop('image', None)
 
+        if self.lab_virtual_machine.get('artifacts') is not None:
+            for artifact in self.lab_virtual_machine.get('artifacts'):
+                source_name = artifact.pop('source_name')
+                source_path = artifact.pop('source_path')
+                template = "/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.DevTestLab/labs/{2}/artifactsources/{3}{4}"
+                artifact['artifact_id'] = template.format(self.subscription_id, self.resource_group, self.lab_name, source_name, source_path)
+
+        template = "/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.DevTestLab/labs/{2}/virtualnetworks/{3}"
+        self.lab_virtual_machine['lab_virtual_network_id'] = template.format(self.subscription_id,
+                                                                             self.resource_group,
+                                                                             self.lab_name,
+                                                                             self.lab_virtual_machine.pop('lab_virtual_network_name'))
+            
         response = None
 
         self.mgmt_client = self.get_mgmt_svc_client(DevTestLabsClient,
                                                     base_url=self._cloud_environment.endpoints.resource_manager)
-
-        resource_group = self.get_resource_group(self.resource_group)
 
         old_response = self.get_virtualmachine()
 
@@ -480,13 +332,44 @@ class AzureRMVirtualMachine(AzureRMModuleBase):
                 self.log("Old instance didn't exist")
             else:
                 self.to_do = Actions.Create
+            # get location from the lab as it has to be the same and has to be specified (why??)
+            lab = self.get_devtestlab()
+            self.lab_virtual_machine['location'] = lab['location']
         else:
             self.log("Virtual Machine instance already exists")
             if self.state == 'absent':
                 self.to_do = Actions.Delete
             elif self.state == 'present':
-                if (not default_compare(self.lab_virtual_machine, old_response, '', self.results)):
-                    self.to_do = Actions.Update
+                self.lab_virtual_machine['location'] = old_response['location']
+
+                if old_response['size'].lower() != self.lab_virtual_machine.get('size').lower():
+                    self.lab_virtual_machine['size'] = old_response['size']
+                    self.module.warn("Property 'size' cannot be changed")
+
+                if old_response.get('gallery_image_reference', {}) != self.lab_virtual_machine.get('gallery_image_reference', {}):
+                    self.lab_virtual_machine['gallery_image_reference'] = old_response['gallery_image_reference']
+                    self.module.warn("Property 'image' cannot be changed")
+
+                # currently artifacts can be only specified when vm is created
+                # and in addition we don't have detailed information, just a number of "total artifacts"
+                if  len(self.lab_virtual_machine.get('artifacts',[])) != old_response['artifact_deployment_status']['total_artifacts']:
+                    self.module.warn("Property 'artifacts' cannot be changed")
+
+                if self.lab_virtual_machine.get('disallow_public_ip_address') is not None:
+                    if old_response['disallow_public_ip_address'] != self.lab_virtual_machine.get('disallow_public_ip_address'):
+                        self.module.warn("Property 'disallow_public_ip_address' cannot be changed")
+                self.lab_virtual_machine['disallow_public_ip_address'] = old_response['disallow_public_ip_address']
+
+                if self.lab_virtual_machine.get('allow_claim') is not None:
+                    if old_response['allow_claim'] != self.lab_virtual_machine.get('allow_claim'):
+                        self.module.warn("Property 'allow_claim' cannot be changed")
+                self.lab_virtual_machine['allow_claim'] = old_response['allow_claim']
+
+                if self.lab_virtual_machine.get('notes') is not None:
+                    if old_response['notes'] != self.lab_virtual_machine.get('notes'):
+                        self.to_do = Actions.Update
+                else:
+                    self.lab_virtual_machine['notes'] = old_response['notes']
 
         if (self.to_do == Actions.Create) or (self.to_do == Actions.Update):
             self.log("Need to Create / Update the Virtual Machine instance")
@@ -518,7 +401,7 @@ class AzureRMVirtualMachine(AzureRMModuleBase):
         if self.state == 'present':
             self.results.update({
                 'id': response.get('id', None)
-                })
+            })
         return self.results
 
     def create_update_virtualmachine(self):
@@ -581,84 +464,23 @@ class AzureRMVirtualMachine(AzureRMModuleBase):
 
         return False
 
+    def get_devtestlab(self):
+        '''
+        Gets the properties of the specified DevTest Lab.
 
-def default_compare(new, old, path, result):
-    if new is None:
-        return True
-    elif isinstance(new, dict):
-        if not isinstance(old, dict):
-            result['compare'] = 'changed [' + path + '] old dict is null'
-            return False
-        for k in new.keys():
-            if not default_compare(new.get(k), old.get(k, None), path + '/' + k, result):
-                return False
-        return True
-    elif isinstance(new, list):
-        if not isinstance(old, list) or len(new) != len(old):
-            result['compare'] = 'changed [' + path + '] length is different or null'
-            return False
-        if isinstance(old[0], dict):
-            key = None
-            if 'id' in old[0] and 'id' in new[0]:
-                key = 'id'
-            elif 'name' in old[0] and 'name' in new[0]:
-                key = 'name'
-            else:
-                key = list(old[0])[0]
-            new = sorted(new, key=lambda x: x.get(key, None))
-            old = sorted(old, key=lambda x: x.get(key, None))
-        else:
-            new = sorted(new)
-            old = sorted(old)
-        for i in range(len(new)):
-            if not default_compare(new[i], old[i], path + '/*', result):
-                return False
-        return True
-    else:
-        if path == '/location':
-            new = new.replace(' ', '').lower()
-            old = new.replace(' ', '').lower()
-        if new == old:
-            return True
-        else:
-            result['compare'] = 'changed [' + path + '] ' + str(new) + ' != ' + str(old)
-            return False
+        :return: deserialized DevTest Lab instance state dictionary
+        '''
+        self.log("Checking if the DevTest Lab instance {0} is present".format(self.lab_name))
+        try:
+            response = self.mgmt_client.labs.get(resource_group_name=self.resource_group,
+                                                 name=self.lab_name)
+            found = True
+            self.log("Response : {0}".format(response))
+            self.log("DevTest Lab instance : {0} found".format(response.name))
+        except CloudError as e:
+            self.fail('Did not find the DevTest Lab instance.')
+        return response.as_dict()
 
-
-def dict_camelize(d, path, camelize_first):
-    if isinstance(d, list):
-        for i in range(len(d)):
-            dict_camelize(d[i], path, camelize_first)
-    elif isinstance(d, dict):
-        if len(path) == 1:
-            old_value = d.get(path[0], None)
-            if old_value is not None:
-                d[path[0]] = _snake_to_camel(old_value, camelize_first)
-        else:
-            sd = d.get(path[0], None)
-            if sd is not None:
-                dict_camelize(sd, path[1:], camelize_first)
-
-
-def dict_resource_id(d, path, **kwargs):
-    if isinstance(d, list):
-        for i in range(len(d)):
-            dict_resource_id(d[i], path)
-    elif isinstance(d, dict):
-        if len(path) == 1:
-            old_value = d.get(path[0], None)
-            if old_value is not None:
-                if isinstance(old_value, dict):
-                    resource_id = format_resource_id(val=self.target['name'],
-                                                    subscription_id=self.target.get('subscription_id') or self.subscription_id,
-                                                    namespace=self.target['namespace'],
-                                                    types=self.target['types'],
-                                                    resource_group=self.target.get('resource_group') or self.resource_group)
-                    d[path[0]] = resource_id
-        else:
-            sd = d.get(path[0], None)
-            if sd is not None:
-                dict_resource_id(sd, path[1:])
 
 
 def main():
