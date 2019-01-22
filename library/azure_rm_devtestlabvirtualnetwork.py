@@ -175,7 +175,8 @@ class AzureRMDevTestLabVirtualNetwork(AzureRMModuleBase):
         self.virtual_network['subnet_overrides'] = [{
             'resource_id': subnet_id,
             'lab_subnet_name': self.name + "Subnet",
-            'use_in_vm_creation_permission': 'Allow'
+            'use_in_vm_creation_permission': 'Allow',
+            'use_public_ip_address_permission':  'Allow'
         }]
 
         old_response = self.get_virtualnetwork()
