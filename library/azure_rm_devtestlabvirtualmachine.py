@@ -131,28 +131,50 @@ author:
 
 EXAMPLES = '''
   - name: Create (or update) Virtual Machine
-    azure_rm_devtestlabsvirtualmachine:
-      resource_group: NOT FOUND
-      lab_name: NOT FOUND
-      name: NOT FOUND
-      applicable_schedule:
-        lab_vms_shutdown:
-          status: status
-          notification_settings:
-            status: status
-        lab_vms_startup:
-          status: status
-          notification_settings:
-            status: status
+    azure_rm_devtestlabvirtualmachine:
+      resource_group: myrg
+      lab_name: mylab
+      name: myvm
+      notes: Virtual machine notes....
+      os_type: linux
+      size: Standard_A2_v2
+      user_name: vmadmin
+      password: ZSuppas$$21!
+      lab_subnet_name: myvnSubnet
+      lab_virtual_network_name: myvn
+      disallow_public_ip_address: no
+      image:
+        offer: UbuntuServer
+        publisher: Canonical
+        sku: 16.04-LTS
+        os_type: Linux
+        version: latest
+      artifacts:
+        - source_name: myartifact
+          source_path: "/Artifacts/linux-install-mongodb"
+      allow_claim: no
+      expiration_date: "2019-02-22T01:49:12.117974Z"
 '''
 
 RETURN = '''
 id:
     description:
-        - The identifier of the resource.
+        - The identifier of the DTL Virtual Machine resource.
     returned: always
     type: str
-    sample: id
+    sample: /subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourcegroups/myrg/providers/microsoft.devtestlab/labs/mylab/virtualmachines/myvm
+compute_id:
+    description:
+        - The identifier of the underlying Compute Virtual Machine resource.
+    returned: always
+    type: str
+    sample: /subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourcegroups/myrg/providers/microsoft.devtestlab/labs/mylab/virtualmachines/myvm
+fqdn:
+    description:
+        - Fully qualified domain name or IP Address of the virtual machine.
+    returned: always
+    type: str
+    sample: myvm.eastus.cloudapp.azure.com
 '''
 
 import time

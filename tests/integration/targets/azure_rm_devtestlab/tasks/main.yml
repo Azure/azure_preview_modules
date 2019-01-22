@@ -60,7 +60,7 @@
     that:
       - output.changed
 
-- name: Create instance of DebTest Labs virtual network
+- name: Create instance of DevTest Labs virtual network
   azure_rm_devtestlabvirtualnetwork:
     resource_group: "{{ resource_group }}"
     lab_name: "{{ lab_name }}"
@@ -73,7 +73,7 @@
     that:
       - output.changed
 
-- name: Update instance of DebTest Labs virtual network with same parameters
+- name: Update instance of DevTest Labs virtual network with same parameters
   azure_rm_devtestlabvirtualnetwork:
     resource_group: "{{ resource_group }}"
     lab_name: "{{ lab_name }}"
@@ -86,7 +86,7 @@
     that:
       - output.changed == false
 
-- name: Update instance of DebTest Labs virtual network with changed description
+- name: Update instance of DevTest Labs virtual network with changed description
   azure_rm_devtestlabvirtualnetwork:
     resource_group: "{{ resource_group }}"
     lab_name: "{{ lab_name }}"
@@ -151,7 +151,7 @@
     lab_name: "{{ lab_name }}"
     name: "{{ vm_name }}"
     notes: Virtual machine notes, just something.... rrr
-    os_type: windows
+    os_type: linux
     size: Standard_A2_v2
     user_name: zim
     password: ZSuppas$$21!
@@ -182,7 +182,7 @@
     lab_name: "{{ lab_name }}"
     name: "{{ vm_name }}"
     notes: Virtual machine notes, just something....
-    os_type: windows
+    os_type: linux
     size: Standard_A2_v2
     user_name: zim
     password: ZSuppas$$21!
@@ -213,7 +213,7 @@
     lab_name: "{{ lab_name }}"
     name: "{{ vm_name }}"
     notes: Virtual machine notes, just something.... more text
-    os_type: windows
+    os_type: linux
     size: Standard_A2_v2
     user_name: zim
     password: ZSuppas$$21!
