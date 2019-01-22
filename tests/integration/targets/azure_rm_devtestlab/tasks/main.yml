@@ -145,32 +145,98 @@
     that:
       - output.changed
 
-- name: Create instance of DevTest Lab Virtual Machine
-  azure_rm_devtestlabsvirtualmachine:
+- name: Create instance of DTL Virtual Machine
+  azure_rm_devtestlabvirtualmachine:
     resource_group: "{{ resource_group }}"
     lab_name: "{{ lab_name }}"
     name: "{{ vm_name }}"
-    location: eastus
-    notes: Virtual machine notes, just something....
-    created_by_user: zikalino@microsoft.com
-    os_type: linux
+    notes: Virtual machine notes, just something.... rrr
+    os_type: windows
     size: Standard_A2_v2
     user_name: zim
     password: ZSuppas$$21!
-    lab_subnet_name: "vn{{ rpfx }}Subnet"
-    lab_virtual_network_id: "{{ output_vn.id }}"
-    disallow_public_ip_address: yes
-    gallery_image_reference:
+    lab_subnet_name: "{{ vn_name }}Subnet"
+    lab_virtual_network_name: "{{ vn_name }}"
+    disallow_public_ip_address: no
+    image:
       offer: UbuntuServer
       publisher: Canonical
       sku: 16.04-LTS
       os_type: Linux
       version: latest
     artifacts:
-      - artifact_id: "{{ artifacts_output.id }}/Artifacts/linux-install-mongodb"
+      - source_name: "{{ artifacts_name }}"
+        source_path: "/Artifacts/linux-install-mongodb"
     allow_claim: no
+    expiration_date: "2019-02-22T01:49:12.117974Z"
   register: vm_output
 
+- name: Assert that change was registered
+  assert:
+    that:
+      - output.changed
+
+- name: Update instance of DTL Virtual Machine with same parameters
+  azure_rm_devtestlabvirtualmachine:
+    resource_group: "{{ resource_group }}"
+    lab_name: "{{ lab_name }}"
+    name: "{{ vm_name }}"
+    notes: Virtual machine notes, just something....
+    os_type: windows
+    size: Standard_A2_v2
+    user_name: zim
+    password: ZSuppas$$21!
+    lab_subnet_name: "{{ vn_name }}Subnet"
+    lab_virtual_network_name: "{{ vn_name }}"
+    disallow_public_ip_address: no
+    image:
+      offer: UbuntuServer
+      publisher: Canonical
+      sku: 16.04-LTS
+      os_type: Linux
+      version: latest
+    artifacts:
+      - source_name: "{{ artifacts_name }}"
+        source_path: "/Artifacts/linux-install-mongodb"
+    allow_claim: no
+    expiration_date: "2019-02-22T01:49:12.117974Z"
+  register: output
+
+- name: Assert that nothing has changed
+  assert:
+    that:
+      - output.changed == false
+
+- name: Update instance of DTL Virtual Machine - change notes
+  azure_rm_devtestlabvirtualmachine:
+    resource_group: "{{ resource_group }}"
+    lab_name: "{{ lab_name }}"
+    name: "{{ vm_name }}"
+    notes: Virtual machine notes, just something.... more text
+    os_type: windows
+    size: Standard_A2_v2
+    user_name: zim
+    password: ZSuppas$$21!
+    lab_subnet_name: "{{ vn_name }}Subnet"
+    lab_virtual_network_name: "{{ vn_name }}"
+    disallow_public_ip_address: no
+    image:
+      offer: UbuntuServer
+      publisher: Canonical
+      sku: 16.04-LTS
+      os_type: Linux
+      version: latest
+    artifacts:
+      - source_name: "{{ artifacts_name }}"
+        source_path: "/Artifacts/linux-install-mongodb"
+    allow_claim: no
+    expiration_date: "2019-02-22T01:49:12.117974Z"
+  register: output
+
+- name: Assert that change was registered
+  assert:
+    that:
+      - output.changed
 
 - name: Delete instance of DevTest Labs artifacts source
   azure_rm_devtestlabartifactsource:

@@ -400,7 +400,9 @@ class AzureRMVirtualMachine(AzureRMModuleBase):
 
         if self.state == 'present':
             self.results.update({
-                'id': response.get('id', None)
+                'id': response.get('id', None),
+                'compute_id': response.get('compute_id', None),
+                'fqdn': response.get('fqdn', None)
             })
         return self.results
 
