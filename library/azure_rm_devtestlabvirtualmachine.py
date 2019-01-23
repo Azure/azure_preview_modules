@@ -392,7 +392,8 @@ class AzureRMVirtualMachine(AzureRMModuleBase):
                     self.lab_virtual_machine['size'] = old_response['size']
                     self.module.warn("Property 'size' cannot be changed")
 
-                if old_response['storage_type'].lower() != self.lab_virtual_machine.get('storage_type').lower():
+                if self.lab_virtual_machine.get('storage_type') is not None and \
+                   old_response['storage_type'].lower() != self.lab_virtual_machine.get('storage_type').lower():
                     self.lab_virtual_machine['storage_type'] = old_response['storage_type']
                     self.module.warn("Property 'storage_type' cannot be changed")
 
