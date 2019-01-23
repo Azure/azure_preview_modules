@@ -11,6 +11,7 @@
       tags:
           testing: testing
   check_mode: yes
+  register: output
 
 - name: Assert check mode creation
   assert:
