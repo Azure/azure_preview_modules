@@ -61,7 +61,7 @@ options:
         description:
             - An existing subnet within lab's virtual network
             - It can be the subnet's resource id.
-            - It can be a dict which contains C(virtual_network_name) and C(name).
+            - It can be a dict which contains C(virtual_network_name) and C(subnet_name).
     disallow_public_ip_address:
         description:
             - Indicates whether the virtual machine is to be created without a public IP address.
@@ -144,9 +144,8 @@ EXAMPLES = '''
       vm_size: Standard_A2_v2
       user_name: vmadmin
       password: ZSuppas$$21!
-      lab_subnet:
-        virtual_network_name: myvn
-        name: myvnSubnet
+      lab_subnet_name: myvnSubnet
+      lab_virtual_network_name: myvn
       disallow_public_ip_address: no
       image:
         offer: UbuntuServer
@@ -342,14 +341,23 @@ class AzureRMVirtualMachine(AzureRMModuleBase):
         self.lab_virtual_machine['size'] = self.lab_virtual_machine.pop('vm_size')
         self.lab_virtual_machine['os_type'] = _snake_to_camel(self.lab_virtual_machine['os_type'], True)
 
-        lab_subnet = self.parse_resource_to_dict(self.lab_virtual_machine['lab_subnet'])
+        lab_subnet = self.lab_virtual_machine.pop('lab_subnet')
 
-        template = "/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.DevTestLab/labs/{2}/virtualnetworks/{3}"
-        self.lab_virtual_machine['lab_virtual_network_id'] = template.format(lab_subnet['subscription_id'],
-                                                                             lab_subnet['resource_group'],
-                                                                             lab_subnet.get('lab_name', self.lab_name),
-                                                                             lab_subnet.get('virtual_network_name'))
-        self.lab_virtual_machine['subnet_name'] = lab_subnet.get('subnet_name')
+        if isinstance(lab_subnet, str):
+            vn_and_subnet = lab_subnet.split('/subnets/')
+
+            if (len(vn_and_subnet) == 2):
+                self.lab_virtual_machine['lab_virtual_network_id'] = vn_and_subnet[0]
+                self.lab_virtual_machine['subnet_name'] = vn_and_subnet[1]
+            else:
+                self.fail("Invalid 'lab_subnet' resource id format")
+        else:
+            template = "/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.DevTestLab/labs/{2}/virtualnetworks/{3}"
+            self.lab_virtual_machine['lab_virtual_network_id'] = template.format(self.subscription_id,
+                                                                                self.resource_group,
+                                                                                self.lab_name,
+                                                                                self.lab_virtual_machine['lab_subnet'].get('virtual_network_name'))
+            self.lab_virtual_machine['subnet_name'] = self.lab_virtual_machine['lab_subnet'].get('name')
 
         response = None
 
