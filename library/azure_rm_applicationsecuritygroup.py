@@ -191,9 +191,9 @@ class AzureRMApplicationSecurityGroup(AzureRMModuleBase):
         '''
         self.log("Creating / Updating the Application Security Group instance {0}".format(self.name))
 
-        param = ApplicationSecurityGroup(name=self.name,
-                                         tags=self.tags,
-                                         location=self.location)
+        param = dict(name=self.name,
+                     tags=self.tags,
+                     location=self.location)
         try:
             response = self.network_client.application_security_groups.create_or_update(resource_group_name=self.resource_group,
                                                                                         application_security_group_name=self.name,
