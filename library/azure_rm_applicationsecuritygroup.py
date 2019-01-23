@@ -76,7 +76,6 @@ try:
     from msrestazure.azure_exceptions import CloudError
     from msrest.polling import LROPoller
     from msrestazure.azure_operation import AzureOperationPoller
-    from azure.mgmt.web.models import ApplicationSecurityGroup
 except ImportError:
     # This is handled in azure_rm_common
     pass
