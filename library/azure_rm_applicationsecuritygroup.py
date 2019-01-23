@@ -180,7 +180,7 @@ class AzureRMApplicationSecurityGroup(AzureRMModuleBase):
 
     def check_update(self, existing_asg):
         if self.location and self.location.lower() != existing_asg['location'].lower():
-            self.module.warn("location cannot be updated. Existing {0}, input {1}".format(existing_asg.location, self.location))
+            self.module.warn("location cannot be updated. Existing {0}, input {1}".format(existing_asg['location'], self.location))
         return False
 
     def create_update_applicationsecuritygroup(self):
