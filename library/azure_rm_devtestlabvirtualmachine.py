@@ -339,10 +339,6 @@ class AzureRMVirtualMachine(AzureRMModuleBase):
                 template = "/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.DevTestLab/labs/{2}/artifactsources/{3}{4}"
                 artifact['artifact_id'] = template.format(self.subscription_id, self.resource_group, self.lab_name, source_name, source_path)
 
-        self.lab_virtual_machine['lab_virtual_network_id'] = template.format(self.subscription_id,
-                                                                             self.resource_group,
-                                                                             self.lab_name,
-                                                                             self.lab_virtual_machine.pop('lab_virtual_network_name'))
         self.lab_virtual_machine['size'] = self.lab_virtual_machine.pop('vm_size')
         self.lab_virtual_machine['os_type'] = _snake_to_camel(self.lab_virtual_machine['os_type'], True)
 
@@ -355,7 +351,6 @@ class AzureRMVirtualMachine(AzureRMModuleBase):
                                                                              lab_subnet.get('virtual_network_name'))
         self.lab_virtual_machine['subnet_name'] = lab_subnet.get('subnet_name')
 
-        self.results['xxx'] = lab_subnet
         response = None
 
         self.mgmt_client = self.get_mgmt_svc_client(DevTestLabsClient,
