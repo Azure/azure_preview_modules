@@ -141,7 +141,7 @@ class AzureRMApplicationSecurityGroup(AzureRMModuleBase):
         if not old_response:
             self.log("Application Security Group instance doesn't exist")
             if self.state == 'present':
-                self.to_do = Actions.Create
+                self.to_do = Actions.CreateOrUpdate
             else:
                 self.log("Old instance didn't exist")
         else:
