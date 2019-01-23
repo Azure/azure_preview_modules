@@ -61,7 +61,7 @@ options:
         description:
             - An existing subnet within lab's virtual network
             - It can be the subnet's resource id.
-            - It can be a dict which contains C(virtual_network_name) and C(subnet_name).
+            - It can be a dict which contains C(virtual_network_name) and C(name).
     disallow_public_ip_address:
         description:
             - Indicates whether the virtual machine is to be created without a public IP address.
@@ -144,8 +144,9 @@ EXAMPLES = '''
       vm_size: Standard_A2_v2
       user_name: vmadmin
       password: ZSuppas$$21!
-      lab_subnet_name: myvnSubnet
-      lab_virtual_network_name: myvn
+      lab_subnet:
+        name: myvnSubnet
+        virtual_network_name: myvn
       disallow_public_ip_address: no
       image:
         offer: UbuntuServer
@@ -347,7 +348,7 @@ class AzureRMVirtualMachine(AzureRMModuleBase):
             vn_and_subnet = lab_subnet.split('/subnets/')
             if (len(vn_and_subnet) == 2):
                 self.lab_virtual_machine['lab_virtual_network_id'] = vn_and_subnet[0]
-                self.lab_virtual_machine['subnet_name'] = vn_and_subnet[1]
+                self.lab_virtual_machine['lab_subnet_name'] = vn_and_subnet[1]
             else:
                 self.fail("Invalid 'lab_subnet' resource id format")
         else:
@@ -356,7 +357,7 @@ class AzureRMVirtualMachine(AzureRMModuleBase):
                                                                                 self.resource_group,
                                                                                 self.lab_name,
                                                                                 lab_subnet.get('virtual_network_name'))
-            self.lab_virtual_machine['subnet_name'] = lab_subnet.get('name')
+            self.lab_virtual_machine['lab_subnet_name'] = lab_subnet.get('name')
 
         response = None
 
