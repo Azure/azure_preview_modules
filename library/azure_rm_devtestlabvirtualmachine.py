@@ -345,7 +345,6 @@ class AzureRMVirtualMachine(AzureRMModuleBase):
 
         if isinstance(lab_subnet, str):
             vn_and_subnet = lab_subnet.split('/subnets/')
-
             if (len(vn_and_subnet) == 2):
                 self.lab_virtual_machine['lab_virtual_network_id'] = vn_and_subnet[0]
                 self.lab_virtual_machine['subnet_name'] = vn_and_subnet[1]
@@ -356,8 +355,8 @@ class AzureRMVirtualMachine(AzureRMModuleBase):
             self.lab_virtual_machine['lab_virtual_network_id'] = template.format(self.subscription_id,
                                                                                 self.resource_group,
                                                                                 self.lab_name,
-                                                                                self.lab_virtual_machine['lab_subnet'].get('virtual_network_name'))
-            self.lab_virtual_machine['subnet_name'] = self.lab_virtual_machine['lab_subnet'].get('name')
+                                                                                lab_subnet.get('virtual_network_name'))
+            self.lab_virtual_machine['subnet_name'] = lab_subnet.get('name')
 
         response = None
 
