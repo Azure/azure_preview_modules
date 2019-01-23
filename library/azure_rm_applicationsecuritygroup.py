@@ -67,7 +67,7 @@ id:
         - Resource id of the application security group.
     returned: always
     type: str
-    sample: /subscriptions/<subid>/resourceGroups/rg1/providers/Microsoft.Network/applicationSecurityGroups/MyAsg
+    sample: /subscriptions/<subid>/resourceGroups/<resourcegroup>/providers/Microsoft.Network/applicationSecurityGroups/MyAsg
 '''
 
 from ansible.module_utils.azure_rm_common import AzureRMModuleBase
@@ -169,7 +169,6 @@ class AzureRMApplicationSecurityGroup(AzureRMModuleBase):
         elif self.to_do == Actions.Delete:
             self.log("Delete Application Security Group instance")
             self.results['changed'] = True
-            self.results['id'] = old_response.get('id', None)
 
             if self.check_mode:
                 return self.results
