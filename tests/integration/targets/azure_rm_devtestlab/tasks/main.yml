@@ -152,11 +152,12 @@
     name: "{{ vm_name }}"
     notes: Virtual machine notes, just something....
     os_type: linux
-    size: Standard_A2_v2
+    vm_size: Standard_A2_v2
     user_name: dtladmin
-    password: ZSuppas$$21!
-    lab_subnet_name: "{{ vn_name }}Subnet"
-    lab_virtual_network_name: "{{ vn_name }}"
+    password: ZSasfovobocu$$21!
+    lab_subnet:
+      virtual_network_name: "{{ vn_name }}"
+      name: "{{ vn_name }}Subnet"
     disallow_public_ip_address: no
     image:
       offer: UbuntuServer
@@ -168,7 +169,7 @@
       - source_name: "{{ artifacts_name }}"
         source_path: "/Artifacts/linux-install-mongodb"
     allow_claim: no
-    expiration_date: "2019-02-22T01:49:12.117974Z"
+    expiration_date: "2029-02-22T01:49:12.117974Z"
   register: vm_output
 
 - name: Assert that change was registered
@@ -183,11 +184,12 @@
     name: "{{ vm_name }}"
     notes: Virtual machine notes, just something....
     os_type: linux
-    size: Standard_A2_v2
+    vm_size: Standard_A2_v2
     user_name: dtladmin
-    password: ZSuppas$$21!
-    lab_subnet_name: "{{ vn_name }}Subnet"
-    lab_virtual_network_name: "{{ vn_name }}"
+    password: ZSasfovobocu$$21!
+    lab_subnet:
+      virtual_network_name: "{{ vn_name }}"
+      name: "{{ vn_name }}Subnet"
     disallow_public_ip_address: no
     image:
       offer: UbuntuServer
@@ -199,7 +201,7 @@
       - source_name: "{{ artifacts_name }}"
         source_path: "/Artifacts/linux-install-mongodb"
     allow_claim: no
-    expiration_date: "2019-02-22T01:49:12.117974Z"
+    expiration_date: "2029-02-22T01:49:12.117974Z"
   register: output
 
 - name: Assert that nothing has changed
@@ -214,11 +216,12 @@
     name: "{{ vm_name }}"
     notes: Virtual machine notes, just something.... more text
     os_type: linux
-    size: Standard_A2_v2
+    vm_size: Standard_A2_v2
     user_name: dtladmin
-    password: ZSuppas$$21!
-    lab_subnet_name: "{{ vn_name }}Subnet"
-    lab_virtual_network_name: "{{ vn_name }}"
+    password: ZSasfovobocu$$21!
+    lab_subnet:
+      virtual_network_name: "{{ vn_name }}"
+      name: "{{ vn_name }}Subnet"
     disallow_public_ip_address: no
     image:
       offer: UbuntuServer
@@ -230,7 +233,7 @@
       - source_name: "{{ artifacts_name }}"
         source_path: "/Artifacts/linux-install-mongodb"
     allow_claim: no
-    expiration_date: "2019-02-22T01:49:12.117974Z"
+    expiration_date: "2029-02-22T01:49:12.117974Z"
   register: output
 
 - name: Assert that change was registered

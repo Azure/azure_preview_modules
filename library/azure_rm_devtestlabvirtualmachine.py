@@ -39,10 +39,15 @@ options:
             - The notes of the virtual machine.
     os_type:
         description:
-            - The OS type of the virtual machine.
-    size:
+            - Base type of operating system.
+        choices:
+            - windows
+            - linux
+        default: linux
+    vm_size:
         description:
-            - The size of the virtual machine.
+            - A valid Azure VM size value. For example, 'Standard_D4'. The list of choices varies depending on the
+              subscription and location. Check your subscription for available choices. Required when creating a VM.
     user_name:
         description:
             - The user name of the virtual machine.
@@ -52,12 +57,11 @@ options:
     ssh_key:
         description:
             - The SSH key of the virtual machine administrator.
-    lab_subnet_name:
+    lab_subnet:
         description:
-            - The lab subnet name of the virtual machine.
-    lab_virtual_network_name:
-        description:
-            - The lab virtual network identifier of the virtual machine.
+            - An existing subnet within lab's virtual network
+            - It can be the subnet's resource id.
+            - It can be a dict which contains C(virtual_network_name) and C(name).
     disallow_public_ip_address:
         description:
             - Indicates whether the virtual machine is to be created without a public IP address.
@@ -137,11 +141,12 @@ EXAMPLES = '''
       name: myvm
       notes: Virtual machine notes....
       os_type: linux
-      size: Standard_A2_v2
+      vm_size: Standard_A2_v2
       user_name: vmadmin
       password: ZSuppas$$21!
-      lab_subnet_name: myvnSubnet
-      lab_virtual_network_name: myvn
+      lab_subnet:
+        virtual_network_name: myvn
+        name: myvnSubnet
       disallow_public_ip_address: no
       image:
         offer: UbuntuServer
@@ -217,9 +222,11 @@ class AzureRMVirtualMachine(AzureRMModuleBase):
                 type='str'
             ),
             os_type=dict(
-                type='str'
+                type='str',
+                choices=['linux', 'windows'],
+                default='linux'
             ),
-            size=dict(
+            vm_size=dict(
                 type='str'
             ),
             user_name=dict(
@@ -233,11 +240,8 @@ class AzureRMVirtualMachine(AzureRMModuleBase):
                 type='str',
                 no_log=True
             ),
-            lab_subnet_name=dict(
-                type='str'
-            ),
-            lab_virtual_network_name=dict(
-                type='str'
+            lab_subnet=dict(
+                type='raw'
             ),
             disallow_public_ip_address=dict(
                 type='str'
@@ -299,7 +303,7 @@ class AzureRMVirtualMachine(AzureRMModuleBase):
 
         required_if = [
             ('state', 'present', [
-             'image', 'lab_virtual_network_name', 'lab_subnet_name'])
+             'image', 'lab_subnet', 'vm_size'])
         ]
 
         self.resource_group = None
@@ -335,12 +339,23 @@ class AzureRMVirtualMachine(AzureRMModuleBase):
                 template = "/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.DevTestLab/labs/{2}/artifactsources/{3}{4}"
                 artifact['artifact_id'] = template.format(self.subscription_id, self.resource_group, self.lab_name, source_name, source_path)
 
-        template = "/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.DevTestLab/labs/{2}/virtualnetworks/{3}"
         self.lab_virtual_machine['lab_virtual_network_id'] = template.format(self.subscription_id,
                                                                              self.resource_group,
                                                                              self.lab_name,
                                                                              self.lab_virtual_machine.pop('lab_virtual_network_name'))
-            
+        self.lab_virtual_machine['size'] = self.lab_virtual_machine.pop('vm_size')
+        self.lab_virtual_machine['os_type'] = _snake_to_camel(self.lab_virtual_machine['os_type'], True)
+
+        lab_subnet = self.parse_resource_to_dict(self.lab_virtual_machine['lab_subnet'])
+
+        template = "/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.DevTestLab/labs/{2}/virtualnetworks/{3}"
+        self.lab_virtual_machine['lab_virtual_network_id'] = template.format(lab_subnet['subscription_id'],
+                                                                             lab_subnet['resource_group'],
+                                                                             lab_subnet.get('lab_name', self.lab_name),
+                                                                             lab_subnet.get('virtual_network_name'))
+        self.lab_virtual_machine['subnet_name'] = lab_subnet.get('subnet_name')
+
+        self.results['xxx'] = lab_subnet
         response = None
 
         self.mgmt_client = self.get_mgmt_svc_client(DevTestLabsClient,
@@ -374,7 +389,7 @@ class AzureRMVirtualMachine(AzureRMModuleBase):
 
                 # currently artifacts can be only specified when vm is created
                 # and in addition we don't have detailed information, just a number of "total artifacts"
-                if  len(self.lab_virtual_machine.get('artifacts',[])) != old_response['artifact_deployment_status']['total_artifacts']:
+                if len(self.lab_virtual_machine.get('artifacts',[])) != old_response['artifact_deployment_status']['total_artifacts']:
                     self.module.warn("Property 'artifacts' cannot be changed")
 
                 if self.lab_virtual_machine.get('disallow_public_ip_address') is not None:
@@ -412,9 +427,6 @@ class AzureRMVirtualMachine(AzureRMModuleBase):
                 return self.results
 
             self.delete_virtualmachine()
-            # This currently doesnt' work as there is a bug in SDK / Service
-            if isinstance(response, LROPoller) or isinstance(response, AzureOperationPoller):
-                response = self.get_poller_result(response)
         else:
             self.log("Virtual Machine instance unchanged")
             self.results['changed'] = False
@@ -464,6 +476,9 @@ class AzureRMVirtualMachine(AzureRMModuleBase):
             self.log('Error attempting to delete the Virtual Machine instance.')
             self.fail("Error deleting the Virtual Machine instance: {0}".format(str(e)))
 
+        if isinstance(response, LROPoller) or isinstance(response, AzureOperationPoller):
+            response = self.get_poller_result(response)
+
         return True
 
     def get_virtualmachine(self):
@@ -498,13 +513,12 @@ class AzureRMVirtualMachine(AzureRMModuleBase):
         try:
             response = self.mgmt_client.labs.get(resource_group_name=self.resource_group,
                                                  name=self.lab_name)
-            found = True
             self.log("Response : {0}".format(response))
             self.log("DevTest Lab instance : {0} found".format(response.name))
+            return response.as_dict()
         except CloudError as e:
             self.fail('Did not find the DevTest Lab instance.')
-        return response.as_dict()
-
+            return False
 
 
 def main():
