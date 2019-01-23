@@ -43,11 +43,11 @@ options:
         choices:
             - windows
             - linux
-        default: linux
     vm_size:
         description:
             - A valid Azure VM size value. For example, 'Standard_D4'. The list of choices varies depending on the
               subscription and location. Check your subscription for available choices. Required when creating a VM.
+            - Available values can be found here: U(https://docs.microsoft.com/en-us/azure/virtual-machines/windows/sizes-general)
     user_name:
         description:
             - The user name of the virtual machine.
@@ -111,10 +111,13 @@ options:
             - The expiration date for VM.
     allow_claim:
         description:
-            - Indicates whether another user can take ownership of the virtual machine
+            - Indicates whether another user can take ownership of the virtual machine.
     storage_type:
         description:
-            - Storage type to use for virtual machine (i.e. Standard, Premium).
+            - Storage type to use for virtual machine.
+        choices:
+            - standard
+            - premium
     state:
       description:
         - Assert the state of the Virtual Machine.
@@ -223,8 +226,7 @@ class AzureRMVirtualMachine(AzureRMModuleBase):
             ),
             os_type=dict(
                 type='str',
-                choices=['linux', 'windows'],
-                default='linux'
+                choices=['linux', 'windows']
             ),
             vm_size=dict(
                 type='str'
@@ -292,7 +294,8 @@ class AzureRMVirtualMachine(AzureRMModuleBase):
                 type='str'
             ),
             storage_type=dict(
-                type='str'
+                type='str',
+                choices=['standard', 'premium']
             ),
             state=dict(
                 type='str',
@@ -303,7 +306,7 @@ class AzureRMVirtualMachine(AzureRMModuleBase):
 
         required_if = [
             ('state', 'present', [
-             'image', 'lab_subnet', 'vm_size'])
+             'image', 'lab_subnet', 'vm_size', 'os_type'])
         ]
 
         self.resource_group = None
@@ -341,6 +344,7 @@ class AzureRMVirtualMachine(AzureRMModuleBase):
 
         self.lab_virtual_machine['size'] = self.lab_virtual_machine.pop('vm_size')
         self.lab_virtual_machine['os_type'] = _snake_to_camel(self.lab_virtual_machine['os_type'], True)
+        self.lab_virtual_machine['storage_type'] = _snake_to_camel(self.lab_virtual_machine['storage_type'], True)
 
         lab_subnet = self.lab_virtual_machine.pop('lab_subnet')
 
@@ -386,6 +390,10 @@ class AzureRMVirtualMachine(AzureRMModuleBase):
                     self.lab_virtual_machine['size'] = old_response['size']
                     self.module.warn("Property 'size' cannot be changed")
 
+                if old_response['storage_type'].lower() != self.lab_virtual_machine.get('storage_type').lower():
+                    self.lab_virtual_machine['storage_type'] = old_response['storage_type']
+                    self.module.warn("Property 'storage_type' cannot be changed")
+
                 if old_response.get('gallery_image_reference', {}) != self.lab_virtual_machine.get('gallery_image_reference', {}):
                     self.lab_virtual_machine['gallery_image_reference'] = old_response['gallery_image_reference']
                     self.module.warn("Property 'image' cannot be changed")
@@ -414,13 +422,12 @@ class AzureRMVirtualMachine(AzureRMModuleBase):
         if (self.to_do == Actions.Create) or (self.to_do == Actions.Update):
             self.log("Need to Create / Update the Virtual Machine instance")
 
+            self.results['changed'] = True
             if self.check_mode:
-                self.results['changed'] = True
                 return self.results
 
             response = self.create_update_virtualmachine()
 
-            self.results['changed'] = True
             self.log("Creation / Update done")
         elif self.to_do == Actions.Delete:
             self.log("Virtual Machine instance deleted")
