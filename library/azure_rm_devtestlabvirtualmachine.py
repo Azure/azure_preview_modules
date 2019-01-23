@@ -345,7 +345,7 @@ class AzureRMVirtualMachine(AzureRMModuleBase):
         self.lab_virtual_machine['size'] = self.lab_virtual_machine.pop('vm_size')
         self.lab_virtual_machine['os_type'] = _snake_to_camel(self.lab_virtual_machine['os_type'], True)
         
-        if lab_virtual_machine.get('storage_type'):
+        if self.lab_virtual_machine.get('storage_type'):
             self.lab_virtual_machine['storage_type'] = _snake_to_camel(self.lab_virtual_machine['storage_type'], True)
 
         lab_subnet = self.lab_virtual_machine.pop('lab_subnet')
