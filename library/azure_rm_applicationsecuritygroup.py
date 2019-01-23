@@ -117,7 +117,7 @@ class AzureRMApplicationSecurityGroup(AzureRMModuleBase):
 
         self.results = dict(changed=False)
 
-        self._action = Actions.NoAction
+        self.to_do = Actions.NoAction
 
         super(AzureRMApplicationSecurityGroup, self).__init__(derived_arg_spec=self.module_arg_spec,
                                                               supports_check_mode=True,
