@@ -129,6 +129,7 @@ before_install:
             for changedfile in ${diffstr[*]}; do
               arrChanged=(${changedfile//// });
               changedFileName=${arrChanged[-1]};
+              changedFileNameWithPath=${arrChanged[-2]};
               echo changedfile is $changedfile;
 
               fileNameNoExtension=${changedFileName%%.py};
@@ -136,8 +137,10 @@ before_install:
                 echo test tests/integration/targets/${fileNameNoExtension}/tasks/main.yml;
                 testList=("tests/integration/targets/${fileNameNoExtension}/tasks/main.yml" "${testList[@]}");
               elif [ "$changedFileName" == "main.yml" ]; then
-                echo test $changedfile;
-                testList=("${changedfile}" "${testList[@]}");
+                if [ "$changedFileNameWithPath" == "tasks" ]; then
+                  echo test $changedfile;
+                  testList=("${changedfile}" "${testList[@]}");
+                fi;
               else
                 for alias in "${list[@]}"; do
                   if grep -Fxq "$changedFileName" "${alias}/aliases"; then
