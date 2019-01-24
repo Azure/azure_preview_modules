@@ -1,6 +1,9 @@
 - name: Prepare random number
   set_fact:
     rpfx: "{{ resource_group | hash('md5') | truncate(7, True, '') }}{{ 1000 | random }}"
+    applicationsecuritygroup_name1: "asg{{ resource_group | hash('md5') | truncate(5, True, '') }}{{ 1000 | random }}"
+    applicationsecuritygroup_name2: "asg{{ resource_group | hash('md5') | truncate(5, True, '') }}{{ 1000 | random }}"
+    nic_name1: "nic1{{ resource_group | hash('md5') | truncate(5, True, '') }}{{ 1000 | random }}"
   run_once: yes
 
 - name: Create virtual network
@@ -318,6 +321,89 @@
       - "output.state.ip_configurations | length == 1"
       - output.state.ip_configurations[0].public_ip_address.name == "tn{{ rpfx }}"
       - output.state.enable_accelerated_networking
+
+- name: Create Application security group
+  azure_rm_applicationsecuritygroup:
+    resource_group: "{{ resource_group }}"
+    name: "{{ applicationsecuritygroup_name1 }}"
+
+- name: Create Application security group in secondary resource group
+  azure_rm_applicationsecuritygroup:
+    resource_group: "{{ resource_group_secondary }}"
+    name: "{{ applicationsecuritygroup_name2 }}"
+  register: asg
+
+- name: Create Nic with application security groups
+  azure_rm_networkinterface:
+    resource_group: "{{ resource_group }}"
+    name: "{{ nic_name1 }}"
+    virtual_network: "tn{{ rpfx }}"
+    subnet: "tn{{ rpfx }}"
+    create_with_security_group: True
+    ip_configurations:
+      - name: ipconfig1
+        public_ip_address_name: "pip{{ rpfx }}"
+        application_security_groups:
+          - "{{ applicationsecuritygroup_name1 }}"
+          - "{{ asg.id }}"
+        primary: True
+  register: output
+
+- name: assert creation succeeded
+  assert:
+    that:
+      - output.changed
+
+- name: Create Nic with application security groups (idempotent)
+  azure_rm_networkinterface:
+    resource_group: "{{ resource_group }}"
+    name: "{{ nic_name1 }}"
+    virtual_network: "tn{{ rpfx }}"
+    subnet: "tn{{ rpfx }}"
+    create_with_security_group: True
+    ip_configurations:
+      - name: ipconfig1
+        public_ip_address_name: "pip{{ rpfx }}"
+        application_security_groups:
+          - "{{ applicationsecuritygroup_name1 }}"
+          - "{{ asg.id }}"
+        primary: True
+  register: output
+
+- name: assert idempotent
+  assert:
+    that:
+      - not output.changed
+
+- name: Update Nic with application security groups
+  azure_rm_networkinterface:
+    resource_group: "{{ resource_group }}"
+    name: "{{ nic_name1 }}"
+    virtual_network: "tn{{ rpfx }}"
+    subnet: "tn{{ rpfx }}"
+    create_with_security_group: True
+    ip_configurations:
+      - name: ipconfig1
+        public_ip_address_name: "pip{{ rpfx }}"
+        application_security_groups:
+          - "{{ applicationsecuritygroup_name1 }}"
+        primary: True
+  register: output
+
+- name: assert update succeeded
+  assert:
+    that:
+      - output.changed
+
+- name: Get fact of the new created NIC
+  azure_rm_networkinterface_facts:
+    resource_group: "{{ resource_group }}"
+    name: "{{ nic_name1 }}"
+  register: facts
+
+- assert:
+    that:
+      - "facts.networkinterfaces[0].ip_configurations[0].application_security_groups | length == 1"
 
 - name: Delete the NIC (check mode)
   azure_rm_networkinterface:
