@@ -337,7 +337,7 @@
   azure_rm_networkinterface:
     resource_group: "{{ resource_group }}"
     name: "{{ nic_name1 }}"
-    virtual_network: "tn{{ rpfx }}"
+    virtual_network: "{{ vn.state.id }}"
     subnet: "tn{{ rpfx }}"
     create_with_security_group: True
     ip_configurations:
@@ -358,7 +358,7 @@
   azure_rm_networkinterface:
     resource_group: "{{ resource_group }}"
     name: "{{ nic_name1 }}"
-    virtual_network: "tn{{ rpfx }}"
+    virtual_network: "{{ vn.state.id }}"
     subnet: "tn{{ rpfx }}"
     create_with_security_group: True
     ip_configurations:
@@ -379,7 +379,7 @@
   azure_rm_networkinterface:
     resource_group: "{{ resource_group }}"
     name: "{{ nic_name1 }}"
-    virtual_network: "tn{{ rpfx }}"
+    virtual_network: "{{ vn.state.id }}"
     subnet: "tn{{ rpfx }}"
     create_with_security_group: True
     ip_configurations:
