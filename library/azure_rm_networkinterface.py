@@ -400,7 +400,8 @@ def nic_to_dict(nic):
                 name=azure_id_to_dict(config.public_ip_address.id).get('publicIPAddresses'),
                 public_ip_allocation_method=config.public_ip_address.public_ip_allocation_method
             ) if config.public_ip_address else None,
-            application_security_groups=config.application_security_groups if config.application_security_groups else None
+            application_security_groups=([asg.id for asg in config.application_security_groups]
+                                         if config.application_security_groups else None)
         ) for config in nic.ip_configurations
     ]
     return dict(
@@ -527,19 +528,21 @@ class AzureRMNetworkInterface(AzureRMModuleBase):
         # if application security groups set, convert to resource id format
         if self.ip_configurations:
             for config in self.ip_configurations:
-                asgs = []
-                for asg in config.application_security_groups:
-                    if isinstance(asg, str) and not is_valid_resource_id(asg):
-                        asg['resource_group'] = self.resource_group
-                    if isinstance(asg, dict):
-                        asg_resource_id = format_resource_id(val=asg['name'],
-                                                             subscription_id=self.subscription_id,
-                                                             namespace='Microsoft/Network',
-                                                             types='applicationSecurityGroups',
-                                                             resource_group=asg['resource_group'])
-                    asgs.append(asg_resource_id)
-                if asgs:
-                    config.application_security_groups = asgs
+                if config.get('application_security_groups'):
+                    asgs = []
+                    for asg in config['application_security_groups']:
+                        asg_resource_id = asg
+                        if isinstance(asg, str) and (not is_valid_resource_id(asg)):
+                            asg = self.parse_resource_to_dict(asg)
+                        if isinstance(asg, dict):
+                            asg_resource_id = format_resource_id(val=asg['name'],
+                                                                 subscription_id=self.subscription_id,
+                                                                 namespace='Microsoft.Network',
+                                                                 types='applicationSecurityGroups',
+                                                                 resource_group=asg['resource_group'])
+                        asgs.append(asg_resource_id)
+                    if asgs:
+                        config['application_security_groups'] = asgs
 
         if self.state == 'present' and not self.ip_configurations:
             # construct the ip_configurations array for compatible
@@ -661,7 +664,9 @@ class AzureRMNetworkInterface(AzureRMModuleBase):
                                                               for bap_id in ip_config.get('load_balancer_backend_address_pools')]
                                                              if ip_config.get('load_balancer_backend_address_pools') else None),
                         primary=ip_config.get('primary'),
-                        application_security_groups=ip_config.get('application_security_groups')
+                        application_security_groups=([self.network_models.ApplicationSecurityGroup(id=asg_id)
+                                                      for asg_id in ip_config.get('application_security_groups')]
+                                                     if ip_config.get('application_security_groups') else None)
                     ) for ip_config in self.ip_configurations
                 ]
 
@@ -766,8 +771,8 @@ class AzureRMNetworkInterface(AzureRMModuleBase):
             load_balancer_backend_address_pools=(set([to_native(self.backend_addr_pool_id(id))
                                                       for id in item.get('load_balancer_backend_address_pools')])
                                                  if item.get('load_balancer_backend_address_pools') else None),
-            application_security_groups=(set([to_natvie(asg_id) for asg_id in item.get('application_security_groups')])
-                                         if item.get('application_security_groups') else None)
+            application_security_groups=(set([to_native(asg_id) for asg_id in item.get('application_security_groups')])
+                                         if item.get('application_security_groups') else None),
             name=to_native(item.get('name'))
         )) for item in raw]
         return set(configurations)
