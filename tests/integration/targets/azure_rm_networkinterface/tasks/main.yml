@@ -340,9 +340,9 @@
     virtual_network: "{{ vn.state.id }}"
     subnet: "tn{{ rpfx }}"
     create_with_security_group: True
+    public_ip: False
     ip_configurations:
       - name: ipconfig1
-        public_ip_address_name: "pip{{ rpfx }}"
         application_security_groups:
           - "{{ applicationsecuritygroup_name1 }}"
           - "{{ asg.id }}"
@@ -361,9 +361,9 @@
     virtual_network: "{{ vn.state.id }}"
     subnet: "tn{{ rpfx }}"
     create_with_security_group: True
+    public_ip: False
     ip_configurations:
       - name: ipconfig1
-        public_ip_address_name: "pip{{ rpfx }}"
         application_security_groups:
           - "{{ applicationsecuritygroup_name1 }}"
           - "{{ asg.id }}"
@@ -382,9 +382,9 @@
     virtual_network: "{{ vn.state.id }}"
     subnet: "tn{{ rpfx }}"
     create_with_security_group: True
+    public_ip: False
     ip_configurations:
       - name: ipconfig1
-        public_ip_address_name: "pip{{ rpfx }}"
         application_security_groups:
           - "{{ applicationsecuritygroup_name1 }}"
         primary: True
