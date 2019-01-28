@@ -501,6 +501,12 @@
     resource_group: '{{ resource_group }}'
     state: absent
 
+- name: Delete the NIC
+  azure_rm_networkinterface:
+      resource_group: "{{ resource_group }}"
+      name: "{{ nic_name1 }}"
+      state: absent
+
 - name: Delete the application security group (check mode)
   azure_rm_applicationsecuritygroup:
       resource_group: "{{ resource_group }}"
