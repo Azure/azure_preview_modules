@@ -322,10 +322,59 @@
       - output.state.ip_configurations[0].public_ip_address.name == "tn{{ rpfx }}"
       - output.state.enable_accelerated_networking
 
+- name: Create application security group(check mode)
+  azure_rm_applicationsecuritygroup:
+      resource_group: "{{ resource_group }}"
+      name: "{{ applicationsecuritygroup_name1 }}"
+      tags:
+          testing: testing
+  check_mode: yes
+  register: output
+
+- name: Assert check mode creation
+  assert:
+    that:
+      - output.changed
+
 - name: Create Application security group
   azure_rm_applicationsecuritygroup:
     resource_group: "{{ resource_group }}"
     name: "{{ applicationsecuritygroup_name1 }}"
+    tags:
+        testing: testing
+
+- name: Assert application security group creation
+  assert:
+    that:
+      - output.changed
+      - output.id != ''
+
+- name: Create application security group (idempotent)
+  azure_rm_applicationsecuritygroup:
+      resource_group: "{{ resource_group }}"
+      name: "{{ applicationsecuritygroup_name1 }}"
+      tags:
+          testing: testing
+  register: output
+
+- name: Assert idempotent
+  assert:
+    that:
+      - not output.changed
+
+- name: Update application security group
+  azure_rm_applicationsecuritygroup:
+      resource_group: "{{ resource_group }}"
+      name: "{{ applicationsecuritygroup_name1 }}"
+      tags:
+          testing: testing
+          foo: bar
+  register: output
+
+- name: Assert update
+  assert:
+    that:
+      - output.changed
 
 - name: Create Application security group in secondary resource group
   azure_rm_applicationsecuritygroup:
@@ -365,8 +414,8 @@
     ip_configurations:
       - name: ipconfig1
         application_security_groups:
-          - "{{ applicationsecuritygroup_name1 }}"
           - "{{ asg.id }}"
+          - "{{ applicationsecuritygroup_name1 }}"
         primary: True
   register: output
 
@@ -450,3 +499,35 @@
     name: "pip{{ rpfx }}"
     resource_group: '{{ resource_group }}'
     state: absent
+
+- name: Delete the application security group (check mode)
+  azure_rm_applicationsecuritygroup:
+      resource_group: "{{ resource_group }}"
+      name: "{{ applicationsecuritygroup_name1 }}"
+      state: absent
+  check_mode: yes
+  register: output
+
+- name: Assert delete check mode
+  assert:
+      that:
+        - output.changed
+
+- name: Delete the application security group
+  azure_rm_applicationsecuritygroup:
+      resource_group: "{{ resource_group }}"
+      name: "{{ applicationsecuritygroup_name1 }}"
+      state: absent
+  register: output
+
+- name: Assert the deletion
+  assert:
+      that:
+        - output.changed
+
+- name: Delete second application security group
+  azure_rm_applicationsecuritygroup:
+      resource_group: "{{ resource_group_secondary }}"
+      name: "{{ applicationsecuritygroup_name2 }}"
+      state: absent
+  register: output

@@ -160,13 +160,8 @@ options:
                 default: 'no'
             application_security_groups:
                 description:
-                    - List of application secuirty groups in which the IP configuration is included.
-                    - Element of the list could be a resource id of application security group, or dict of resource_group and name.
-                    suboptions:
-                        - resource_group:
-                            description: Resource group name of the application security group.
-                        - name:
-                            description: Name of the application security group.
+                    - List of application security groups in which the IP configuration is included.
+                    - Element of the list could be a resource id of application security group, or dict of C(resource_group) and C(name).
                 version_added: 2.8
         version_added: 2.5
     enable_accelerated_networking:
