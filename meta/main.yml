@@ -1,10 +1,10 @@
---- 
+---
 dependencies: []
-galaxy_info: 
+galaxy_info:
   author: ZhijunZhao
   company: Microsoft
   description: "latest Azure modules for provisioning Azure resources"
-  galaxy_tags: ["Azure", "cloud", "system", "development", "networking", "docker", "container", "kubernetes"]
+  galaxy_tags: ["azure", "cloud", "system", "development", "networking", "docker", "container", "kubernetes"]
   license: MIT
   min_ansible_version: "2.5.0"
   platforms:
@@ -17,7 +17,7 @@ galaxy_info:
         - Sierra
 
     - name: MacOSX
-      versions: 
+      versions:
         - 10.7
         - 10.8
         - 10.9
@@ -26,6 +26,5 @@ galaxy_info:
         - 10.12
 
     - name: Windows
-      versions: 
+      versions:
         - 2012R2
-
