@@ -342,6 +342,7 @@
     name: "{{ applicationsecuritygroup_name1 }}"
     tags:
         testing: testing
+  register: output
 
 - name: Assert application security group creation
   assert:
