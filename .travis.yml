@@ -133,11 +133,16 @@ before_install:
               echo changedfile is $changedfile;
 
               fileNameNoExtension=${changedFileName%%.py};
+
+              if [[ ! -f $changedfile ]]; then
+                continue;
+              fi;
+
               if [[ -d "tests/integration/targets/${fileNameNoExtension}" ]]; then
                 echo test tests/integration/targets/${fileNameNoExtension}/tasks/main.yml;
                 testList=("tests/integration/targets/${fileNameNoExtension}/tasks/main.yml" "${testList[@]}");
               elif [ "$changedFileName" == "main.yml" ]; then
-                if [ "$changedFileNameWithPath" == "tasks" ]; then
+                if [[ "$changedFileNameWithPath" == "tasks" ]]; then
                   echo test $changedfile;
                   testList=("${changedfile}" "${testList[@]}");
                 fi;
