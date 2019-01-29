@@ -57,7 +57,7 @@ AZURE_API_PROFILES = {
         'ComputeManagementClient': dict(
             default_api_version='2018-10-01',
             resource_skus='2018-10-01',
-            disks='2018-10-01',
+            disks='2018-06-01',
             snapshots='2018-10-01',
             virtual_machine_run_commands='2018-10-01'
         ),
@@ -200,11 +200,11 @@ def normalize_location_name(name):
 AZURE_PKG_VERSIONS = {
     'StorageManagementClient': {
         'package_name': 'storage',
-        'expected_version': '3.1.0'
+        'expected_version': '1.5.0'
     },
     'ComputeManagementClient': {
         'package_name': 'compute',
-        'expected_version': '4.3.1'
+        'expected_version': '4.4.0'
     },
     'ContainerInstanceManagementClient': {
         'package_name': 'containerinstance',
@@ -785,12 +785,12 @@ class AzureRMModuleBase(object):
         if not self._storage_client:
             self._storage_client = self.get_mgmt_svc_client(StorageManagementClient,
                                                             base_url=self._cloud_environment.endpoints.resource_manager,
-                                                            api_version='2018-07-01')
+                                                            api_version='2017-10-01')
         return self._storage_client
 
     @property
     def storage_models(self):
-        return StorageManagementClient.models("2018-07-01")
+        return StorageManagementClient.models("2017-10-01")
 
     @property
     def network_client(self):
@@ -826,13 +826,13 @@ class AzureRMModuleBase(object):
         if not self._compute_client:
             self._compute_client = self.get_mgmt_svc_client(ComputeManagementClient,
                                                             base_url=self._cloud_environment.endpoints.resource_manager,
-                                                            api_version='2017-03-30')
+                                                            api_version='2018-06-01')
         return self._compute_client
 
     @property
     def compute_models(self):
         self.log("Getting compute models")
-        return ComputeManagementClient.models("2017-03-30")
+        return ComputeManagementClient.models("2018-06-01")
 
     @property
     def dns_client(self):

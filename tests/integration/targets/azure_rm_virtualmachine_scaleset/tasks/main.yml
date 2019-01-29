@@ -290,6 +290,46 @@
   assert:
     that: not results.changed
 
+- name: Query extension
+  azure_rm_virtualmachinescalesetextension_facts:
+    resource_group: "{{ resource_group }}"
+    vmss_name: testVMSS{{ rpfx }}
+    name: testExtension
+  register: results
+- name: Assert that facts are returned
+  assert:
+    that:
+      - results.changed == False
+      - results.extensions[0]['id'] != None
+      - results.extensions[0]['resource_group'] != None
+      - results.extensions[0]['vmss_name'] != None
+      - results.extensions[0]['name'] != None
+      - results.extensions[0]['publisher'] != None
+      - results.extensions[0]['type'] != None
+      - results.extensions[0]['settings'] != None
+      - results.extensions[0]['auto_upgrade_minor_version'] != None
+      - results.extensions[0]['provisioning_state'] != None
+
+- name: List extensions
+  azure_rm_virtualmachinescalesetextension_facts:
+    resource_group: "{{ resource_group }}"
+    vmss_name: testVMSS{{ rpfx }}
+  register: results
+- name: Assert that facts are returned
+  assert:
+    that:
+      - results.changed == False
+      - results.extensions[0]['id'] != None
+      - results.extensions[0]['resource_group'] != None
+      - results.extensions[0]['vmss_name'] != None
+      - results.extensions[0]['name'] != None
+      - results.extensions[0]['publisher'] != None
+      - results.extensions[0]['type'] != None
+      - results.extensions[0]['settings'] != None
+      - results.extensions[0]['auto_upgrade_minor_version'] != None
+      - results.extensions[0]['provisioning_state'] != None
+
+
 - name: Delete VMSS Extension
   azure_rm_virtualmachinescalesetextension:
     resource_group: "{{ resource_group }}"
@@ -302,56 +342,11 @@
   assert:
     that: results.changed
 
-- name: Upgrade instance to the latest image
-  azure_rm_virtualmachinescalesetinstance:
-    resource_group: "{{ resource_group }}"
-    vmss_name: testVMSS{{ rpfx }}
-    instance_id: "{{ instances.instances[0].instance_id }}"
-    latest_model: yes
-  register: results
-
-- name: Assert that something has changed
-  assert:
-    that: results.changed
-
-- name: Stop virtual machine
-  azure_rm_virtualmachinescalesetinstance:
-    resource_group: "{{ resource_group }}"
-    vmss_name: testVMSS{{ rpfx }}
-    instance_id: "{{ instances.instances[0].instance_id }}"
-    power_state: stopped
-  register: results
-
-- name: Assert that something has changed
-  assert:
-    that: results.changed
-
-- name: Delete instance
-  azure_rm_virtualmachinescalesetinstance:
-    resource_group: "{{ resource_group }}"
-    vmss_name: testVMSS{{ rpfx }}
-    instance_id: "{{ instances.instances[0].instance_id }}"
-    state: absent
-  register: results
-
-- name: Assert that something has changed
-  assert:
-    that: results.changed
-
-
 - name: Delete VMSS
   azure_rm_virtualmachine_scaleset:
     resource_group: "{{ resource_group }}"
     name: testVMSS{{ rpfx }}
     state: absent
-    remove_on_absent: ['all']
-    vm_size: Standard_B1s
-    capacity: 1
-    image:
-      offer: CoreOS
-      publisher: CoreOS
-      sku: Stable
-      version: latest
 
 - name: Create VMSS with security group in same resource group, with accelerated networking(check mode).
   azure_rm_virtualmachine_scaleset:
@@ -483,14 +478,6 @@
     resource_group: "{{ resource_group }}"
     name: testVMSS{{ rpfx }}2
     state: absent
-    remove_on_absent: ['all']
-    vm_size: Standard_B1s
-    capacity: 1
-    image:
-      offer: CoreOS
-      publisher: CoreOS
-      sku: Stable
-      version: latest
 
 - name: Fail when instance type is not supported to enable accelerated networking
   azure_rm_virtualmachine_scaleset:
