@@ -102,7 +102,7 @@ try:
     from msrestazure.azure_operation import AzureOperationPoller
     from msrest.serialization import Model
     from azure.mgmt.authorization import AuthorizationManagementClient
-    from azure.mgmt.authorization.model import { RoleDefinition, Permission }
+    from azure.mgmt.authorization.model import (RoleDefinition, Permission)
 
 except ImportError:
     # This is handled in azure_rm_common
@@ -325,7 +325,7 @@ class AzureRMRoleDefinition(AzureRMModuleBase):
         :return: True
         '''
         self.log("Deleting the role definition {0}".format(self.name))
-        scope = 
+        scope = self.build_scope()
         try:
             response = self._client.role_definitions.delete(name=self.name,
                                                             scope=self.scope)
