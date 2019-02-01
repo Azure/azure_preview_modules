@@ -152,7 +152,7 @@ class Actions:
 
 
 class AzureRMRoleDefinition(AzureRMModuleBase):
-    """Configuration class for an Azure RM Web App resource"""
+    """Configuration class for an Azure RM Role definition resource"""
 
     def __init__(self):
         self.module_arg_spec = dict(
@@ -204,7 +204,7 @@ class AzureRMRoleDefinition(AzureRMModuleBase):
     def exec_module(self, **kwargs):
         """Main module execution method"""
 
-        for key in list(self.module_arg_spec.keys()) + ['tags']:
+        for key in list(self.module_arg_spec.keys()):
             if hasattr(self, key):
                 setattr(self, key, kwargs[key])
 
@@ -216,7 +216,7 @@ class AzureRMRoleDefinition(AzureRMModuleBase):
                                                 base_url=self._cloud_environment.endpoints.resource_manager)
 
         # build cope
-        self.scope = build_scope()
+        self.scope = self.build_scope()
 
         # get existing role definition
         old_response = self.get_roledefinition()
@@ -304,6 +304,7 @@ class AzureRMRoleDefinition(AzureRMModuleBase):
             role_definition = RoleDefinition(name=self.name,
                                              type=self.type,
                                              description=self.description,
+                                             permissions=permissions,
                                              role_type='CustomRole')
             response = self._client.role_definitions.create_or_update(role_definition_id=role_id,
                                                                       scope=self.scope,
@@ -349,8 +350,10 @@ class AzureRMRoleDefinition(AzureRMModuleBase):
 
             if response.length > 0:
                 self.log("Response : {0}".format(response))
-
-                roles = [r for r in response if r.name == name or r.role_name == name]
+                roles = []
+                for r in response:
+                    if r.name == name or r.role_name == name:
+                        roles.append(r)
 
                 if roles.length == 1:
                     self.log("role definition : {0} found".format(self.name))
