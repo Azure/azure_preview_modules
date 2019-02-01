@@ -84,7 +84,6 @@ EXAMPLES = '''
                 - "Microsoft.Storage/storageAccounts/blobServices/containers/blobs/write"
         assignable_scopes:
             - "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-
 '''
 
 RETURN = '''
@@ -92,9 +91,7 @@ id:
     description: Id of current role definition.
     returned: always
     type: str
-    sample: {
-        "id": "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/providers/Microsoft.Authorization/roleDefinitions/roleDefinitionId"
-    }
+    sample: "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/providers/Microsoft.Authorization/roleDefinitions/roleDefinitionId"
 '''
 
 import time
@@ -213,7 +210,6 @@ class AzureRMRoleDefinition(AzureRMModuleBase):
 
         old_response = None
         response = None
-        to_be_updated = False
 
         # get management client
         self._client = self.get_mgmt_svc_client(AuthorizationManagementClient,
@@ -233,7 +229,6 @@ class AzureRMRoleDefinition(AzureRMModuleBase):
             if not old_response:
                 self.log("Role definition doesn't exist in this scope")
 
-                to_be_updated = True
                 self.to_do = Actions.CreateOrUpdate
 
             else:
@@ -243,7 +238,6 @@ class AzureRMRoleDefinition(AzureRMModuleBase):
 
                 # compare if role definition changed
                 if self.check_update(old_response):
-                    to_be_updated = True
                     self.to_do = Actions.CreateOrUpdate
 
         elif self.state == 'absent':
@@ -261,17 +255,15 @@ class AzureRMRoleDefinition(AzureRMModuleBase):
             else:
                 self.fail("role definition {0} not exists.".format(self.name))
 
-        if to_be_updated:
+        if self.to_do == Actions.CreateOrUpdate:
             self.log('Need to Create/Update role definition')
             self.results['changed'] = True
 
             if self.check_mode:
                 return self.results
 
-            if self.to_do == Actions.CreateOrUpdate:
-                response = self.create_update_roledefinition()
-
-                self.results['id'] = response['id']
+            response = self.create_update_roledefinition()
+            self.results['id'] = response['id']
 
         return self.results
 
