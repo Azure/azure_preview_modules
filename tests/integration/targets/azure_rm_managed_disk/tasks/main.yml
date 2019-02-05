@@ -232,10 +232,16 @@
        that:
            - "azure_managed_disk | length > 0"
 
+ - debug:
+       var: azure_managed_disk
+
  - set_fact:
      parameter: "{{parameter |combine({item.key: item.value})}}"
    when: "{{item.key not in ['id', 'changed'] and item.value != None}}"
    with_dict: "{{ azure_managed_disk[0] }}"
+
+ - debug:
+       var: parameter
 
  - name: Create disk with facts return value
    azure_rm_managed_disk:
