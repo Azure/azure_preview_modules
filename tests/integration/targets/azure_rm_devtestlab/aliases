@@ -2,4 +2,3 @@ cloud/azure
 destructive
 shippable/azure/group1
 azure_rm_devtestlabvirtualnetwork
-azure_rm_devtestlabvirtualmachine
