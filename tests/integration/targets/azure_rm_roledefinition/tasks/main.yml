@@ -9,10 +9,10 @@
     name: "{{ role_name }}"
     scope: "/subscriptions/{{ subscription_id }}/resourceGroups/{{ resource_group }}"
     permissions:
-      actions:
-        - "Microsoft.Compute/read"
-      data_actions:
-        - "Microsoft.Storage/storageAccounts/blobServices/containers/blobs/write"
+      - actions:
+          - "Microsoft.Compute/read"
+        data_actions:
+          - "Microsoft.Storage/storageAccounts/blobServices/containers/blobs/write"
     assignable_scopes:
         - "/subscriptions/{{ subscription_id }}/resourceGroups/{{ resource_group }}"
   check_mode: yes
@@ -28,10 +28,10 @@
     name: "{{ role_name }}"
     scope: "/subscriptions/{{ subscription_id }}/resourceGroups/{{ resource_group }}"
     permissions:
-      actions:
-        - "Microsoft.Compute/read"
-      data_actions:
-        - "Microsoft.Storage/storageAccounts/blobServices/containers/blobs/write"
+      - actions:
+          - "Microsoft.Compute/read"
+        data_actions:
+          - "Microsoft.Storage/storageAccounts/blobServices/containers/blobs/write"
     assignable_scopes:
         - "/subscriptions/{{ subscription_id }}/resourceGroups/{{ resource_group }}"
   register: output
@@ -46,12 +46,12 @@
     name: "{{ role_name }}"
     scope: "/subscriptions/{{ subscription_id }}/resourceGroups/{{ resource_group }}"
     permissions:
-      actions:
-        - "Microsoft.Compute/read"
-      data_actions:
-        - "Microsoft.Storage/storageAccounts/blobServices/containers/blobs/write"
+      - actions:
+          - "Microsoft.Compute/read"
+        data_actions:
+          - "Microsoft.Storage/storageAccounts/blobServices/containers/blobs/write"
     assignable_scopes:
-        - "/subscriptions/{{ subscription_id }}/resourceGroups/{{ resource_group }}"
+          - "/subscriptions/{{ subscription_id }}/resourceGroups/{{ resource_group }}"
   register: output
 
 - name: assert output not changed
@@ -64,12 +64,12 @@
     name: "{{ role_name }}"
     scope: "/subscriptions/{{ subscription_id }}/resourceGroups/{{ resource_group }}"
     permissions:
-      actions:
-        - "Microsoft.Compute/read"
-        - "Microsoft.Storage/read"
-        - "Microsoft.Network/read"
-      data_actions:
-        - "Microsoft.Storage/storageAccounts/blobServices/containers/blobs/write"
+      - actions:
+          - "Microsoft.Compute/read"
+          - "Microsoft.Storage/read"
+          - "Microsoft.Network/read"
+        data_actions:
+          - "Microsoft.Storage/storageAccounts/blobServices/containers/blobs/write"
     assignable_scopes:
         - "/subscriptions/{{ subscription_id }}/resourceGroups/{{ resource_group }}"
   register: output
