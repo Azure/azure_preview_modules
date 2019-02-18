@@ -10,7 +10,7 @@
     scope: "/subscriptions/{{ subscription_id }}/resourceGroups/{{ resource_group }}"
     permissions:
       - actions:
-          - "Microsoft.Compute/read"
+          - "Microsoft.Compute/virtualMachines/read"
         data_actions:
           - "Microsoft.Storage/storageAccounts/blobServices/containers/blobs/write"
     assignable_scopes:
@@ -29,7 +29,7 @@
     scope: "/subscriptions/{{ subscription_id }}/resourceGroups/{{ resource_group }}"
     permissions:
       - actions:
-          - "Microsoft.Compute/read"
+          - "Microsoft.Compute/virtualMachines/read"
         data_actions:
           - "Microsoft.Storage/storageAccounts/blobServices/containers/blobs/write"
     assignable_scopes:
@@ -47,7 +47,7 @@
     scope: "/subscriptions/{{ subscription_id }}/resourceGroups/{{ resource_group }}"
     permissions:
       - actions:
-          - "Microsoft.Compute/read"
+          - "Microsoft.Compute/virtualMachines/read"
         data_actions:
           - "Microsoft.Storage/storageAccounts/blobServices/containers/blobs/write"
     assignable_scopes:
@@ -65,9 +65,8 @@
     scope: "/subscriptions/{{ subscription_id }}/resourceGroups/{{ resource_group }}"
     permissions:
       - actions:
-          - "Microsoft.Compute/read"
-          - "Microsoft.Storage/read"
-          - "Microsoft.Network/read"
+          - "Microsoft.Compute/virtualMachines/read"
+          - "Microsoft.Compute/virtualMachines/start/action"
         data_actions:
           - "Microsoft.Storage/storageAccounts/blobServices/containers/blobs/write"
     assignable_scopes:
