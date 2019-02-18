@@ -1,10 +1,6 @@
 language: python
 python: '2.7'
 
-branches:
-  only:
-    - master
-
 env:
   global:
     - exit_code=0
@@ -93,16 +89,87 @@ before_install:
       end=$((id * number_per_job));
       start=$((end - number_per_job));
 
-      liststr=tests/integration/targets/azure_rm_*/tasks/main.yml;
+      branch=$TRAVIS_BRANCH;
+      echo branch is $branch;
+      diffstr=$(git diff $branch remotes/origin/master --name-only  -- * --no-pager);
+
+      liststr=tests/integration/targets/azure_rm_*;
       list=($liststr);
 
-      echo start = $start, end = $end, list_lenth = ${#list[@]};
-
-      for (( i = $start; i < $end; i++ )); do
-        if [ "$i" -lt "${#list[@]}" ]; then
-          run_test ${list[$i]};
+      run_all=false
+ 
+      for item in ${diffstr[*]}; do
+        if [[ "$item" != *"main.yml" ]] && [[ "$item" != *"aliases" ]] && [[ "$item" != *"virtualmachines.yml" ]]; then
+          if [[ "$item" != *"azure_rm_"*.py ]]; then
+            run_all=true;
+            break;
+          elif [[ "$item" == *"azure_rm_common"*.py ]]; then
+            run_all=true;
+            break;
+          fi
         fi
       done;
+
+      echo run_all is $run_all;
+      echo start = $start, end = $end, list_lenth = ${#listall[@]};
+      
+      if [ "$run_all" == true ]; then
+        listfiles=tests/integration/targets/azure_rm_*/tasks/main.yml;
+        listall=($listfiles);
+        
+        for (( i = $start; i < $end; i++ )); do
+          if [ "$i" -lt "${#listall[@]}" ]; then
+            run_test ${listall[$i]};
+          fi;
+        done;
+      else
+        testlist=();
+        for (( i = $start; i < $end; i++ )); do
+          if [ "$i" -lt "${#diffstr[@]}" ]; then
+            for changedfile in ${diffstr[*]}; do
+              arrChanged=(${changedfile//// });
+              changedFileName=${arrChanged[-1]};
+              changedFileNameWithPath=${arrChanged[-2]};
+              echo changedfile is $changedfile;
+
+              fileNameNoExtension=${changedFileName%%.py};
+
+              if [[ ! -f $changedfile ]]; then
+                continue;
+              fi;
+
+              if [[ -d "tests/integration/targets/${fileNameNoExtension}" ]]; then
+                echo test tests/integration/targets/${fileNameNoExtension}/tasks/main.yml;
+                testList=("tests/integration/targets/${fileNameNoExtension}/tasks/main.yml" "${testList[@]}");
+              elif [ "$changedFileName" == "main.yml" ]; then
+                if [[ "$changedFileNameWithPath" == "tasks" ]]; then
+                  echo test $changedfile;
+                  testList=("${changedfile}" "${testList[@]}");
+                fi;
+              else
+                for alias in "${list[@]}"; do
+                  if grep -Fxq "$changedFileName" "${alias}/aliases"; then
+                    echo test $alias;
+                    testList=("${alias}/tasks/main.yml" "${testList[@]}");
+                    break;
+                  fi;
+                done;
+              fi;
+            done;
+          fi
+
+          sorted_unique_testList=($(echo "${testList[@]}" | tr ' ' '\n' | sort -u | tr '\n' ' '));
+          echo start = $start, end = $end, list_lenth = ${#sorted_unique_testList[@]};
+          for (( i = $start; i < $end; i++ )); do
+            if [ "$i" -lt "${#sorted_unique_testList[@]}" ]; then
+              for test in "${sorted_unique_testList[@]}"; do
+                echo test file is $test;
+                run_test $test;
+              done;
+            fi
+          done;
+        done;
+      fi
     }
 
 install:
@@ -112,6 +179,8 @@ install:
   - ansible --version
   - pip install -I -r ./files/requirements-azure.txt
   - pip freeze
+  - git remote set-branches --add origin master
+  - git fetch
 
 script:
   - scan_test
@@ -123,5 +192,3 @@ notifications:
     - yuwzho@microsoft.com
     - zikalino@microsoft.com
     - yungez@microsoft.com
-    - yaweiw@microsoft.com
-

@@ -184,7 +184,7 @@ def subnet_to_dict(subnet):
         result['route_table']['name'] = id_keys['routeTables']
         result['route_table']['resource_group'] = id_keys['resourceGroups']
     if subnet.service_endpoints:
-        result['service_endpoints'] = [{'service': item.service, 'locations': item.locations} for item in subnet.service_endpoints]
+        result['service_endpoints'] = [{'service': item.service, 'locations': item.locations or []} for item in subnet.service_endpoints]
     return result
 
 
@@ -241,6 +241,7 @@ class AzureRMSubnet(AzureRMModuleBase):
         if self.security_group:
             nsg = self.parse_nsg()
 
+        route_table = dict()
         if self.route_table:
             route_table = self.parse_resource_to_dict(self.route_table)
             self.route_table = format_resource_id(val=route_table['name'],
@@ -276,18 +277,20 @@ class AzureRMSubnet(AzureRMModuleBase):
                 if self.route_table != results['route_table'].get('id'):
                     changed = True
                     results['route_table']['id'] = self.route_table
-                    self.log("CHANGED: subnet {0} route_table to {1}".format(self.name, route_table['name']))
+                    self.log("CHANGED: subnet {0} route_table to {1}".format(self.name, route_table.get('name')))
 
                 if self.service_endpoints:
                     oldd = {}
                     for item in self.service_endpoints:
                         name = item['service']
-                        oldd[name] = {'service': name, 'locations': item['locations'].sort()}
+                        locations = item.get('locations') or []
+                        oldd[name] = {'service': name, 'locations': locations.sort()}
                     newd = {}
                     if 'service_endpoints' in results:
                         for item in results['service_endpoints']:
                             name = item['service']
-                            newd[name] = {'service': name, 'locations': item['locations'].sort()}
+                            locations = item.get('locations') or []
+                            newd[name] = {'service': name, 'locations': locations.sort()}
                     if newd != oldd:
                         changed = True
                         results['service_endpoints'] = self.service_endpoints
