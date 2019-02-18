@@ -94,12 +94,14 @@ id:
     sample: "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/providers/Microsoft.Authorization/roleDefinitions/roleDefinitionId"
 '''
 
-import time
+import uuid
 from ansible.module_utils.azure_rm_common import AzureRMModuleBase
+from ansible.module_utils._text import to_native
 
 try:
     from msrestazure.azure_exceptions import CloudError
     from msrestazure.azure_operation import AzureOperationPoller
+    from msrest.polling import LROPoller
     from msrest.serialization import Model
     from azure.mgmt.authorization import AuthorizationManagementClient
     from azure.mgmt.authorization.model import (RoleDefinition, Permission)
@@ -133,12 +135,13 @@ def roledefinition_to_dict(role):
     result = dict(
         id=role.id,
         name=role.name,
-        type=role.kind,
+        type=role.role_type,
         assignable_scopes=role.assignable_scopes,
         description=role.description,
+        role_name=role.role_name
     )
     if role.permissions:
-        result.permissions = [dict(
+        result['permissions'] = [dict(
             actions=p.actions,
             not_actions=p.not_actions,
             data_actions=p.data_actions,
@@ -195,6 +198,8 @@ class AzureRMRoleDefinition(AzureRMModuleBase):
         self.state = None
         self.to_do = Actions.NoAction
 
+        self.role = None
+
         self._client = None
 
         super(AzureRMRoleDefinition, self).__init__(derived_arg_spec=self.module_arg_spec,
@@ -213,7 +218,8 @@ class AzureRMRoleDefinition(AzureRMModuleBase):
 
         # get management client
         self._client = self.get_mgmt_svc_client(AuthorizationManagementClient,
-                                                base_url=self._cloud_environment.endpoints.resource_manager)
+                                                base_url=self._cloud_environment.endpoints.resource_manager,
+                                                api_version="2018-01-01-preview")
 
         # build cope
         self.scope = self.build_scope()
@@ -223,6 +229,7 @@ class AzureRMRoleDefinition(AzureRMModuleBase):
 
         if old_response:
             self.results['id'] = old_response['id']
+            self.role = old_response
 
         if self.state == 'present':
             # check if the role definition exists
@@ -248,7 +255,7 @@ class AzureRMRoleDefinition(AzureRMModuleBase):
                 if self.check_mode:
                     return self.results
 
-                self.delete_roledefinition()
+                self.delete_roledefinition(old_response['name'])
 
                 self.log('role definition deleted')
 
@@ -278,11 +285,25 @@ class AzureRMRoleDefinition(AzureRMModuleBase):
     def check_update(self, old_definition):
         if self.description and self.description != old_definition['properties']['description']:
             return True
-        if self.permissions and self.permissions != old_definition['permissions']:
-            return True
-        if self.assignable_scopes and self.assignable_scopes != old_definition['assignment_scopes']:
+        if self.permissions:
+            if len(self.permissions) != len(old_definition['permissions']):
+                return True
+            existing_permissions = self.permissions_to_set(old_definition['permissions'])
+            new_permissions = self.permissions_to_set(self.permissions)
+            if existing_permissions != new_permissions:
+                return True
+        if self.assignable_scopes and self.assignable_scopes != old_definition['assignable_scopes']:
             return True
         return False
+
+    def permissions_to_set(self, permissions):
+        new_permissions = [str(dict(
+            actions=(set([to_native(a) for a in item.get('actions')]) if item.get('actions') else None),
+            non_actions=(set([to_native(a) for a in item.get('non_actions')]) if item.get('non_actions') else None),
+            data_actions=(set([to_native(a) for a in item.get('data_actions')]) if item.get('data_actions') else None),
+            non_data_actions=(set([to_native(a) for a in item.get('non_data_actions')]) if item.get('non_data_actions') else None),
+        )) for item in permissions]
+        return set(new_permissions)
 
     def create_update_roledefinition(self):
         '''
@@ -295,18 +316,23 @@ class AzureRMRoleDefinition(AzureRMModuleBase):
         try:
             permissions = None
             if self.permissions:
-                permissions = [Permission(
-                    actions=p.actions,
-                    not_actions=p.not_actions,
-                    data_actions=p.data_actions,
-                    not_data_actions=p.not_data_actions
+                permissions = [AuthorizationManagementClient.models("2018-01-01-preview").Permission(
+                    actions=p.get('actions', None),
+                    not_actions=p.get('not_actions', None),
+                    data_actions=p.get('data_actions', None),
+                    not_data_actions=p.get('not_data_actions', None)
                 ) for p in self.permissions]
-            role_definition = RoleDefinition(name=self.name,
-                                             type=self.type,
-                                             description=self.description,
-                                             permissions=permissions,
-                                             role_type='CustomRole')
-            response = self._client.role_definitions.create_or_update(role_definition_id=role_id,
+            role_definition = AuthorizationManagementClient.models("2018-01-01-preview").RoleDefinition(
+                role_name=self.name,
+                description=self.description,
+                permissions=permissions,
+                assignable_scopes=self.assignable_scopes,
+                role_type='CustomRole')
+            if self.role:
+                role_definition.name = self.role['name']
+                #print("role is:")
+                print(self.role)
+            response = self._client.role_definitions.create_or_update(role_definition_id=self.role['name'] if self.role else str(uuid.uuid4()),
                                                                       scope=self.scope,
                                                                       role_definition=role_definition)
             if isinstance(response, AzureOperationPoller):
@@ -314,11 +340,10 @@ class AzureRMRoleDefinition(AzureRMModuleBase):
 
         except CloudError as exc:
             self.log('Error attempting to create role definition.')
-            self.fail(
-                "Error creating role definition: {0}".format(str(exc)))
+            self.fail("Error creating role definition: {0}".format(str(exc)))
         return roledefinition_to_dict(response)
 
-    def delete_roledefinition(self):
+    def delete_roledefinition(self, role_definition_id):
         '''
         Deletes specified role definition.
 
@@ -328,7 +353,10 @@ class AzureRMRoleDefinition(AzureRMModuleBase):
         scope = self.build_scope()
         try:
             response = self._client.role_definitions.delete(name=self.name,
-                                                            scope=self.scope)
+                                                            scope=scope,
+                                                            role_definition_id=role_definition_id)
+            if isinstance(response, LROPoller) or isinstance(response, AzureOperationPoller):
+                response = self.get_poller_result(response)
         except CloudError as e:
             self.log('Error attempting to delete the role definition.')
             self.fail("Error deleting the role definition: {0}".format(str(e)))
@@ -348,22 +376,21 @@ class AzureRMRoleDefinition(AzureRMModuleBase):
         try:
             response = list(self._client.role_definitions.list(scope=self.scope))
 
-            if response.length > 0:
+            if len(response) > 0:
                 self.log("Response : {0}".format(response))
                 roles = []
                 for r in response:
-                    if r.name == name or r.role_name == name:
+                    if r.role_name == self.name:
                         roles.append(r)
 
-                if roles.length == 1:
+                if len(roles) == 1:
                     self.log("role definition : {0} found".format(self.name))
                     return roledefinition_to_dict(roles[0])
-                if roles.length > 1:
+                if len(roles) > 1:
                     self.fail("Found multiple role definitions: {0}".format(roles))
 
         except CloudError as ex:
-            self.log("Didn't find role definition {0} in resource group {1}".format(
-                self.name, self.resource_group))
+            self.log("Didn't find role definition {0}".format(self.name))
 
         return False
 
@@ -375,3 +402,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+

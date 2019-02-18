@@ -7,15 +7,14 @@
 - name: Create a role definition (Check Mode)
   azure_rm_roledefinition:
     name: "{{ role_name }}"
-    scope: "/subscriptions/{{ subscription_id }}/resourceGroups/myresourceGroup"
+    scope: "/subscriptions/{{ subscription_id }}/resourceGroups/{{ resource_group }}"
     permissions:
       actions:
         - "Microsoft.Compute/read"
-        - "Microsoft.Storage/read"
       data_actions:
         - "Microsoft.Storage/storageAccounts/blobServices/containers/blobs/write"
     assignable_scopes:
-        - "/subscriptions/{{ subscription_id }}"
+        - "/subscriptions/{{ subscription_id }}/resourceGroups/{{ resource_group }}"
   check_mode: yes
   register: output
 
@@ -27,15 +26,14 @@
 - name: Create a role definition
   azure_rm_roledefinition:
     name: "{{ role_name }}"
-    scope: "/subscriptions/{{ subscription_id }}/resourceGroups/myresourceGroup"
+    scope: "/subscriptions/{{ subscription_id }}/resourceGroups/{{ resource_group }}"
     permissions:
       actions:
         - "Microsoft.Compute/read"
-        - "Microsoft.Storage/read"
       data_actions:
         - "Microsoft.Storage/storageAccounts/blobServices/containers/blobs/write"
     assignable_scopes:
-        - "/subscriptions/{{ subscription_id }}"
+        - "/subscriptions/{{ subscription_id }}/resourceGroups/{{ resource_group }}"
   register: output
 
 - name: Assert creating role definition
@@ -46,15 +44,14 @@
 - name: Update the role definition (idempotent)
   azure_rm_roledefinition:
     name: "{{ role_name }}"
-    scope: "/subscriptions/{{ subscription_id }}/resourceGroups/myresourceGroup"
+    scope: "/subscriptions/{{ subscription_id }}/resourceGroups/{{ resource_group }}"
     permissions:
       actions:
         - "Microsoft.Compute/read"
-        - "Microsoft.Storage/read"
       data_actions:
         - "Microsoft.Storage/storageAccounts/blobServices/containers/blobs/write"
     assignable_scopes:
-        - "/subscriptions/{{ subscription_id }}"
+        - "/subscriptions/{{ subscription_id }}/resourceGroups/{{ resource_group }}"
   register: output
 
 - name: assert output not changed
@@ -65,17 +62,16 @@
 - name: Update the role definition
   azure_rm_roledefinition:
     name: "{{ role_name }}"
-    scope: "/subscriptions/{{ subscription_id }}/resourceGroups/myresourceGroup"
+    scope: "/subscriptions/{{ subscription_id }}/resourceGroups/{{ resource_group }}"
     permissions:
       actions:
         - "Microsoft.Compute/read"
-        - "Microsoft.Compute/virtualMachines/start/action"
         - "Microsoft.Storage/read"
         - "Microsoft.Network/read"
       data_actions:
-        - "Microsoft.Storage/storageAccounts/blobServices/containers/blobs/*"
+        - "Microsoft.Storage/storageAccounts/blobServices/containers/blobs/write"
     assignable_scopes:
-        - "/subscriptions/{{ subscription_id }}"
+        - "/subscriptions/{{ subscription_id }}/resourceGroups/{{ resource_group }}"
   register: output
 
 - name: assert output changed
@@ -86,7 +82,7 @@
 - name: Delete the role definition (Check Mode)
   azure_rm_roledefinition:
     name: "{{ role_name }}"
-    scope: "/subscriptions/{{ subscription_id }}/resourceGroups/myresourceGroup"
+    scope: "/subscriptions/{{ subscription_id }}/resourceGroups/{{ resource_group }}"
   check_mode: yes
   register: output
 
@@ -97,7 +93,7 @@
 - name: Delete the redis cache
   azure_rm_roledefinition:
     name: "{{ role_name }}"
-    scope: "/subscriptions/{{ subscription_id }}/resourceGroups/myresourceGroup"
+    scope: "/subscriptions/{{ subscription_id }}/resourceGroups/{{ resource_group }}"
   register: output
 
 - assert:
