@@ -156,10 +156,6 @@ networkinterfaces:
                 primary:
                     description:
                         - Whether the ip configuration is the primary one in the list.
-                application_security_groups:
-                    description:
-                        - List of Application security groups.
-                    sample: /subscriptions/<subsid>/resourceGroups/<rg>/providers/Microsoft.Network/applicationSecurityGroups/myASG
         enable_accelerated_networking:
             description:
                 - Specifies whether the network interface should be created with the accelerated networking feature or not
@@ -221,9 +217,7 @@ def nic_to_dict(nic):
             load_balancer_backend_address_pools=([item.id for item in config.load_balancer_backend_address_pools]
                                                  if config.load_balancer_backend_address_pools else None),
             public_ip_address=config.public_ip_address.id if config.public_ip_address else None,
-            public_ip_allocation_method=config.public_ip_address.public_ip_allocation_method if config.public_ip_address else None,
-            application_security_groups=([asg.id for asg in config.application_security_groups]
-                                         if config.application_security_groups else None)
+            public_ip_allocation_method=config.public_ip_address.public_ip_allocation_method if config.public_ip_address else None
         ) for config in nic.ip_configurations
     ]
     config = nic.ip_configurations[0] if len(nic.ip_configurations) > 0 else None
