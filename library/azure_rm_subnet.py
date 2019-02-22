@@ -49,8 +49,8 @@ options:
             - security_group_name
     state:
         description:
-            - Assert the state of the subnet. Use 'present' to create or update a subnet and
-              'absent' to delete a subnet.
+            - Assert the state of the subnet. Use C(present) to create or update a subnet and
+              C(absent) to delete a subnet.
         default: present
         choices:
             - absent
@@ -98,25 +98,25 @@ EXAMPLES = '''
       azure_rm_subnet:
         name: foobar
         virtual_network_name: My_Virtual_Network
-        resource_group: Testing
+        resource_group: myResourceGroup
         address_prefix_cidr: "10.1.0.0/24"
 
     - name: Create a subnet refer nsg from other resource group
       azure_rm_subnet:
         name: foobar
         virtual_network_name: My_Virtual_Network
-        resource_group: Testing
+        resource_group: myResourceGroup
         address_prefix_cidr: "10.1.0.0/16"
         security_group:
           name: secgroupfoo
-          resource_group: Testing1
+          resource_group: mySecondResourceGroup
         route_table: route
 
     - name: Delete a subnet
       azure_rm_subnet:
         name: foobar
         virtual_network_name: My_Virtual_Network
-        resource_group: Testing
+        resource_group: myResourceGroup
         state: absent
 '''
 

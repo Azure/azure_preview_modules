@@ -33,8 +33,8 @@ options:
             - Name of the storage account to update or create.
     state:
         description:
-            - Assert the state of the storage account. Use 'present' to create or update a storage account and
-              'absent' to delete an account.
+            - Assert the state of the storage account. Use C(present) to create or update a storage account and
+              C(absent) to delete an account.
         default: present
         choices:
             - absent
@@ -96,7 +96,7 @@ options:
         description:
             - Specifies CORS rules for the Blob service.
             - You can include up to five CorsRule elements in the request.
-            - If no CorsRule elements are included in the request body, nothing about CORS will be changed.
+            - If no blob_cors elements are included in the argument list, nothing about CORS will be changed.
             - "If you want to delete all CORS rules and disable CORS for the Blob service, explicitly set blob_cors: []."
         type: list
         version_added: "2.8"
@@ -134,19 +134,18 @@ extends_documentation_fragment:
 author:
     - "Chris Houseknecht (@chouseknecht)"
     - "Matt Davis (@nitzmahone)"
-
 '''
 
 EXAMPLES = '''
     - name: remove account, if it exists
       azure_rm_storageaccount:
-        resource_group: Testing
+        resource_group: myResourceGroup
         name: clh0002
         state: absent
 
     - name: create an account
       azure_rm_storageaccount:
-        resource_group: Testing
+        resource_group: myResourceGroup
         name: clh0002
         type: Standard_RAGRS
         tags:
@@ -155,9 +154,22 @@ EXAMPLES = '''
 
     - name: create an account with blob CORS
       azure_rm_storageaccount:
-        resource_group: Testing
+        resource_group: myResourceGroup
         name: clh002
         type: Standard_RAGRS
+        blob_cors:
+            - allowed_origins:
+                - http://www.example.com/
+              allowed_methods:
+                - GET
+                - POST
+              allowed_headers:
+                - x-ms-meta-data*
+                - x-ms-meta-target*
+                - x-ms-meta-abc
+              exposed_headers:
+                - x-ms-meta-*
+              max_age_in_seconds: 200
 '''
 
 
@@ -202,15 +214,15 @@ except ImportError:
     pass
 
 import copy
-from ansible.module_utils.azure_rm_common import AZURE_SUCCESS_STATE, AzureRMModuleBase, HAS_AZURE
+from ansible.module_utils.azure_rm_common import AZURE_SUCCESS_STATE, AzureRMModuleBase
 from ansible.module_utils._text import to_native
 
 cors_rule_spec = dict(
-    allowed_origins=dict(type='list', required=True),
-    allowed_methods=dict(type='list', required=True),
+    allowed_origins=dict(type='list', elements='str', required=True),
+    allowed_methods=dict(type='list', elements='str', required=True),
     max_age_in_seconds=dict(type='int', required=True),
-    exposed_headers=dict(type='list', required=True),
-    allowed_headers=dict(type='list', required=True),
+    exposed_headers=dict(type='list', elements='str', required=True),
+    allowed_headers=dict(type='list', elements='str', required=True),
 )
 
 
@@ -253,11 +265,6 @@ class AzureRMStorageAccount(AzureRMModuleBase):
             https_only=dict(type='bool', default=False),
             blob_cors=dict(type='list', options=cors_rule_spec, elements='dict')
         )
-
-        if HAS_AZURE:
-            for key in self.storage_models.SkuName:
-                if getattr(key, 'value') not in self.module_arg_spec['account_type']['choices']:
-                    self.module_arg_spec['account_type']['choices'].append(getattr(key, 'value'))
 
         self.results = dict(
             changed=False,

@@ -35,7 +35,7 @@ options:
         required: true
     state:
         description:
-            - Assert the state of the managed disk. Use C(present) to create or update a managed disk and 'absent' to delete a managed disk.
+            - Assert the state of the managed disk. Use C(present) to create or update a managed disk and C(absent) to delete a managed disk.
         default: present
         choices:
             - absent
@@ -98,14 +98,14 @@ EXAMPLES = '''
       azure_rm_managed_disk:
         name: mymanageddisk
         location: eastus
-        resource_group: Testing
+        resource_group: myResourceGroup
         disk_size_gb: 4
 
     - name: Create managed operating system disk from page blob
       azure_rm_managed_disk:
         name: mymanageddisk
         location: eastus2
-        resource_group: Testing
+        resource_group: myResourceGroup
         create_option: import
         source_uri: https://storageaccountname.blob.core.windows.net/containername/blob-name.vhd
         os_type: windows
@@ -115,7 +115,7 @@ EXAMPLES = '''
       azure_rm_managed_disk:
         name: mymanageddisk
         location: eastus
-        resource_group: Testing
+        resource_group: myResourceGroup
         disk_size_gb: 4
         managed_by: testvm001
 
@@ -123,14 +123,14 @@ EXAMPLES = '''
       azure_rm_managed_disk:
         name: mymanageddisk
         location: eastus
-        resource_group: Testing
+        resource_group: myResourceGroup
         disk_size_gb: 4
 
     - name: Delete managed disk
       azure_rm_manage_disk:
         name: mymanageddisk
         location: eastus
-        resource_group: Testing
+        resource_group: myResourceGroup
         state: absent
 '''
 
@@ -169,11 +169,11 @@ def managed_disk_to_dict(managed_disk):
         name=managed_disk.name,
         location=managed_disk.location,
         tags=managed_disk.tags,
-        create_option=create_data.create_option.value.lower(),
+        create_option=create_data.create_option.lower(),
         source_uri=create_data.source_uri or create_data.source_resource_id,
         disk_size_gb=managed_disk.disk_size_gb,
-        os_type=managed_disk.os_type.value.lower() if managed_disk.os_type else None,
-        storage_account_type=managed_disk.sku.name.value if managed_disk.sku else None,
+        os_type=managed_disk.os_type.lower() if managed_disk.os_type else None,
+        storage_account_type=managed_disk.sku.name if managed_disk.sku else None,
         managed_by=managed_disk.managed_by
     )
 
