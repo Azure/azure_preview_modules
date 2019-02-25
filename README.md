@@ -84,7 +84,7 @@ Example Playbook
 
     - hosts: localhost
       roles:
-        - { role: Azure.azure_preview_modules }
+        - { role: azure.azure_preview_modules }
       tasks:
       - name: create storage account
         azure_rm_storageaccount:
