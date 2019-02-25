@@ -17,7 +17,7 @@ Installation
 1. Install the role.
 
   ``` bash
-  $ ansible-galaxy install Azure.azure_preview_modules
+  $ ansible-galaxy install azure.azure_preview_modules
   ```
 
 2. Upgrade Azure Python SDKs required by new Azure modules.
