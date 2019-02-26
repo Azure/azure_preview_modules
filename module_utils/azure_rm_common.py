@@ -13,7 +13,12 @@ import json
 
 from os.path import expanduser
 
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+try:
+    from ansible.module_utils.basic import missing_required_lib
+except Exception:
+    def missing_required_lib(msg, reason=None, url=None):
+        return msg
+
 try:
     from ansible.module_utils.ansible_release import __version__ as ANSIBLE_VERSION
 except Exception:
