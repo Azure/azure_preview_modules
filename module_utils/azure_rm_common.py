@@ -12,6 +12,7 @@ import traceback
 import json
 
 from os.path import expanduser
+from ansible.module_utils.basic import AnsibleModule
 
 try:
     from ansible.module_utils.basic import missing_required_lib
