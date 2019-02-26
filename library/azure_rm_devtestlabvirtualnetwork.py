@@ -43,7 +43,7 @@ options:
     state:
       description:
         - Assert the state of the Virtual Network.
-        - Use 'present' to create or update an Virtual Network and 'absent' to delete it.
+        - Use C(present) to create or update an Virtual Network and C(absent) to delete it.
       default: present
       choices:
         - absent
@@ -61,7 +61,7 @@ author:
 EXAMPLES = '''
   - name: Create (or update) Virtual Network
     azure_rm_devtestlabvirtualnetwork:
-      resource_group: testrg
+      resource_group: myResourceGroup
       lab_name: mylab
       name: myvn
       description: My Lab Virtual Network
@@ -176,7 +176,7 @@ class AzureRMDevTestLabVirtualNetwork(AzureRMModuleBase):
             'resource_id': subnet_id,
             'lab_subnet_name': self.name + "Subnet",
             'use_in_vm_creation_permission': 'Allow',
-            'use_public_ip_address_permission':  'Allow'
+            'use_public_ip_address_permission': 'Allow'
         }]
 
         old_response = self.get_virtualnetwork()
