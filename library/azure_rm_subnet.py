@@ -111,6 +111,18 @@ EXAMPLES = '''
           name: secgroupfoo
           resource_group: mySecondResourceGroup
         route_table: route
+ 
+    - name: Create a subnet with Service Endpoints
+      azure_rm_subnet:
+        name: foobar
+        virtual_network_name: My_Virtual_Network
+        resource_group: myResourceGroup
+        address_prefix_cidr: "10.1.0.0/16"
+        service_endpoints:
+          - service: Microsoft.AzureActiveDirectory
+          - service: Microsoft.KeyVault
+          - service: Microsoft.Storage
+          - service: Microsoft.Sql
 
     - name: Delete a subnet
       azure_rm_subnet:
