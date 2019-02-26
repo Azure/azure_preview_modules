@@ -59,12 +59,12 @@ options:
                 description:
                     - "When used with the Bounded Staleness consistency level, this value represents the number of stale requests tolerated. Accepted range
                        for this value is 1 - 2,147,483,647. Required when I(default_consistency_policy) is set to C(bounded_staleness)."
-                type: number
+                type: int
             max_interval_in_seconds:
                 description:
                     - "When used with the Bounded Staleness consistency level, this value represents the time amount of staleness (in seconds) tolerated.
                        Accepted range for this value is 5 - 86400. Required when I(default_consistency_policy) is set to C(bounded_staleness)."
-                type: number
+                type: int
     geo_rep_locations:
         description:
             - An array that contains the georeplication locations enabled for the Cosmos DB account.
@@ -78,6 +78,7 @@ options:
                 description:
                     - "The failover priority of the region. A failover priority of 0 indicates a write region. The maximum value for a failover priority =
                        (total number of regions - 1). Failover priority values must be unique for each of the regions in which the database account exists."
+                type: int
     database_account_offer_type:
         description:
             - Database account offer type, for example I(Standard)
@@ -89,36 +90,46 @@ options:
     is_virtual_network_filter_enabled:
         description:
             - Flag to indicate whether to enable/disable Virtual Network ACL rules.
+        type: bool
     enable_automatic_failover:
         description:
             - "Enables automatic failover of the write region in the rare event that the region is unavailable due to an outage. Automatic failover will
                result in a new write region for the account and is chosen based on the failover priorities configured for the account."
         type: bool
-    capabilities:
+    enable_cassandra:
         description:
-            - List of Cosmos DB capabilities for the account
-        type: list
-        suboptions:
-            name:
-                description:
-                    - "Name of the Cosmos DB capability. For example I(EnableCassandra), I(EnableTable) or I(EnableGremlin)"
+            - Enable Cassandra.
+        type: bool
+    enable_table:
+        description:
+            - Enable Table.
+        type: bool
+    enable_gremlin:
+        description:
+            - Enable Gremlin.
+        type: bool
     virtual_network_rules:
         description:
             - List of Virtual Network ACL rules configured for the Cosmos DB account.
         type: list
         suboptions:
-            id:
+            subnet:
                 description:
-                    - "Resource ID of a subnet, for example:
-                       /subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/Microsoft.Network/virtualNetworks/{virtualNetworkName}/subnets/{
-                      subnetName}."
+                    - It can be a string containing resource id of a subnet.
+                    - It can be a dictionary containing 'resource_group', 'virtual_network_name' and 'subnet_name'
+            ignore_missing_vnet_service_endpoint:
+                description:
+                    - Create Cosmos DB account without existing virtual network service endpoint.
+                type: bool
+
     enable_multiple_write_locations:
         description:
-            - Enables the account to write in multiple I(locations)
+            - Enables the account to write in multiple locations
+        type: bool
     state:
       description:
         - Assert the state of the Database Account.
-        - Use 'present' to create or update an Database Account and 'absent' to delete it.
+        - Use C(present) to create or update an Database Account and C(absent) to delete it.
       default: present
       choices:
         - absent
@@ -136,7 +147,7 @@ author:
 EXAMPLES = '''
   - name: Create Cosmos DB Account - min
     azure_rm_cosmosdbaccount:
-      resource_group: testResourceGroup
+      resource_group: myResourceGroup
       name: ddb1
       location: westus
       geo_rep_locations:
@@ -146,7 +157,7 @@ EXAMPLES = '''
 
   - name: Create Cosmos DB Account - max
     azure_rm_cosmosdbaccount:
-      resource_group: testResourceGroup
+      resource_group: myResourceGroup
       name: ddb1
       location: westus
       kind: mongo_db
@@ -157,7 +168,7 @@ EXAMPLES = '''
       ip_range_filter: 10.10.10.10
       enable_multiple_write_locations: yes
       virtual_network_rules:
-        - id: /subscriptions/subId/resourceGroups/rg/providers/Microsoft.Network/virtualNetworks/vnet1/subnets/subnet1
+        - subnet: /subscriptions/subId/resourceGroups/rg/providers/Microsoft.Network/virtualNetworks/vnet1/subnets/subnet1
       consistency_policy:
         default_consistency_level: bounded_staleness
         max_staleness_prefix: 10
@@ -170,7 +181,7 @@ id:
         - The unique resource identifier of the database account.
     returned: always
     type: str
-    sample: /subscriptions/subid/resourceGroups/rg1/providers/Microsoft.DocumentDB/databaseAccounts/ddb1
+    sample: /subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/myResourceGroup/providers/Microsoft.DocumentDB/databaseAccounts/ddb1
 '''
 
 import time
@@ -220,16 +231,16 @@ class AzureRMCosmosDBAccount(AzureRMModuleBase):
                     default_consistency_level=dict(
                         type='str',
                         choices=['eventual',
-                                'session',
-                                'bounded_staleness',
-                                'strong',
-                                'consistent_prefix']
+                                 'session',
+                                 'bounded_staleness',
+                                 'strong',
+                                 'consistent_prefix']
                     ),
                     max_staleness_prefix=dict(
-                        type='number'
+                        type='int'
                     ),
                     max_interval_in_seconds=dict(
-                        type='number'
+                        type='int'
                     )
                 )
             ),
@@ -241,7 +252,7 @@ class AzureRMCosmosDBAccount(AzureRMModuleBase):
                         required=True
                     ),
                     failover_priority=dict(
-                        type='number',
+                        type='int',
                         required=True
                     )
                 )
@@ -253,19 +264,19 @@ class AzureRMCosmosDBAccount(AzureRMModuleBase):
                 type='str'
             ),
             is_virtual_network_filter_enabled=dict(
-                type='str'
+                type='bool'
             ),
             enable_automatic_failover=dict(
                 type='bool'
             ),
-            capabilities=dict(
-                type='list',
-                options=dict(
-                    name=dict(
-                        type='str',
-                        required=True
-                    )
-                )
+            enable_cassandra=dict(
+                type='bool'
+            ),
+            enable_table=dict(
+                type='bool'
+            ),
+            enable_gremlin=dict(
+                type='bool'
             ),
             virtual_network_rules=dict(
                 type='list',
@@ -273,11 +284,14 @@ class AzureRMCosmosDBAccount(AzureRMModuleBase):
                     id=dict(
                         type='str',
                         required=True
+                    ),
+                    ignore_missing_vnet_service_endpoint=dict(
+                        type='bool'
                     )
                 )
             ),
             enable_multiple_write_locations=dict(
-                type='str'
+                type='bool'
             ),
             state=dict(
                 type='str',
@@ -296,8 +310,8 @@ class AzureRMCosmosDBAccount(AzureRMModuleBase):
         self.to_do = Actions.NoAction
 
         super(AzureRMCosmosDBAccount, self).__init__(derived_arg_spec=self.module_arg_spec,
-                                                      supports_check_mode=True,
-                                                      supports_tags=True)
+                                                     supports_check_mode=True,
+                                                     supports_tags=True)
 
     def exec_module(self, **kwargs):
         """Main module execution method"""
@@ -312,6 +326,23 @@ class AzureRMCosmosDBAccount(AzureRMModuleBase):
         dict_camelize(self.parameters, ['consistency_policy', 'default_consistency_level'], True)
         dict_rename(self.parameters, ['geo_rep_locations', 'name'], 'location_name')
         dict_rename(self.parameters, ['geo_rep_locations'], 'locations')
+        self.parameters['capabilities'] = []
+        if self.parameters.pop('enable_cassandra', False):
+            self.parameters['capabilities'].append({'name': 'EnableCassandra'})
+        if self.parameters.pop('enable_table', False):
+            self.parameters['capabilities'].append({'name': 'EnableTable'})
+        if self.parameters.pop('enable_gremlin', False):
+            self.parameters['capabilities'].append({'name': 'EnableGremlin'})
+
+        for rule in self.parameters.get('virtual_network_rules', []):
+            subnet = rule.pop('subnet')
+            if isinstance(subnet, dict):
+                virtual_network_name = subnet.get('virtual_network_name')
+                subnet_name = subnet.get('subnet_name')
+                resource_group_name = subnet.get('resource_group', self.resource_group)
+                template = "/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.Network/virtualNetworks/{2}/subnets/{3}"
+                subnet = template.format(self.subscription_id, resource_group_name, virtual_network_name, subnet_name)
+            rule['id'] = subnet
 
         response = None
 
@@ -445,16 +476,18 @@ def default_compare(new, old, path, result):
         if not isinstance(old, list) or len(new) != len(old):
             result['compare'] = 'changed [' + path + '] length is different or null'
             return False
-        if isinstance(old[0], dict):
+        elif len(old) == 0:
+            return True
+        elif isinstance(old[0], dict):
             key = None
             if 'id' in old[0] and 'id' in new[0]:
                 key = 'id'
             elif 'name' in old[0] and 'name' in new[0]:
                 key = 'name'
             else:
-                key = old[0].keys()[0]
-            new = sorted(new, key=lambda x: x.get(key, None))
-            old = sorted(old, key=lambda x: x.get(key, None))
+                key = list(old[0])[0]
+            new = sorted(new, key=lambda x: x.get(key, ''))
+            old = sorted(old, key=lambda x: x.get(key, ''))
         else:
             new = sorted(new)
             old = sorted(old)

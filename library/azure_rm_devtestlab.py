@@ -41,7 +41,7 @@ options:
             - 'premium'
     premium_data_disks:
         description:
-            - "Allow creation of C(premium) data disks."
+            - "Allow creation of premium data disks."
         type: bool
     state:
       description:
@@ -64,7 +64,7 @@ author:
 EXAMPLES = '''
   - name: Create (or update) DevTest Lab
     azure_rm_devtestlab:
-      resource_group: testrg
+      resource_group: myResourceGroup
       name: mylab
       storage_type: standard
 '''
@@ -75,7 +75,7 @@ id:
         - The identifier of the resource.
     returned: always
     type: str
-    sample: /subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourcegroups/testrg/providers/microsoft.devtestlab/labs/mylab
+    sample: /subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourcegroups/myResourceGroup/providers/microsoft.devtestlab/labs/mylab
 '''
 
 import time
@@ -179,7 +179,8 @@ class AzureRMDevTestLab(AzureRMModuleBase):
             if self.state == 'absent':
                 self.to_do = Actions.Delete
             elif self.state == 'present':
-                if self.lab.get('lab_storage_type') is not None and self.lab.get('lab_storage_type').lower() != old_response.get('lab_storage_type', '').lower():
+                if self.lab.get('lab_storage_type') is not None and \
+                   self.lab.get('lab_storage_type').lower() != old_response.get('lab_storage_type', '').lower():
                     self.to_do = Actions.Update
                 if (self.lab.get('premium_data_disks') is not None and
                         self.lab.get('premium_data_disks').lower() != old_response.get('premium_data_disks').lower()):
