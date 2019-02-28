@@ -178,6 +178,7 @@ install:
   - "{ echo '[defaults]'; echo 'roles_path = ../'; echo 'lookup_plugins = ./tests/integration/targets/azure_rm_keyvaultkey/lookup_plugins'; } >> ansible.cfg"
   - ansible --version
   - pip install -I -r ./files/requirements-azure.txt
+  - pip install xmltodict
   - pip freeze
   - git remote set-branches --add origin master
   - git fetch
