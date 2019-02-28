@@ -130,7 +130,7 @@ class AzureRMKeyVaultSecret(AzureRMModuleBase):
             setattr(self, key, kwargs[key])
 
         # Create KeyVault Client
-        self.client = self.get_keyVaultClient()
+        self.client = self.get_keyvault_client()
 
         results = dict()
         changed = False
@@ -169,7 +169,7 @@ class AzureRMKeyVaultSecret(AzureRMModuleBase):
 
         return self.results
 
-    def get_keyVaultClient(self):
+    def get_keyvault_client(self):
         try:
             self.log("Get KeyVaultClient from MSI")
             credentials = MSIAuthentication(resource='https://vault.azure.net')
