@@ -12,14 +12,8 @@ import traceback
 import json
 
 from os.path import expanduser
-from ansible.module_utils.basic import AnsibleModule
 
-try:
-    from ansible.module_utils.basic import missing_required_lib
-except Exception:
-    def missing_required_lib(msg, reason=None, url=None):
-        return msg
-
+from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 try:
     from ansible.module_utils.ansible_release import __version__ as ANSIBLE_VERSION
 except Exception:
@@ -227,7 +221,7 @@ AZURE_PKG_VERSIONS = {
     },
     'ResourceManagementClient': {
         'package_name': 'resource',
-        'expected_version': '1.2.2'
+        'expected_version': '2.1.0'
     },
     'DnsManagementClient': {
         'package_name': 'dns',
@@ -301,6 +295,7 @@ class AzureRMModuleBase(object):
         self._containerregistry_client = None
         self._containerinstance_client = None
         self._containerservice_client = None
+        self._managedcluster_client = None
         self._traffic_manager_management_client = None
         self._monitor_client = None
         self._resource = None
@@ -874,8 +869,23 @@ class AzureRMModuleBase(object):
         self.log('Getting container service client')
         if not self._containerservice_client:
             self._containerservice_client = self.get_mgmt_svc_client(ContainerServiceClient,
-                                                                     base_url=self._cloud_environment.endpoints.resource_manager)
+                                                                     base_url=self._cloud_environment.endpoints.resource_manager,
+                                                                     api_version='2017-07-01')
         return self._containerservice_client
+
+    @property
+    def managedcluster_models(self):
+        self.log("Getting container service models")
+        return ContainerServiceClient.models('2018-03-31')
+
+    @property
+    def managedcluster_client(self):
+        self.log('Getting container service client')
+        if not self._managedcluster_client:
+            self._managedcluster_client = self.get_mgmt_svc_client(ContainerServiceClient,
+                                                                   base_url=self._cloud_environment.endpoints.resource_manager,
+                                                                   api_version='2018-03-31')
+        return self._managedcluster_client
 
     @property
     def sql_client(self):

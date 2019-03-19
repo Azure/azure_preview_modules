@@ -96,39 +96,27 @@ author:
 EXAMPLES = '''
     - name: Create a subnet
       azure_rm_subnet:
-        name: foobar
-        virtual_network_name: My_Virtual_Network
         resource_group: myResourceGroup
+        virtual_network_name: myVirtualNetwork
+        name: mySubnet
         address_prefix_cidr: "10.1.0.0/24"
 
     - name: Create a subnet refer nsg from other resource group
       azure_rm_subnet:
-        name: foobar
-        virtual_network_name: My_Virtual_Network
         resource_group: myResourceGroup
+        virtual_network_name: myVirtualNetwork
+        name: mySubnet
         address_prefix_cidr: "10.1.0.0/16"
         security_group:
           name: secgroupfoo
           resource_group: mySecondResourceGroup
         route_table: route
- 
-    - name: Create a subnet with Service Endpoints
-      azure_rm_subnet:
-        name: foobar
-        virtual_network_name: My_Virtual_Network
-        resource_group: myResourceGroup
-        address_prefix_cidr: "10.1.0.0/16"
-        service_endpoints:
-          - service: Microsoft.AzureActiveDirectory
-          - service: Microsoft.KeyVault
-          - service: Microsoft.Storage
-          - service: Microsoft.Sql
 
     - name: Delete a subnet
       azure_rm_subnet:
-        name: foobar
-        virtual_network_name: My_Virtual_Network
         resource_group: myResourceGroup
+        virtual_network_name: myVirtualNetwork
+        name: mySubnet
         state: absent
 '''
 
@@ -145,7 +133,7 @@ state:
         id:
           description: Subnet resource path.
           type: str
-          example: "/subscriptions/XXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXX/resourceGroups/Testing/providers/Microsoft.Network/virtualNetworks/My_Virtual_Network/subnets/foobar"
+          example: "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroup/myResourceGroup/providers/Microsoft.Network/virtualNetworks/myVirtualNetwork/subnets/mySubnet"
         name:
           description: Subnet name.
           type: str
@@ -156,7 +144,7 @@ state:
             id:
               description: Security group resource identifier.
               type: str
-              example: "/subscriptions/XXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXX/resourceGroups/Testing/providers/Microsoft.Network/networkSecurityGroups/secgroupfoo"
+              example: "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroup/myResourceGroup/providers/Microsoft.Network/networkSecurityGroups/secgroupfoo"
             name:
               description: Name of the security group.
               type: str
