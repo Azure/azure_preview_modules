@@ -276,7 +276,7 @@ class AzureRMResource(AzureRMModuleBase):
                     self.fail("Couldn't find api version for {0}/{1}".format(provider, resourceType))
             except Exception as exc:
                 self.fail("Failed to obtain API version: {0}".format(str(exc)))
-              
+
         query_parameters = {}
         query_parameters['api-version'] = self.api_version
 
