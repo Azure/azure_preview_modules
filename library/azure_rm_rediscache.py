@@ -17,9 +17,9 @@ DOCUMENTATION = '''
 ---
 module: azure_rm_rediscache
 version_added: "2.8"
-short_description: Manage Azure Cache for Redis instance.
+short_description: Manage Azure Redis Cache instance.
 description:
-    - Create, update and delete instance of Azure Cache for Redis.
+    - Create, update and delete instance of Azure Redis Cache.
 
 options:
     resource_group:
@@ -28,16 +28,17 @@ options:
         required: True
     name:
         description:
-            - Unique name of the Azure Cache for Redis to create or update.
+            - Unique name of the redis cache to create or update. To create or update a deployment slot, use the {slot} parameter.
         required: True
+
     location:
         description:
             - Resource location. If not set, location from the resource group will be used as default.
     sku:
-        description: Sku info of Azure Cache for Redis.
+        description: Sku info of redis cache.
         suboptions:
             name:
-                description: Type of Azure Cache for Redis to deploy
+                description: Type of redis cache to deploy
                 choices:
                     - basic
                     - standard
@@ -45,7 +46,7 @@ options:
                 required: True
             size:
                 description:
-                    - Size of Azure Cache for Redis to deploy.
+                    - Size of redis cache to deploy.
                     - When I(sku) is C(basic) or C(standard), allowed values are C0, C1, C2, C3, C4, C5, C6.
                     - When I(sku) is C(premium), allowed values are P1, P2, P3, P4.
                     - Please see U(https://docs.microsoft.com/en-us/rest/api/redis/redis/create#sku) for allowed values.
@@ -96,10 +97,10 @@ options:
         type: int
     static_ip:
         description:
-            - Static IP address. Required when deploying an Azure Cache for Redis inside an existing Azure virtual network.
+            - Static IP address. Required when deploying a redis cache inside an existing Azure virtual network.
     subnet:
         description:
-            - Subnet in a virtual network to deploy the Azure Cache for Redis in.
+            - Subnet in a virtual network to deploy the redis cache in.
             - "It can be resource id of subnet, eg.
               /subscriptions/{subid}/resourceGroups/{resourceGroupName}/Microsoft.{Network|ClassicNetwork}/VirtualNetworks/vnet1/subnets/subnet1"
             - It can be a dictionary where contains C(name), C(virtual_network_name) and C(resource_group).
@@ -109,32 +110,10 @@ options:
     tenant_settings:
         description:
             - Dict of tenant settings.
-    reboot:
-        description: Reboot specified Redis node(s). There can be potential data loss.
-        suboptions:
-            shard_id:
-                description: If clustering is enabled, the id of the shard to be rebooted.
-                type: int
-            reboot_type:
-                description: Which Redis node(s) to reboot.
-                choices:
-                    - primary
-                    - secondary
-                    - all
-                default: all
-    regenerate_key:
-        description:
-            - Regenerate Redis cache's access keys.
-        suboptions:
-            key_type:
-                description: The Redis key to regenerate.
-                choices:
-                    - primary
-                    - secondary
     state:
       description:
-        - Assert the state of the Azure Cache for Redis.
-        - Use C(present) to create or update an Azure Cache for Redis and C(absent) to delete it.
+        - Assert the state of the redis cache.
+        - Use C(present) to create or update a redis cache and C(absent) to delete it.
       default: present
       choices:
         - absent
@@ -150,57 +129,51 @@ author:
 '''
 
 EXAMPLES = '''
-  - name: Create an Azure Cache for Redis
+  - name: Create a redis cache
     azure_rm_rediscache:
         resource_group: myResourceGroup
-        name: myRedisCache
+        name: myRedis
         sku:
           name: basic
           size: C1
 
 
-  - name: Scale up the Azure Cache for Redis
+  - name: Scale up the redis cache
     azure_rm_rediscache:
         resource_group: myResourceGroup
-        name: myRedisCache
+        name: myRedis
         sku:
           name: standard
           size: C1
         tags:
           testing: foo
 
-  - name: Create Azure Cache for Redis with subnet
+  - name: Create redis with subnet
     azure_rm_rediscache:
         resource_group: myResourceGroup
-        name: myRedisCache2
+        name: myRedis
         sku:
           name: premium
           size: P1
-        subnet: /subscriptions/<subs_id>/resourceGroups/redistest1/providers/Microsoft.Network/virtualNetworks/testredisvnet1/subnets/subnet1
-
-  - name: Force reboot the redis cache
-    azure_rm_rediscache:
-        resource_group: myResourceGroup
-        name: myRedisCache
-        reboot:
-          reboot_type: all
+        subnet: "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/myResourceGroup/providers/Microsoft.Network/virtualNetworks/myVirt
+                 ualNetwork/subnets/mySubnet"
 
 '''
 
 RETURN = '''
 id:
-    description: Id of the Azure Cache for Redis.
+    description: Id of the redis cache.
     returned: always
     type: str
     sample: {
-        "id": "/subscriptions/<subs_id>/resourceGroups/rg/providers/Microsoft.Cache/Redis/redis1"
+        "id": "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/myResourceGroup/providers/Microsoft.Cache/Redis/myRedis"
     }
 host_name:
-    description: Host name of the Azure Cache for Redis.
+    description: Host name of the redis cache.
     returned: state is present
     type: str
     sample: {
-        "host_name": "redis1.redis.cache.windows.net"
+        "host_name": "myredis.redis.cache.windows.net"
     }
 '''
 
@@ -225,25 +198,6 @@ sku_spec = dict(
     size=dict(
         type='str',
         choices=['C0', 'C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'P1', 'P2', 'P3', 'P4']
-    )
-)
-
-
-reboot_spec = dict(
-    shard_id=dict(
-        type='str'
-    ),
-    reboot_type=dict(
-        type='str',
-        choices=['primary', 'secondary', 'all']
-    )
-)
-
-
-regenerate_key_spec = dict(
-    key_type=dict(
-        type='str',
-        choices=['primary', 'secondary']
     )
 )
 
@@ -283,22 +237,12 @@ def underline_to_hyphen(input):
     return input
 
 
-def get_reboot_type(type):
-    if type == "primary":
-        return "PrimaryNode"
-    if type == "secondary":
-        return "SecondaryNode"
-    if type == "all":
-        return "AllNodes"
-    return type
-
-
 class Actions:
     NoAction, Create, Update, Delete = range(4)
 
 
 class AzureRMRedisCaches(AzureRMModuleBase):
-    """Configuration class for an Azure RM Cache for Redis resource"""
+    """Configuration class for an Azure RM Redis Cache resource"""
 
     def __init__(self):
         self.module_arg_spec = dict(
@@ -353,14 +297,6 @@ class AzureRMRedisCaches(AzureRMModuleBase):
             tenant_settings=dict(
                 type='dict'
             ),
-            reboot=dict(
-                type='dict',
-                options=reboot_spec
-            ),
-            regenerate_key=dict(
-                type='dict',
-                options=regenerate_key_spec
-            ),
             state=dict(
                 type='str',
                 default='present',
@@ -383,9 +319,6 @@ class AzureRMRedisCaches(AzureRMModuleBase):
         self.subnet = None
         self.tenant_settings = None
 
-        self.reboot = None
-        self.regenerate_key = None
-
         self.tags = None
 
         self.results = dict(
@@ -395,6 +328,8 @@ class AzureRMRedisCaches(AzureRMModuleBase):
         )
         self.state = None
         self.to_do = Actions.NoAction
+
+        self.frameworks = None
 
         super(AzureRMRedisCaches, self).__init__(derived_arg_spec=self.module_arg_spec,
                                                  supports_check_mode=True,
@@ -430,7 +365,7 @@ class AzureRMRedisCaches(AzureRMModuleBase):
         if self.subnet:
             self.subnet = self.parse_subnet()
 
-        # get existing Azure Cache for Redis
+        # get existing redis cache
         old_response = self.get_rediscache()
 
         if old_response:
@@ -439,17 +374,17 @@ class AzureRMRedisCaches(AzureRMModuleBase):
         if self.state == 'present':
             # if redis not exists
             if not old_response:
-                self.log("Azure Cache for Redis instance doesn't exist")
+                self.log("Redis cache instance doesn't exist")
 
                 to_be_updated = True
                 self.to_do = Actions.Create
 
                 if not self.sku:
-                    self.fail("Please specify sku to creating new Azure Cache for Redis.")
+                    self.fail("Please specify sku to creating new redis cache.")
 
             else:
                 # redis exists already, do update
-                self.log("Azure Cache for Redis instance already exists")
+                self.log("Redis cache instance already exists")
 
                 update_tags, self.tags = self.update_tags(old_response.get('tags', None))
 
@@ -464,16 +399,16 @@ class AzureRMRedisCaches(AzureRMModuleBase):
 
         elif self.state == 'absent':
             if old_response:
-                self.log("Delete Azure Cache for Redis instance")
+                self.log("Delete Redis cache instance")
                 self.results['id'] = old_response['id']
                 to_be_updated = True
                 self.to_do = Actions.Delete
             else:
                 self.results['changed'] = False
-                self.log("Azure Cache for Redis {0} not exists.".format(self.name))
+                self.log("Redis cache {0} not exists.".format(self.name))
 
         if to_be_updated:
-            self.log('Need to Create/Update Azure Cache for Redis')
+            self.log('Need to Create/Update redis cache')
             self.results['changed'] = True
 
             if self.check_mode:
@@ -491,25 +426,7 @@ class AzureRMRedisCaches(AzureRMModuleBase):
 
             if self.to_do == Actions.Delete:
                 self.delete_rediscache()
-                self.log('Azure Cache for Redis instance deleted')
-
-        if old_response:
-            if self.reboot:
-                self.results['changed'] = True
-
-                if self.check_mode:
-                    return self.results
-                self.reboot['reboot_type'] = get_reboot_type(self.reboot['reboot_type'])
-                self.force_reboot_rediscache()
-
-            if self.regenerate_key:
-                self.results['changed'] = True
-
-                if self.check_mode:
-                    return self.results
-
-                response = self.rergenerate_rediscache_key()
-                self.results['keys'] = response.to_dict()
+                self.log('Redis cache instance deleted')
 
         return self.results
 
@@ -544,12 +461,12 @@ class AzureRMRedisCaches(AzureRMModuleBase):
 
     def create_rediscache(self):
         '''
-        Creates Azure Cache for Redis instance with the specified configuration.
+        Creates redis cache instance with the specified configuration.
 
-        :return: deserialized Azure Cache for Redis instance state dictionary
+        :return: deserialized redis cache instance state dictionary
         '''
         self.log(
-            "Creating Azure Cache for Redis instance {0}".format(self.name))
+            "Creating redis cache instance {0}".format(self.name))
 
         try:
             redis_config = dict()
@@ -576,19 +493,19 @@ class AzureRMRedisCaches(AzureRMModuleBase):
                 response = self.get_poller_result(response)
 
         except CloudError as exc:
-            self.log('Error attempting to create the Azure Cache for Redis instance.')
+            self.log('Error attempting to create the redis cache instance.')
             self.fail(
-                "Error creating the Azure Cache for Redis instance: {0}".format(str(exc)))
+                "Error creating the redis cache instance: {0}".format(str(exc)))
         return rediscache_to_dict(response)
 
     def update_rediscache(self):
         '''
-        Updates Azure Cache for Redis instance with the specified configuration.
+        Updates redis cache instance with the specified configuration.
 
-        :return: Azure Cache for Redis instance state dictionary
+        :return: redis cache instance state dictionary
         '''
         self.log(
-            "Updating Azure Cache for Redis instance {0}".format(self.name))
+            "Updating redis cache instance {0}".format(self.name))
 
         try:
             redis_config = dict()
@@ -612,34 +529,34 @@ class AzureRMRedisCaches(AzureRMModuleBase):
                 response = self.get_poller_result(response)
 
         except CloudError as exc:
-            self.log('Error attempting to update the Azure Cache for Redis instance.')
+            self.log('Error attempting to update the redis cache instance.')
             self.fail(
-                "Error updating the Azure Cache for Redis instance: {0}".format(str(exc)))
+                "Error updating the redis cache instance: {0}".format(str(exc)))
         return rediscache_to_dict(response)
 
     def delete_rediscache(self):
         '''
-        Deletes specified Azure Cache for Redis instance in the specified subscription and resource group.
+        Deletes specified redis cache instance in the specified subscription and resource group.
 
         :return: True
         '''
-        self.log("Deleting the Azure Cache for Redis instance {0}".format(self.name))
+        self.log("Deleting the redis cache instance {0}".format(self.name))
         try:
             response = self._client.redis.delete(resource_group_name=self.resource_group,
                                                  name=self.name)
         except CloudError as e:
-            self.log('Error attempting to delete the Azure Cache for Redis instance.')
+            self.log('Error attempting to delete the redis cache instance.')
             self.fail(
-                "Error deleting the Azure Cache for Redis instance: {0}".format(str(e)))
+                "Error deleting the redis cache instance: {0}".format(str(e)))
         return True
 
     def get_rediscache(self):
         '''
-        Gets the properties of the specified Azure Cache for Redis instance.
+        Gets the properties of the specified redis cache instance.
 
-        :return: Azure Cache for Redis instance state dictionary
+        :return: redis cache instance state dictionary
         '''
-        self.log("Checking if the Azure Cache for Redis instance {0} is present".format(self.name))
+        self.log("Checking if the redis cache instance {0} is present".format(self.name))
 
         response = None
 
@@ -648,49 +565,14 @@ class AzureRMRedisCaches(AzureRMModuleBase):
                                               name=self.name)
 
             self.log("Response : {0}".format(response))
-            self.log("Azure Cache for Redis instance : {0} found".format(response.name))
+            self.log("Redis cache instance : {0} found".format(response.name))
             return rediscache_to_dict(response)
 
         except CloudError as ex:
-            self.log("Didn't find Azure Cache for Redis {0} in resource group {1}".format(
+            self.log("Didn't find redis cache {0} in resource group {1}".format(
                 self.name, self.resource_group))
 
         return False
-
-    def force_reboot_rediscache(self):
-        '''
-        Force reboot specified redis cache instance in the specified subscription and resource group.
-
-        :return: True
-        '''
-        self.log("Force reboot the redis cache instance {0}".format(self.name))
-        try:
-            response = self._client.redis.force_reboot(resource_group_name=self.resource_group,
-                                                       name=self.name,
-                                                       reboot_type=self.reboot['reboot_type'],
-                                                       shard_id=self.reboot.get('shard_id'))
-        except CloudError as e:
-            self.log('Error attempting to force reboot the redis cache instance.')
-            self.fail(
-                "Error force rebooting the redis cache instance: {0}".format(str(e)))
-        return True
-
-    def rergenerate_rediscache_key(self):
-        '''
-        Regenerate key of redis cache instance in the specified subscription and resource group.
-
-        :return: True
-        '''
-        self.log("Regenerate key of redis cache instance {0}".format(self.name))
-        try:
-            response = self._client.redis.regenerate_key(resource_group_name=self.resource_group,
-                                                         name=self.name,
-                                                         key_type=self.regenerate_key['key_type'].title())
-            return response.to_dict()
-        except CloudError as e:
-            self.log('Error attempting to regenerate key of redis cache instance.')
-            self.fail(
-                "Error regenerate key of redis cache instance: {0}".format(str(e)))
 
     def get_subnet(self):
         '''
