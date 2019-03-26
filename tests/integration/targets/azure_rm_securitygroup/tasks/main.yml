@@ -267,7 +267,7 @@
                 - "{{ asg_name1 }}"
             destination_application_security_groups:
                 - resource_group: "{{ resource_group_secondary }}"
-                - name: "{{ asg_name2 }}"
+                  name: "{{ asg_name2 }}"
             destination_port_range: 22
             access: Allow
             priority: 101
