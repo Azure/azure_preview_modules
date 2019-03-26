@@ -254,7 +254,6 @@
 - assert:
     that:
       - output.changed
-      - output.id
 
 - name: Create security group with application security group - Idempotent
   azure_rm_securitygroup:
