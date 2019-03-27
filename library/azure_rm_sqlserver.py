@@ -17,9 +17,9 @@ DOCUMENTATION = '''
 ---
 module: azure_rm_sqlserver
 version_added: "2.5"
-short_description: Manage SQL Server instance.
+short_description: Manage SQL Server instance
 description:
-    - Create, update and delete instance of SQL Server.
+    - Create, update and delete instance of SQL Server
 
 options:
     resource_group:
@@ -32,7 +32,7 @@ options:
         required: True
     location:
         description:
-            - Resource location. If not set, location from the resource group will be used as default.
+            - Resource location.
     admin_username:
         description:
             - Administrator username for the server. Once created it cannot be changed.
@@ -44,13 +44,20 @@ options:
             - "The version of the server. For example '12.0'."
     identity:
         description:
-            - "The identity type. Set this to 'C(system_assigned)' in order to automatically create and assign an Azure Active Directory principal for the re
-              source."
+            - "The identity type. Set this to 'SystemAssigned' in order to automatically create and assign an Azure Active Directory principal for the resour
+               ce. Possible values include: 'SystemAssigned'"
+    state:
+        description:
+            - Assert the state of the SQL server. Use C(present) to create or update a server and
+              C(absent) to delete a server.
+        default: present
         choices:
-            - 'system_assigned'
+            - absent
+            - present
 
 extends_documentation_fragment:
     - azure
+    - azure_tags
 
 author:
     - "Zim Kalinowski (@zikalino)"
@@ -60,8 +67,8 @@ author:
 EXAMPLES = '''
   - name: Create (or update) SQL Server
     azure_rm_sqlserver:
-      resource_group: resource_group
-      name: sqlcrudtest-4645
+      resource_group: myResourceGroup
+      name: server_name
       location: westus
       admin_username: mylogin
       admin_password: Testpasswordxyz12!
@@ -73,7 +80,7 @@ id:
         - Resource ID.
     returned: always
     type: str
-    sample: /subscriptions/00000000-1111-2222-3333-444444444444/resourceGroups/sqlcrudtest-7398/providers/Microsoft.Sql/servers/sqlcrudtest-4645
+    sample: /subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/myResourceGroup/providers/Microsoft.Sql/servers/sqlcrudtest-4645
 version:
     description:
         - The version of the server.
@@ -85,7 +92,7 @@ state:
         - The state of the server.
     returned: always
     type: str
-    sample: Ready
+    sample: state
 fully_qualified_domain_name:
     description:
         - The fully qualified domain name of the server.
@@ -99,7 +106,7 @@ from ansible.module_utils.azure_rm_common import AzureRMModuleBase
 
 try:
     from msrestazure.azure_exceptions import CloudError
-    from msrestazure.azure_operation import AzureOperationPoller
+    from msrest.polling import LROPoller
     from azure.mgmt.sql import SqlManagementClient
     from msrest.serialization import Model
 except ImportError:
@@ -138,8 +145,7 @@ class AzureRMServers(AzureRMModuleBase):
                 type='str'
             ),
             identity=dict(
-                type='str',
-                choices=['system_assigned']
+                type='str'
             ),
             state=dict(
                 type='str',
@@ -151,39 +157,37 @@ class AzureRMServers(AzureRMModuleBase):
         self.resource_group = None
         self.name = None
         self.parameters = dict()
+        self.tags = None
 
         self.results = dict(changed=False)
-        self.mgmt_client = None
         self.state = None
         self.to_do = Actions.NoAction
 
         super(AzureRMServers, self).__init__(derived_arg_spec=self.module_arg_spec,
                                              supports_check_mode=True,
-                                             supports_tags=False)
+                                             supports_tags=True)
 
     def exec_module(self, **kwargs):
         """Main module execution method"""
 
-        for key in list(self.module_arg_spec.keys()):
+        for key in list(self.module_arg_spec.keys()) + ['tags']:
             if hasattr(self, key):
                 setattr(self, key, kwargs[key])
             elif kwargs[key] is not None:
                 if key == "location":
-                    self.parameters["location"] = kwargs[key]
+                    self.parameters.update({"location": kwargs[key]})
                 elif key == "admin_username":
-                    self.parameters["administrator_login"] = kwargs[key]
+                    self.parameters.update({"administrator_login": kwargs[key]})
                 elif key == "admin_password":
-                    self.parameters["administrator_login_password"] = kwargs[key]
+                    self.parameters.update({"administrator_login_password": kwargs[key]})
                 elif key == "version":
-                    self.parameters["version"] = kwargs[key]
+                    self.parameters.update({"version": kwargs[key]})
                 elif key == "identity":
-                    self.parameters.setdefault("identity", {})["type"] = _snake_to_camel(kwargs[key], True)
+                    self.parameters.update({"identity": {"type": kwargs[key]}})
 
         old_response = None
         response = None
-
-        self.mgmt_client = self.get_mgmt_svc_client(SqlManagementClient,
-                                                    base_url=self._cloud_environment.endpoints.resource_manager)
+        results = dict()
 
         resource_group = self.get_resource_group(self.resource_group)
 
@@ -204,6 +208,9 @@ class AzureRMServers(AzureRMModuleBase):
                 self.to_do = Actions.Delete
             elif self.state == 'present':
                 self.log("Need to check if SQL Server instance has to be deleted or may be updated")
+                update_tags, newtags = self.update_tags(old_response.get('tags', dict()))
+                if update_tags:
+                    self.tags = newtags
                 self.to_do = Actions.Update
 
         if (self.to_do == Actions.Create) or (self.to_do == Actions.Update):
@@ -213,6 +220,7 @@ class AzureRMServers(AzureRMModuleBase):
                 self.results['changed'] = True
                 return self.results
 
+            self.parameters['tags'] = self.tags
             response = self.create_update_sqlserver()
             response.pop('administrator_login_password', None)
 
@@ -255,10 +263,10 @@ class AzureRMServers(AzureRMModuleBase):
         self.log("Creating / Updating the SQL Server instance {0}".format(self.name))
 
         try:
-            response = self.mgmt_client.servers.create_or_update(resource_group_name=self.resource_group,
-                                                                 server_name=self.name,
-                                                                 parameters=self.parameters)
-            if isinstance(response, AzureOperationPoller):
+            response = self.sql_client.servers.create_or_update(self.resource_group,
+                                                                self.name,
+                                                                self.parameters)
+            if isinstance(response, LROPoller):
                 response = self.get_poller_result(response)
 
         except CloudError as exc:
@@ -274,8 +282,8 @@ class AzureRMServers(AzureRMModuleBase):
         '''
         self.log("Deleting the SQL Server instance {0}".format(self.name))
         try:
-            response = self.mgmt_client.servers.delete(resource_group_name=self.resource_group,
-                                                       server_name=self.name)
+            response = self.sql_client.servers.delete(self.resource_group,
+                                                      self.name)
         except CloudError as e:
             self.log('Error attempting to delete the SQL Server instance.')
             self.fail("Error deleting the SQL Server instance: {0}".format(str(e)))
@@ -291,8 +299,8 @@ class AzureRMServers(AzureRMModuleBase):
         self.log("Checking if the SQL Server instance {0} is present".format(self.name))
         found = False
         try:
-            response = self.mgmt_client.servers.get(resource_group_name=self.resource_group,
-                                                    server_name=self.name)
+            response = self.sql_client.servers.get(self.resource_group,
+                                                   self.name)
             found = True
             self.log("Response : {0}".format(response))
             self.log("SQL Server instance : {0} found".format(response.name))
@@ -304,16 +312,10 @@ class AzureRMServers(AzureRMModuleBase):
         return False
 
 
-def _snake_to_camel(snake, capitalize_first= False):
-    if capitalize_first:
-        return ''.join(x.capitalize() or '_' for x in snake.split('_'))
-    else:
-        return snake.split('_')[0] + ''.join(x.capitalize() or '_' for x in snake.split('_')[1:])
-
-
 def main():
     """Main execution"""
     AzureRMServers()
+
 
 if __name__ == '__main__':
     main()

@@ -16,19 +16,22 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = '''
 ---
 module: azure_rm_containerinstance_facts
-version_added: "2.5"
-short_description: Get Container Group facts.
+version_added: "2.8"
+short_description: Get Azure Container Instance facts.
 description:
-    - Get facts of Container Group.
+    - Get facts of Container Instance.
 
 options:
     resource_group:
         description:
             - The name of the resource group.
         required: True
-    container_group_name:
+    name:
         description:
-            - The name of the container group.
+            - The name of the container instance.
+    tags:
+        description:
+            - Limit results by providing a list of tags. Format tags as 'key' or 'key:value'.
 
 extends_documentation_fragment:
     - azure
@@ -39,58 +42,108 @@ author:
 '''
 
 EXAMPLES = '''
-  - name: Get instance of Container Group
+  - name: Get specific Container Instance facts
     azure_rm_containerinstance_facts:
-      resource_group: resource_group_name
-      container_group_name: container_group_name
+      resource_group: myResourceGroup
+      name: container_group_name
 
-  - name: List instances of Container Group
+  - name: List Container Instances in a specified resource group name
     azure_rm_containerinstance_facts:
-      resource_group: resource_group_name
+      resource_group: myResourceGroup
 '''
 
 RETURN = '''
 container_groups:
-    description: A list of dict results where the key is the name of the Container Group and the values are the facts for that Container Group.
+    description: A list of Container Instance dictionaries.
     returned: always
     type: complex
     contains:
-        containergroup_name:
-            description: The key is the name of the server that the values relate to.
+        id:
+            description:
+                - The resource id.
+            returned: always
+            type: str
+            sample: "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/demo/providers/Microsoft.ContainerInstance/containerGroups/my
+                    containers"
+        resource_group:
+            description:
+                - Resource group where the container exists.
+            returned: always
+            type: str
+            sample: testrg
+        name:
+            description:
+                - The resource name.
+            returned: always
+            type: str
+            sample: mycontainers
+        location:
+            description:
+                - The resource location.
+            returned: always
+            type: str
+            sample: westus
+        os_type:
+            description:
+                - The OS type of containers.
+            returned: always
+            type: str
+            sample: linux
+        ip_address:
+            description:
+                - IP address of the container instance.
+            returned: always
+            type: str
+            sample: 173.15.18.1
+        ports:
+            description:
+                - List of ports exposed by the container instance.
+            returned: always
+            type: list
+            sample: [ 80, 81 ]
+        containers:
+            description:
+                - The containers within the container group.
+            returned: always
             type: complex
+            sample: containers
             contains:
-                id:
-                    description:
-                        - The resource id.
-                    returned: always
-                    type: str
-                    sample: "/subscriptions/ae43b1e3-c35d-4c8c-bc0d-f148b4c52b78/resourceGroups/demo/providers/Microsoft.ContainerInstance/containerGroups/my
-                            containers"
                 name:
                     description:
-                        - The resource name.
+                        - The name of the container instance.
                     returned: always
                     type: str
-                    sample: mycontainers
-                type:
+                    sample: "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/demo/providers/Microsoft.ContainerInstance/containerGroups/my
+                            containers"
+                image:
                     description:
-                        - The resource type.
+                        - The container image name.
                     returned: always
                     type: str
-                    sample: Microsoft.ContainerInstance/containerGroups
-                location:
+                    sample: "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/demo/providers/Microsoft.ContainerInstance/containerGroups/my
+                            containers"
+                memory:
                     description:
-                        - The resource location.
+                        - The required memory of the containers in GB.
                     returned: always
-                    type: str
-                    sample: westus
-                containers:
+                    type: float
+                    sample: 1.5
+                cpu:
                     description:
-                        - The containers within the container group.
+                        - The required number of CPU cores of the containers.
                     returned: always
-                    type: complex
-                    sample: containers
-                    contains:
+                    type: int
+                    sample: 1
+                ports:
+                    description:
+                        - List of ports exposed within the container group.
+                    returned: always
+                    type: list
+                    sample: [ 80, 81 ]
+        tags:
+            description: Tags assigned to the resource. Dictionary of string:string pairs.
+            type: dict
+            sample: { "tag1": "abc" }
 '''
 
 from ansible.module_utils.azure_rm_common import AzureRMModuleBase
@@ -105,7 +158,7 @@ except ImportError:
     pass
 
 
-class AzureRMContainerGroupsFacts(AzureRMModuleBase):
+class AzureRMContainerInstanceFacts(AzureRMModuleBase):
     def __init__(self):
         # define user inputs into argument
         self.module_arg_spec = dict(
@@ -113,8 +166,11 @@ class AzureRMContainerGroupsFacts(AzureRMModuleBase):
                 type='str',
                 required=True
             ),
-            container_group_name=dict(
+            name=dict(
                 type='str'
+            ),
+            tags=dict(
+                type='list'
             )
         )
         # store the results of the module operation
@@ -122,66 +178,108 @@ class AzureRMContainerGroupsFacts(AzureRMModuleBase):
             changed=False,
             ansible_facts=dict()
         )
-        self.mgmt_client = None
         self.resource_group = None
-        self.container_group_name = None
-        super(AzureRMContainerGroupsFacts, self).__init__(self.module_arg_spec)
+        self.name = None
+        super(AzureRMContainerInstanceFacts, self).__init__(self.module_arg_spec, supports_tags=False)
 
     def exec_module(self, **kwargs):
         for key in self.module_arg_spec:
             setattr(self, key, kwargs[key])
-        self.mgmt_client = self.get_mgmt_svc_client(ContainerInstanceManagementClient,
-                                                    base_url=self._cloud_environment.endpoints.resource_manager)
 
-        if (self.resource_group is not None and
-                self.container_group_name is not None):
-            self.results['container_groups'] = self.get()
+        if (self.name is not None):
+            self.results['containerinstances'] = self.get()
         elif (self.resource_group is not None):
-            self.results['container_groups'] = self.list_by_resource_group()
+            self.results['containerinstances'] = self.list_by_resource_group()
+        else:
+            self.results['containerinstances'] = self.list_all()
         return self.results
 
     def get(self):
-        '''
-        Gets facts of the specified Container Group.
-
-        :return: deserialized Container Groupinstance state dictionary
-        '''
         response = None
-        results = {}
+        results = []
         try:
-            response = self.mgmt_client.container_groups.get(resource_group_name=self.resource_group,
-                                                             container_group_name=self.container_group_name)
+            response = self.containerinstance_client.container_groups.get(resource_group_name=self.resource_group,
+                                                                          container_group_name=self.name)
             self.log("Response : {0}".format(response))
         except CloudError as e:
-            self.log('Could not get facts for ContainerGroups.')
+            self.log('Could not get facts for Container Instances.')
 
-        if response is not None:
-            results[response.name] = response.as_dict()
+        if response is not None and self.has_tags(response.tags, self.tags):
+            results.append(self.format_item(response))
 
         return results
 
     def list_by_resource_group(self):
-        '''
-        Gets facts of the specified Container Group.
-
-        :return: deserialized Container Groupinstance state dictionary
-        '''
         response = None
-        results = {}
+        results = []
         try:
-            response = self.mgmt_client.container_groups.list_by_resource_group(resource_group_name=self.resource_group)
+            response = self.containerinstance_client.container_groups.list_by_resource_group(resource_group_name=self.resource_group)
             self.log("Response : {0}".format(response))
         except CloudError as e:
-            self.log('Could not get facts for ContainerGroups.')
+            self.fail('Could not list facts for Container Instances.')
 
         if response is not None:
             for item in response:
-                results[item.name] = item.as_dict()
+                if self.has_tags(item.tags, self.tags):
+                    results.append(self.format_item(item))
 
         return results
 
+    def list_all(self):
+        response = None
+        results = []
+        try:
+            response = self.containerinstance_client.container_groups.list()
+            self.log("Response : {0}".format(response))
+        except CloudError as e:
+            self.fail('Could not list facts for Container Instances.')
+
+        if response is not None:
+            for item in response:
+                if self.has_tags(item.tags, self.tags):
+                    results.append(self.format_item(item))
+
+        return results
+
+    def format_item(self, item):
+        d = item.as_dict()
+        containers = d['containers']
+        ports = d['ip_address']['ports']
+        resource_group = d['id'].split('resourceGroups/')[1].split('/')[0]
+
+        for port_index in range(len(ports)):
+            ports[port_index] = ports[port_index]['port']
+
+        for container_index in range(len(containers)):
+            old_container = containers[container_index]
+            new_container = {
+                'name': old_container['name'],
+                'image': old_container['image'],
+                'memory': old_container['resources']['requests']['memory_in_gb'],
+                'cpu': old_container['resources']['requests']['cpu'],
+                'ports': []
+            }
+            for port_index in range(len(old_container['ports'])):
+                new_container['ports'].append(old_container['ports'][port_index]['port'])
+            containers[container_index] = new_container
+
+        d = {
+            'id': d['id'],
+            'resource_group': resource_group,
+            'name': d['name'],
+            'os_type': d['os_type'],
+            'ip_address': 'public' if d['ip_address']['type'] == 'Public' else 'none',
+            'ports': ports,
+            'location': d['location'],
+            'containers': containers,
+            'tags': d.get('tags', None)
+        }
+        return d
+
 
 def main():
-    AzureRMContainerGroupsFacts()
+    AzureRMContainerInstanceFacts()
+
+
 if __name__ == '__main__':
     main()

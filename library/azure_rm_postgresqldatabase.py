@@ -37,13 +37,28 @@ options:
     charset:
         description:
             - The charset of the database. Check PostgreSQL documentation for possible values.
+            - This is only set on creation, use I(force_update) to recreate a database if the
+              values don't match.
     collation:
         description:
             - The collation of the database. Check PostgreSQL documentation for possible values.
+            - This is only set on creation, use I(force_update) to recreate a database if the
+              values don't match.
     force_update:
       description:
-          - Needs to be set to True in order to PostgreSQL Database to be updated.
+          - When set to C(true), will delete and recreate the existing PostgreSQL database if any
+            of the properties don't match what is set.
+          - When set to C(false), no change will occur to the database even if any
+            of the properties do not match.
       type: bool
+      default: 'no'
+    state:
+        description:
+            - Assert the state of the PostgreSQL database. Use C(present) to create or update a database and C(absent) to delete it.
+        default: present
+        choices:
+            - absent
+            - present
 
 extends_documentation_fragment:
     - azure
@@ -56,7 +71,7 @@ author:
 EXAMPLES = '''
   - name: Create (or update) PostgreSQL Database
     azure_rm_postgresqldatabase:
-      resource_group: TestGroup
+      resource_group: myResourceGroup
       server_name: testserver
       name: db1
 '''
@@ -67,7 +82,8 @@ id:
         - Resource ID
     returned: always
     type: str
-    sample: /subscriptions/ffffffff-ffff-ffff-ffff-ffffffffffff/resourceGroups/TestGroup/providers/Microsoft.DBforPostgreSQL/servers/testserver/databases/db1
+    sample: "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/myResourceGroups/providers/Microsoft.DBforPostgreSQL/servers/testserve
+             r/databases/db1"
 name:
     description:
         - Resource name.
@@ -80,9 +96,9 @@ import time
 from ansible.module_utils.azure_rm_common import AzureRMModuleBase
 
 try:
-    from msrestazure.azure_exceptions import CloudError
-    from msrestazure.azure_operation import AzureOperationPoller
     from azure.mgmt.rdbms.postgresql import PostgreSQLManagementClient
+    from msrestazure.azure_exceptions import CloudError
+    from msrest.polling import LROPoller
     from msrest.serialization import Model
 except ImportError:
     # This is handled in azure_rm_common
@@ -117,7 +133,8 @@ class AzureRMDatabases(AzureRMModuleBase):
                 type='str'
             ),
             force_update=dict(
-                type='bool'
+                type='bool',
+                default=False
             ),
             state=dict(
                 type='str',
@@ -129,6 +146,7 @@ class AzureRMDatabases(AzureRMModuleBase):
         self.resource_group = None
         self.server_name = None
         self.name = None
+        self.force_update = None
         self.parameters = dict()
 
         self.results = dict(changed=False)
@@ -183,6 +201,7 @@ class AzureRMDatabases(AzureRMModuleBase):
                 if not self.check_mode:
                     self.delete_postgresqldatabase()
             else:
+                self.fail("Database properties cannot be updated without setting 'force_update' option")
                 self.to_do = Actions.NoAction
 
         if (self.to_do == Actions.Create) or (self.to_do == Actions.Update):
@@ -193,11 +212,7 @@ class AzureRMDatabases(AzureRMModuleBase):
                 return self.results
 
             response = self.create_update_postgresqldatabase()
-
-            if not old_response:
-                self.results['changed'] = True
-            else:
-                self.results['changed'] = old_response.__ne__(response)
+            self.results['changed'] = True
             self.log("Creation / Update done")
         elif self.to_do == Actions.Delete:
             self.log("PostgreSQL Database instance deleted")
@@ -235,7 +250,7 @@ class AzureRMDatabases(AzureRMModuleBase):
                                                                    server_name=self.server_name,
                                                                    database_name=self.name,
                                                                    parameters=self.parameters)
-            if isinstance(response, AzureOperationPoller):
+            if isinstance(response, LROPoller):
                 response = self.get_poller_result(response)
 
         except CloudError as exc:
@@ -286,6 +301,7 @@ class AzureRMDatabases(AzureRMModuleBase):
 def main():
     """Main execution"""
     AzureRMDatabases()
+
 
 if __name__ == '__main__':
     main()

@@ -56,10 +56,7 @@
     actions:
       - push
   register: output
-- name: Assert the state has not changed
-  assert:
-    that:
-      - output.changed == false
+
 
 - name: Delete instance of Webhook -- check mode
   azure_rm_containerregistrywebhook:

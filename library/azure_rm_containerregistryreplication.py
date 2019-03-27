@@ -84,9 +84,24 @@ try:
     from msrestazure.azure_operation import AzureOperationPoller
     from azure.mgmt.containerregistry import ContainerRegistryManagementClient
     from msrest.serialization import Model
+    from msrest.polling import LROPoller
 except ImportError:
     # This is handled in azure_rm_common
     pass
+
+
+def create_replication_dict(replication):
+    if replication is None:
+        return None
+    results = dict(
+        id=replication.id,
+        name=replication.name,
+        location=replication.location,
+        provisioning_state=replication.provisioning_state,
+        tags=replication.tags,
+        status=replication.status.display_status
+    )
+    return results
 
 
 class Actions:
@@ -147,8 +162,11 @@ class AzureRMReplications(AzureRMModuleBase):
         old_response = None
         response = None
 
-        self.mgmt_client = self.get_mgmt_svc_client(ContainerRegistryManagementClient,
-                                                    base_url=self._cloud_environment.endpoints.resource_manager)
+        self.mgmt_client = self.get_mgmt_svc_client(
+                ContainerRegistryManagementClient,
+                base_url=self._cloud_environment.endpoints.resource_manager,
+                api_version='2017-10-01'
+            )
 
         resource_group = self.get_resource_group(self.resource_group)
 
@@ -227,13 +245,13 @@ class AzureRMReplications(AzureRMModuleBase):
                                                                 registry_name=self.registry_name,
                                                                 replication_name=self.replication_name,
                                                                 location=self.location)
-            if isinstance(response, AzureOperationPoller):
+            if isinstance(response, LROPoller):
                 response = self.get_poller_result(response)
 
         except CloudError as exc:
             self.log('Error attempting to create the Replication instance.')
             self.fail("Error creating the Replication instance: {0}".format(str(exc)))
-        return response.as_dict()
+        return create_replication_dict(response)
 
     def delete_replication(self):
         '''

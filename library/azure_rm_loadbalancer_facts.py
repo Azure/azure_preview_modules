@@ -1,22 +1,9 @@
 #!/usr/bin/python
-#
-# Copyright (c) 2016 Thomas Stringer, <tomstr@microsoft.com>
-#
-# This file is part of Ansible
-#
-# Ansible is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# Ansible is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with Ansible.  If not, see <http://www.gnu.org/licenses/>.
-#
+# -*- coding: utf-8 -*-
+
+# Copyright: (c) 2016, Thomas Stringer <tomstr@microsoft.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -41,18 +28,12 @@ options:
     name:
         description:
             - Limit results to a specific resource group.
-        required: false
-        default: null
     resource_group:
         description:
             - The resource group to search for the desired load balancer
-        required: false
-        default: null
     tags:
         description:
             - Limit results by providing a list of tags. Format tags as 'key' or 'key:value'.
-        required: false
-        default: null
 
 extends_documentation_fragment:
     - azure
@@ -65,10 +46,14 @@ EXAMPLES = '''
     - name: Get facts for one load balancer
       azure_rm_loadbalancer_facts:
         name: Testing
-        resource_group: TestRG
+        resource_group: myResourceGroup
 
     - name: Get facts for all load balancers
       azure_rm_loadbalancer_facts:
+
+    - name: Get facts for all load balancers in a specific resource group
+      azure_rm_loadbalancer_facts:
+        resource_group: myResourceGroup
 
     - name: Get facts by tags
       azure_rm_loadbalancer_facts:
@@ -88,7 +73,7 @@ from ansible.module_utils.azure_rm_common import AzureRMModuleBase
 try:
     from msrestazure.azure_exceptions import CloudError
     from azure.common import AzureHttpError
-except:
+except Exception:
     # handled in azure_rm_common
     pass
 
@@ -128,75 +113,51 @@ class AzureRMLoadBalancerFacts(AzureRMModuleBase):
         for key in self.module_args:
             setattr(self, key, kwargs[key])
 
-        if self.resource_group is not None and self.name is not None:
-            self.results['loadbalancers'] = self.get()
-        elif self.resource_group is not None:
-            self.results['loadbalancers'] = self.list_by_resource_group()
-        else:
-            self.results['loadbalancers'] = self.list_all()
-
-        # old way of listing load balancers
-        self.results['ansible_facts']['azure_loadbalancers'] = [k for k in self.results['loadbalancers']]
+        self.results['ansible_facts']['azure_loadbalancers'] = (
+            self.get_item() if self.name
+            else self.list_items()
+        )
 
         return self.results
 
-    def get(self):
-        '''
-        Gets facts of the specified Load Balancer.
+    def get_item(self):
+        """Get a single load balancer"""
 
-        :return: deserialized Load Balancerinstance state dictionary
-        '''
-        response = None
-        results = {}
+        self.log('Get properties for {0}'.format(self.name))
+
+        item = None
+        result = []
+
         try:
-            response = self.network_client.load_balancers.get(resource_group_name=self.resource_group,
-                                                              load_balancer_name=self.name)
-            self.log("Response : {0}".format(response))
-        except CloudError as e:
-            self.log('Could not get facts for LoadBalancers.')
+            item = self.network_client.load_balancers.get(self.resource_group, self.name)
+        except CloudError:
+            pass
 
-        if response is not None:
-            results[response.name] = response.as_dict()
+        if item and self.has_tags(item.tags, self.tags):
+            result = [self.serialize_obj(item, AZURE_OBJECT_CLASS)]
 
-        return results
+        return result
 
-    def list_by_resource_group(self):
-        '''
-        Get all Load Balancers in a specified resource group.
+    def list_items(self):
+        """Get all load balancers"""
 
-        :return: deserialized Load Balancer instance state dictionary
-        '''
-        response = None
-        results = {}
-        try:
-            response = self.network_client.load_balancers.list(resource_group_name=self.resource_group)
-            self.log("Response : {0}".format(response))
-        except CloudError as e:
-            self.log('Could not get facts for Load Balancers.')
+        self.log('List all load balancers')
 
-        if response is not None:
-            for item in response:
-                results[item.name] = item.as_dict()
+        if self.resource_group:
+            try:
+                response = self.network_client.load_balancers.list(self.resource_group)
+            except AzureHttpError as exc:
+                self.fail('Failed to list items in resource group {0} - {1}'.format(self.resource_group, str(exc)))
+        else:
+            try:
+                response = self.network_client.load_balancers.list_all()
+            except AzureHttpError as exc:
+                self.fail('Failed to list all items - {0}'.format(str(exc)))
 
-        return results
-
-    def list_all(self):
-        '''
-        Get all Load Balancers in a specified resource group.
-
-        :return: deserialized Load Balancer instance state dictionary
-        '''
-        response = None
-        results = {}
-        try:
-            response = self.network_client.load_balancers.list_all()
-            self.log("Response : {0}".format(response))
-        except CloudError as e:
-            self.log('Could not get facts for Load Balancers.')
-
-        if response is not None:
-            for item in response:
-                results[item.name] = item.as_dict()
+        results = []
+        for item in response:
+            if self.has_tags(item.tags, self.tags):
+                results.append(self.serialize_obj(item, AZURE_OBJECT_CLASS))
 
         return results
 
@@ -205,6 +166,7 @@ def main():
     """Main module execution code path"""
 
     AzureRMLoadBalancerFacts()
+
 
 if __name__ == '__main__':
     main()

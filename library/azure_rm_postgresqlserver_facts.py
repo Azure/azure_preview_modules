@@ -16,19 +16,22 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = '''
 ---
 module: azure_rm_postgresqlserver_facts
-version_added: "2.5"
-short_description: Get MySQL Server facts.
+version_added: "2.7"
+short_description: Get Azure PostgreSQL Server facts.
 description:
-    - Get facts of MySQL Server.
+    - Get facts of PostgreSQL Server.
 
 options:
     resource_group:
         description:
             - The name of the resource group that contains the resource. You can obtain this value from the Azure Resource Manager API or the portal.
         required: True
-    server_name:
+    name:
         description:
             - The name of the server.
+    tags:
+        description:
+            - Limit results by providing a list of tags. Format tags as 'key' or 'key:value'.
 
 extends_documentation_fragment:
     - azure
@@ -39,100 +42,117 @@ author:
 '''
 
 EXAMPLES = '''
-  - name: Get instance of MySQL Server
+  - name: Get instance of PostgreSQL Server
     azure_rm_postgresqlserver_facts:
-      resource_group: resource_group_name
-      server_name: server_name
+      resource_group: myResourceGroup
+      name: server_name
 
-  - name: List instances of MySQL Server
+  - name: List instances of PostgreSQL Server
     azure_rm_postgresqlserver_facts:
-      resource_group: resource_group_name
+      resource_group: myResourceGroup
 '''
 
 RETURN = '''
 servers:
-    description: A list of dict results where the key is the name of the MySQL Server and the values are the facts for that MySQL Server.
+    description: A list of dictionaries containing facts for PostgreSQL servers.
     returned: always
     type: complex
     contains:
-        mysqlserver_name:
-            description: The key is the name of the server that the values relate to.
+        id:
+            description:
+                - Resource ID
+            returned: always
+            type: str
+            sample: "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/myResourceGroup/providers/Microsoft.DBforPostgreSQL/servers/po
+                     stgreabdud1223"
+        resource_group:
+            description:
+                - Resource group name.
+            returned: always
+            type: str
+            sample: myResourceGroup
+        name:
+            description:
+                - Resource name.
+            returned: always
+            type: str
+            sample: postgreabdud1223
+        location:
+            description:
+                - The location the resource resides in.
+            returned: always
+            type: str
+            sample: eastus
+        sku:
+            description:
+                - The SKU of the server.
+            returned: always
             type: complex
             contains:
-                id:
-                    description:
-                        - Resource ID
-                    returned: always
-                    type: str
-                    sample: /subscriptions/ffffffff-ffff-ffff-ffff-ffffffffffff/resourceGroups/TestGroup/providers/Microsoft.DBforPostgreSQL/servers/testserver
                 name:
                     description:
-                        - Resource name.
+                        - The name of the SKU
                     returned: always
                     type: str
-                    sample: testserver
-                type:
+                    sample: GP_Gen4_2
+                tier:
                     description:
-                        - Resource type.
+                        - The tier of the particular SKU
                     returned: always
                     type: str
-                    sample: Microsoft.DBforPostgreSQL/servers
-                location:
+                    sample: GeneralPurpose
+                capacity:
                     description:
-                        - The location the resource resides in.
+                        - The scale capacity.
                     returned: always
-                    type: str
-                    sample: onebox
-                sku:
-                    description:
-                        - The SKU (pricing tier) of the server.
-                    returned: always
-                    type: complex
-                    sample: sku
-                    contains:
-                        name:
-                            description:
-                                - The name of the sku, typically, a letter + Number code, e.g. P3.
-                            returned: always
-                            type: str
-                            sample: PGSQLB100
-                        tier:
-                            description:
-                                - "The tier of the particular SKU, e.g. Basic. Possible values include: 'Basic', 'Standard'"
-                            returned: always
-                            type: str
-                            sample: Basic
-                        capacity:
-                            description:
-                                - "The scale up/out capacity, representing server's compute units."
-                            returned: always
-                            type: int
-                            sample: 100
-                version:
-                    description:
-                        - "Server version. Possible values include: '9.5', '9.6'"
-                    returned: always
-                    type: str
-                    sample: version
-                user_visible_state:
-                    description:
-                        - "A state of a server that is visible to user. Possible values include: 'Ready', 'Dropping', 'Disabled'"
-                    returned: always
-                    type: str
-                    sample: user_visible_state
-                fully_qualified_domain_name:
-                    description:
-                        - The fully qualified domain name of a server.
-                    returned: always
-                    type: str
-                    sample: fully_qualified_domain_name
+                    type: int
+                    sample: 2
+        storage_mb:
+            description:
+                - The maximum storage allowed for a server.
+            returned: always
+            type: int
+            sample: 128000
+        enforce_ssl:
+            description:
+                - Enable SSL enforcement.
+            returned: always
+            type: bool
+            sample: False
+        admin_username:
+            description:
+                - "The administrator's login name of a server."
+            returned: always
+            type: str
+            sample: serveradmin
+        version:
+            description:
+                - Server version.
+            returned: always
+            type: str
+            sample: "9.6"
+        user_visible_state:
+            description:
+                - A state of a server that is visible to user.
+            returned: always
+            type: str
+            sample: Ready
+        fully_qualified_domain_name:
+            description:
+                - The fully qualified domain name of a server.
+            returned: always
+            type: str
+            sample: postgreabdud1223.postgres.database.azure.com
+        tags:
+            description: Tags assigned to the resource. Dictionary of string:string pairs.
+            type: dict
+            sample: { tag1: abc }
 '''
 
 from ansible.module_utils.azure_rm_common import AzureRMModuleBase
 
 try:
     from msrestazure.azure_exceptions import CloudError
-    from msrestazure.azure_operation import AzureOperationPoller
     from azure.mgmt.rdbms.postgresql import PostgreSQLManagementClient
     from msrest.serialization import Model
 except ImportError:
@@ -148,75 +168,87 @@ class AzureRMServersFacts(AzureRMModuleBase):
                 type='str',
                 required=True
             ),
-            server_name=dict(
+            name=dict(
                 type='str'
+            ),
+            tags=dict(
+                type='list'
             )
         )
         # store the results of the module operation
         self.results = dict(
-            changed=False,
-            ansible_facts=dict()
+            changed=False
         )
-        self.mgmt_client = None
         self.resource_group = None
-        self.server_name = None
-        super(AzureRMServersFacts, self).__init__(self.module_arg_spec)
+        self.name = None
+        self.tags = None
+        super(AzureRMServersFacts, self).__init__(self.module_arg_spec, supports_tags=False)
 
     def exec_module(self, **kwargs):
         for key in self.module_arg_spec:
             setattr(self, key, kwargs[key])
-        self.mgmt_client = self.get_mgmt_svc_client(PostgreSQLManagementClient,
-                                                    base_url=self._cloud_environment.endpoints.resource_manager)
 
         if (self.resource_group is not None and
-                self.server_name is not None):
+                self.name is not None):
             self.results['servers'] = self.get()
         elif (self.resource_group is not None):
             self.results['servers'] = self.list_by_resource_group()
         return self.results
 
     def get(self):
-        '''
-        Gets facts of the specified MySQL Server.
-
-        :return: deserialized MySQL Serverinstance state dictionary
-        '''
         response = None
-        results = {}
+        results = []
         try:
-            response = self.mgmt_client.servers.get(resource_group_name=self.resource_group,
-                                                    server_name=self.server_name)
+            response = self.postgresql_client.servers.get(resource_group_name=self.resource_group,
+                                                          server_name=self.name)
             self.log("Response : {0}".format(response))
         except CloudError as e:
-            self.log('Could not get facts for Servers.')
+            self.log('Could not get facts for PostgreSQL Server.')
 
-        if response is not None:
-            results[response.name] = response.as_dict()
+        if response and self.has_tags(response.tags, self.tags):
+            results.append(self.format_item(response))
 
         return results
 
     def list_by_resource_group(self):
-        '''
-        Gets facts of the specified MySQL Server.
-
-        :return: deserialized MySQL Serverinstance state dictionary
-        '''
         response = None
-        results = {}
+        results = []
         try:
-            response = self.mgmt_client.servers.list_by_resource_group(resource_group_name=self.resource_group)
+            response = self.postgresql_client.servers.list_by_resource_group(resource_group_name=self.resource_group)
             self.log("Response : {0}".format(response))
         except CloudError as e:
-            self.log('Could not get facts for Servers.')
+            self.log('Could not get facts for PostgreSQL Servers.')
 
         if response is not None:
             for item in response:
-                results[item.name] = item.as_dict()
+                if self.has_tags(item.tags, self.tags):
+                    results.append(self.format_item(item))
 
         return results
+
+    def format_item(self, item):
+        d = item.as_dict()
+        d = {
+            'id': d['id'],
+            'resource_group': self.resource_group,
+            'name': d['name'],
+            'sku': d['sku'],
+            'location': d['location'],
+            'storage_mb': d['storage_profile']['storage_mb'],
+            'version': d['version'],
+            'enforce_ssl': (d['ssl_enforcement'] == 'Enabled'),
+            'admin_username': d['administrator_login'],
+            'user_visible_state': d['user_visible_state'],
+            'fully_qualified_domain_name': d['fully_qualified_domain_name'],
+            'tags': d.get('tags')
+        }
+
+        return d
 
 
 def main():
     AzureRMServersFacts()
+
+
 if __name__ == '__main__':
     main()

@@ -99,9 +99,24 @@ try:
     from msrestazure.azure_operation import AzureOperationPoller
     from azure.mgmt.containerregistry import ContainerRegistryManagementClient
     from msrest.serialization import Model
+    from msrest.polling import LROPoller
 except ImportError:
     # This is handled in azure_rm_common
     pass
+
+
+def create_webhook_dict(webhook):
+    if webhook is None:
+        return None
+    results = dict(
+        id=webhook.id,
+        name=webhook.name,
+        location=webhook.location,
+        provisioning_state=webhook.provisioning_state,
+        tags=webhook.tags,
+        status=webhook.status
+    )
+    return results
 
 
 class Actions:
@@ -189,10 +204,16 @@ class AzureRMWebhooks(AzureRMModuleBase):
         old_response = None
         response = None
 
-        self.mgmt_client = self.get_mgmt_svc_client(ContainerRegistryManagementClient,
-                                                    base_url=self._cloud_environment.endpoints.resource_manager)
+        self.mgmt_client = self.get_mgmt_svc_client(
+                ContainerRegistryManagementClient,
+                base_url=self._cloud_environment.endpoints.resource_manager,
+                api_version='2017-10-01'
+            )
 
         resource_group = self.get_resource_group(self.resource_group)
+
+        if 'location' not in self.parameters:
+            self.parameters['location'] = resource_group.location
 
         old_response = self.get_webhook()
 
@@ -266,13 +287,13 @@ class AzureRMWebhooks(AzureRMModuleBase):
                                                             registry_name=self.registry_name,
                                                             webhook_name=self.webhook_name,
                                                             webhook_update_parameters=self.parameters)
-            if isinstance(response, AzureOperationPoller):
+            if isinstance(response, LROPoller):
                 response = self.get_poller_result(response)
 
         except CloudError as exc:
             self.log('Error attempting to create the Webhook instance.')
             self.fail("Error creating the Webhook instance: {0}".format(str(exc)))
-        return response.as_dict()
+        return create_webhook_dict(response)
 
     def delete_webhook(self):
         '''

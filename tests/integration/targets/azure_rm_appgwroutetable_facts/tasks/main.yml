@@ -48,4 +48,3 @@
       - output.changed == False
       - "'routetablename{{ rpfx }}' not in output.route_tables"
       - "'routetablename{{ rpfx }}second' not in output.route_tables"
-
