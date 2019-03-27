@@ -1,5 +1,7 @@
 ---
 - hosts: localhost
+  roles:
+  - { role: azure_preview_modules }
   tasks:
     - name: query
       azure_rm_resourcegroup_facts:
