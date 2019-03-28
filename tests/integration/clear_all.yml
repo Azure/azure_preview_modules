@@ -11,7 +11,7 @@
         name: "{{ item }}"
         state: absent
         force: yes
-      with_items: "{{ output | json_query('ansible_facts.azure_resourcegroups[*].name') | select('match', 'lab') | list }}"
+      with_items: "{{ output | json_query('ansible_facts.azure_resourcegroups[*].name') | select('match', '^lab') | list }}"
       async: 10000
       poll: 0
       register: jobs
