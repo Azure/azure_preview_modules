@@ -100,7 +100,7 @@ options:
                     - List of the source application security groups ids.
                     - It could be list of resource id.
                     - It could be list of names in same resource group.
-                    - It could be list of resource_group and name.
+                    - It could be list of dict containing resource_group and name.
                 type: list
             destination_application_security_groups:
                 description:
