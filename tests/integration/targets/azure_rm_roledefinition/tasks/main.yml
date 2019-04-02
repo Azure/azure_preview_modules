@@ -70,7 +70,7 @@
 - name: Assert facts
   assert:
     that:
-      - facts['roledefinitions'] | length == 1
+      - facts['roledefinitions'] | length >= 1
       - facts['roledefinitions']['permissions'] | length == 1
       - facts['roledefinitions']['permissions'][0]['not_data_actions'] | length == 1
       - facts['roledefinitions']['permissions'][0]['data_actions'] | length == 1
