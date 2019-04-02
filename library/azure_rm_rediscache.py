@@ -153,30 +153,20 @@ EXAMPLES = '''
   - name: Create an Azure Cache for Redis
     azure_rm_rediscache:
         resource_group: myResourceGroup
-        name: myRedisCache
+        name: myRedis
         sku:
           name: basic
           size: C1
 
-
   - name: Scale up the Azure Cache for Redis
     azure_rm_rediscache:
         resource_group: myResourceGroup
-        name: myRedisCache
+        name: myRedis
         sku:
           name: standard
           size: C1
         tags:
           testing: foo
-
-  - name: Create Azure Cache for Redis with subnet
-    azure_rm_rediscache:
-        resource_group: myResourceGroup
-        name: myRedisCache2
-        sku:
-          name: premium
-          size: P1
-        subnet: /subscriptions/<subs_id>/resourceGroups/redistest1/providers/Microsoft.Network/virtualNetworks/testredisvnet1/subnets/subnet1
 
   - name: Force reboot the redis cache
     azure_rm_rediscache:
@@ -184,6 +174,16 @@ EXAMPLES = '''
         name: myRedisCache
         reboot:
           reboot_type: all
+
+  - name: Create Azure Cache for Redis with subnet
+    azure_rm_rediscache:
+        resource_group: myResourceGroup
+        name: myRedis
+        sku:
+          name: premium
+          size: P1
+        subnet: "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/myResourceGroup/providers/Microsoft.Network/virtualNetworks/myVirt
+                 ualNetwork/subnets/mySubnet"
 
 '''
 
@@ -193,14 +193,14 @@ id:
     returned: always
     type: str
     sample: {
-        "id": "/subscriptions/<subs_id>/resourceGroups/rg/providers/Microsoft.Cache/Redis/redis1"
+        "id": "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/myResourceGroup/providers/Microsoft.Cache/Redis/myRedis"
     }
 host_name:
     description: Host name of the Azure Cache for Redis.
     returned: state is present
     type: str
     sample: {
-        "host_name": "redis1.redis.cache.windows.net"
+        "host_name": "myredis.redis.cache.windows.net"
     }
 '''
 
@@ -353,6 +353,11 @@ class AzureRMRedisCaches(AzureRMModuleBase):
             tenant_settings=dict(
                 type='dict'
             ),
+            state=dict(
+                type='str',
+                default='present',
+                choices=['present', 'absent']
+            ),
             reboot=dict(
                 type='dict',
                 options=reboot_spec
@@ -360,11 +365,6 @@ class AzureRMRedisCaches(AzureRMModuleBase):
             regenerate_key=dict(
                 type='dict',
                 options=regenerate_key_spec
-            ),
-            state=dict(
-                type='str',
-                default='present',
-                choices=['present', 'absent']
             )
         )
 
@@ -382,7 +382,6 @@ class AzureRMRedisCaches(AzureRMModuleBase):
         self.static_ip = None
         self.subnet = None
         self.tenant_settings = None
-
         self.reboot = None
         self.regenerate_key = None
 
@@ -493,23 +492,13 @@ class AzureRMRedisCaches(AzureRMModuleBase):
                 self.delete_rediscache()
                 self.log('Azure Cache for Redis instance deleted')
 
-        if old_response:
-            if self.reboot:
-                self.results['changed'] = True
+        if self.reboot:
+            self.reboot['reboot_type'] = get_reboot_type(self.reboot['reboot_type'])
+            self.force_reboot_rediscache()
 
-                if self.check_mode:
-                    return self.results
-                self.reboot['reboot_type'] = get_reboot_type(self.reboot['reboot_type'])
-                self.force_reboot_rediscache()
-
-            if self.regenerate_key:
-                self.results['changed'] = True
-
-                if self.check_mode:
-                    return self.results
-
-                response = self.rergenerate_rediscache_key()
-                self.results['keys'] = response.to_dict()
+        if self.regenerate_key:
+            response = self.rergenerate_rediscache_key()
+            self.results['keys'] = response
 
         return self.results
 
