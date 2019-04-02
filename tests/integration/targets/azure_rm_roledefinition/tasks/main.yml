@@ -81,22 +81,22 @@
 #      - facts['roledefinitions']['permissions'][0]['not_data_actions'] | length == 1
 #      - facts['roledefinitions']['permissions'][0]['data_actions'] | length == 1
 
-- name: Update the role definition (idempotent)
-  azure_rm_roledefinition:
-    name: "{{ role_name }}"
-    scope: "/subscriptions/{{ subscription_id }}/resourceGroups/{{ resource_group }}"
-    permissions:
-      - actions:
-          - "Microsoft.Compute/virtualMachines/read"
-        not_actions:
-          - "Microsoft.Compute/virtualMachines/write"
-        data_actions:
-          - "Microsoft.Storage/storageAccounts/blobServices/containers/blobs/read"
-        not_data_actions:
-          - "Microsoft.Storage/storageAccounts/blobServices/containers/blobs/write"
-    assignable_scopes:
-          - "/subscriptions/{{ subscription_id }}/resourceGroups/{{ resource_group }}"
-  register: output
+#- name: Update the role definition (idempotent)
+#  azure_rm_roledefinition:
+#    name: "{{ role_name }}"
+#    scope: "/subscriptions/{{ subscription_id }}/resourceGroups/{{ resource_group }}"
+#    permissions:
+#      - actions:
+#          - "Microsoft.Compute/virtualMachines/read"
+#        not_actions:
+#          - "Microsoft.Compute/virtualMachines/write"
+#        data_actions:
+#          - "Microsoft.Storage/storageAccounts/blobServices/containers/blobs/read"
+#        not_data_actions:
+#          - "Microsoft.Storage/storageAccounts/blobServices/containers/blobs/write"
+#    assignable_scopes:
+#          - "/subscriptions/{{ subscription_id }}/resourceGroups/{{ resource_group }}"
+#  register: output
 
 - name: assert output not changed
   assert:
