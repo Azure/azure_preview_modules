@@ -267,11 +267,14 @@ class AzureRMResource(AzureRMModuleBase):
                     provider = self.url.split("/providers/")[1].split("/")[0]
                     resourceType = self.url.split(provider + "/")[1].split("/")[0]
                     url = "/subscriptions/" + self.subscription_id + "/providers/" + provider
-                    api_versions = json.loads(self.mgmt_client.query(url, "GET", { 'api-version': '2015-01-01'}, None, None, [200], 0, 0).text)
+                    api_versions = json.loads(self.mgmt_client.query(url, "GET", {'api-version': '2015-01-01'}, None, None, [200], 0, 0).text)
                     for rt in api_versions['resourceTypes']:
                         if rt['resourceType'].lower() == resourceType.lower():
                             self.api_version = rt['apiVersions'][0]
                             break
+                else:
+                    # if there's no provider in API version, assume Microsoft.Resources
+                    self.api_version = '2018-05-01'
                 if not self.api_version:
                     self.fail("Couldn't find api version for {0}/{1}".format(provider, resourceType))
             except Exception as exc:

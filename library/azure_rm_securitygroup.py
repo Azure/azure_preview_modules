@@ -97,17 +97,19 @@ options:
                 default: "*"
             source_application_security_groups:
                 description:
-                    - List of the source application security groups ids.
+                    - List of the source application security groups.
                     - It could be list of resource id.
                     - It could be list of names in same resource group.
                     - It could be list of dict containing resource_group and name.
+                    - It is mutually exclusive with C(source_address_prefix) and C(source_address_prefixes).
                 type: list
             destination_application_security_groups:
                 description:
-                    - List of the destination application security groups ids.
+                    - List of the destination application security groups.
                     - It could be list of resource id.
                     - It could be list of names in same resource group.
-                    - It could be list of resource_group and name.
+                    - It could be list of dict containing resource_group and name.
+                    - It is mutually exclusive with C(destination_address_prefix) and C(destination_address_prefixes).
                 type: list
             access:
                 description:
@@ -223,7 +225,7 @@ state:
                 "destination_port_range": "*",
                 "direction": "Inbound",
                 "etag": 'W/"edf48d56-b315-40ca-a85d-dbcb47f2da7d"',
-                "id": "/subscriptions/3f7e29ba-24e0-42f6-8d9c-5149a14bda37/resourceGroups/Testing/providers/Microsoft.Network/networkSecurityGroups/mysecgroup/defaultSecurityRules/AllowVnetInBound",
+                "id": "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroup/myResourceGroup/providers/Microsoft.Network/networkSecurityGroups/mysecgroup/defaultSecurityRules/AllowVnetInBound",
                 "name": "AllowVnetInBound",
                 "priority": 65000,
                 "protocol": "*",
@@ -238,7 +240,7 @@ state:
                 "destination_port_range": "*",
                 "direction": "Inbound",
                 "etag": 'W/"edf48d56-b315-40ca-a85d-dbcb47f2da7d"',
-                "id": "/subscriptions/3f7e29ba-24e0-42f6-8d9c-5149a14bda37/resourceGroups/Testing/providers/Microsoft.Network/networkSecurityGroups/mysecgroup/defaultSecurityRules/AllowAzureLoadBalancerInBound",
+                "id": "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroup/myResourceGroup/providers/Microsoft.Network/networkSecurityGroups/mysecgroup/defaultSecurityRules/AllowAzureLoadBalancerInBound",
                 "name": "AllowAzureLoadBalancerInBound",
                 "priority": 65001,
                 "protocol": "*",
@@ -253,7 +255,7 @@ state:
                 "destination_port_range": "*",
                 "direction": "Inbound",
                 "etag": 'W/"edf48d56-b315-40ca-a85d-dbcb47f2da7d"',
-                "id": "/subscriptions/3f7e29ba-24e0-42f6-8d9c-5149a14bda37/resourceGroups/Testing/providers/Microsoft.Network/networkSecurityGroups/mysecgroup/defaultSecurityRules/DenyAllInBound",
+                "id": "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroup/myResourceGroup/providers/Microsoft.Network/networkSecurityGroups/mysecgroup/defaultSecurityRules/DenyAllInBound",
                 "name": "DenyAllInBound",
                 "priority": 65500,
                 "protocol": "*",
@@ -268,7 +270,7 @@ state:
                 "destination_port_range": "*",
                 "direction": "Outbound",
                 "etag": 'W/"edf48d56-b315-40ca-a85d-dbcb47f2da7d"',
-                "id": "/subscriptions/3f7e29ba-24e0-42f6-8d9c-5149a14bda37/resourceGroups/Testing/providers/Microsoft.Network/networkSecurityGroups/mysecgroup/defaultSecurityRules/AllowVnetOutBound",
+                "id": "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroup/myResourceGroup/providers/Microsoft.Network/networkSecurityGroups/mysecgroup/defaultSecurityRules/AllowVnetOutBound",
                 "name": "AllowVnetOutBound",
                 "priority": 65000,
                 "protocol": "*",
@@ -283,7 +285,7 @@ state:
                 "destination_port_range": "*",
                 "direction": "Outbound",
                 "etag": 'W/"edf48d56-b315-40ca-a85d-dbcb47f2da7d"',
-                "id": "/subscriptions/3f7e29ba-24e0-42f6-8d9c-5149a14bda37/resourceGroups/Testing/providers/Microsoft.Network/networkSecurityGroups/mysecgroup/defaultSecurityRules/AllowInternetOutBound",
+                "id": "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroup/myResourceGroup/providers/Microsoft.Network/networkSecurityGroups/mysecgroup/defaultSecurityRules/AllowInternetOutBound",
                 "name": "AllowInternetOutBound",
                 "priority": 65001,
                 "protocol": "*",
@@ -298,7 +300,7 @@ state:
                 "destination_port_range": "*",
                 "direction": "Outbound",
                 "etag": 'W/"edf48d56-b315-40ca-a85d-dbcb47f2da7d"',
-                "id": "/subscriptions/3f7e29ba-24e0-42f6-8d9c-5149a14bda37/resourceGroups/Testing/providers/Microsoft.Network/networkSecurityGroups/mysecgroup/defaultSecurityRules/DenyAllOutBound",
+                "id": "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroup/myResourceGroup/providers/Microsoft.Network/networkSecurityGroups/mysecgroup/defaultSecurityRules/DenyAllOutBound",
                 "name": "DenyAllOutBound",
                 "priority": 65500,
                 "protocol": "*",
@@ -307,7 +309,7 @@ state:
                 "source_port_range": "*"
             }
         ],
-        "id": "/subscriptions/3f7e29ba-24e0-42f6-8d9c-5149a14bda37/resourceGroups/Testing/providers/Microsoft.Network/networkSecurityGroups/mysecgroup",
+        "id": "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroup/myResourceGroup/providers/Microsoft.Network/networkSecurityGroups/mysecgroup",
         "location": "westus",
         "name": "mysecgroup",
         "network_interfaces": [],
@@ -319,7 +321,7 @@ state:
                 "destination_port_range": "22",
                 "direction": "Inbound",
                 "etag": 'W/"edf48d56-b315-40ca-a85d-dbcb47f2da7d"',
-                "id": "/subscriptions/3f7e29ba-24e0-42f6-8d9c-5149a14bda37/resourceGroups/Testing/providers/Microsoft.Network/networkSecurityGroups/mysecgroup/securityRules/DenySSH",
+                "id": "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroup/myResourceGroup/providers/Microsoft.Network/networkSecurityGroups/mysecgroup/securityRules/DenySSH",
                 "name": "DenySSH",
                 "priority": 100,
                 "protocol": "Tcp",
@@ -334,7 +336,7 @@ state:
                 "destination_port_range": "22",
                 "direction": "Inbound",
                 "etag": 'W/"edf48d56-b315-40ca-a85d-dbcb47f2da7d"',
-                "id": "/subscriptions/3f7e29ba-24e0-42f6-8d9c-5149a14bda37/resourceGroups/Testing/providers/Microsoft.Network/networkSecurityGroups/mysecgroup/securityRules/AllowSSH",
+                "id": "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroup/myResourceGroup/providers/Microsoft.Network/networkSecurityGroups/mysecgroup/securityRules/AllowSSH",
                 "name": "AllowSSH",
                 "priority": 101,
                 "protocol": "Tcp",
@@ -393,6 +395,7 @@ def validate_rule(self, rule, rule_type=None):
         rule['source_address_prefix'] = None
     if rule.get('destination_application_security_groups') and rule.get('destination_address_prefix') == '*':
         rule['destination_address_prefix'] = None
+
 
 def compare_rules_change(old_list, new_list, purge_list):
     old_list = old_list or []
@@ -470,10 +473,12 @@ def create_rule_instance(self, rule):
         destination_address_prefixes=rule.get('destination_address_prefixes', None),
         source_port_ranges=rule.get('source_port_ranges', None),
         destination_port_ranges=rule.get('destination_port_ranges', None),
-        source_application_security_groups=[self.nsg_models.ApplicationSecurityGroup(id=p) for p in rule.get('source_application_security_groups')] \
-            if rule.get('source_application_security_groups') else None,
-        destination_application_security_groups=[self.nsg_models.ApplicationSecurityGroup(id=p) for p in rule.get('destination_application_security_groups')] \
-            if rule.get('destination_application_security_groups') else None,
+        source_application_security_groups=[
+            self.nsg_models.ApplicationSecurityGroup(id=p)
+            for p in rule.get('source_application_security_groups')] if rule.get('source_application_security_groups') else None,
+        destination_application_security_groups=[
+            self.nsg_models.ApplicationSecurityGroup(id=p)
+            for p in rule.get('destination_application_security_groups')] if rule.get('destination_application_security_groups') else None,
         access=rule.get('access', None),
         priority=rule.get('priority', None),
         direction=rule.get('direction', None),
@@ -504,8 +509,8 @@ def create_rule_dict_from_obj(rule):
         source_address_prefixes=rule.source_address_prefixes,
         destination_address_prefixes=rule.destination_address_prefixes,
         source_application_security_groups=[p.id for p in rule.source_application_security_groups] if rule.source_application_security_groups else None,
-        destination_application_security_groups=[p.id for p in rule.destination_application_security_groups] \
-            if rule.destination_application_security_groups else None,
+        destination_application_security_groups=[
+            p.id for p in rule.destination_application_security_groups] if rule.destination_application_security_groups else None,
         access=rule.access,
         priority=rule.priority,
         direction=rule.direction,
@@ -592,10 +597,10 @@ class AzureRMSecurityGroup(AzureRMModuleBase):
             state=dict()
         )
 
-        mutually_exclusive = [{ "source_application_security_group", "source_address_prefix" },
-                              { "source_application_security_group", "source_address_prefixes" },
-                              { "destination_application_security_group", "destination_address_prefix" },
-                              { "destination_application_security_group", "destination_address_prefixes" }]
+        mutually_exclusive = [["source_application_security_group", "source_address_prefix"],
+                              ["source_application_security_group", "source_address_prefixes"],
+                              ["destination_application_security_group", "destination_address_prefix"],
+                              ["destination_application_security_group", "destination_address_prefixes"]]
 
         super(AzureRMSecurityGroup, self).__init__(self.module_arg_spec,
                                                    supports_check_mode=True,

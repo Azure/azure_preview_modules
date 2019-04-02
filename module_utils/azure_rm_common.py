@@ -12,14 +12,8 @@ import traceback
 import json
 
 from os.path import expanduser
-from ansible.module_utils.basic import AnsibleModule
 
-try:
-    from ansible.module_utils.basic import missing_required_lib
-except Exception:
-    def missing_required_lib(msg, reason=None, url=None):
-        return msg
-
+from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 try:
     from ansible.module_utils.ansible_release import __version__ as ANSIBLE_VERSION
 except Exception:
@@ -75,7 +69,8 @@ AZURE_API_PROFILES = {
         'StorageManagementClient': '2017-10-01',
         'WebsiteManagementClient': '2016-08-01',
         'PostgreSQLManagementClient': '2017-12-01',
-        'MySQLManagementClient': '2017-12-01'
+        'MySQLManagementClient': '2017-12-01',
+        'MariaDBManagementClient': '2019-03-01'
     },
 
     '2017-03-09-profile': {
@@ -170,8 +165,11 @@ try:
     import azure.mgmt.servicebus.models as ServicebusModel
     from azure.mgmt.rdbms.postgresql import PostgreSQLManagementClient
     from azure.mgmt.rdbms.mysql import MySQLManagementClient
+    from azure.mgmt.rdbms.mariadb import MariaDBManagementClient
     from azure.mgmt.containerregistry import ContainerRegistryManagementClient
     from azure.mgmt.containerinstance import ContainerInstanceManagementClient
+    from azure.mgmt.loganalytics import LogAnalyticsManagementClient
+    import azure.mgmt.loganalytics.models as LogAnalyticsModels
 except ImportError as exc:
     HAS_AZURE_EXC = traceback.format_exc()
     HAS_AZURE = False
@@ -229,7 +227,7 @@ AZURE_PKG_VERSIONS = {
     },
     'ResourceManagementClient': {
         'package_name': 'resource',
-        'expected_version': '1.2.2'
+        'expected_version': '2.1.0'
     },
     'DnsManagementClient': {
         'package_name': 'dns',
@@ -299,13 +297,16 @@ class AzureRMModuleBase(object):
         self._marketplace_client = None
         self._sql_client = None
         self._mysql_client = None
+        self._mariadb_client = None
         self._postgresql_client = None
         self._containerregistry_client = None
         self._containerinstance_client = None
         self._containerservice_client = None
+        self._managedcluster_client = None
         self._traffic_manager_management_client = None
         self._monitor_client = None
         self._resource = None
+        self._log_analytics_client = None
         self._servicebus_client = None
 
         self.check_mode = self.module.check_mode
@@ -877,8 +878,23 @@ class AzureRMModuleBase(object):
         self.log('Getting container service client')
         if not self._containerservice_client:
             self._containerservice_client = self.get_mgmt_svc_client(ContainerServiceClient,
-                                                                     base_url=self._cloud_environment.endpoints.resource_manager)
+                                                                     base_url=self._cloud_environment.endpoints.resource_manager,
+                                                                     api_version='2017-07-01')
         return self._containerservice_client
+
+    @property
+    def managedcluster_models(self):
+        self.log("Getting container service models")
+        return ContainerServiceClient.models('2018-03-31')
+
+    @property
+    def managedcluster_client(self):
+        self.log('Getting container service client')
+        if not self._managedcluster_client:
+            self._managedcluster_client = self.get_mgmt_svc_client(ContainerServiceClient,
+                                                                   base_url=self._cloud_environment.endpoints.resource_manager,
+                                                                   api_version='2018-03-31')
+        return self._managedcluster_client
 
     @property
     def sql_client(self):
@@ -903,6 +919,14 @@ class AzureRMModuleBase(object):
             self._mysql_client = self.get_mgmt_svc_client(MySQLManagementClient,
                                                           base_url=self._cloud_environment.endpoints.resource_manager)
         return self._mysql_client
+
+    @property
+    def mariadb_client(self):
+        self.log('Getting MariaDB client')
+        if not self._mariadb_client:
+            self._mariadb_client = self.get_mgmt_svc_client(MariaDBManagementClient,
+                                                            base_url=self._cloud_environment.endpoints.resource_manager)
+        return self._mariadb_client
 
     @property
     def sql_client(self):
@@ -955,6 +979,19 @@ class AzureRMModuleBase(object):
             self._monitor_client = self.get_mgmt_svc_client(MonitorManagementClient,
                                                             base_url=self._cloud_environment.endpoints.resource_manager)
         return self._monitor_client
+
+    @property
+    def log_analytics_client(self):
+        self.log('Getting log analytics client')
+        if not self._log_analytics_client:
+            self._log_analytics_client = self.get_mgmt_svc_client(LogAnalyticsManagementClient,
+                                                                  base_url=self._cloud_environment.endpoints.resource_manager)
+        return self._log_analytics_client
+
+    @property
+    def log_analytics_models(self):
+        self.log('Getting log analytics models')
+        return LogAnalyticsModels
 
     @property
     def servicebus_client(self):
