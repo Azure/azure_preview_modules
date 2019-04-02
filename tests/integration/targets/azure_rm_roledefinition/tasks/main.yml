@@ -167,7 +167,7 @@
 - name: assert role assignment facts
   assert:
     that:
-      - facts['roleassignments'] | length > 1
+      - facts['roleassignments'] | length >= 1
       - facts['roleassignments'][0]['id']
 
 - name: delete role assignment
