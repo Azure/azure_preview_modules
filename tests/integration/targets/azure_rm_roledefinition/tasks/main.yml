@@ -103,44 +103,44 @@
 #    that:
 #      - not output.changed
 
-- name: Update the role definition
-  azure_rm_roledefinition:
-    name: "{{ role_name }}"
-    scope: "/subscriptions/{{ subscription_id }}/resourceGroups/{{ resource_group }}"
-    permissions:
-      - actions:
-          - "Microsoft.Compute/virtualMachines/read"
-          - "Microsoft.Compute/virtualMachines/start/action"
-        not_actions:
-          - "Microsoft.Compute/virtualMachines/write"
-        data_actions:
-          - "Microsoft.Storage/storageAccounts/blobServices/containers/blobs/read"
-        not_data_actions:
-          - "Microsoft.Storage/storageAccounts/blobServices/containers/blobs/write"
-    assignable_scopes:
-        - "/subscriptions/{{ subscription_id }}/resourceGroups/{{ resource_group }}"
-  register: output
+#- name: Update the role definition
+#  azure_rm_roledefinition:
+#    name: "{{ role_name }}"
+#    scope: "/subscriptions/{{ subscription_id }}/resourceGroups/{{ resource_group }}"
+#    permissions:
+#      - actions:
+#          - "Microsoft.Compute/virtualMachines/read"
+#          - "Microsoft.Compute/virtualMachines/start/action"
+#        not_actions:
+#          - "Microsoft.Compute/virtualMachines/write"
+#        data_actions:
+#          - "Microsoft.Storage/storageAccounts/blobServices/containers/blobs/read"
+#        not_data_actions:
+#          - "Microsoft.Storage/storageAccounts/blobServices/containers/blobs/write"
+#    assignable_scopes:
+#        - "/subscriptions/{{ subscription_id }}/resourceGroups/{{ resource_group }}"
+#  register: output
 
-- name: assert output changed
-  assert:
-    that:
-      - output.changed
+#- name: assert output changed
+#  assert:
+#    that:
+#      - output.changed
 
-- name: Get role definition facts
-  azure_rm_roledefinition_info:
-    role_name: "{{ role_name }}"
-    scope: "/subscriptions/{{ subscription_id }}/resourceGroups/{{ resource_group }}"
-    type: custom
-  register: roledef
+#- name: Get role definition facts
+#  azure_rm_roledefinition_info:
+#    role_name: "{{ role_name }}"
+#    scope: "/subscriptions/{{ subscription_id }}/resourceGroups/{{ resource_group }}"
+#    type: custom
+#  register: roledef
 
-- debug:
-    var: roledef
+#- debug:
+#    var: roledef
 
-- name: Assert role definition facts
-  assert:
-    that:
-      - roledef['roledefinitions'] | length > 1
-      - roledef['roledefinitions'][0]['id']
+#- name: Assert role definition facts
+#  assert:
+#    that:
+#      - roledef['roledefinitions'] | length > 1
+#      - roledef['roledefinitions'][0]['id']
 
 - name: Create a role assignment (Check Mode)
   azure_rm_roleassignment:
