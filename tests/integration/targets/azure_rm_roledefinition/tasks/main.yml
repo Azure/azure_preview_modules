@@ -56,6 +56,9 @@
     type: custom
   register: facts
 
+- debug:
+    var: facts
+
 - name: Assert facts
   assert:
     that:
