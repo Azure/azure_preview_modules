@@ -98,10 +98,10 @@
 #          - "/subscriptions/{{ subscription_id }}/resourceGroups/{{ resource_group }}"
 #  register: output
 
-- name: assert output not changed
-  assert:
-    that:
-      - not output.changed
+#- name: assert output not changed
+#  assert:
+#    that:
+#      - not output.changed
 
 - name: Update the role definition
   azure_rm_roledefinition:
