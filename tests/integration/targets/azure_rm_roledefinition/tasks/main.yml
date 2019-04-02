@@ -126,15 +126,15 @@
 #    that:
 #      - output.changed
 
-#- name: Get role definition facts
-#  azure_rm_roledefinition_info:
-#    role_name: "{{ role_name }}"
-#    scope: "/subscriptions/{{ subscription_id }}/resourceGroups/{{ resource_group }}"
-#    type: custom
-#  register: roledef
+- name: Get role definition facts
+  azure_rm_roledefinition_info:
+    role_name: "{{ role_name }}"
+    scope: "/subscriptions/{{ subscription_id }}/resourceGroups/{{ resource_group }}"
+    type: custom
+  register: roledef
 
-#- debug:
-#    var: roledef
+- debug:
+    var: roledef
 
 #- name: Assert role definition facts
 #  assert:
