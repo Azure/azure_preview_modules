@@ -61,10 +61,6 @@
     that:
       - facts['roledefinitions'] | length > 1
 
-- name: dump outoupt
-  debug:
-    var: facts['roledefinitions']
-
 - name: Get facts by name
   azure_rm_roledefinition_info:
     scope: "/subscriptions/{{ subscription_id }}/resourceGroups/{{ resource_group }}"
@@ -74,17 +70,13 @@
   retries: 100
   delay: 60
 
-- name: dump outoupt
-  debug:
-    var: facts['roledefinitions']
-
 - name: Assert facts
   assert:
     that:
       - facts['roledefinitions'] | length == 1
-      - facts['roledefinitions']['permissions'] | length == 1
-      - facts['roledefinitions']['permissions'][0]['not_data_actions'] | length == 1
-      - facts['roledefinitions']['permissions'][0]['data_actions'] | length == 1
+      - facts['roledefinitions'][0]['permissions'] | length == 1
+      - facts['roledefinitions'][0]['permissions'][0]['not_data_actions'] | length == 1
+      - facts['roledefinitions'][0]['permissions'][0]['data_actions'] | length == 1
 
 - name: Update the role definition (idempotent)
   azure_rm_roledefinition:
