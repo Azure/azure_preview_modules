@@ -67,6 +67,10 @@
     role_name: "{{ role_name }}"
   register: facts
 
+- name: dump outoupt
+  debug:
+    var: facts['roledefinitions']
+
 - name: Assert facts
   assert:
     that:
