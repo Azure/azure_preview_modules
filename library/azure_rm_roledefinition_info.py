@@ -280,7 +280,7 @@ class AzureRMRoleDefinitionFacts(AzureRMModuleBase):
                    if r['role_name'] == self.role_name:
                         roles.append(r)
 
-                if len(roles) == 1:	
+                if len(roles) == 1:
                     self.log("Role Definition : {0} found".format(self.role_name))
                     return roles
                 if len(roles) > 1:
