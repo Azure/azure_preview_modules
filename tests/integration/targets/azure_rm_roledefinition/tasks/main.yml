@@ -50,7 +50,7 @@
     that:
       - output.changed
 
-- name: Get facts by name
+- name: Get facts by type
   azure_rm_roledefinition_info:
     scope: "/subscriptions/{{ subscription_id }}/resourceGroups/{{ resource_group }}"
     type: custom
@@ -61,7 +61,7 @@
     that:
       - facts['roledefinitions'] | length > 1
 
-- name: Get facts
+- name: Get facts by name
   azure_rm_roledefinition_info:
     scope: "/subscriptions/{{ subscription_id }}/resourceGroups/{{ resource_group }}"
     role_name: "{{ role_name }}"
