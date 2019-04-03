@@ -61,6 +61,10 @@
     that:
       - facts['roledefinitions'] | length > 1
 
+- name: dump outoupt
+  debug:
+    var: facts['roledefinitions']
+
 - name: Get facts by name
   azure_rm_roledefinition_info:
     scope: "/subscriptions/{{ subscription_id }}/resourceGroups/{{ resource_group }}"
