@@ -277,9 +277,14 @@ class AzureRMRoleDefinitionFacts(AzureRMModuleBase):
             if len(response) > 0:
                 roles = []
                 for r in response:
-                    if r['role_name'] == self.role_name or r['name'] == self.role_name:
+                   if r['role_name'] == self.role_name:
                         roles.append(r)
-                return roles
+
+                if len(roles) == 1:	
+                    self.log("Role Definition : {0} found".format(self.role_name))
+                    return roles
+                if len(roles) > 1:
+                    self.fail("Found multiple Role Definitions with name: {0}".format(self.role_name))
 
         except CloudError as ex:
             self.log("Didn't find Role Definition by name {0}".format(self.role_name))

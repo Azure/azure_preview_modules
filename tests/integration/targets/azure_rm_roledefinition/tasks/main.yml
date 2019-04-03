@@ -68,7 +68,7 @@
   register: facts
   until: "{{ facts.roledefinitions | length > 0 }}"
   retries: 100
-  delay: 60
+  delay: 30
 
 - name: Assert facts
   assert:
@@ -127,8 +127,10 @@
   azure_rm_roledefinition_info:
     role_name: "{{ role_name }}"
     scope: "/subscriptions/{{ subscription_id }}/resourceGroups/{{ resource_group }}"
-    type: custom
   register: roledef
+  until: "{{ roledef.roledefinitions | length > 0 }}"
+  retries: 100
+  delay: 30
 
 - name: Assert role definition facts
   assert:
