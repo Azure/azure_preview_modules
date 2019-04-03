@@ -70,6 +70,9 @@
     scope: "/subscriptions/{{ subscription_id }}/resourceGroups/{{ resource_group }}"
     role_name: "{{ role_name }}"
   register: facts
+  until: "{{ facts.roledefinitions | length > 0 }}"
+  retries: 100
+  delay: 60
 
 - name: dump outoupt
   debug:
