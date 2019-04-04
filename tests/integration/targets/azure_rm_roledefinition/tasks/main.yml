@@ -193,6 +193,7 @@
   azure_rm_roledefinition:
     name: "{{ role_name }}"
     scope: "/subscriptions/{{ subscription_id }}/resourceGroups/{{ resource_group }}"
+  state: absent
   check_mode: yes
   register: output
 
@@ -204,6 +205,7 @@
   azure_rm_roledefinition:
     name: "{{ role_name }}"
     scope: "/subscriptions/{{ subscription_id }}/resourceGroups/{{ resource_group }}"
+    state: absent
   register: output
 
 - assert:
