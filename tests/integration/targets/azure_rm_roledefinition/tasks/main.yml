@@ -79,7 +79,7 @@
       - facts['roledefinitions'][0]['permissions'][0]['data_actions'] | length == 1
 
 - name: sleep 2 minutes for role definition creation finish
-  wait_for: timeout=120
+  wait_for: timeout=180
   delegate_to: localhost
 
 - name: Update the role definition (idempotent)
@@ -187,7 +187,7 @@
     state: absent
 
 - name: sleep 2 minutes for role definition deletion finish
-  wait_for: timeout=120
+  wait_for: timeout=180
   delegate_to: localhost
 
 - name: Delete the role definition (Check Mode)
