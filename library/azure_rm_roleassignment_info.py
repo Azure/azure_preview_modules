@@ -203,7 +203,7 @@ class AzureRMRoleAssignmentFacts(AzureRMModuleBase):
                 response = roleassignment_to_dict(response)
 
                 if self.role_definition_id:
-                    if self.role_definition_id == response['role_definition_id']
+                    if self.role_definition_id == response['role_definition_id']:
                         results = [response]
                 else:
                     results = [response]
