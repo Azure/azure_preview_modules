@@ -78,6 +78,10 @@
       - facts['roledefinitions'][0]['permissions'][0]['not_data_actions'] | length == 1
       - facts['roledefinitions'][0]['permissions'][0]['data_actions'] | length == 1
 
+- name: sleep 2 minutes for role definition creation finish
+  wait_for: timeout=120
+  delegate_to: localhost
+
 - name: Update the role definition (idempotent)
   azure_rm_roledefinition:
     name: "{{ role_name }}"
