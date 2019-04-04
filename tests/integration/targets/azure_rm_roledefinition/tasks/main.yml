@@ -2,7 +2,7 @@
   set_fact:
     role_name: "{{ (resource_group | replace('-','x'))[-8:] }}{{ 1000 | random }}testrole"
     subscription_id: "{{ lookup('env','AZURE_SUBSCRIPTION_ID') }}"
-    principal_id: "{{ lookup('env','AZURE_CLIENT_ID') }}"
+    principal_id: "{{ lookup('env','AZURE_OBJECT_ID') }}"
   run_once: yes
 
 - name: Create a role definition (Check Mode)
