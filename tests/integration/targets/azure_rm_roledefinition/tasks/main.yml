@@ -162,7 +162,7 @@
     role_definition_id: "{{ roledef['roledefinitions'][0]['id'] }}"
   register: output
 
-- name: Assert creating role definition
+- name: Assert creating role assignment
   assert:
     that:
       - output.changed

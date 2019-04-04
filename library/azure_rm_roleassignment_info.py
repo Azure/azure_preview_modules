@@ -230,7 +230,9 @@ class AzureRMRoleAssignmentFacts(AzureRMModuleBase):
                 response = [roleassignment_to_dict(a) for a in response]
 
                 if self.role_definition_id:
-                    results = [r if r['role_definition_id'] == self.role_definition_id for r in response]
+                    for r in response:
+                        if r['role_definition_id'] == self.role_definition_id:
+                            results.append(r)
                 else:
                     results = response
 
@@ -254,8 +256,10 @@ class AzureRMRoleAssignmentFacts(AzureRMModuleBase):
             if response and len(response) > 0:
                 response = [roleassignment_to_dict(a) for a in response]
 
-            if self.role_definition_id:
-                    results = [r if r['role_definition_id'] == self.role_definition_id for r in response]
+                if self.role_definition_id:
+                    for r in response:
+                        if r['role_definition_id'] == self.role_definition_id:
+                            results.append(r)
                 else:
                     results = response
 
