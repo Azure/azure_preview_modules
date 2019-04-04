@@ -243,7 +243,7 @@ class AzureRMRoleAssignment(AzureRMModuleBase):
         self.log("Deleting the role assignment {0}".format(self.name))
         scope = self.build_scope()
         try:
-            response = self._client.role_assignments.delete(name=self.name,
+            response = self._client.role_assignments.delete(role_assignment_name=self.name,
                                                             scope=self.scope)
         except CloudError as e:
             self.log('Error attempting to delete the role assignment.')

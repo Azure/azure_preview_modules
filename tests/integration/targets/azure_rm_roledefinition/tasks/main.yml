@@ -182,8 +182,12 @@
 - name: delete role assignment
   azure_rm_roleassignment:
     name: "{{ facts['roleassignments'][0]['id'].split('/')[-1] }}"
-    scope: "/subscriptions/{{ subscription_id }}/resourceGroups/{{ resource_group }}"
+    scope: "/subscriptions/{{ subscription_id }}"
     state: absent
+
+- name: sleep 2 minutes for role definition deletion finish
+  wait_for: timeout=120
+  delegate_to: localhost
 
 - name: Delete the role definition (Check Mode)
   azure_rm_roledefinition:
