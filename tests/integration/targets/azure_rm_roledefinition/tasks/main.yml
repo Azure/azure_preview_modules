@@ -147,7 +147,7 @@
     scope: "/subscriptions/{{ subscription_id }}/resourceGroups/{{ resource_group }}"
     assignee_object_id: "{{ principal_id }}"
     role_definition_id: "{{ roledef['roledefinitions'][0]['id'] }}"
-    check_mode: yes
+  check_mode: yes
   register: output
 
 - name: Assert creating role definition check mode
