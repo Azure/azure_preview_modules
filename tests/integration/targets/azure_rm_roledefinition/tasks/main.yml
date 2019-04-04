@@ -171,6 +171,7 @@
   azure_rm_roleassignment_info:
     scope: "/subscriptions/{{ subscription_id }}/resourceGroups/{{ resource_group }}"
     assignee: "{{ principal_id }}"
+    role_definition_id: "{{ roledef['roledefinitions'][0]['id'] }}"
   register: facts
 
 - name: assert role assignment facts
