@@ -181,7 +181,7 @@
 
 - name: delete role assignment
   azure_rm_roleassignment:
-    name: "{{ facts['roleassignments'][0]['id'].split('/'')[-1] }}"
+    name: "{{ facts['roleassignments'][0]['id'].split('/')[-1] }}"
     scope: "/subscriptions/{{ subscription_id }}/resourceGroups/{{ resource_group }}"
     state: absent
 
@@ -196,7 +196,7 @@
   assert:
     that: output.changed
 
-- name: Delete the redis cache
+- name: Delete the role definition
   azure_rm_roledefinition:
     name: "{{ role_name }}"
     scope: "/subscriptions/{{ subscription_id }}/resourceGroups/{{ resource_group }}"
