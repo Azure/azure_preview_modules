@@ -139,7 +139,7 @@
 - name: Assert role definition facts
   assert:
     that:
-      - roledef['roledefinitions'] | length > 1
+      - roledef['roledefinitions'] | length == 1
       - roledef['roledefinitions'][0]['id']
 
 - name: Create a role assignment (Check Mode)
@@ -176,7 +176,7 @@
 - name: assert role assignment facts
   assert:
     that:
-      - facts['roleassignments'] | length > 1
+      - facts['roleassignments'] | length > 0
       - facts['roleassignments'][0]['id']
 
 - name: delete role assignment
