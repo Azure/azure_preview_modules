@@ -180,6 +180,10 @@
       - facts['roleassignments'] | length > 0
       - facts['roleassignments'][0]['id']
 
+- name: dump role assignments
+  debug:
+    var: facts
+
 - name: delete role assignment
   azure_rm_roleassignment:
     name: "{{ facts['roleassignments'][0]['id'].split('/')[-1] }}"
