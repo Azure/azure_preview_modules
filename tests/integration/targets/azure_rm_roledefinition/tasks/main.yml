@@ -190,7 +190,7 @@
     scope: "/subscriptions/{{ subscription_id }}"
     state: absent
 
-- name: sleep 2 minutes for role definition deletion finish
+- name: sleep 2 minutes for role assignment deletion finish
   wait_for: timeout=180
   delegate_to: localhost
 

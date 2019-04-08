@@ -262,9 +262,11 @@ class AzureRMRoleAssignment(AzureRMModuleBase):
         response = None
 
         try:
-            response = self._client.role_assignments.get(scope=self.scope, role_assignment_name=self.name)
-
-            return roleassignment_to_dict(response)
+            response = self._client.role_assignments.list()
+            if response:
+                for assignment in response:
+                    if assignment.name == self.name:
+                        return roleassignment_to_dict(response)
 
         except CloudError as ex:
             self.log("Didn't find role assignment {0} in scope {1}".format(self.name, self.scope))
