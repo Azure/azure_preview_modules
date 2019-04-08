@@ -266,7 +266,7 @@ class AzureRMRoleAssignment(AzureRMModuleBase):
             if response:
                 for assignment in response:
                     if assignment.name == self.name:
-                        return roleassignment_to_dict(response)
+                        return roleassignment_to_dict(assignment)
 
         except CloudError as ex:
             self.log("Didn't find role assignment {0} in scope {1}".format(self.name, self.scope))
