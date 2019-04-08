@@ -262,7 +262,7 @@ class AzureRMRoleAssignment(AzureRMModuleBase):
         response = None
 
         try:
-            response = self._client.role_assignments.list()
+            response = list(self._client.role_assignments.list())
             if response:
                 for assignment in response:
                     if assignment.name == self.name:
