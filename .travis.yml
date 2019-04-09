@@ -119,7 +119,12 @@ before_install:
         
         for (( i = $start; i < $end; i++ )); do
           if [ "$i" -lt "${#listall[@]}" ]; then
-            run_test ${listall[$i]};
+            aliasFile="${listall[$i]}/../aliases"
+            if grep -Fxq "unsupported" "${alias}/aliases"; then
+              echo "not supported test";
+            else
+              run_test ${listall[$i]};
+            fi;
           fi;
         done;
       else

@@ -177,8 +177,6 @@ class AzureRMRoleAssignmentFacts(AzureRMModuleBase):
             self.results['roleassignments'] = self.get_by_name()
         elif self.assignee:
             self.results['roleassignments'] = self.get_by_assignee()
-        elif self.resource_group:
-            self.results['roleassignments'] = self.list_by_resource_group()
         elif self.scope:
             self.results['roleassignments'] = self.list_by_scope()
         else:
@@ -247,7 +245,7 @@ class AzureRMRoleAssignmentFacts(AzureRMModuleBase):
 
         :return: deserialized role assignment dictionary
         '''
-        self.log("Lists role assignment by resource group {0}".format(self.resource_group))
+        self.log("Lists role assignment by scope {0}".format(self.scope))
 
         results = []
         try:
