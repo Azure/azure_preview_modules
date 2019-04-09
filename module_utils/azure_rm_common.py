@@ -13,12 +13,7 @@ import json
 
 from os.path import expanduser
 
-from ansible.module_utils.basic import AnsibleModule
-try: 
-    from ansible.module_utils.basic import missing_required_lib 
-except Exception: 
-    def missing_required_lib(msg, reason=None, url=None): 
-        return msg
+from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 try:
     from ansible.module_utils.ansible_release import __version__ as ANSIBLE_VERSION
 except Exception:
@@ -72,7 +67,7 @@ AZURE_API_PROFILES = {
         'NetworkManagementClient': '2018-08-01',
         'ResourceManagementClient': '2017-05-10',
         'StorageManagementClient': '2017-10-01',
-        'WebsiteManagementClient': '2016-08-01',
+        'WebSiteManagementClient': '2018-02-01',
         'PostgreSQLManagementClient': '2017-12-01',
         'MySQLManagementClient': '2017-12-01',
         'MariaDBManagementClient': '2019-03-01'
@@ -240,7 +235,7 @@ AZURE_PKG_VERSIONS = {
     },
     'WebSiteManagementClient': {
         'package_name': 'web',
-        'expected_version': '0.32.0'
+        'expected_version': '0.41.0'
     },
     'TrafficManagerManagementClient': {
         'package_name': 'trafficmanager',
@@ -875,7 +870,7 @@ class AzureRMModuleBase(object):
         if not self._web_client:
             self._web_client = self.get_mgmt_svc_client(WebSiteManagementClient,
                                                         base_url=self._cloud_environment.endpoints.resource_manager,
-                                                        api_version='2016-08-01')
+                                                        api_version='2018-02-01')
         return self._web_client
 
     @property

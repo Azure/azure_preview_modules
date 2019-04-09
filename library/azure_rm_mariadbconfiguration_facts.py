@@ -1,6 +1,7 @@
 #!/usr/bin/python
 #
 # Copyright (c) 2019 Zim Kalinowski, (@zikalino)
+# Copyright (c) 2019 Matti Ranta, (@techknowlogick)
 #
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
@@ -15,11 +16,11 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 
 DOCUMENTATION = '''
 ---
-module: azure_rm_mysqlconfiguration_facts
+module: azure_rm_mariadbconfiguration_facts
 version_added: "2.8"
-short_description: Get Azure MySQL Configuration facts.
+short_description: Get Azure MariaDB Configuration facts.
 description:
-    - Get facts of Azure MySQL Configuration.
+    - Get facts of Azure MariaDB Configuration.
 
 options:
     resource_group:
@@ -39,25 +40,26 @@ extends_documentation_fragment:
 
 author:
     - "Zim Kalinowski (@zikalino)"
+    - "Matti Ranta (@techknowlogick)"
 
 '''
 
 EXAMPLES = '''
-  - name: Get specific setting of MySQL Server
-    azure_rm_mysqlconfiguration_facts:
+  - name: Get specific setting of MariaDB Server
+    azure_rm_mariadbconfiguration_facts:
       resource_group: myResourceGroup
-      server_name: testmysqlserver
+      server_name: testserver
       name: deadlock_timeout
 
-  - name: Get all settings of MySQL Server
-    azure_rm_mysqlconfiguration_facts:
+  - name: Get all settings of MariaDB Server
+    azure_rm_mariadbconfiguration_facts:
       resource_group: myResourceGroup
       server_name: server_name
 '''
 
 RETURN = '''
 settings:
-    description: A list of dictionaries containing MySQL Server settings.
+    description: A list of dictionaries containing MariaDB Server settings.
     returned: always
     type: complex
     contains:
@@ -66,8 +68,8 @@ settings:
                 - Setting resource ID
             returned: always
             type: str
-            sample: "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/myResourceGroup/providers/Microsoft.DBforMySQL/servers/testmysqlser
-                     ver/configurations/deadlock_timeout"
+            sample: "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/myResourceGroup/providers/Microsoft.DBforMariaDB/servers/testserver
+                     /configurations/deadlock_timeout"
         name:
             description:
                 - Setting name.
@@ -99,14 +101,14 @@ from ansible.module_utils.azure_rm_common import AzureRMModuleBase
 try:
     from msrestazure.azure_exceptions import CloudError
     from msrestazure.azure_operation import AzureOperationPoller
-    from azure.mgmt.rdbms.mysql import MySQLManagementClient
+    from azure.mgmt.rdbms.mariadb import MariaDBManagementClient
     from msrest.serialization import Model
 except ImportError:
     # This is handled in azure_rm_common
     pass
 
 
-class AzureRMMySqlConfigurationFacts(AzureRMModuleBase):
+class AzureRMMariaDbConfigurationFacts(AzureRMModuleBase):
     def __init__(self):
         # define user inputs into argument
         self.module_arg_spec = dict(
@@ -128,12 +130,12 @@ class AzureRMMySqlConfigurationFacts(AzureRMModuleBase):
         self.resource_group = None
         self.server_name = None
         self.name = None
-        super(AzureRMMySqlConfigurationFacts, self).__init__(self.module_arg_spec, supports_tags=False)
+        super(AzureRMMariaDbConfigurationFacts, self).__init__(self.module_arg_spec, supports_tags=False)
 
     def exec_module(self, **kwargs):
         for key in self.module_arg_spec:
             setattr(self, key, kwargs[key])
-        self.mgmt_client = self.get_mgmt_svc_client(MySQLManagementClient,
+        self.mgmt_client = self.get_mgmt_svc_client(MariaDBManagementClient,
                                                     base_url=self._cloud_environment.endpoints.resource_manager)
 
         if self.name is not None:
@@ -144,9 +146,9 @@ class AzureRMMySqlConfigurationFacts(AzureRMModuleBase):
 
     def get(self):
         '''
-        Gets facts of the specified MySQL Configuration.
+        Gets facts of the specified MariaDB Configuration.
 
-        :return: deserialized MySQL Configurationinstance state dictionary
+        :return: deserialized MariaDB Configurationinstance state dictionary
         '''
         response = None
         results = []
@@ -165,9 +167,9 @@ class AzureRMMySqlConfigurationFacts(AzureRMModuleBase):
 
     def list_by_server(self):
         '''
-        Gets facts of the specified MySQL Configuration.
+        Gets facts of the specified MariaDB Configuration.
 
-        :return: deserialized MySQL Configurationinstance state dictionary
+        :return: deserialized MariaDB Configurationinstance state dictionary
         '''
         response = None
         results = []
@@ -199,7 +201,7 @@ class AzureRMMySqlConfigurationFacts(AzureRMModuleBase):
 
 
 def main():
-    AzureRMMySqlConfigurationFacts()
+    AzureRMMariaDbConfigurationFacts()
 
 
 if __name__ == '__main__':
