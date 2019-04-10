@@ -171,7 +171,7 @@ options:
     state:
       description:
         - Assert the state of the Web App.
-        - Use 'present' to create or update a Web App and 'absent' to delete it.
+        - Use C(present) to create or update a Web App and C(absent) to delete it.
       default: present
       choices:
         - absent
@@ -277,7 +277,7 @@ azure_webapp:
     returned: always
     type: dict
     sample: {
-        "id": "/subscriptions/<subscription_id>/resourceGroups/ansiblewebapp1/providers/Microsoft.Web/sites/ansiblewindowsaaa"
+        "id": "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/myResourceGroup/providers/Microsoft.Web/sites/ansiblewindowsaaa"
     }
 '''
 
@@ -783,7 +783,7 @@ class AzureRMWebApps(AzureRMModuleBase):
             if self.site_config.get(fx_version):
                 if not getattr(existing_config, fx_version) or \
                         getattr(existing_config, fx_version).upper() != self.site_config.get(fx_version).upper():
-                            return True
+                    return True
 
         return False
 

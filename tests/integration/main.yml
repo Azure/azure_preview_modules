@@ -5,29 +5,24 @@
   vars_files:
   - ~/arg.json
   tasks:
-    - name: Create first resource group
+    - name: Create resource group
       azure_rm_resourcegroup:
-        name: "{{ resource_group }}"
+        name: "{{ item }}"
         location: eastus
-    - name: Create second resource group
-      azure_rm_resourcegroup:
-        name: "{{ resource_group_secondary }}"
-        location: eastus
+      with_items:
+        - "{{ resource_group }}"
+        - "{{ resource_group_secondary }}"
     - name: run integration test
       block:
         - include_tasks: "{{test}}"
       always:
-        - name: Delete a resource group
+        - name: Delete resource group
           azure_rm_resourcegroup:
-            name: "{{ resource_group }}"
+            name: "{{ item }}"
             state: absent
             force: True
-          async: 5000
-          poll: 0
-        - name: Delete second resource group
-          azure_rm_resourcegroup:
-            name: "{{ resource_group_secondary }}"
-            state: absent
-            force: True
+          with_items:
+            - "{{ resource_group }}"
+            - "{{ resource_group_secondary }}"
           async: 5000
           poll: 0

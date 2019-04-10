@@ -6,7 +6,6 @@
    azure_rm_storageaccount:
        resource_group: "{{ resource_group }}" 
        name: "invalid_char$"
-       state: present
    register: invalid_name     
    ignore_errors: yes  
 
@@ -111,22 +110,6 @@
 
  - name: Assert CNAME failure
    assert: { that: "'custom domain name could not be verified' in  change_account['msg']" }
-
- - name: Update account tags
-   azure_rm_storageaccount:
-       resource_group: "{{ resource_group }}"
-       name: "{{ storage_account }}"
-       append_tags: no
-       tags:
-           testing: testing
-           delete: never
-           galaxy: 'no'
-   register: output
-
- - assert:
-      that:
-         - "output.state.tags | length == 3"
-         - "output.state.tags.galaxy == 'no'"
 
  - name: Update account tags
    azure_rm_storageaccount:

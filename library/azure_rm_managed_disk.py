@@ -35,7 +35,7 @@ options:
         required: true
     state:
         description:
-            - Assert the state of the managed disk. Use C(present) to create or update a managed disk and 'absent' to delete a managed disk.
+            - Assert the state of the managed disk. Use C(present) to create or update a managed disk and C(absent) to delete a managed disk.
         default: present
         choices:
             - absent
@@ -45,36 +45,50 @@ options:
             - Valid Azure location. Defaults to location of the resource group.
     storage_account_type:
         description:
-            - "Type of storage for the managed disk: C(Standard_LRS)  or C(Premium_LRS). If not specified the disk is created C(Standard_LRS)."
+            - "Type of storage for the managed disk."
+            - "If not specified, the disk is created as C(Standard_LRS)."
+            - "C(Standard_LRS) is for Standard HDD."
+            - "C(StandardSSD_LRS) (added in 2.8) is for Standard SSD."
+            - "C(Premium_LRS) is for Premium SSD."
+            - "C(UltraSSD_LRS) (added in 2.8) is for Ultra SSD, which is in preview mode, and only available on select instance types."
+            - "See https://docs.microsoft.com/en-us/azure/virtual-machines/windows/disks-types for more information about disk types."
         choices:
             - Standard_LRS
+            - StandardSSD_LRS
             - Premium_LRS
+            - UltraSSD_LRS
     create_option:
         description:
-            - "Allowed values: empty, import, copy. C(import) from a VHD file in I(source_uri) and C(copy) from previous managed disk I(source_resource_uri)."
+            - "Allowed values: empty, import, copy.
+            - C(import) from a VHD file in I(source_uri) and C(copy) from previous managed disk I(source_uri)."
         choices:
             - empty
             - import
             - copy
     source_uri:
         description:
-            - URI to a valid VHD file to be used when I(create_option) is C(import).
-    source_resource_uri:
-        description:
-            - The resource ID of the managed disk to copy when I(create_option) is C(copy).
+            - URI to a valid VHD file to be used or the resource ID of the managed disk to copy.
+        aliases:
+            - source_resource_uri
     os_type:
         description:
-            - "Type of Operating System: C(linux) or C(windows). Used when I(create_option) is either C(copy) or C(import) and the source is an OS disk."
+            - "Type of Operating System: C(linux) or C(windows)."
+            - "Used when I(create_option) is either C(copy) or C(import) and the source is an OS disk."
+            - "If omitted during creation, no value is set."
+            - "If omitted during an update, no change is made."
+            - "Once set, this value cannot be cleared."
         choices:
             - linux
             - windows
     disk_size_gb:
         description:
-            - Size in GB of the managed disk to be created. If I(create_option) is C(copy) then the value must be greater than or equal to the source's size.
+            - "Size in GB of the managed disk to be created."
+            - "If I(create_option) is C(copy) then the value must be greater than or equal to the source's size."
     managed_by:
         description:
             - Name of an existing virtual machine with which the disk is or will be associated, this VM should be in the same resource group.
-            - To detach a disk from a vm, keep undefined.
+            - To detach a disk from a vm, explicitly set to ''.
+            - If this option is unset, the value will not be changed.
         version_added: 2.5
     tags:
         description:
@@ -92,14 +106,24 @@ EXAMPLES = '''
       azure_rm_managed_disk:
         name: mymanageddisk
         location: eastus
-        resource_group: Testing
+        resource_group: myResourceGroup
         disk_size_gb: 4
+
+    - name: Create managed operating system disk from page blob
+      azure_rm_managed_disk:
+        name: mymanageddisk
+        location: eastus2
+        resource_group: myResourceGroup
+        create_option: import
+        source_uri: https://storageaccountname.blob.core.windows.net/containername/blob-name.vhd
+        os_type: windows
+        storage_account_type: Premium_LRS
 
     - name: Mount the managed disk to VM
       azure_rm_managed_disk:
         name: mymanageddisk
         location: eastus
-        resource_group: Testing
+        resource_group: myResourceGroup
         disk_size_gb: 4
         managed_by: testvm001
 
@@ -107,14 +131,14 @@ EXAMPLES = '''
       azure_rm_managed_disk:
         name: mymanageddisk
         location: eastus
-        resource_group: Testing
+        resource_group: myResourceGroup
         disk_size_gb: 4
 
     - name: Delete managed disk
       azure_rm_manage_disk:
         name: mymanageddisk
         location: eastus
-        resource_group: Testing
+        resource_group: myResourceGroup
         state: absent
 '''
 
@@ -153,12 +177,11 @@ def managed_disk_to_dict(managed_disk):
         name=managed_disk.name,
         location=managed_disk.location,
         tags=managed_disk.tags,
-        create_option=create_data.create_option.value.lower(),
-        source_uri=create_data.source_uri,
-        source_resource_uri=create_data.source_resource_id,
+        create_option=create_data.create_option.lower(),
+        source_uri=create_data.source_uri or create_data.source_resource_id,
         disk_size_gb=managed_disk.disk_size_gb,
-        os_type=managed_disk.os_type.value if managed_disk.os_type else None,
-        storage_account_type=managed_disk.sku.name.value if managed_disk.sku else None,
+        os_type=managed_disk.os_type.lower() if managed_disk.os_type else None,
+        storage_account_type=managed_disk.sku.name if managed_disk.sku else None,
         managed_by=managed_disk.managed_by
     )
 
@@ -186,17 +209,15 @@ class AzureRMManagedDisk(AzureRMModuleBase):
             ),
             storage_account_type=dict(
                 type='str',
-                choices=['Standard_LRS', 'Premium_LRS']
+                choices=['Standard_LRS', 'StandardSSD_LRS', 'Premium_LRS', 'UltraSSD_LRS']
             ),
             create_option=dict(
                 type='str',
                 choices=['empty', 'import', 'copy']
             ),
             source_uri=dict(
-                type='str'
-            ),
-            source_resource_uri=dict(
-                type='str'
+                type='str',
+                aliases=['source_resource_uri']
             ),
             os_type=dict(
                 type='str',
@@ -211,7 +232,7 @@ class AzureRMManagedDisk(AzureRMModuleBase):
         )
         required_if = [
             ('create_option', 'import', ['source_uri']),
-            ('create_option', 'copy', ['source_resource_uri']),
+            ('create_option', 'copy', ['source_uri']),
             ('create_option', 'empty', ['disk_size_gb'])
         ]
         self.results = dict(
@@ -224,7 +245,6 @@ class AzureRMManagedDisk(AzureRMModuleBase):
         self.storage_account_type = None
         self.create_option = None
         self.source_uri = None
-        self.source_resource_uri = None
         self.os_type = None
         self.disk_size_gb = None
         self.tags = None
@@ -261,15 +281,17 @@ class AzureRMManagedDisk(AzureRMModuleBase):
                     result = True
 
         # unmount from the old virtual machine and mount to the new virtual machine
-        vm_name = parse_resource_id(disk_instance.get('managed_by', '')).get('name') if disk_instance else None
-        if self.managed_by != vm_name:
-            changed = True
-            if not self.check_mode:
-                if vm_name:
-                    self.detach(vm_name, result)
-                if self.managed_by:
-                    self.attach(self.managed_by, result)
-                result = self.get_managed_disk()
+        if self.managed_by or self.managed_by == '':
+            vm_name = parse_resource_id(disk_instance.get('managed_by', '')).get('name') if disk_instance else None
+            vm_name = vm_name or ''
+            if self.managed_by != vm_name:
+                changed = True
+                if not self.check_mode:
+                    if vm_name:
+                        self.detach(vm_name, result)
+                    if self.managed_by:
+                        self.attach(self.managed_by, result)
+                    result = self.get_managed_disk()
 
         if self.state == 'absent' and disk_instance:
             changed = True
@@ -316,6 +338,7 @@ class AzureRMManagedDisk(AzureRMModuleBase):
             self.fail("Error getting virtual machine {0} - {1}".format(name, str(exc)))
 
     def generate_managed_disk_property(self):
+        # TODO: Add support for EncryptionSettings, DiskIOPSReadWrite, DiskMBpsReadWrite, Zones
         disk_params = {}
         creation_data = {}
         disk_params['location'] = self.location
@@ -324,14 +347,21 @@ class AzureRMManagedDisk(AzureRMModuleBase):
             storage_account_type = self.compute_models.DiskSku(name=self.storage_account_type)
             disk_params['sku'] = storage_account_type
         disk_params['disk_size_gb'] = self.disk_size_gb
-        # TODO: Add support for EncryptionSettings
         creation_data['create_option'] = self.compute_models.DiskCreateOption.empty
         if self.create_option == 'import':
             creation_data['create_option'] = self.compute_models.DiskCreateOption.import_enum
             creation_data['source_uri'] = self.source_uri
         elif self.create_option == 'copy':
             creation_data['create_option'] = self.compute_models.DiskCreateOption.copy
-            creation_data['source_resource_id'] = self.source_resource_uri
+            creation_data['source_resource_id'] = self.source_uri
+        if self.os_type:
+            typecon = {
+                'linux': self.compute_models.OperatingSystemTypes.linux,
+                'windows': self.compute_models.OperatingSystemTypes.windows
+            }
+            disk_params['os_type'] = typecon[self.os_type]
+        else:
+            disk_params['os_type'] = None
         disk_params['creation_data'] = creation_data
         return disk_params
 
@@ -352,6 +382,9 @@ class AzureRMManagedDisk(AzureRMModuleBase):
         resp = False
         if new_disk.get('disk_size_gb'):
             if not found_disk['disk_size_gb'] == new_disk['disk_size_gb']:
+                resp = True
+        if new_disk.get('os_type'):
+            if not found_disk['os_type'] == new_disk['os_type']:
                 resp = True
         if new_disk.get('sku'):
             if not found_disk['storage_account_type'] == new_disk['sku'].name:

@@ -1,10 +1,6 @@
 language: python
 python: '2.7'
 
-branches:
-  only:
-    - master
-
 env:
   global:
     - exit_code=0
@@ -103,7 +99,7 @@ before_install:
       run_all=false
  
       for item in ${diffstr[*]}; do
-        if [[ "$item" != *"main.yml" ]]; then
+        if [[ "$item" != *"main.yml" ]] && [[ "$item" != *"aliases" ]] && [[ "$item" != *"virtualmachines.yml" ]]; then
           if [[ "$item" != *"azure_rm_"*.py ]]; then
             run_all=true;
             break;
@@ -123,7 +119,12 @@ before_install:
         
         for (( i = $start; i < $end; i++ )); do
           if [ "$i" -lt "${#listall[@]}" ]; then
-            run_test ${listall[$i]};
+            aliasFile="${listall[$i]}/../aliases";
+            if grep -Fxq "unsupported" "${alias}/aliases"; then
+              echo "not supported test";
+            else
+              run_test ${listall[$i]};
+            fi;
           fi;
         done;
       else
@@ -133,21 +134,33 @@ before_install:
             for changedfile in ${diffstr[*]}; do
               arrChanged=(${changedfile//// });
               changedFileName=${arrChanged[-1]};
+              changedFileNameWithPath=${arrChanged[-2]};
               echo changedfile is $changedfile;
 
               fileNameNoExtension=${changedFileName%%.py};
+
+              if [[ ! -f $changedfile ]]; then
+                continue;
+              fi;
+
               if [[ -d "tests/integration/targets/${fileNameNoExtension}" ]]; then
                 echo test tests/integration/targets/${fileNameNoExtension}/tasks/main.yml;
                 testList=("tests/integration/targets/${fileNameNoExtension}/tasks/main.yml" "${testList[@]}");
               elif [ "$changedFileName" == "main.yml" ]; then
-                echo test $changedfile;
-                testList=("${changedfile}" "${testList[@]}");
+                if [[ "$changedFileNameWithPath" == "tasks" ]]; then
+                  echo test $changedfile;
+                  testList=("${changedfile}" "${testList[@]}");
+                fi;
               else
                 for alias in "${list[@]}"; do
                   if grep -Fxq "$changedFileName" "${alias}/aliases"; then
-                    echo test $alias;
-                    testList=("${alias}/tasks/main.yml" "${testList[@]}");
-                    break;
+                    if grep -Fxq "unsupported" "${alias}/aliases"; then
+                      echo "not supported test";
+                    else
+                      echo test $alias;
+                      testList=("${alias}/tasks/main.yml" "${testList[@]}");
+                      break;
+                    fi;
                   fi;
                 done;
               fi;
@@ -174,7 +187,10 @@ install:
   - "{ echo '[defaults]'; echo 'roles_path = ../'; echo 'lookup_plugins = ./tests/integration/targets/azure_rm_keyvaultkey/lookup_plugins'; } >> ansible.cfg"
   - ansible --version
   - pip install -I -r ./files/requirements-azure.txt
+  - pip install xmltodict
   - pip freeze
+  - git remote set-branches --add origin master
+  - git fetch
 
 script:
   - scan_test
@@ -186,5 +202,3 @@ notifications:
     - yuwzho@microsoft.com
     - zikalino@microsoft.com
     - yungez@microsoft.com
-    - yaweiw@microsoft.com
-

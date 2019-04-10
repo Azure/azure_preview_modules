@@ -3,6 +3,7 @@
       storage_account: "{{ resource_group | hash('md5') | truncate(24, True, '') }}"
       vm_name1: "vm1{{ resource_group | hash('md5') | truncate(5, True, '') }}"
       vm_name2: "vm2{{ resource_group | hash('md5') | truncate(5, True, '') }}"
+      vm_name3: "vm3{{ resource_group | hash('md5') | truncate(5, True, '') }}"
       abs_name1: "avbs1{{ resource_group | hash('md5') | truncate(3, True, '') }}"
       abs_name2: "avbs2{{ resource_group | hash('md5') | truncate(3, True, '') }}"
 
@@ -331,7 +332,8 @@
         publisher: Canonical
         sku: 16.04-LTS
         version: latest
-
+      tags:
+        abc: def
 - assert:
       that:
         - azure_vm.properties.availabilitySet.id
@@ -343,10 +345,6 @@
     name: "{{ vm_name2 }}"
   register: results
 
-- name: Just dump output
-  debug:
-    var: results
-
 - name: Assert that facts module returned the second vm
   assert:
     that: 
@@ -356,6 +354,17 @@
       - results.vms[0].admin_username == 'adminuser'
       - results.vms[0].resource_group == "{{ resource_group }}"
       - results.vms[0].power_state != None
+
+- name: Retrieve facts by tags
+  azure_rm_virtualmachine_facts:
+    tags:
+      - abc:def
+  register: results
+
+- name: Assert that facts module returned the second vm
+  assert:
+    that: 
+      - results.vms | length >= 1
 
 - name: Should be idempotent with a dual NICs
   azure_rm_virtualmachine:
@@ -412,7 +421,6 @@
   azure_rm_virtualmachine:
       resource_group: "{{ resource_group }}"
       name: testvm002
-      state: present
       image:
         offer: UbuntuServer
   register: fail_invalid_image_dict
@@ -422,7 +430,6 @@
   azure_rm_virtualmachine:
       resource_group: "{{ resource_group }}"
       name: testvm002
-      state: present
       image:
       - testing
   register: fail_invalid_image_type
@@ -432,7 +439,6 @@
   azure_rm_virtualmachine:
       resource_group: "{{ resource_group }}"
       name: testvm002
-      state: present
       image: invalid-image
   register: fail_missing_custom_image
   failed_when: fail_missing_custom_image.msg != "Error could not find image with name invalid-image"
@@ -441,7 +447,6 @@
   azure_rm_virtualmachine:
       resource_group: "{{ resource_group }}"
       name: testvm002
-      state: present
       image:
         name: invalid-image
   register: fail_missing_custom_image_dict
@@ -500,3 +505,49 @@
 
 #- assert:
     #that: not output.changed
+
+- name: Create minimal VM with defaults
+  azure_rm_virtualmachine:
+    resource_group: "{{ resource_group }}"
+    name: "{{ vm_name3 }}"
+    admin_username: "testuser"
+    admin_password: "Pass123$$$abx!"
+    vm_size: Standard_B1ms
+    image:
+      offer: UbuntuServer
+      publisher: Canonical
+      sku: 16.04-LTS
+      version: latest
+  register: vm_output
+
+- name: Delete VM
+  azure_rm_virtualmachine:
+    resource_group: "{{ resource_group }}"
+    name: "{{ vm_name3 }}"
+    remove_on_absent: all_autocreated
+    state: absent
+
+- name: Query NIC
+  azure_rm_networkinterface_facts:
+    resource_group: "{{ resource_group }}"
+    name: "{{ vm_name3 }}01"
+  register: output_nic
+      
+- name: Query NSG
+  azure_rm_securitygroup_facts:
+    resource_group: "{{ resource_group }}"
+    name: "{{ vm_name3 }}01"
+  register: output_nsg
+
+- name: Query PIP
+  azure_rm_publicipaddress_facts:
+    resource_group: "{{ resource_group }}"
+    name: "{{ vm_name3 }}01"
+  register: output_pip
+
+- name: Assert that autocreated resources were deleted
+  assert:
+    that: 
+      - output_nic.ansible_facts.azure_networkinterfaces | length == 0
+      - output_nsg.ansible_facts.azure_securitygroups | length == 0
+      - output_pip.ansible_facts.azure_publicipaddresses | length == 0

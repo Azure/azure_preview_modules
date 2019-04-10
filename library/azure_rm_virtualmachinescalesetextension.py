@@ -64,8 +64,8 @@ options:
         type: bool
     state:
         description:
-            - Assert the state of the SQL server. Use 'present' to create or update a server and
-              'absent' to delete a server.
+            - Assert the state of the extension.
+            - Use C(present) to create or update an extension and C(absent) to delete it.
         default: present
         choices:
             - absent
@@ -84,7 +84,7 @@ EXAMPLES = '''
       azure_rm_virtualmachinescalesetextension:
         name: myvmssextension
         location: eastus
-        resource_group: Testing
+        resource_group: myResourceGroup
         vmss_name: myvm
         publisher: Microsoft.Azure.Extensions
         type: CustomScript
@@ -96,7 +96,7 @@ EXAMPLES = '''
       azure_rm_virtualmachinescalesetextension:
         name: myvmssextension
         location: eastus
-        resource_group: Testing
+        resource_group: myResourceGroup
         vmss_name: myvm
         state: absent
 '''
@@ -107,7 +107,7 @@ id:
         - VMSS extension resource ID
     returned: always
     type: str
-    sample: /subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/TestGroup/providers/Microsoft.Compute/scalesets/myscaleset/extensions/myext
+    sample: /subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/myResourceGroup/providers/Microsoft.Compute/scalesets/myscaleset/extensions/myext
 '''
 
 from ansible.module_utils.azure_rm_common import AzureRMModuleBase
@@ -174,10 +174,16 @@ class AzureRMVMSSExtension(AzureRMModuleBase):
         self.protected_settings = None
         self.state = None
 
+        required_if = [
+            ('state', 'present', [
+             'publisher', 'type', 'type_handler_version'])
+        ]
+
         self.results = dict(changed=False, state=dict())
 
         super(AzureRMVMSSExtension, self).__init__(derived_arg_spec=self.module_arg_spec,
-                                                   supports_tags=False)
+                                                   supports_tags=False,
+                                                   required_if=required_if)
 
     def exec_module(self, **kwargs):
         for key in list(self.module_arg_spec.keys()):
@@ -209,6 +215,25 @@ class AzureRMVMSSExtension(AzureRMModuleBase):
                         to_be_updated = True
                 else:
                     self.protected_settings = response.get('protected_settings')
+
+                if response['publisher'] != self.publisher:
+                    self.publisher = response['publisher']
+                    self.module.warn("Property 'publisher' cannot be changed")
+
+                if response['type'] != self.type:
+                    self.type = response['type']
+                    self.module.warn("Property 'type' cannot be changed")
+
+                if response['type_handler_version'] != self.type_handler_version:
+                    response['type_handler_version'] = self.type_handler_version
+                    to_be_updated = True
+
+                if self.auto_upgrade_minor_version is not None:
+                    if response['auto_upgrade_minor_version'] != self.auto_upgrade_minor_version:
+                        response['auto_upgrade_minor_version'] = self.auto_upgrade_minor_version
+                        to_be_updated = True
+                else:
+                    self.auto_upgrade_minor_version = response['auto_upgrade_minor_version']
 
             if to_be_updated:
                 if not self.check_mode:
