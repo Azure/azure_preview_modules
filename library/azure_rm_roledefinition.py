@@ -331,7 +331,7 @@ class AzureRMRoleDefinition(AzureRMModuleBase):
             response = self._client.role_definitions.create_or_update(role_definition_id=self.role['name'] if self.role else str(uuid.uuid4()),
                                                                       scope=self.scope,
                                                                       role_definition=role_definition)
-            if isinstance(response, AzureOperationPoller) or isinstance(response, LROPoller):
+            if isinstance(response, LROPoller) or isinstance(response, AzureOperationPoller):
                 response = self.get_poller_result(response)
 
         except CloudError as exc:
@@ -375,7 +375,7 @@ class AzureRMRoleDefinition(AzureRMModuleBase):
                 self.log("Response : {0}".format(response))
                 roles = []
                 for r in response:
-                    if r.role_name == self.name or r.name == self.name:
+                    if r.role_name == self.name:
                         roles.append(r)
 
                 if len(roles) == 1:
