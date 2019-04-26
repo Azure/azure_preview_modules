@@ -123,6 +123,12 @@ options:
             - The web's startup file.
             - This only applies for linux web app.
 
+    always_on:
+        description:
+            - "Enable AlwaysOn"
+        type: bool
+        default: False
+
     client_affinity_enabled:
         description:
             - "True to enable client affinity; False to stop sending session affinity cookies, which route client requests in the
@@ -419,6 +425,10 @@ class AzureRMWebApps(AzureRMModuleBase):
                 type='dict',
                 options=container_settings_spec
             ),
+            always_on=dict(
+                type='bool',
+                default=False
+            ),
             scm_type=dict(
                 type='str',
             ),
@@ -509,7 +519,8 @@ class AzureRMWebApps(AzureRMModuleBase):
         self.frameworks = None
 
         # set site_config value from kwargs
-        self.site_config_updatable_properties = ["net_framework_version",
+        self.site_config_updatable_properties = ["always_on",
+                                                 "net_framework_version",
                                                  "java_version",
                                                  "php_version",
                                                  "python_version",
@@ -537,7 +548,7 @@ class AzureRMWebApps(AzureRMModuleBase):
             if hasattr(self, key):
                 setattr(self, key, kwargs[key])
             elif kwargs[key] is not None:
-                if key == "scm_type":
+                if key == "scm_type" or key == "always_on":
                     self.site_config[key] = kwargs[key]
 
         old_response = None
