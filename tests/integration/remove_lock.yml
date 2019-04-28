@@ -1,0 +1,13 @@
+- name: Get locks
+  azure_rm_lock_facts:
+    resource_group: "{{ resource_group }}"
+  register: locks
+
+- name: Remove all locks
+  azure_rm_lock:
+    state: absent
+    name: "{{ lock.name }}"
+    managed_resource_id: "{{ lock.managed_resource_id }}"
+  with_items: "{{ locks.locks }}"
+  loop_control:
+      loop_var: lock

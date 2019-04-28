@@ -33,7 +33,7 @@ AZURE_COMMON_ARGS = dict(
         choices=['auto', 'cli', 'env', 'credential_file', 'msi']
     ),
     profile=dict(type='str'),
-    subscription_id=dict(type='str', no_log=True),
+    subscription_id=dict(type='str'),
     client_id=dict(type='str', no_log=True),
     secret=dict(type='str', no_log=True),
     tenant=dict(type='str', no_log=True),
@@ -73,9 +73,11 @@ AZURE_API_PROFILES = {
         'NetworkManagementClient': '2018-08-01',
         'ResourceManagementClient': '2017-05-10',
         'StorageManagementClient': '2017-10-01',
-        'WebsiteManagementClient': '2016-08-01',
+        'WebSiteManagementClient': '2018-02-01',
         'PostgreSQLManagementClient': '2017-12-01',
-        'MySQLManagementClient': '2017-12-01'
+        'MySQLManagementClient': '2017-12-01',
+        'MariaDBManagementClient': '2019-03-01',
+        'ManagementLockClient': '2016-09-01'
     },
 
     '2017-03-09-profile': {
@@ -172,6 +174,7 @@ try:
     from azure.mgmt.rdbms.mysql import MySQLManagementClient
     from azure.mgmt.containerregistry import ContainerRegistryManagementClient
     from azure.mgmt.containerinstance import ContainerInstanceManagementClient
+    from azure.mgmt.resource.locks import ManagementLockClient
 except ImportError as exc:
     HAS_AZURE_EXC = traceback.format_exc()
     HAS_AZURE = False
@@ -307,6 +310,7 @@ class AzureRMModuleBase(object):
         self._monitor_client = None
         self._resource = None
         self._servicebus_client = None
+        self._lock_client = None
 
         self.check_mode = self.module.check_mode
         self.api_profile = self.module.params.get('api_profile')
@@ -967,6 +971,20 @@ class AzureRMModuleBase(object):
     @property
     def servicebus_models(self):
         return ServicebusModel
+
+    @property
+    def lock_client(self):
+        self.log('Getting lock client')
+        if not self._lock_client:
+            self._lock_client = self.get_mgmt_svc_client(ManagementLockClient,
+                                                         base_url=self._cloud_environment.endpoints.resource_manager,
+                                                         api_version='2016-09-01')
+        return self._lock_client
+
+    @property
+    def lock_models(self):
+        self.log("Getting lock models")
+        return ManagementLockClient.models('2016-09-01')
 
 
 class AzureRMAuthException(Exception):

@@ -1,23 +1,31 @@
 ---
 - hosts: localhost
-  roles:
-  - { role: azure_preview_modules }
   tasks:
     - name: query
       azure_rm_resourcegroup_facts:
       register: output
+    - set_fact:
+        rgs: "{{ output | json_query('ansible_facts.azure_resourcegroups[*].name') | select('match', 'asb-roletest') | list }}"
+    - include_tasks: remove_lock.yml
+      vars:
+        resource_group: "{{ item }}"
+      with_items: "{{ rgs }}"
     - name: delete
       azure_rm_resourcegroup:
         name: "{{ item }}"
         state: absent
         force: yes
-      with_items: "{{ output | json_query('ansible_facts.azure_resourcegroups[*].name') | select('match', 'asb-roletest') | list }}"
+      with_items: "{{ rgs }}"
       async: 10000
       poll: 0
       register: jobs
     - name: Wait for complete
-      async_status: jid={{ item.ansible_job_id }}
+      async_status: jid={{ await.ansible_job_id }}
       register: job
       until: job.finished
       retries: 300
       with_items: "{{ jobs.results }}"
+      loop_control:
+        loop_var: await
+
+
