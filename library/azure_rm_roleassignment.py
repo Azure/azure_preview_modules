@@ -265,7 +265,7 @@ class AzureRMRoleAssignment(AzureRMModuleBase):
             response = list(self._client.role_assignments.list())
             if response:
                 for assignment in response:
-                    if assignment.name == self.name:
+                    if assignment.name == self.name and assignment.scope == self.scope:
                         return roleassignment_to_dict(assignment)
 
         except CloudError as ex:
