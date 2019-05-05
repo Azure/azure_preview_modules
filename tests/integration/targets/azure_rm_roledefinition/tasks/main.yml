@@ -2,7 +2,7 @@
   set_fact:
     role_name: "{{ (resource_group | replace('-','x'))[-8:] }}{{ 1000 | random }}testrole"
     subscription_id: "{{ lookup('env','AZURE_SUBSCRIPTION_ID') }}"
-    principal_id: "{{ lookup('env','AZURE_OBJECT_ID') }}"
+    principal_id: "{{ lookup('env','AZURE_CLIENT_ID') }}"
   run_once: yes
 
 - name: Create a role definition (Check Mode)
@@ -51,7 +51,7 @@
       - output.changed
 
 - name: Get facts by type
-  azure_rm_roledefinition_info:
+  azure_rm_roledefinition_facts:
     scope: "/subscriptions/{{ subscription_id }}/resourceGroups/{{ resource_group }}"
     type: custom
   register: facts
@@ -62,11 +62,11 @@
       - facts['roledefinitions'] | length > 1
 
 - name: Get facts by name
-  azure_rm_roledefinition_info:
+  azure_rm_roledefinition_facts:
     scope: "/subscriptions/{{ subscription_id }}/resourceGroups/{{ resource_group }}"
     role_name: "{{ role_name }}"
   register: facts
-  until: "{{ facts.roledefinitions | length > 0 }}"
+  until: facts.roledefinitions | length > 0
   retries: 50
   delay: 60
 
@@ -77,10 +77,6 @@
       - facts['roledefinitions'][0]['permissions'] | length == 1
       - facts['roledefinitions'][0]['permissions'][0]['not_data_actions'] | length == 1
       - facts['roledefinitions'][0]['permissions'][0]['data_actions'] | length == 1
-
-- name: sleep 2 minutes for role definition creation finish
-  wait_for: timeout=180
-  delegate_to: localhost
 
 - name: Update the role definition (idempotent)
   azure_rm_roledefinition:
@@ -128,9 +124,10 @@
       - output.changed
 
 - name: Get role definition facts
-  azure_rm_roledefinition_info:
+  azure_rm_roledefinition_facts:
     role_name: "{{ role_name }}"
     scope: "/subscriptions/{{ subscription_id }}/resourceGroups/{{ resource_group }}"
+    type: custom
   register: roledef
   until: "{{ roledef.roledefinitions | length > 0 }}"
   retries: 50
@@ -168,7 +165,7 @@
       - output.changed
 
 - name: Get facts
-  azure_rm_roleassignment_info:
+  azure_rm_roleassignment_facts:
     scope: "/subscriptions/{{ subscription_id }}/resourceGroups/{{ resource_group }}"
     assignee: "{{ principal_id }}"
     role_definition_id: "{{ roledef['roledefinitions'][0]['id'] }}"
@@ -180,19 +177,11 @@
       - facts['roleassignments'] | length > 0
       - facts['roleassignments'][0]['id']
 
-- name: dump role assignments
-  debug:
-    var: facts
-
 - name: delete role assignment
   azure_rm_roleassignment:
     name: "{{ facts['roleassignments'][0]['id'].split('/')[-1] }}"
     scope: "/subscriptions/{{ subscription_id }}"
     state: absent
-
-- name: sleep 2 minutes for role assignment deletion finish
-  wait_for: timeout=180
-  delegate_to: localhost
 
 - name: Delete the role definition (Check Mode)
   azure_rm_roledefinition:
