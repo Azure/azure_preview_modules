@@ -1,6 +1,12 @@
  - set_fact:
      rpfx: "{{ resource_group | hash('md5') | truncate(8, True, '') }}"
 
+ - name: set service principal info
+   set_fact:
+     azure_client_id: "{{ lookup('env','AZURE_CLIENT_ID') }}"
+     azure_secret: "{{ lookup('env','AZURE_SECRET') }}"
+   no_log: yes
+
  - name: Find available k8s version
    azure_rm_aksversion_facts:
      location: eastus
