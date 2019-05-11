@@ -8,6 +8,7 @@ env:
     - message=()
     - ANSIBLE_VERSION=latest
     - max_retry_count=2
+    - max_id=30
     #- ANSIBLE_VERSION=2.5.5
   matrix:
     - id=1
@@ -58,7 +59,7 @@ before_install:
       resource_group_secondary="asb-roletest-${test_name##azure_rm_}$(date +%s)2nd";
       resource_prefix=$(date +%s);
 
-      printf "{\"resource_group\":\"$resource_group\",\n\"test\":\"$filename\",\n\"resource_group_secondary\":\"$resource_group_secondary\",\n\"azure_object_id\":\"$AZURE_OBJECT_ID\",\n\"resource_prefix\":\"$resource_prefix\"}" > ~/arg.json;
+      printf "{\"resource_group\":\"$resource_group\",\n\"test\":\"$test_name\",\n\"resource_group_secondary\":\"$resource_group_secondary\",\n\"azure_object_id\":\"$AZURE_OBJECT_ID\",\n\"resource_prefix\":\"$resource_prefix\"}" > ~/arg.json;
       cat ~/arg.json;
 
       while [ $m -le $max_retry_count ]; do
@@ -88,6 +89,7 @@ before_install:
   - scan_test() {
       end=$((id * number_per_job));
       start=$((end - number_per_job));
+      total=$((max_id * number_per_job));
 
       branch=$TRAVIS_BRANCH;
       echo branch is $branch;
@@ -129,63 +131,60 @@ before_install:
         done;
       else
         testlist=();
-        for (( i = $start; i < $end; i++ )); do
-          if [ "$i" -lt "${#diffstr[@]}" ]; then
-            for changedfile in ${diffstr[*]}; do
-              arrChanged=(${changedfile//// });
-              changedFileName=${arrChanged[-1]};
-              changedFileNameWithPath=${arrChanged[-2]};
-              echo changedfile is $changedfile;
+        for changedfile in ${diffstr[*]}; do
+          arrChanged=(${changedfile//// });
+          changedFileName=${arrChanged[-1]};
+          changedFileNameWithPath=${arrChanged[-2]};
+          echo changedfile is $changedfile;
 
-              fileNameNoExtension=${changedFileName%%.py};
+          fileNameNoExtension=${changedFileName%%.py};
 
-              if [[ ! -f $changedfile ]]; then
-                continue;
-              fi;
+          if [[ ! -f $changedfile ]]; then
+            continue;
+          fi;
 
-              if [[ -d "tests/integration/targets/${fileNameNoExtension}" ]]; then
-                echo test tests/integration/targets/${fileNameNoExtension}/tasks/main.yml;
-                testList=("tests/integration/targets/${fileNameNoExtension}/tasks/main.yml" "${testList[@]}");
-              elif [ "$changedFileName" == "main.yml" ]; then
-                if [[ "$changedFileNameWithPath" == "tasks" ]]; then
-                  echo test $changedfile;
-                  testList=("${changedfile}" "${testList[@]}");
+          if [[ -d "tests/integration/targets/${fileNameNoExtension}" ]]; then
+            echo test tests/integration/targets/${fileNameNoExtension}/tasks/main.yml;
+            testList=("tests/integration/targets/${fileNameNoExtension}/tasks/main.yml" "${testList[@]}");
+          elif [ "$changedFileName" == "main.yml" ]; then
+            if [[ "$changedFileNameWithPath" == "tasks" ]]; then
+              echo test $changedfile;
+              testList=("${changedfile}" "${testList[@]}");
+            fi;
+          else
+            for alias in "${list[@]}"; do
+              if grep -Fxq "$changedFileName" "${alias}/aliases"; then
+                if grep -Fxq "unsupported" "${alias}/aliases"; then
+                  echo "not supported test";
+                else
+                  echo test $alias;
+                  testList=("${alias}/tasks/main.yml" "${testList[@]}");
+                  break;
                 fi;
-              else
-                for alias in "${list[@]}"; do
-                  if grep -Fxq "$changedFileName" "${alias}/aliases"; then
-                    if grep -Fxq "unsupported" "${alias}/aliases"; then
-                      echo "not supported test";
-                    else
-                      echo test $alias;
-                      testList=("${alias}/tasks/main.yml" "${testList[@]}");
-                      break;
-                    fi;
-                  fi;
-                done;
               fi;
             done;
-          fi
+          fi;
+        done;
 
-          sorted_unique_testList=($(echo "${testList[@]}" | tr ' ' '\n' | sort -u | tr '\n' ' '));
-          echo start = $start, end = $end, list_lenth = ${#sorted_unique_testList[@]};
-          for (( i = $start; i < $end; i++ )); do
-            if [ "$i" -lt "${#sorted_unique_testList[@]}" ]; then
-              for test in "${sorted_unique_testList[@]}"; do
-                echo test file is $test;
-                run_test $test;
-              done;
-            fi
-          done;
+        sorted_unique_testList=($(echo "${testList[@]}" | tr ' ' '\n' | sort -u | tr '\n' ' '));
+        number_per_job=$((${#sorted_unique_testList[@]}/$max_id+1));
+        end=$((id * number_per_job));
+        start=$((end - number_per_job));
+        echo start = $start, end = $end, list_lenth = ${#sorted_unique_testList[@]};
+        for (( i = $start; i < $end; i++ )); do
+          echo test file is ${sorted_unique_testList[$i]};
+          run_test ${sorted_unique_testList[$i]};
         done;
       fi
     }
+
 
 install:
   - if [ "$ANSIBLE_VERSION" == "latest" ]; then pip install ansible[azure]; else pip
     install ansible[azure]==$ANSIBLE_VERSION; fi
   - "{ echo '[defaults]'; echo 'roles_path = ../'; echo 'lookup_plugins = ./tests/integration/targets/azure_rm_keyvaultkey/lookup_plugins'; } >> ansible.cfg"
   - ansible --version
+  - ansible-galaxy init ../setup_azure
   - pip install -I -r ./files/requirements-azure.txt
   - pip install xmltodict
   - pip freeze

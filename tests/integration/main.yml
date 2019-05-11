@@ -14,7 +14,8 @@
         - "{{ resource_group_secondary }}"
     - name: run integration test
       block:
-        - include_tasks: "{{test}}"
+        - include_role:
+            name: "./targets/{{ test }}"
       always:
         - name: Delete resource group
           azure_rm_resourcegroup:
