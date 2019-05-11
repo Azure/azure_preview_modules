@@ -59,7 +59,7 @@ before_install:
       resource_group_secondary="asb-roletest-${test_name##azure_rm_}$(date +%s)2nd";
       resource_prefix=$(date +%s);
 
-      printf "{\"resource_group\":\"$resource_group\",\n\"test\":\"$test_name\",\n\"resource_group_secondary\":\"$resource_group_secondary\",\n\"azure_object_id\":\"$AZURE_OBJECT_ID\",\n\"resource_prefix\":\"$resource_prefix\"}" > ~/arg.json;
+      printf "{\"resource_group\":\"$resource_group\",\n\"test\":\"$test_name\",\n\"resource_group_secondary\":\"$resource_group_secondary\",\n\"azure_object_id\":\"$AZURE_OBJECT_ID\",\n\"resource_prefix\":\"$resource_prefix\",\n\"azure_tenant\":\"$subscriptionId\",\n\"azure_client_id\":\"$clientId\",\n\"azure_secret\":\"$secret\",\n\"azure_subscription_id\":\"$subscriptionId\"}" > ~/arg.json;
       cat ~/arg.json;
 
       while [ $m -le $max_retry_count ]; do
