@@ -173,11 +173,16 @@ before_install:
         echo start = $start, end = $end, list_lenth = ${#sorted_unique_testList[@]};
         for (( i = $start; i < $end; i++ )); do
           if [ "$i" -lt "${#sorted_unique_testList[@]}" ]; then
-            echo test file is ${sorted_unique_testList[$i]};
-            run_test ${sorted_unique_testList[$i]};
-          fi
+            aliasFile="${sorted_unique_testList[$i]}/../aliases";
+            if grep -Fxq "unsupported" "${alias}/aliases"; then
+              echo "not supported test";
+            else
+              echo test file is ${sorted_unique_testList[$i]};
+              run_test ${sorted_unique_testList[$i]};
+            fi;
+          fi;
         done;
-      fi
+      fi;
     }
 
 
