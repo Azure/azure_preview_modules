@@ -174,7 +174,7 @@ before_install:
         for (( i = $start; i < $end; i++ )); do
           if [ "$i" -lt "${#sorted_unique_testList[@]}" ]; then
             aliasFile="${sorted_unique_testList[$i]}/../aliases";
-            if grep -Fxq "unsupported" "${alias}/aliases"; then
+            if grep -Fxq "unsupported" "${aliasFile}"; then
               echo "not supported test";
             else
               echo test file is ${sorted_unique_testList[$i]};
@@ -187,8 +187,7 @@ before_install:
 
 
 install:
-  - if [ "$ANSIBLE_VERSION" == "latest" ]; then pip install ansible[azure]; else pip
-    install ansible[azure]==$ANSIBLE_VERSION; fi
+  - if [ "$ANSIBLE_VERSION" == "latest" ]; then pip install ansible[azure]; else pip install ansible[azure]==$ANSIBLE_VERSION; fi
   - "{ echo '[defaults]'; echo 'roles_path = ../'; echo 'lookup_plugins = ./tests/integration/targets/azure_rm_keyvaultkey/lookup_plugins'; } >> ansible.cfg"
   - ansible --version
   - ansible-galaxy init ../setup_azure
