@@ -172,8 +172,10 @@ before_install:
         start=$((end - number_per_job));
         echo start = $start, end = $end, list_lenth = ${#sorted_unique_testList[@]};
         for (( i = $start; i < $end; i++ )); do
-          echo test file is ${sorted_unique_testList[$i]};
-          run_test ${sorted_unique_testList[$i]};
+          if [ "$i" -lt "${#sorted_unique_testList[@]}" ]; then
+            echo test file is ${sorted_unique_testList[$i]};
+            run_test ${sorted_unique_testList[$i]};
+          fi
         done;
       fi
     }
