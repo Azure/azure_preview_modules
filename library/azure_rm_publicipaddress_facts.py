@@ -125,11 +125,6 @@ publicipaddresses:
                 - The FQDN of the DNS record associated with the public IP address.
             returned: always
             type: complex
-        ip_tags:
-            description:
-                - The list of tags associated with the public IP address.
-            returned: always
-            type: complex
         ip_address:
             description:
                 - The Public IP Prefix this Public IP Address should be allocated from.
@@ -241,7 +236,6 @@ class AzureRMPublicIPFacts(AzureRMModuleBase):
             allocation_method=pip.public_ip_allocation_method.lower(),
             version=pip.public_ip_address_version.lower(),
             dns_settings=dict(),
-            ip_tags=dict(),
             ip_address=pip.ip_address,
             idle_timeout=pip.idle_timeout_in_minutes,
             provisioning_state=pip.provisioning_state,
@@ -252,8 +246,6 @@ class AzureRMPublicIPFacts(AzureRMModuleBase):
             result['dns_settings']['domain_name_label'] = pip.dns_settings.domain_name_label
             result['dns_settings']['fqdn'] = pip.dns_settings.fqdn
             result['dns_settings']['reverse_fqdn'] = pip.dns_settings.reverse_fqdn
-        if pip.ip_tags:
-            result['ip_tags'] = [dict(type=x.ip_tag_type, value=x.tag) for x in pip.ip_tags]
         return result
 
     def get_item(self):
