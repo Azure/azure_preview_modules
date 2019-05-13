@@ -178,6 +178,11 @@ options:
         description:
             - Load balancer name.
         version_added: "2.5"
+    backend_pool_name:
+        description:
+            - Specify the backend pool of load balancer.
+            - C(backend_pool_name) will be ignored if C(load_balancer) is not set.
+        version_added: "2.9"
     application_gateway:
         description:
             - Application gateway name.
@@ -425,6 +430,7 @@ class AzureRMVirtualMachineScaleSet(AzureRMModuleBase):
             data_disks=dict(type='list'),
             subnet_name=dict(type='str', aliases=['subnet']),
             load_balancer=dict(type='str'),
+            backend_pool_name=dict(type='str'),
             application_gateway=dict(type='str'),
             virtual_network_resource_group=dict(type='str'),
             virtual_network_name=dict(type='str', aliases=['virtual_network']),
@@ -460,6 +466,7 @@ class AzureRMVirtualMachineScaleSet(AzureRMModuleBase):
         self.tags = None
         self.differences = None
         self.load_balancer = None
+        self.backend_pool_name = None
         self.application_gateway = None
         self.enable_accelerated_networking = None
         self.security_group = None
@@ -579,9 +586,16 @@ class AzureRMVirtualMachineScaleSet(AzureRMModuleBase):
 
             if self.load_balancer:
                 load_balancer = self.get_load_balancer(self.load_balancer)
-                load_balancer_backend_address_pools = ([self.compute_models.SubResource(id=resource.id)
-                                                        for resource in load_balancer.backend_address_pools]
-                                                       if load_balancer.backend_address_pools else None)
+                if not self.backend_pool_name:
+                    load_balancer_backend_address_pools = ([self.compute_models.SubResource(id=resource.id)
+                                                            for resource in load_balancer.backend_address_pools]
+                                                        if load_balancer.backend_address_pools else None)
+                else:
+                    filtered_backend_address_pools = self.filter_backend_pool_by_name(name=self.backend_pool_name,
+                                                                                      backend_pools=load_balancer.backend_address_pools)
+                    load_balancer_backend_address_pools = ([self.compute_models.SubResource(id=resource.id)
+                                                            for resource in filtered_backend_address_pools]
+                                                        if load_balancer.backend_address_pools else None)
                 load_balancer_inbound_nat_pools = ([self.compute_models.SubResource(id=resource.id)
                                                     for resource in load_balancer.inbound_nat_pools]
                                                    if load_balancer.inbound_nat_pools else None)
@@ -671,7 +685,13 @@ class AzureRMVirtualMachineScaleSet(AzureRMModuleBase):
                         differences.append('load_balancer')
                         changed = True
 
+                    if self.load_balancer:
+                        if self.backend_pool_name and backend_address_pool_id != load_balancer_backend_address_pools[0].id:
+                            differences.append('load_balancer')
+                            changed = True
+
                 if self.custom_data:
+                    # It seems that vmss_dict['properties']['virtualMachineProfile']['osProfile'] doesn't contain customData
                     if self.custom_data != vmss_dict['properties']['virtualMachineProfile']['osProfile'].get('customData'):
                         differences.append('custom_data')
                         changed = True
@@ -865,6 +885,9 @@ class AzureRMVirtualMachineScaleSet(AzureRMModuleBase):
 
                     if image_reference is not None:
                         vmss_resource.virtual_machine_profile.storage_profile.image_reference = image_reference
+
+                    if self.custom_data is not None:
+                        vmss_resource.virtual_machine_profile.os_profile.custom_data = self.custom_data
                     self.log("Update virtual machine with parameters:")
                     self.create_or_update_vmss(vmss_resource)
 
@@ -924,6 +947,18 @@ class AzureRMVirtualMachineScaleSet(AzureRMModuleBase):
             return self.network_client.application_gateways.get(id_dict.get('resource_group', self.resource_group), id_dict.get('name'))
         except CloudError as exc:
             self.fail("Error fetching application_gateway {0} - {1}".format(id, str(exc)))
+
+    def filter_backend_pool_by_name(self, name, backend_pools):
+        results = []
+        if backend_pools is None:
+            return results
+        for resource in backend_pools:
+            if resource.name == name:
+                results.append(resource)
+        if len(results) == 0:
+            self.module.warn('Please check the name of the backend pool')
+            results = backend_pools
+        return results
 
     def serialize_vmss(self, vmss):
         '''
