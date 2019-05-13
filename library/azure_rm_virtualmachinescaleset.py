@@ -680,7 +680,7 @@ class AzureRMVirtualMachineScaleSet(AzureRMModuleBase):
                     elif application_gateway:
                         lb_or_ag_id = "{0}/".format(application_gateway.id)
 
-                    backend_address_pool_id = backend_address_pool[0].get('id')
+                    backend_address_pool_id = backend_address_pool[0].get('id') if len(backend_address_pool) != 0 else None
                     if bool(lb_or_ag_id) != bool(backend_address_pool_id) or not backend_address_pool_id.startswith(lb_or_ag_id):
                         differences.append('load_balancer')
                         changed = True
