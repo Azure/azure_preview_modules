@@ -4,7 +4,6 @@ python: '2.7'
 env:
   global:
     - exit_code=0
-    - number_per_job=2
     - message=()
     - ANSIBLE_VERSION=latest
     - max_retry_count=2
@@ -159,7 +158,7 @@ before_install:
         if [ "$i" -lt "${#sorted_unique_testList[@]}" ]; then
           aliasFile="${sorted_unique_testList[$i]%%tasks/main.yml}";
           if grep -Fxq "unsupported" "${aliasFile}/aliases"; then
-            echo "not supported test";
+            echo "not supported declared in ${aliasFile}/aliases";
           else
             echo test file is ${sorted_unique_testList[$i]};
             run_test ${sorted_unique_testList[$i]};
@@ -184,9 +183,9 @@ script:
   - scan_test
   - exit $exit_code
 
-# notifications:
-#   webhooks: https://galaxy.ansible.com/api/v1/notifications/
-#   email:
-#     - yuwzho@microsoft.com
-#     - zikalino@microsoft.com
-#     - yungez@microsoft.com
+notifications:
+  webhooks: https://galaxy.ansible.com/api/v1/notifications/
+  email:
+    - yuwzho@microsoft.com
+    - zikalino@microsoft.com
+    - yungez@microsoft.com
