@@ -4,7 +4,6 @@ python: '2.7'
 env:
   global:
     - exit_code=0
-    - number_per_job=2
     - message=()
     - ANSIBLE_VERSION=latest
     - max_retry_count=2
@@ -80,17 +79,13 @@ before_install:
           echo test $test_name passed;
           break;
         fi;
-        
+
       done;
-      
+
     }
 
 
   - scan_test() {
-      end=$((id * number_per_job));
-      start=$((end - number_per_job));
-      total=$((max_id * number_per_job));
-
       branch=$TRAVIS_BRANCH;
       echo branch is $branch;
       diffstr=$(git diff $branch remotes/origin/master --name-only  -- * --no-pager);
@@ -99,7 +94,7 @@ before_install:
       list=($liststr);
 
       run_all=false
- 
+
       for item in ${diffstr[*]}; do
         if [[ "$item" != *"main.yml" ]] && [[ "$item" != *"aliases" ]] && [[ "$item" != *"virtualmachines.yml" ]]; then
           if [[ "$item" != *"azure_rm_"*.py ]]; then
@@ -113,22 +108,10 @@ before_install:
       done;
 
       echo run_all is $run_all;
-      echo start = $start, end = $end, list_lenth = ${#listall[@]};
-      
+
       if [ "$run_all" == true ]; then
         listfiles=tests/integration/targets/azure_rm_*/tasks/main.yml;
-        listall=($listfiles);
-        
-        for (( i = $start; i < $end; i++ )); do
-          if [ "$i" -lt "${#listall[@]}" ]; then
-            aliasFile="${listall[$i]}/../aliases";
-            if grep -Fxq "unsupported" "${alias}/aliases"; then
-              echo "not supported test";
-            else
-              run_test ${listall[$i]};
-            fi;
-          fi;
-        done;
+        sorted_unique_testList=($listfiles);
       else
         testlist=();
         for changedfile in ${diffstr[*]}; do
@@ -165,24 +148,23 @@ before_install:
             done;
           fi;
         done;
-
         sorted_unique_testList=($(echo "${testList[@]}" | tr ' ' '\n' | sort -u | tr '\n' ' '));
-        number_per_job=$((${#sorted_unique_testList[@]}/$max_id+1));
-        end=$((id * number_per_job));
-        start=$((end - number_per_job));
-        echo start = $start, end = $end, list_lenth = ${#sorted_unique_testList[@]};
-        for (( i = $start; i < $end; i++ )); do
-          if [ "$i" -lt "${#sorted_unique_testList[@]}" ]; then
-            aliasFile="${sorted_unique_testList[$i]}/../aliases";
-            if grep -Fxq "unsupported" "${aliasFile}"; then
-              echo "not supported test";
-            else
-              echo test file is ${sorted_unique_testList[$i]};
-              run_test ${sorted_unique_testList[$i]};
-            fi;
-          fi;
-        done;
       fi;
+      number_per_job=$((${#sorted_unique_testList[@]}/$max_id+1));
+      end=$((id * number_per_job));
+      start=$((end - number_per_job));
+      echo start = $start, end = $end, list_lenth = ${#sorted_unique_testList[@]};
+      for (( i = $start; i < $end; i++ )); do
+        if [ "$i" -lt "${#sorted_unique_testList[@]}" ]; then
+          aliasFile="${sorted_unique_testList[$i]%%tasks/main.yml}";
+          if grep -Fxq "unsupported" "${aliasFile}/aliases"; then
+            echo "not supported declared in ${aliasFile}/aliases";
+          else
+            echo test file is ${sorted_unique_testList[$i]};
+            run_test ${sorted_unique_testList[$i]};
+          fi;
+        fi;
+      done;
     }
 
 
