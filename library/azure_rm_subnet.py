@@ -18,7 +18,7 @@ DOCUMENTATION = '''
 ---
 module: azure_rm_subnet
 version_added: "2.1"
-short_description: Manage Azure subnets
+short_description: Manage Azure subnets.
 description:
     - Create, update or delete a subnet within a given virtual network. Allows setting and updating the address
       prefix CIDR, which must be valid within the context of the virtual network. Use the azure_rm_networkinterface

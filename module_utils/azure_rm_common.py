@@ -25,10 +25,10 @@ from os.path import expanduser
 
 from ansible.module_utils.basic import AnsibleModule
 
-try: 
-    from ansible.module_utils.basic import missing_required_lib 
-except Exception: 
-    def missing_required_lib(msg, reason=None, url=None): 
+try:
+    from ansible.module_utils.basic import missing_required_lib
+except Exception:
+    def missing_required_lib(msg, reason=None, url=None):
         return msg
 
 try:
@@ -1358,7 +1358,7 @@ class AzureRMAuth(object):
 
     def log(self, msg, pretty_print=False):
         pass
-        # Use only during module development
+        # Use only during module development!
         # if self.debug:
         #     log_file = open('azure_rm.log', 'a')
         #     if pretty_print:

@@ -17,7 +17,7 @@ DOCUMENTATION = '''
 ---
 module: azure_rm_roledefinition
 version_added: "2.8"
-short_description: Manage Azure Role Definition
+short_description: Manage Azure Role Definition.
 description:
     - Create, update and delete instance of Azure Role Definition.
 
