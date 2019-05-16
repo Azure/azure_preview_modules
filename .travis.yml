@@ -184,9 +184,9 @@ script:
   - scan_test
   - exit $exit_code
 
-notifications:
-  webhooks: https://galaxy.ansible.com/api/v1/notifications/
-  email:
-    - yuwzho@microsoft.com
-    - zikalino@microsoft.com
-    - yungez@microsoft.com
+# notifications:
+#   webhooks: https://galaxy.ansible.com/api/v1/notifications/
+#   email:
+#     - yuwzho@microsoft.com
+#     - zikalino@microsoft.com
+#     - yungez@microsoft.com
