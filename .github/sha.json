@@ -1,6 +1,6 @@
 {
   "lib/ansible/module_utils/azure_rm_common.py": "c7bf3e035b3cc3304b0dcafc3437ba8ea0db30b4", 
-  "lib/ansible/modules/cloud/azure": "fbee506284ee9efcbb3aaa9575aa284a58c744bd", 
+  "lib/ansible/modules/cloud/azure": "dfab364a19c15dc3ab0d1e86a6a67bf755fe426d", 
   "packaging/requirements/requirements-azure.txt": "8b1b22ddc7dad0d901ecbd96a982e34429bdfdb9", 
-  "test/integration/targets": "1554befd952a5f486fb6bf4b1650f4f569663db4"
+  "test/integration/targets": "6c1dbbe554f299512d4ac8a53ee5fea9ebefffeb"
 }
