@@ -152,8 +152,9 @@ before_install:
       fi;
       total_length=${#sorted_unique_testList[@]};
       number_per_job=$((${#sorted_unique_testList[@]}/$max_id+1));
-      echo start = $id, list_lenth = $total_length;
-      for (( i = $id; i < $total_length; i=$i+$max_id )); do
+      start=$((id-1));
+      echo start = $start, list_lenth = $total_length;
+      for (( i = $start; i < $total_length; i=$i+$max_id )); do
         echo "Running ${i}th test";
         aliasFile="${sorted_unique_testList[$i]%%tasks/main.yml}";
         if grep -Fxq "unsupported" "${aliasFile}/aliases"; then
