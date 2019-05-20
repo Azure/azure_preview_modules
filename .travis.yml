@@ -150,19 +150,17 @@ before_install:
         done;
         sorted_unique_testList=($(echo "${testList[@]}" | tr ' ' '\n' | sort -u | tr '\n' ' '));
       fi;
+      total_length=${#sorted_unique_testList[@]};
       number_per_job=$((${#sorted_unique_testList[@]}/$max_id+1));
-      end=$((id * number_per_job));
-      start=$((end - number_per_job));
-      echo start = $start, end = $end, list_lenth = ${#sorted_unique_testList[@]};
-      for (( i = $start; i < $end; i++ )); do
-        if [ "$i" -lt "${#sorted_unique_testList[@]}" ]; then
-          aliasFile="${sorted_unique_testList[$i]%%tasks/main.yml}";
-          if grep -Fxq "unsupported" "${aliasFile}/aliases"; then
-            echo "not supported declared in ${aliasFile}/aliases";
-          else
-            echo test file is ${sorted_unique_testList[$i]};
-            run_test ${sorted_unique_testList[$i]};
-          fi;
+      start=$((($id-1)*$number_per_job));
+      echo start = $start, list_lenth = $total_length;
+      for (( i = $start; i < $total_length; i=$i+$max_id )); do
+        aliasFile="${sorted_unique_testList[$i]%%tasks/main.yml}";
+        if grep -Fxq "unsupported" "${aliasFile}/aliases"; then
+          echo "not supported declared in ${aliasFile}/aliases";
+        else
+          echo test file is ${sorted_unique_testList[$i]};
+          run_test ${sorted_unique_testList[$i]};
         fi;
       done;
     }
