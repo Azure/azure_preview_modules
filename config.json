@@ -5,7 +5,7 @@
   "repo_mapping_file_path": "./repo_mapping.json",
   "author": "Microsoft Visual Studio China Ansible on Azure robot",
   "mail": "ansibleazurebot@microsoft.com",
-  "alias": "@yungezz @yuwzho @zikalino",
+  "alias": "@yungezz @yuwzho @zikalino @MyronFanQiu",
   "ansible_default_branch": "devel",
   "azure_default_branch": "master",
   "special_src_folder_path": "test/integration/targets",
