@@ -1,4 +1,5 @@
 {
+  "lib/ansible/module_utils/azure_rm_common_ext.py": "b37ae35ba051cd9787effe8b485136ee436a2db7",
   "lib/ansible/module_utils/azure_rm_common.py": "c7bf3e035b3cc3304b0dcafc3437ba8ea0db30b4", 
   "lib/ansible/modules/cloud/azure": "bd48a7fb736157a1e73a413010bf11d174bf8db4", 
   "packaging/requirements/requirements-azure.txt": "8b1b22ddc7dad0d901ecbd96a982e34429bdfdb9", 
