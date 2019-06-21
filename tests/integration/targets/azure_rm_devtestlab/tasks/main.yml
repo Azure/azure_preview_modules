@@ -349,6 +349,13 @@
       - output.changed
   when: "github_token | length > 0"
 
+- name: Enable the public environment repo artifact source
+  azure_rm_devtestlabartifactsource:
+    resource_group: "{{ resource_group }}"
+    lab_name: "{{ lab_name }}"
+    name: "public environment repo"
+    is_enabled: true
+
 - name:
   set_fact:
     artifact_source:
