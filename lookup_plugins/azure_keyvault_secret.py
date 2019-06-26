@@ -163,7 +163,7 @@ class LookupModule(LookupBase):
             secret_headers = {'Authorization': 'Bearer ' + token}
             for term in terms:
                 try:
-                    secret_res = requests.get(vault_url + 'secrets/' + term, params=secret_params, headers=secret_headers)
+                    secret_res = requests.get(vault_url + '/secrets/' + term, params=secret_params, headers=secret_headers)
                     ret.append(secret_res.json()["value"])
                 except requests.exceptions.RequestException:
                     raise AnsibleError('Failed to fetch secret: ' + term + ' via MSI endpoint.')
