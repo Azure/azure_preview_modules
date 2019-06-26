@@ -83,7 +83,10 @@ RETURN = """
 
 from ansible.errors import AnsibleError, AnsibleParserError
 from ansible.plugins.lookup import LookupBase
+from ansible.utils.display import Display
 import requests
+
+display = Display()
 
 TOKEN_ACQUIRED = False
 
@@ -101,10 +104,11 @@ try:
     if token is not None:
         TOKEN_ACQUIRED = True
     else:
-        print('Successfully called MSI endpoint, but no token was available. Will use service principal if provided.')
+        display.v('Successfully called MSI endpoint, but no token was available. Will use service principal if provided.')
 except requests.exceptions.RequestException:
-    print('Unable to fetch MSI token. Will use service principal if provided.')
+    display.v('Unable to fetch MSI token. Will use service principal if provided.')
     TOKEN_ACQUIRED = False
+
 
 
 def lookup_secret_non_msi(terms, vault_url, kwargs):
