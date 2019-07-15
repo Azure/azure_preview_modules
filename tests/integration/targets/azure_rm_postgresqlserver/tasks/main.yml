@@ -101,6 +101,9 @@
     location: westus2
     storage_mb: 51200
     enforce_ssl: True
+    geo_redundant_backup: True
+    storage_autogrow: True
+    backup_retention_days: 7
     admin_username: zimxyz
     admin_password: Testpasswordxyz12!
     tags:
@@ -116,6 +119,9 @@
     location: westus2
     storage_mb: 51200
     enforce_ssl: True
+    geo_redundant_backup: True
+    storage_autogrow: True
+    backup_retention_days: 7
     admin_username: zimxyz
     admin_password: Testpasswordxyz12!
     tags:
@@ -142,6 +148,9 @@
       - output.servers[0]['fully_qualified_domain_name'] != None
       - output.servers[0]['tags']['aaa'] == 'bbb'
       - output.servers[0]['tags']['ccc'] == 'ddd'
+      - output.servers[0]['geo_redundant_backup'] == True
+      - output.servers[0]['backup_retention_days'] == 7
+      - output.servers[0]['storage_profile'] == True
 
 - name: Gather facts PostgreSQL Server
   azure_rm_postgresqlserver_facts:
