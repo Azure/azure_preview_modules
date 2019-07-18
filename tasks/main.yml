@@ -1,9 +1,10 @@
 ---
-# Install Azure Python SDK required by modules.
-#- pip:
-#    requirements: "{{ role_path }}/files/requirements-azure.txt"
-#    extra_args: -I
-#  when: skip_azure_sdk is undefined
+- name: Install Azure Python SDK required by modules.
+  pip:
+    requirements: "{{ role_path }}/files/requirements-azure.txt"
+    extra_args: -I
+  when: skip_azure_sdk
+
 - debug:
     msg:
       - "Your Ansible version is lower than 2.5.0"
