@@ -510,6 +510,16 @@ EXAMPLES = '''
       name: customimage001
       resource_group: myResourceGroup
 
+- name: Create a VM with an image id
+  azure_rm_virtualmachine:
+    resource_group: myResourceGroup
+    name: testvm001
+    vm_size: Standard_DS1_v2
+    admin_username: adminUser
+    admin_password: password01
+    image:
+      id: '{{image_id}}'
+
 - name: Create VM with spcified OS disk size
   azure_rm_virtualmachine:
     resource_group: myResourceGroup
@@ -553,12 +563,12 @@ EXAMPLES = '''
 
 - name: Power On
   azure_rm_virtualmachine:
-    resource_group:
+    resource_group: myResourceGroup
     name: testvm002
 
 - name: Restart
   azure_rm_virtualmachine:
-    resource_group:
+    resource_group: myResourceGroup
     name: testvm002
     restarted: yes
 
@@ -988,8 +998,13 @@ class AzureRMVirtualMachine(AzureRMModuleBase):
                     image_reference = self.get_custom_image_reference(
                         self.image.get('name'),
                         self.image.get('resource_group'))
+                elif self.image.get('id'):
+                    try:
+                        image_reference = self.compute_models.ImageReference(id=self.image['id'])
+                    except Exception as exc:
+                        self.fail("id Error: Cannot get image from the reference id - {0}".format(self.image['id']))
                 else:
-                    self.fail("parameter error: expecting image to contain [publisher, offer, sku, version] or [name, resource_group]")
+                    self.fail("parameter error: expecting image to contain [publisher, offer, sku, version], [name, resource_group] or [id]")
             elif self.image and isinstance(self.image, str):
                 custom_image = True
                 image_reference = self.get_custom_image_reference(self.image)
@@ -1794,6 +1809,9 @@ class AzureRMVirtualMachine(AzureRMModuleBase):
             self.log('Deleting public IPs')
             for pip_dict in pip_names:
                 self.delete_pip(pip_dict['resource_group'], pip_dict['name'])
+
+        if 'all' in self.remove_on_absent or 'all_autocreated' in self.remove_on_absent:
+            self.remove_autocreated_resources(vm.tags)
 
         return True
 
