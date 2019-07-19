@@ -1,5 +1,6 @@
 packaging
 requests[security]
+xmltodict
 azure-cli-core==2.0.35
 azure-cli-nspkg==3.0.2
 azure-common==1.1.11
@@ -34,4 +35,3 @@ azure-mgmt-cosmosdb==0.5.2
 azure-mgmt-hdinsight==0.1.0
 azure-mgmt-devtestlabs==3.0.0
 azure-mgmt-loganalytics==0.2.0
-azure-mgmt-iothub==0.7.0
