@@ -1,2 +1,2 @@
 ---
-skip_azure_sdk=true
+skip_azure_sdk:true
