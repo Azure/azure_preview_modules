@@ -3,7 +3,7 @@
   pip:
     requirements: "{{ role_path }}/files/requirements-azure.txt"
     extra_args: -I
-  when: skip_azure_sdk
+  when: skip_azure_sdk is undefined
 
 - debug:
     msg:
