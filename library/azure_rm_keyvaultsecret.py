@@ -138,7 +138,7 @@ class AzureRMKeyVaultSecret(AzureRMModuleBase):
         changed = False
 
         try:
-            results['secret_id'] = self.get_secret(self.secret_name)
+            results = self.get_secret(self.secret_name)
 
             # Secret exists and will be deleted
             if self.state == 'absent':
@@ -207,7 +207,8 @@ class AzureRMKeyVaultSecret(AzureRMModuleBase):
         secret_bundle = self.client.get_secret(self.keyvault_uri, name, version)
         if secret_bundle:
             secret_id = KeyVaultId.parse_secret_id(secret_bundle.id)
-        return secret_id.id
+            return dict(secret_id = secret_id.id, secret_value = secret_bundle.value)
+        return None
 
     def create_update_secret(self, name, secret, tags):
         ''' Creates/Updates a secret '''
