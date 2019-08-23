@@ -70,7 +70,6 @@ options:
         description:
                 - The storage automatically grows when close to be full.
         type: bool
-        default: False
         version_added: "2.9"
     version:
         description:
