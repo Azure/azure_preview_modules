@@ -47,7 +47,7 @@ author:
 
 EXAMPLES = '''
   - name: List VM instances in Virtual Machine ScaleSet
-    azure_rm_virtualmachinescalesetinstance_info:
+    azure_rm_virtualmachinescalesetinstance_facts:
       resource_group: myResourceGroup
       vmss_name: myVMSS
 '''
