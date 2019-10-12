@@ -11,26 +11,9 @@ import inspect
 import traceback
 import json
 
-from base64 import b64encode, b64decode
-from hashlib import sha256
-from hmac import HMAC
-from time import time
-
-try:
-    from urllib import (urlencode, quote_plus)
-except ImportError:
-    from urllib.parse import (urlencode, quote_plus)
-
 from os.path import expanduser
 
-from ansible.module_utils.basic import AnsibleModule
-
-try: 
-    from ansible.module_utils.basic import missing_required_lib 
-except Exception: 
-    def missing_required_lib(msg, reason=None, url=None): 
-        return msg
-
+from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 try:
     from ansible.module_utils.ansible_release import __version__ as ANSIBLE_VERSION
 except Exception:
@@ -87,7 +70,8 @@ AZURE_API_PROFILES = {
         'WebSiteManagementClient': '2018-02-01',
         'PostgreSQLManagementClient': '2017-12-01',
         'MySQLManagementClient': '2017-12-01',
-        'MariaDBManagementClient': '2019-03-01'
+        'MariaDBManagementClient': '2019-03-01',
+        'ManagementLockClient': '2016-09-01'
     },
 
     '2017-03-09-profile': {
@@ -187,15 +171,28 @@ try:
     from azure.mgmt.containerinstance import ContainerInstanceManagementClient
     from azure.mgmt.loganalytics import LogAnalyticsManagementClient
     import azure.mgmt.loganalytics.models as LogAnalyticsModels
+    from azure.mgmt.automation import AutomationClient
+    import azure.mgmt.automation.models as AutomationModel
     from azure.mgmt.iothub import IotHubClient
     from azure.mgmt.iothub import models as IoTHubModels
     from msrest.service_client import ServiceClient
     from msrestazure import AzureConfiguration
     from msrest.authentication import Authentication
+    from azure.mgmt.resource.locks import ManagementLockClient
 except ImportError as exc:
     Authentication = object
     HAS_AZURE_EXC = traceback.format_exc()
     HAS_AZURE = False
+
+from base64 import b64encode, b64decode
+from hashlib import sha256
+from hmac import HMAC
+from time import time
+
+try:
+    from urllib import (urlencode, quote_plus)
+except ImportError:
+    from urllib.parse import (urlencode, quote_plus)
 
 try:
     from azure.cli.core.util import CLIError
@@ -331,7 +328,9 @@ class AzureRMModuleBase(object):
         self._resource = None
         self._log_analytics_client = None
         self._servicebus_client = None
+        self._automation_client = None
         self._IoThub_client = None
+        self._lock_client = None
 
         self.check_mode = self.module.check_mode
         self.api_profile = self.module.params.get('api_profile')
@@ -1059,6 +1058,18 @@ class AzureRMModuleBase(object):
         return ServicebusModel
 
     @property
+    def automation_client(self):
+        self.log('Getting automation client')
+        if not self._automation_client:
+            self._automation_client = self.get_mgmt_svc_client(AutomationClient,
+                                                               base_url=self._cloud_environment.endpoints.resource_manager)
+        return self._automation_client
+
+    @property
+    def automation_models(self):
+        return AutomationModel
+
+    @property
     def IoThub_client(self):
         self.log('Getting iothub client')
         if not self._IoThub_client:
@@ -1069,6 +1080,32 @@ class AzureRMModuleBase(object):
     @property
     def IoThub_models(self):
         return IoTHubModels
+
+    @property
+    def automation_client(self):
+        self.log('Getting automation client')
+        if not self._automation_client:
+            self._automation_client = self.get_mgmt_svc_client(AutomationClient,
+                                                               base_url=self._cloud_environment.endpoints.resource_manager)
+        return self._automation_client
+
+    @property
+    def automation_models(self):
+        return AutomationModel
+
+    @property
+    def lock_client(self):
+        self.log('Getting lock client')
+        if not self._lock_client:
+            self._lock_client = self.get_mgmt_svc_client(ManagementLockClient,
+                                                         base_url=self._cloud_environment.endpoints.resource_manager,
+                                                         api_version='2016-09-01')
+        return self._lock_client
+
+    @property
+    def lock_models(self):
+        self.log("Getting lock models")
+        return ManagementLockClient.models('2016-09-01')
 
 
 class AzureSASAuthentication(Authentication):

@@ -16,8 +16,8 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = '''
 ---
 module: azure_rm_roleassignment_info
-version_added: "2.8"
-short_description: Gets Azure Role Assignment facts.
+version_added: "2.9"
+short_description: Gets Azure Role Assignment facts
 description:
     - Gets facts of Azure Role Assignment.
 
@@ -25,9 +25,9 @@ options:
     scope:
         description:
             - The scope that the role assignment applies to.
-            - For example, use /subscriptions/{subscription-id}/ for a subscription,
-            - /subscriptions/{subscription-id}/resourceGroups/{resourcegroup-name} for a resource group,
-            - /subscriptions/{subscription-id}/resourceGroups/{resourcegroup-name}/providers/{resource-provider}/{resource-type}/{resource-name} for a resource
+            - For example, use /subscriptions/{subscription-id}/ for a subscription.
+            - /subscriptions/{subscription-id}/resourceGroups/{resourcegroup-name} for a resource group.
+            - /subscriptions/{subscription-id}/resourceGroups/{resourcegroup-name}/providers/{resource-provider}/{resource-type}/{resource-name} for a resource.
     name:
         description:
             - Name of role assignment.
@@ -44,7 +44,7 @@ extends_documentation_fragment:
     - azure
 
 author:
-    - "Yunge Zhu(@yungezz)"
+    - Yunge Zhu(@yungezz)
 
 '''
 
@@ -60,7 +60,8 @@ EXAMPLES = '''
 
 RETURN = '''
 roleassignments:
-    description: List of role assignments.
+    description:
+        - List of role assignments.
     returned: always
     type: complex
     contains:
@@ -96,7 +97,7 @@ roleassignments:
             sample: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
         scope:
             description:
-                - The role assignment scope
+                - The role assignment scope.
             type: str
             returned: always
             sample: /subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
@@ -126,7 +127,7 @@ def roleassignment_to_dict(assignment):
     )
 
 
-class AzureRMRoleAssignmentFacts(AzureRMModuleBase):
+class AzureRMRoleAssignmentInfo(AzureRMModuleBase):
 
     def __init__(self):
         self.module_arg_spec = dict(
@@ -157,12 +158,15 @@ class AzureRMRoleAssignmentFacts(AzureRMModuleBase):
 
         mutually_exclusive = [['name', 'assignee']]
 
-        super(AzureRMRoleAssignmentFacts, self).__init__(derived_arg_spec=self.module_arg_spec,
-                                                         supports_tags=False,
-                                                         mutually_exclusive=mutually_exclusive)
+        super(AzureRMRoleAssignmentInfo, self).__init__(derived_arg_spec=self.module_arg_spec,
+                                                        supports_tags=False,
+                                                        mutually_exclusive=mutually_exclusive)
 
     def exec_module(self, **kwargs):
         """Main module execution method"""
+        is_old_facts = self.module._name == 'azure_rm_roleassignment_facts'
+        if is_old_facts:
+            self.module.deprecate("The 'azure_rm_roleassignment_facts' module has been renamed to 'azure_rm_roleassignment_info'", version='2.13')
 
         for key in list(self.module_arg_spec.keys()):
             if hasattr(self, key):
@@ -219,7 +223,7 @@ class AzureRMRoleAssignmentFacts(AzureRMModuleBase):
         '''
         self.log("Gets role assignment {0} by name".format(self.name))
 
-        results =  []
+        results = []
         filter = "principalId eq '{0}'".format(self.assignee)
         try:
             response = list(self._client.role_assignments.list(filter=filter))
@@ -269,7 +273,7 @@ class AzureRMRoleAssignmentFacts(AzureRMModuleBase):
 
 def main():
     """Main execution"""
-    AzureRMRoleAssignmentFacts()
+    AzureRMRoleAssignmentInfo()
 
 
 if __name__ == '__main__':
