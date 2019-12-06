@@ -5,7 +5,6 @@
     vm_name: "vn{{ resource_group | hash('md5') | truncate(7, True, '') }}{{ 1000 | random }}"
     artifacts_name: myartifacts
     github_token: "{{ lookup('env','GITHUB_ACCESS_TOKEN') }}"
-
   run_once: yes
 
 - name: Create instance of Lab -- check mode
@@ -341,7 +340,7 @@
     source_type: github
     folder_path: /library
     security_token: "{{ github_token }}"
-    display_name: myArtifactsSource
+    display_name: My Artifacts Source
   register: output 
   when: "github_token | length > 0"
 - name: Assert that nothing was changed
@@ -349,17 +348,6 @@
     that:
       - output.changed
   when: "github_token | length > 0"
-
-- name: Enable the public environment repo artifact source
-  azure_rm_devtestlabartifactsource:
-    resource_group: "{{ resource_group }}"
-    lab_name: "{{ lab_name }}"
-    name: "publicEnvironmentRepo"
-    security_token: "{{ github_token }}"
-    uri: https://github.com/Azure/azure_preview_modules.git
-    source_type: github
-    folder_path: /library
-    is_enabled: true
 
 - name:
   set_fact:
@@ -676,7 +664,7 @@
     user_name: "@me"
     name: myEnvironment
     location: eastus
-    deployment_template: "{{ output_lab.labs[0].id }}/artifactSources/publicEnvironmentRepo/armTemplates/WebApp"
+    deployment_template: "{{ output_lab.labs[0].id }}/artifactSources/public environment repo/armTemplates/WebApp"
   register: output
 - name: Assert if the change was correctly reported
   assert:
