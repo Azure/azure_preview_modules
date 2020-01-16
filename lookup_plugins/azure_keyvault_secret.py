@@ -100,11 +100,12 @@ token_headers = {
 token = None
 try:
     token_res = requests.get('http://169.254.169.254/metadata/identity/oauth2/token', params=token_params, headers=token_headers)
-    token = token_res.json().get("access_token")
-    if token is not None:
-        TOKEN_ACQUIRED = True
-    else:
-        display.v('Successfully called MSI endpoint, but no token was available. Will use service principal if provided.')
+    if token_res.ok:
+        token = token_res.json().get("access_token")
+        if token is not None:
+            TOKEN_ACQUIRED = True
+        else:
+            display.v('Successfully called MSI endpoint, but no token was available. Will use service principal if provided.')
 except requests.exceptions.RequestException:
     display.v('Unable to fetch MSI token. Will use service principal if provided.')
     TOKEN_ACQUIRED = False
