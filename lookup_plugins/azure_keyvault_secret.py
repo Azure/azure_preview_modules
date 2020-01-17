@@ -106,6 +106,8 @@ try:
             TOKEN_ACQUIRED = True
         else:
             display.v('Successfully called MSI endpoint, but no token was available. Will use service principal if provided.')
+    else:
+        display.v("Unable to query MSI endpoint, Error Code %s. Will use service principal if provided" % token_res.status_code)
 except requests.exceptions.RequestException:
     display.v('Unable to fetch MSI token. Will use service principal if provided.')
     TOKEN_ACQUIRED = False
