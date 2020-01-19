@@ -108,6 +108,9 @@
     resource_group: "{{ resource_group }}"
   register: results
 
+- debug:
+    var: results
+
 - assert:
     that: 
       - not results.changed

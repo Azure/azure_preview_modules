@@ -137,6 +137,9 @@
        name: "md{{ rpfx }}1"
    register: output
 
+ - debug:
+     var: output
+
  - assert:
        that:
            - output.azure_managed_disk[0].storage_account_type == "StandardSSD_LRS"
