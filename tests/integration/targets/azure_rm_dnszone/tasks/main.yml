@@ -40,11 +40,14 @@
     name: "{{ domain_name }}.com"
   register: zones
 
+- debug:
+    var: zones
+
 - name: Assert that facts module returned result
   assert:
     that: 
-      - zones.azure_dnszones[0].tags.test == 'modified'
-      - zones.dnszones[0].type == 'public'
+      - zones.ansible_info.azure_dnszones[0].tags.test == 'modified'
+      - zones.ansible_info.dnszones[0].type == 'public'
 
 - name: Create virtual network
   azure_rm_virtualnetwork:
