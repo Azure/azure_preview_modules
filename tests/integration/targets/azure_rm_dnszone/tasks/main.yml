@@ -47,7 +47,7 @@
   assert:
     that: 
       - zones.ansible_info.azure_dnszones[0].tags.test == 'modified'
-      - zones.ansible_info.dnszones[0].type == 'public'
+      - zones.ansible_info.azure_dnszones[0].type == 'public'
 
 - name: Create virtual network
   azure_rm_virtualnetwork:
