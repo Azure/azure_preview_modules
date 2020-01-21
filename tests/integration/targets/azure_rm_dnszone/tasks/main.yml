@@ -35,15 +35,18 @@
       - results.state.tags.test == 'modified'
 
 - name: Retrieve DNS Zone Facts
-  azure_rm_dnszone_facts:
+  azure_rm_dnszone_info:
     resource_group: "{{ resource_group }}"
     name: "{{ domain_name }}.com"
   register: zones
 
+- debug:
+    var: zones
+
 - name: Assert that facts module returned result
   assert:
     that: 
-      - azure_dnszones[0].tags.test == 'modified'
+      - zones.ansible_info.azure_dnszones[0].tags.test == 'modified'
       - zones.dnszones[0].type == 'public'
 
 - name: Create virtual network

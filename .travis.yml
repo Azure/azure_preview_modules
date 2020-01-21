@@ -93,19 +93,7 @@ before_install:
       liststr=tests/integration/targets/azure_rm_*;
       list=($liststr);
 
-      run_all=false
-
-      for item in ${diffstr[*]}; do
-        if [[ "$item" != *"main.yml" ]] && [[ "$item" != *"aliases" ]] && [[ "$item" != *"virtualmachines.yml" ]]; then
-          if [[ "$item" != *"azure_rm_"*.py ]]; then
-            run_all=true;
-            break;
-          elif [[ "$item" == *"azure_rm_common"*.py ]]; then
-            run_all=true;
-            break;
-          fi
-        fi
-      done;
+      run_all=true
 
       echo run_all is $run_all;
 
