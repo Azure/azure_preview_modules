@@ -710,10 +710,10 @@
 #     state: absent
 #   register: output
 # - name: Assert that change was detected
-  assert:
-    that:
-      - output.changed
-  when: "github_token | length > 0"
+#   assert:
+#      that:
+#        - output.changed
+#   when: "github_token | length > 0"
 
 - name: Create instance of DevTest Lab Image
   azure_rm_devtestlabcustomimage:
