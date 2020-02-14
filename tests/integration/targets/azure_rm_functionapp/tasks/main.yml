@@ -33,9 +33,6 @@
     name: "{{ funcapp_name_basic }}"
   register: results
 
-- debug:
-    var: results
-
 - name: assert the facts were retrieved
   assert:
     that:
