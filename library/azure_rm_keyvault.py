@@ -380,16 +380,19 @@ class AzureRMVaults(AzureRMModuleBase):
                             if n.get('application_id', None) != o.get('application_id', None):
                                 self.to_do = Actions.Update
                                 break
-                            if sorted(n.get('keys', [])) != sorted(o.get('keys', [])):
+
+                            new_permissions = n.get('permissions', {})
+                            old_permissions = o.get('permissions', {})
+                            if sorted(new_permissions.get('keys', []) or []) != sorted(old_permissions.get('keys', []) or []):
                                 self.to_do = Actions.Update
                                 break
-                            if sorted(n.get('secrets', [])) != sorted(o.get('secrets', [])):
+                            if sorted(new_permissions.get('secrets', []) or []) != sorted(old_permissions.get('secrets', []) or []):
                                 self.to_do = Actions.Update
                                 break
-                            if sorted(n.get('certificates', [])) != sorted(o.get('certificates', [])):
+                            if sorted(new_permissions.get('certificates', []) or []) != sorted(old_permissions.get('certificates', []) or []):
                                 self.to_do = Actions.Update
                                 break
-                            if sorted(n.get('storage', [])) != sorted(o.get('storage', [])):
+                            if sorted(new_permissions.get('storage', []) or []) != sorted(old_permissions.get('storage', []) or []):
                                 self.to_do = Actions.Update
                                 break
 
