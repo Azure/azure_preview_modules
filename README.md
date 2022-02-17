@@ -1,3 +1,7 @@
+
+# This repo is not maintained anymore, instead please go to [AzCollection](https://github.com/ansible-collections/azure) .
+
+
 azure.azure_preview_modules
 =========
 
