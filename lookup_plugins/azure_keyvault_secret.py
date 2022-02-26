@@ -46,7 +46,7 @@ EXAMPLE = """
     client_id: '123456789'
     secret: 'abcdefg'
     tenant: 'uvwxyz'
-  debug: msg="the value of this secret is {{lookup('azure_keyvault_secret',secretname,vault_url=url, cliend_id=client_id, secret=secret, tenant_id=tenant)}}"
+  debug: msg="the value of this secret is {{lookup('azure_keyvault_secret',secretname,vault_url=url, client_id=client_id, secret=secret, tenant_id=tenant)}}"
 
 # Example below creates an Azure Virtual Machine with SSH public key from key vault using 'azure_keyvault_secret' lookup plugin.
 - name: Create Azure VM
