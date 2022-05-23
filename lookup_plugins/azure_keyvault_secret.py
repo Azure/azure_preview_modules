@@ -99,7 +99,7 @@ token_headers = {
 }
 token = None
 try:
-    token_res = requests.get('http://169.254.169.254/metadata/identity/oauth2/token', params=token_params, headers=token_headers)
+    token_res = requests.get('http://169.254.169.254/metadata/identity/oauth2/token', params=token_params, headers=token_headers, timeout=2)
     token = token_res.json().get("access_token")
     if token is not None:
         TOKEN_ACQUIRED = True
