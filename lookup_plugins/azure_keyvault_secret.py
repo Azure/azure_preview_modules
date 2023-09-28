@@ -94,6 +94,12 @@ token_params = {
     'api-version': '2018-02-01',
     'resource': 'https://vault.azure.net'
 }
+
+# use AZURE_CLIENT_ID as user managed instance if existing
+client_id = os.getenv("AZURE_CLIENT_ID")
+if client_id != None:
+    token_params["client_id"] = client_id
+
 token_headers = {
     'Metadata': 'true'
 }
